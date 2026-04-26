@@ -5,6 +5,7 @@ import { Size, Variant } from './input.tokens';
 import { prefix } from './input.helpers';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/formField.context';
+import { CloseIcon } from './CloseIcon';
 
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
     variant?: Variant;
@@ -155,7 +156,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             className={prefix(`__clear-button`)}
                             tabIndex={-1} // prevent focus steal
                         >
-                            ×
+                            <CloseIcon />
                         </button>
                     </span>
                 )}

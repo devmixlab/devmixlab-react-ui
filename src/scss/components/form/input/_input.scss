@@ -154,6 +154,27 @@ $compPrefix: 'dru--input';
         }
     }
 
+    &__toggle {
+        appearance: none;
+        border: none;
+        background: transparent;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+        color: var(--text-muted);
+
+        &:hover {
+            color: var(--text);
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 2px var(--focus-ring);
+        }
+    }
+
     .#{$compPrefix}__icon {
         display: flex;
         align-items: center;
@@ -204,12 +225,13 @@ $compPrefix: 'dru--input';
         }
 
         &-button {
-            position: absolute;
+            //position: absolute;
 
-            top: 50%;
-            left: 50%;
-
-            transform: translate(-50%, -50%) scale(1.8);
+            //top: 50%;
+            //left: 50%;
+            //
+            //transform: translate(-50%, -50%) scale(1.2);
+            transform: scale(1.2);
 
             line-height: 1;
 
