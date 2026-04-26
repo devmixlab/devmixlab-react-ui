@@ -6,58 +6,56 @@
 
 $compPrefix: 'dru--input';
 
+@mixin intent-vars($palette, $palette-name) {
+    @each $step, $value in $palette {
+        --intent-#{
+            $palette-name
+        }-#{$step}: #{$value};
+    }
+}
+
 .#{$compPrefix} {
-    --border: #{map.get($neutral, 300)};
-    --border-hover: #{map.get($blue, 400)};
-    --border-focus: #{map.get($blue, 500)};
+    @include intent-vars($red, red);
+    @include intent-vars($blue, blue);
+    @include intent-vars($neutral, neutral);
+    @include intent-vars($gray, gray);
 
     --focus-ring: #{rgba(map.get($blue, 500), 0.25)};
+    --text: var(--intent-gray-900);
+    --danger: var(--intent-red-500);
+    --text-muted: var(--intent-gray-500);
 
-    --bg: #fff;
-    --bg-muted: #{map.get($gray, 100)};
-    --text: #{map.get($gray, 900)};
+    --bg: transparent;
+    --bg-hover: var(--intent-neutral-50);
 
-    --danger: #{map.get($red, 500)};
-    --text-muted: #{map.get($gray, 500)};
-
-    --bg-hover: #{map.get($neutral, 50)};
-
-    --filled-bg: #{map.get($gray, 200)};
-    --filled-bg-hover: #{map.get($gray, 300)};
-
-    --filled-border: #{map.get($gray, 300)};
-    --filled-border-hover: #{map.get($gray, 400)};
-    --filled-border-focus: #{map.get($blue, 500)};
+    --border: var(--intent-neutral-300);
+    --border-hover: var(--intent-blue-400);
+    --border-focus: var(--intent-blue-500);
 
     @include dark {
-        --border: #{map.get($neutral, 700)};
-        --border-hover: #{map.get($blue, 500)};
-        --border-focus: #{map.get($blue, 400)};
 
         --focus-ring: #{rgba(map.get($blue, 400), 0.35)};
+        --text: var(--intent-gray-100);
+        --danger: var(--intent-red-400);
+        --text-muted: var(--intent-gray-400);
 
-        --bg: #{map.get($gray, 900)};
-        --bg-muted: #{map.get($gray, 800)};
-        --text: #{map.get($gray, 100)};
+        --bg: transparent;
+        --bg-hover: var(--intent-gray-800);
 
-        --danger: #{map.get($red, 400)};
-        --text-muted: #{map.get($gray, 400)};
+        --border: var(--intent-neutral-700);
+        --border-hover: var(--intent-blue-500);
+        --border-focus: var(--intent-blue-400);
 
-        --bg-hover: #{map.get($gray, 800)};
-
-        --filled-bg: #{map.get($gray, 800)};
-        --filled-bg-hover: #{map.get($gray, 700)};
-
-        --filled-border: #{map.get($gray, 700)};
-        --filled-border-hover: #{map.get($gray, 600)};
-        --filled-border-focus: #{map.get($blue, 400)};
     }
 
+    box-sizing: border-box;
     display: inline-flex;
     vertical-align: middle;
     align-items: center;
     gap: 8px;
     min-width: 0;
+    cursor: text;
+    user-select: none;
 
     border: 1px solid var(--border);
     background: var(--bg);
@@ -71,10 +69,19 @@ $compPrefix: 'dru--input';
     //    /* keyboard-only focus */
     //}
 
+    // Chrome autofill will break your design.
+    //input:-webkit-autofill {
+    //    box-shadow: 0 0 0 1000px var(--bg) inset;
+    //    -webkit-text-fill-color: var(--text);
+    //}
+
     padding: 0 12px;
     height: 40px;
 
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
 
     &:hover:not([data-disabled]) {
         border-color: var(--border-hover);
@@ -84,7 +91,7 @@ $compPrefix: 'dru--input';
     /* focus */
     &:focus-within {
         border-color: var(--border-focus);
-        box-shadow: 0 0 0 2px var(--focus-ring);
+        box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
     /* states */
@@ -93,7 +100,7 @@ $compPrefix: 'dru--input';
 
         &:focus-within {
             border-color: var(--danger);
-            box-shadow: 0 0 0 2px #{rgba(map.get($red, 500), 0.25)};
+            box-shadow: 0 0 0 3px #{rgba(map.get($red, 500), 0.25)};
         }
 
         &:hover:not([data-disabled]) {
@@ -104,7 +111,11 @@ $compPrefix: 'dru--input';
     &[data-disabled] {
         opacity: 0.6;
         cursor: not-allowed;
-        //pointer-events: none;
+    }
+
+    &[data-disabled] .#{$compPrefix}__icon,
+    &[data-disabled] .#{$compPrefix}__clear {
+        pointer-events: none;
     }
 
     .#{$compPrefix}__field:focus,
@@ -117,6 +128,7 @@ $compPrefix: 'dru--input';
         appearance: none;
         border: none;
         background: transparent;
+        user-select: text;
 
         padding: 0;
         margin: 0;
@@ -128,6 +140,7 @@ $compPrefix: 'dru--input';
         flex: 1;
 
         font: inherit;
+        line-height: 1;
         color: inherit;
 
         outline: none; /* wrapper handles focus */
@@ -221,55 +234,46 @@ $compPrefix: 'dru--input';
         font-size: 18px;
     }
 
-    &--outlined {
-        border: 1px solid var(--border);
-        background: transparent;
-
-        &:focus-within {
-            border-color: var(--border-focus);
-        }
-    }
-
-    //&--filled {
-    //    background: var(--filled-bg);
-    //    border: 1px solid transparent;
-    //
-    //    &:hover:not([data-disabled]) {
-    //        background: var(--filled-bg-hover);
-    //        border-color: transparent;
-    //    }
-    //
-    //    &:focus-within {
-    //        border-color: transparent;
-    //    }
-    //}
+    &--outlined {}
 
     &--filled {
-        background: var(--filled-bg);
-        border: 1px solid var(--filled-border);
+        --bg: var(--intent-gray-200);
+        --bg-hover: var(--intent-gray-300);
 
-        &:hover:not([data-disabled]) {
-            background: var(--filled-bg-hover);
-            border-color: var(--filled-border-hover);
-        }
-
-        &:focus-within {
-            border-color: var(--filled-border-focus);
-        }
+        --border: var(--intent-gray-300);
+        --border-hover: var(--intent-gray-400);
+        --border-focus: var(--intent-blue-500);
     }
 
     &--ghost {
-        background: transparent;
-        border: 1px solid transparent;
+        --bg: transparent;
+        --bg-hover: var(--intent-neutral-50);
 
-        &:hover:not([data-disabled]) {
-            background: var(--bg-hover);
-            border-color: transparent;
+        --border: transparent;
+        --border-hover: transparent;
+        --border-focus: transparent;
+    }
+
+    @include dark {
+
+        &--outlined {}
+
+        &--filled {
+            --bg: var(--intent-gray-800);
+            --bg-hover: var(--intent-gray-700);
+
+            --border: var(--intent-gray-700);
+            --border-hover: var(--intent-gray-600);
+            --border-focus: var(--intent-blue-400);
         }
 
-        &:focus-within {
-            border-color: transparent;
-            box-shadow: 0 0 0 2px var(--focus-ring);
+        &--ghost {
+            --bg: transparent;
+            --bg-hover: var(--intent-gray-800);
+
+            --border: transparent;
+            --border-hover: transparent;
+            --border-focus: transparent;
         }
     }
 }
