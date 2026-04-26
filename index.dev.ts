@@ -12,6 +12,7 @@ export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 
 // Form
 export { Input } from './src/form/Input/Input';
+export { FormField } from './src/form/FormField';
 
 export { Badge } from './src/Badge/Badge';
 export { Chip } from './src/Chip/Chip';

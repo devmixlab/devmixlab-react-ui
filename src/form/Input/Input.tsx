@@ -4,6 +4,7 @@ import { Box, type BoxProps } from '../../Box/Box';
 import { Size, Variant } from './input.tokens';
 import { prefix } from './input.helpers';
 import { mergeRefs } from '../../utils/mergeRefs';
+import { useFormFieldContext } from '../FormField/formField.context';
 
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
     variant?: Variant;
@@ -48,6 +49,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         },
         ref,
     ) => {
+        const ctx = useFormFieldContext();
+        const inputProps = ctx
+            ? {
+                  id: rest.id ?? ctx.id,
+                  'aria-describedby': ctx.describedBy,
+                  'aria-invalid': ctx.hasError || invalid || undefined,
+              }
+            : {};
+
         const isControlled = value !== undefined;
 
         const isTextLike = TEXT_INPUT_TYPES.has(type);
@@ -130,6 +140,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     readOnly={readOnly}
                     aria-invalid={invalid || undefined}
                     {...rest}
+                    {...inputProps}
                 />
 
                 {endAdornment != null && <span className={prefix(`__icon`)}>{endAdornment}</span>}
