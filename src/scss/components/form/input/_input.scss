@@ -29,6 +29,30 @@ $compPrefix: 'dru--input';
     --filled-border-hover: #{map.get($gray, 400)};
     --filled-border-focus: #{map.get($blue, 500)};
 
+    @include dark {
+        --border: #{map.get($neutral, 700)};
+        --border-hover: #{map.get($blue, 500)};
+        --border-focus: #{map.get($blue, 400)};
+
+        --focus-ring: #{rgba(map.get($blue, 400), 0.35)};
+
+        --bg: #{map.get($gray, 900)};
+        --bg-muted: #{map.get($gray, 800)};
+        --text: #{map.get($gray, 100)};
+
+        --danger: #{map.get($red, 400)};
+        --text-muted: #{map.get($gray, 400)};
+
+        --bg-hover: #{map.get($gray, 800)};
+
+        --filled-bg: #{map.get($gray, 800)};
+        --filled-bg-hover: #{map.get($gray, 700)};
+
+        --filled-border: #{map.get($gray, 700)};
+        --filled-border-hover: #{map.get($gray, 600)};
+        --filled-border-focus: #{map.get($blue, 400)};
+    }
+
     display: inline-flex;
     vertical-align: middle;
     align-items: center;
