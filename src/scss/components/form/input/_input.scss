@@ -1,0 +1,251 @@
+@use '../../../abstracts/config' as *;
+@use '../../../abstracts/mixins' as *;
+
+@use '../../../abstracts/palette' as *;
+@use 'sass:map';
+
+$compPrefix: 'dru--input';
+
+.#{$compPrefix} {
+    --border: #{map.get($neutral, 300)};
+    --border-hover: #{map.get($blue, 400)};
+    --border-focus: #{map.get($blue, 500)};
+
+    --focus-ring: #{rgba(map.get($blue, 500), 0.25)};
+
+    --bg: #fff;
+    --bg-muted: #{map.get($gray, 100)};
+    --text: #{map.get($gray, 900)};
+
+    --danger: #{map.get($red, 500)};
+    --text-muted: #{map.get($gray, 500)};
+
+    --bg-hover: #{map.get($neutral, 50)};
+
+    --filled-bg: #{map.get($gray, 200)};
+    --filled-bg-hover: #{map.get($gray, 300)};
+
+    --filled-border: #{map.get($gray, 300)};
+    --filled-border-hover: #{map.get($gray, 400)};
+    --filled-border-focus: #{map.get($blue, 500)};
+
+    display: inline-flex;
+    vertical-align: middle;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+
+    //.#{$compPrefix}:focus-within {
+    //    /* fallback */
+    //}
+    //
+    //.#{$compPrefix}:has(input:focus-visible) {
+    //    /* keyboard-only focus */
+    //}
+
+    padding: 0 12px;
+    height: 40px;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+    &:hover:not([data-disabled]) {
+        border-color: var(--border-hover);
+        background: var(--bg-hover); // or token
+    }
+
+    /* focus */
+    &:focus-within {
+        border-color: var(--border-focus);
+        box-shadow: 0 0 0 2px var(--focus-ring);
+    }
+
+    /* states */
+    &[data-invalid] {
+        border-color: var(--danger);
+
+        &:focus-within {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 2px #{rgba(map.get($red, 500), 0.25)};
+        }
+
+        &:hover:not([data-disabled]) {
+            border-color: var(--danger);
+        }
+    }
+
+    &[data-disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+        //pointer-events: none;
+    }
+
+    .#{$compPrefix}__field:focus,
+    .#{$compPrefix}__field:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .#{$compPrefix}__field {
+        appearance: none;
+        border: none;
+        background: transparent;
+
+        padding: 0;
+        margin: 0;
+
+        height: 100%;
+        width: 100%;
+        min-width: 0;
+
+        flex: 1;
+
+        font: inherit;
+        color: inherit;
+
+        outline: none; /* wrapper handles focus */
+
+        &::placeholder {
+            color: var(--text-muted);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    .#{$compPrefix}__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        color: var(--text-muted);
+
+        > svg,
+        > .MuiSvgIcon-root {
+            width: 1.1em;
+            height: 1.1em;
+            font-size: 1.1em;
+            display: block;
+        }
+    }
+
+    .#{$compPrefix}__clear {
+        appearance: none;
+        border: none;
+        background: transparent;
+        position: relative;
+
+        padding: 0;
+        margin: 0;
+
+        width: 1em;
+        height: 1em;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+        color: var(--text-muted);
+
+        &::before {
+            content: '';
+            position: absolute;
+
+            inset: -0.4em; // 👈 expand clickable area
+            border-radius: 50%;
+        }
+
+        &:hover {
+            color: var(--text);
+        }
+
+        &-button {
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            transform: translate(-50%, -50%) scale(1.8);
+
+            line-height: 1;
+
+            &:focus-visible {
+                box-shadow: 0 0 0 2px var(--focus-ring);
+            }
+        }
+    }
+
+    &--size-sm {
+        height: 32px;
+        font-size: 14px;
+    }
+
+    &--size-md {
+        height: 40px;
+        font-size: 16px;
+    }
+
+    &--size-lg {
+        height: 48px;
+        font-size: 18px;
+    }
+
+    &--outlined {
+        border: 1px solid var(--border);
+        background: transparent;
+
+        &:focus-within {
+            border-color: var(--border-focus);
+        }
+    }
+
+    //&--filled {
+    //    background: var(--filled-bg);
+    //    border: 1px solid transparent;
+    //
+    //    &:hover:not([data-disabled]) {
+    //        background: var(--filled-bg-hover);
+    //        border-color: transparent;
+    //    }
+    //
+    //    &:focus-within {
+    //        border-color: transparent;
+    //    }
+    //}
+
+    &--filled {
+        background: var(--filled-bg);
+        border: 1px solid var(--filled-border);
+
+        &:hover:not([data-disabled]) {
+            background: var(--filled-bg-hover);
+            border-color: var(--filled-border-hover);
+        }
+
+        &:focus-within {
+            border-color: var(--filled-border-focus);
+        }
+    }
+
+    &--ghost {
+        background: transparent;
+        border: 1px solid transparent;
+
+        &:hover:not([data-disabled]) {
+            background: var(--bg-hover);
+            border-color: transparent;
+        }
+
+        &:focus-within {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px var(--focus-ring);
+        }
+    }
+}

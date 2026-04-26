@@ -10,6 +10,9 @@ export { Button } from './src/Button/Button';
 export { Group as ButtonGroup } from './src/Button/Group';
 export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 
+// Form
+export { Input } from './src/form/Input/Input';
+
 export { Badge } from './src/Badge/Badge';
 export { Chip } from './src/Chip/Chip';
 export { Alert } from './src/Alert/Alert';
