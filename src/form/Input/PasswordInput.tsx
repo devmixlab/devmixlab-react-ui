@@ -2,8 +2,8 @@ import React, { forwardRef, useState } from 'react';
 import { Input, type InputProps } from './Input';
 import { prefix } from './input.helpers';
 import { useFormFieldContext } from '../FormField/formField.context';
-import { EyeIcon } from './EyeIcon';
-import { EyeOffIcon } from './EyeOffIcon';
+import { Eye } from '../../Icon/Eye';
+import { EyeOff } from '../../Icon/EyeOff';
 
 export type PasswordInputProps = Omit<InputProps, 'type'> & {
     showToggle?: boolean;
@@ -26,12 +26,12 @@ const ToggleButton = ({ toggle, visible, id }: ToogleButtonProps) => (
         // tabIndex={-1} // prevent stealing focus
         className={prefix('__toggle')}
     >
-        {visible ? <EyeOffIcon /> : <EyeIcon />}
+        {visible ? <EyeOff /> : <Eye />}
     </button>
 );
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-    ({ showToggle = true, endAdornment, id: idProp, ...props }, ref) => {
+    ({ showToggle = false, endAdornment, id: idProp, ...props }, ref) => {
         const [visible, setVisible] = useState(false);
         const ctx = useFormFieldContext();
 

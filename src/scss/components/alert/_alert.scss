@@ -1,24 +1,110 @@
 @use '../../abstracts/config' as *;
 @use '../../abstracts/mixins' as *;
 
-.dru--alert {
+@use 'sass:map';
+
+$alert-sizes: (
+    sm: (
+        icon-size: 1.05em,
+        dismiss-button-inset: -.2em,
+    ),
+    md: (
+        icon-size: 1.125em,
+        dismiss-button-inset: -.4em,
+    ),
+    lg: (
+        icon-size: 1.2em,
+        dismiss-button-inset: -.6em,
+    ),
+);
+
+//&__dismiss-button
+
+$compPrefix: 'dru--alert';
+
+.#{$compPrefix} {
     --dru--alert__dismiss-button--bg: transparent;
-    --dru--alert__dismiss-button--bg-hover: rgba(0,0,0,0.05);
+    --dru--alert__dismiss-button--bg-hover: rgba(0, 0, 0, 0.05);
     --dru--alert__dismiss-button--color: var(--dru-icon-color);
+
+    @each $size, $value in $alert-sizes {
+        &--size-#{$size} {
+            --icon-size: #{map.get($value, icon-size)};
+
+            .#{$compPrefix}__dismiss-button::before {
+                inset: #{map.get($value, dismiss-button-inset)};
+                //inset: -2em;
+            }
+        }
+    }
+
+    //&__dismiss-button {
+    //    display: flex;
+    //    align-items: center;
+    //    justify-content: center;
+    //    background: var(--dru--alert__dismiss-button--bg);
+    //    transition: background-color 200ms ease, color 200ms ease;
+    //    border: none;
+    //    cursor: pointer;
+    //    //font-size: 26px;
+    //    line-height: 1;
+    //    padding: 0;
+    //    color: var(--dru--alert__dismiss-button--color);
+    //
+    //    &::before {
+    //        content: '';
+    //        position: absolute;
+    //
+    //        inset: -0.4em; // 👈 expand clickable area
+    //        border-radius: 50%;
+    //    }
+    //
+    //    &:hover {
+    //        background: var(--dru--alert__dismiss-button--bg-hover);
+    //    }
+    //}
+
     &__dismiss-button {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--dru--alert__dismiss-button--bg);
-        transition: background-color 200ms ease, color 200ms ease;
-        border: none;
-        cursor: pointer;
-        font-size: 26px;
-        line-height: 1;
-        padding: 0;
-        color: var(--dru--alert__dismiss-button--color);
-        &:hover{
-            background: var(--dru--alert__dismiss-button--bg-hover);
+        position: relative;
+
+        flex-shrink: 0;
+
+        &::before {
+            content: '';
+            position: absolute;
+
+            inset: 0; // 🔥 important so it has size
+            border-radius: inherit;
+
+            background: transparent;
+            transition: background-color 200ms ease;
+        }
+
+        .#{$compPrefix}__dismiss-icon {
+
+            position: relative;
+            //top: 50%;
+            //left: 50%;
+            //transform: translate(-50%, -50%);
+
+            background: var(--dru--alert__dismiss-button--bg);
+            transition: background-color 200ms ease, color 200ms ease;
+            border: none;
+            cursor: pointer;
+            //font-size: 26px;
+            line-height: 1;
+            padding: 0;
+            color: var(--dru--alert__dismiss-button--color);
+
+        }
+
+        &:hover {
+            &::before {
+                background: var(--dru--alert__dismiss-button--bg-hover);
+            }
         }
     }
 }
@@ -50,6 +136,7 @@
             --dru-card--ring-light: #{$ring};
             --dru-icon-color: #2563eb;
         }
+
         &-solid {
             // 👇 lighter surface
             --dru-card--surface-light: #3b82f6;
@@ -61,7 +148,7 @@
 
             // text stays clean
             --dru-card--text-light: #fff;
-            --dru-card--text-muted-light: rgba(255,255,255,0.85);
+            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
             --dru-card--border-light: #1d4ed8;
@@ -70,6 +157,7 @@
             --dru-card--ring-light: #{$ring};
             --dru-icon-color: #ffffff;
         }
+
         &-outlined {
             // no fill, very subtle surface
             --dru-card--surface-light: transparent;
@@ -94,6 +182,7 @@
             // icon follows accent
             --dru-icon-color: #{$accent};
         }
+
         &-subtle {
             // very soft background
             --dru-card--surface-light: rgba(37, 99, 235, 0.06);
@@ -119,6 +208,7 @@
             --dru-icon-color: #2563eb;
         }
     }
+
     @include dark {
         &--primary {
             $accent: #60a5fa;
@@ -142,6 +232,7 @@
 
                 --dru-card--ring-dark: #{$ring};
             }
+
             &-solid {
                 // lighter surface (critical!)
                 --dru-card--surface-dark: #60a5fa;
@@ -163,6 +254,7 @@
 
                 --dru-card--ring-dark: #{$ring};
             }
+
             &-outlined {
                 --dru-card--surface-dark: transparent;
                 --dru-card--surface-raised-dark: transparent;
@@ -183,6 +275,7 @@
 
                 --dru-icon-color: #{$accent};
             }
+
             &-subtle {
                 --dru-card--surface-dark: rgba(96, 165, 250, 0.10);
                 --dru-card--surface-raised-dark: rgba(96, 165, 250, 0.14);
@@ -213,7 +306,7 @@
 
         &-base {
             // neutral gray (not near-white)
-            --dru-card--surface-light: #f3f4f6;        // gray-100
+            --dru-card--surface-light: #f3f4f6; // gray-100
             --dru-card--surface-raised-light: #e5e7eb; // gray-200
             --dru-card--surface-hover-light: #e5e7eb;
             --dru-card--surface-raised-hover-light: #d1d5db;
@@ -236,7 +329,7 @@
             --dru-card--surface-raised-hover-light: #4b5563;
 
             --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255,255,255,0.85);
+            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
             --dru-card--border-light: #4b5563;
@@ -296,7 +389,7 @@
 
             &-base {
                 // neutral dark (no blue tint)
-                --dru-card--surface-dark: #111827;        // gray-900
+                --dru-card--surface-dark: #111827; // gray-900
                 --dru-card--surface-raised-dark: #1f2937; // gray-800
                 --dru-card--surface-hover-dark: #273244;
                 --dru-card--surface-raised-hover-dark: #374151;
@@ -379,7 +472,7 @@
         $ring: rgba(8, 145, 178, 0.5);
 
         &-base {
-            --dru-card--surface-light: #ecfeff;        // cyan-50
+            --dru-card--surface-light: #ecfeff; // cyan-50
             --dru-card--surface-raised-light: #cffafe; // cyan-100
             --dru-card--surface-hover-light: #cffafe;
             --dru-card--surface-raised-hover-light: #a5f3fc;
@@ -402,7 +495,7 @@
             --dru-card--surface-raised-hover-light: #0891b2;
 
             --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255,255,255,0.85);
+            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
             --dru-card--border-light: #0e7490;
@@ -461,7 +554,7 @@
             $ring: rgba(34, 211, 238, 0.5);
 
             &-base {
-                --dru-card--surface-dark: #083344;        // cyan-950
+                --dru-card--surface-dark: #083344; // cyan-950
                 --dru-card--surface-raised-dark: #164e63; // cyan-900
                 --dru-card--surface-hover-dark: #1e6a82;
                 --dru-card--surface-raised-hover-dark: #0891b2;
@@ -545,7 +638,7 @@
 
         &-base {
             // soft success background
-            --dru-card--surface-light: #f0fdf4;        // green-50
+            --dru-card--surface-light: #f0fdf4; // green-50
             --dru-card--surface-raised-light: #dcfce7; // green-100
             --dru-card--surface-hover-light: #dcfce7;
             --dru-card--surface-raised-hover-light: #bbf7d0;
@@ -568,7 +661,7 @@
             --dru-card--surface-raised-hover-light: #16a34a;
 
             --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255,255,255,0.85);
+            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
             --dru-card--border-light: #15803d; // green-700
@@ -627,7 +720,7 @@
             $ring: rgba(74, 222, 128, 0.5);
 
             &-base {
-                --dru-card--surface-dark: #052e16;        // green-950
+                --dru-card--surface-dark: #052e16; // green-950
                 --dru-card--surface-raised-dark: #064e3b; // green-900
                 --dru-card--surface-hover-dark: #065f46;
                 --dru-card--surface-raised-hover-dark: #16a34a;
@@ -710,7 +803,7 @@
         $ring: rgba(217, 119, 6, 0.5);
 
         &-base {
-            --dru-card--surface-light: #fffbeb;        // amber-50
+            --dru-card--surface-light: #fffbeb; // amber-50
             --dru-card--surface-raised-light: #fef3c7; // amber-100
             --dru-card--surface-hover-light: #fef3c7;
             --dru-card--surface-raised-hover-light: #fde68a;
@@ -795,7 +888,7 @@
             $ring: rgba(251, 191, 36, 0.5);
 
             &-base {
-                --dru-card--surface-dark: #451a03;        // amber-950
+                --dru-card--surface-dark: #451a03; // amber-950
                 --dru-card--surface-raised-dark: #78350f; // amber-900
                 --dru-card--surface-hover-dark: #92400e;
                 --dru-card--surface-raised-hover-dark: #d97706;
@@ -879,7 +972,7 @@
         $ring: rgba(220, 38, 38, 0.5);
 
         &-base {
-            --dru-card--surface-light: #fef2f2;        // red-50
+            --dru-card--surface-light: #fef2f2; // red-50
             --dru-card--surface-raised-light: #fee2e2; // red-100
             --dru-card--surface-hover-light: #fee2e2;
             --dru-card--surface-raised-hover-light: #fecaca;
@@ -904,7 +997,7 @@
 
             // ✔ white works for red
             --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255,255,255,0.85);
+            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
             --dru-card--border-light: #b91c1c; // red-700
@@ -963,7 +1056,7 @@
             $ring: rgba(248, 113, 113, 0.5);
 
             &-base {
-                --dru-card--surface-dark: #450a0a;        // red-950
+                --dru-card--surface-dark: #450a0a; // red-950
                 --dru-card--surface-raised-dark: #7f1d1d; // red-900
                 --dru-card--surface-hover-dark: #991b1b;
                 --dru-card--surface-raised-hover-dark: #dc2626;

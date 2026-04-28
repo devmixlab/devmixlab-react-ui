@@ -13,6 +13,7 @@ export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 // Form
 export { Input } from './src/form/Input/Input';
 export { PasswordInput } from './src/form/Input/PasswordInput';
+export { Textarea } from './src/form/Textarea/Textarea';
 export { FormField } from './src/form/FormField';
 
 export { Badge } from './src/Badge/Badge';
@@ -29,3 +30,4 @@ export { Grid } from './src/Box/Grid';
 export { Col } from './src/Box/Col';
 export { Box } from './src/Box/Box';
 export { Icon } from './src/Icon/Icon';
+export { IconWrapper } from './src/Icon/IconWrapper';

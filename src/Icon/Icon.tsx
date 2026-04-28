@@ -1,29 +1,26 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box/Box';
-import { createPolymorphic } from '../types/polymorphic';
-import { CLASS_PREFIX } from '../constants';
+import { prefix } from './icon.helpers';
 
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type IconProps = React.SVGProps<SVGSVGElement> & {};
 
-// type SizeConfig = {
-//     size: number;
-//     fs: number;
-// };
-
-export type IconProps = {
-    className?: string;
-    size?: Size;
-} & Omit<BoxProps, 'children' | 'size'>;
-
-export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--icon${name}`;
+const Icon = ({ className, children, ...props }: React.PropsWithChildren<IconProps>) => {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+            className={clsx(prefix(), className)}
+            {...props}
+        >
+            {children}
+        </svg>
+    );
 };
 
-export const IconImpl = ({ className, size = 'md', ...rest }: IconProps, ref: React.Ref<any>) => {
-    const cl = clsx(prefix(), prefix(`--${size}`), className);
-
-    return <Box {...rest} className={cl} />;
-};
-
-export const Icon = createPolymorphic<IconProps>(forwardRef(IconImpl), 'Icon');
+export { Icon };

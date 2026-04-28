@@ -1,30 +1,22 @@
-.dru--icon{
+.dru--icon {
     color: var(--dru-icon-color, currentColor);
+
+    width: var(--icon-size, 1.2em);
+    height: var(--icon-size, 1.2em);
 
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     flex-shrink: 0;
 
-    line-height: 0;
-    vertical-align: middle;
-
     user-select: none;
-    &--decorative {
-        pointer-events: none;
-    }
+    pointer-events: none;
+}
 
-    &--xs { width: 20px; height: 20px; font-size: 12px; }
-    &--sm { width: 28px; height: 28px; font-size: 14px; }
-    &--md { width: 36px; height: 36px; font-size: 18px; }
-    &--lg { width: 44px; height: 44px; font-size: 22px; }
-    &--xl { width: 52px; height: 52px; font-size: 26px; }
-
-    > svg,
-    > .MuiSvgIcon-root {
-        width: 1em;
-        height: 1em;
-        font-size: 1em;
-        display: block;
-    }
+.dru--icon > svg,
+.dru--icon > .MuiSvgIcon-root {
+    width: var(--icon-size, 1.2em);
+    height: var(--icon-size, 1.2em);
+    font-size: var(--icon-size, 1.2em);
 }

@@ -1,29 +1,32 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Box, type BoxProps } from '../../Box/Box';
-import { Size, Variant } from './input.tokens';
-import { prefix } from './input.helpers';
+import { Size, Variant } from './textarea.tokens';
+import { prefix } from './textarea.helpers';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { Close } from '../../Icon/Close';
 
-export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
+export type TextareaProps = Omit<
+    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+    'size' | 'wrap'
+> & {
     variant?: Variant;
     size?: Size;
-    htmlSize?: number;
     invalid?: boolean;
     rounded?: BoxProps['rounded'];
+
     startAdornment?: React.ReactNode;
     endAdornment?: React.ReactNode;
 
     clearable?: boolean;
     onClear?: () => void;
     onValueChange?: (value: string) => void;
+
+    rows?: number;
 };
 
-const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);
-
-const Input = forwardRef<HTMLInputElement, InputProps>(
+const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     (
         {
             className,
@@ -38,20 +41,21 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             defaultValue,
             onChange,
             onKeyDown,
-            htmlSize,
-            type = 'text',
             readOnly,
 
             clearable = false,
             onClear,
             onValueChange,
 
+            rows = 3,
+
             ...rest
         },
         ref,
     ) => {
         const ctx = useFormFieldContext();
-        const inputProps = ctx
+
+        const textareaProps = ctx
             ? {
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
@@ -61,18 +65,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         const isControlled = value !== undefined;
 
-        const isTextLike = TEXT_INPUT_TYPES.has(type);
+        const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-        const inputRef = useRef<HTMLInputElement>(null);
-
-        // minimal UI state (only for uncontrolled)
         const [hasValueState, setHasValueState] = useState(
             () => defaultValue != null && String(defaultValue).length > 0,
         );
 
         const hasValue = isControlled ? value != null && String(value).length > 0 : hasValueState;
 
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             if (!isControlled) {
                 setHasValueState(e.target.value.length > 0);
             }
@@ -82,25 +83,23 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         };
 
         const handleClear = () => {
-            console.log('handleClear');
             if (isControlled) {
                 onValueChange?.('');
-
                 onChange?.({
                     target: { value: '' },
-                } as React.ChangeEvent<HTMLInputElement>);
-            } else if (inputRef.current) {
-                inputRef.current.value = '';
+                } as React.ChangeEvent<HTMLTextAreaElement>);
+            } else if (textareaRef.current) {
+                textareaRef.current.value = '';
                 setHasValueState(false);
             }
 
             onClear?.();
         };
 
-        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
             const isClearShortcut = e.key === 'Backspace' && (e.ctrlKey || e.metaKey);
 
-            if (isClearShortcut && clearable && isTextLike && hasValue && !disabled && !readOnly) {
+            if (isClearShortcut && clearable && hasValue && !disabled && !readOnly) {
                 e.preventDefault();
                 handleClear();
             }
@@ -114,7 +113,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             [prefix(`--clearable`)]: clearable,
         });
 
-        const combinedRef = mergeRefs(inputRef, ref);
+        const combinedRef = mergeRefs(textareaRef, ref);
 
         return (
             <Box
@@ -129,9 +128,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                 <Box
                     ref={combinedRef}
-                    as="input"
-                    type={type}
-                    size={htmlSize}
+                    as="textarea"
+                    rows={rows}
                     className={prefix(`__field`)}
                     value={isControlled ? value : undefined}
                     defaultValue={!isControlled ? defaultValue : undefined}
@@ -141,20 +139,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     readOnly={readOnly}
                     aria-invalid={invalid || undefined}
                     {...rest}
-                    {...inputProps}
+                    {...textareaProps}
                 />
 
                 {endAdornment != null && <span className={prefix(`__icon`)}>{endAdornment}</span>}
 
-                {clearable && isTextLike && hasValue && !disabled && !readOnly && (
+                {clearable && hasValue && !disabled && !readOnly && (
                     <span className={prefix(`__clear`)}>
                         <button
                             type="button"
-                            aria-label="Clear input"
+                            aria-label="Clear textarea"
                             onClick={handleClear}
                             onMouseDown={(e) => e.preventDefault()}
                             className={prefix(`__clear-button`)}
-                            tabIndex={-1} // prevent focus steal
+                            tabIndex={-1}
                         >
                             <Close />
                         </button>
@@ -165,6 +163,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     },
 );
 
-Input.displayName = 'Input';
+Textarea.displayName = 'Textarea';
 
-export { Input };
+export { Textarea };
