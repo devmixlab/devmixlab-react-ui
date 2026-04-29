@@ -97,8 +97,23 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             onValueChange?.(e.target.value);
         };
 
-        const handleClear = () => {
-            console.log('handleClear');
+        const handleClearClick = (e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation();
+            clearValue();
+        };
+
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+            const isClearShortcut = e.key === 'Backspace' && (e.ctrlKey || e.metaKey);
+
+            if (isClearShortcut && clearable && isTextLike && hasValue && !disabled && !readOnly) {
+                e.preventDefault();
+                clearValue(); // no event needed
+            }
+
+            onKeyDown?.(e);
+        };
+
+        const clearValue = () => {
             if (isControlled) {
                 onValueChange?.('');
 
@@ -111,17 +126,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             }
 
             onClear?.();
-        };
-
-        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-            const isClearShortcut = e.key === 'Backspace' && (e.ctrlKey || e.metaKey);
-
-            if (isClearShortcut && clearable && isTextLike && hasValue && !disabled && !readOnly) {
-                e.preventDefault();
-                handleClear();
-            }
-
-            onKeyDown?.(e);
         };
 
         const showClearable = clearable && isTextLike && hasValue && !disabled && !readOnly;
@@ -157,6 +161,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
                 rounded={rounded}
+                onClick={() => {
+                    if (disabled) return;
+                    inputRef.current?.focus();
+                }}
                 style={
                     {
                         '--start-slot-count': startCount,
@@ -183,6 +191,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     disabled={disabled}
                     readOnly={readOnly}
                     aria-invalid={invalid || undefined}
+                    aria-disabled={disabled || undefined}
                     {...rest}
                     {...inputProps}
                 />
@@ -198,7 +207,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                                 <button
                                     type="button"
                                     aria-label="Clear input"
-                                    onClick={handleClear}
+                                    onClick={handleClearClick}
                                     onMouseDown={(e) => e.preventDefault()}
                                     className={prefix(`__clear-button`)}
                                     tabIndex={-1} // prevent focus steal

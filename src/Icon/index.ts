@@ -5,3 +5,4 @@ export { EyeOff } from './EyeOff';
 export { Info } from './Info';
 export { Success } from './Success';
 export { Warning } from './Warning';
+export { TriangleDown } from './TriangleDown';

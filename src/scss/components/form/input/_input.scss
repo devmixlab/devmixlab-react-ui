@@ -7,15 +7,15 @@
 $compPrefix: 'dru--input';
 
 $textarea-sizes: (
-    sm: (fontSize: 14px, slotSpacingX: 8px, slotSpacingTop: 8px, fieldYSpacing: 6px, slotGap: 4px),
-    md: (fontSize: 16px, slotSpacingX: 16px, slotSpacingTop: 12px, fieldYSpacing: 9px, slotGap: 6px),
-    lg: (fontSize: 18px, slotSpacingX: 24px, slotSpacingTop: 16px, fieldYSpacing: 12px, slotGap: 8px),
+    sm: (fontSize: 14px, spacingX: 8px, spacingTop: 8px, gap: 4px),
+    md: (fontSize: 16px, spacingX: 16px, spacingTop: 12px, gap: 6px),
+    lg: (fontSize: 18px, spacingX: 24px, spacingTop: 16px, gap: 8px),
 );
 
 $input-sizes: (
-    sm: (height: 32px, fontSize: 14px, slotSpacingX: 8px, fieldXSpacing: 8px, slotGap: 4px),
-    md: (height: 40px, fontSize: 16px, slotSpacingX: 16px, fieldXSpacing: 12px, slotGap: 6px),
-    lg: (height: 48px, fontSize: 18px, slotSpacingX: 24px, fieldXSpacing: 16px, slotGap: 8px),
+    sm: (height: 32px, fontSize: 14px, spacingX: 8px, gap: 4px),
+    md: (height: 40px, fontSize: 16px, spacingX: 16px, gap: 6px),
+    lg: (height: 48px, fontSize: 18px, spacingX: 24px, gap: 8px),
 );
 
 @mixin intent-vars($palette, $palette-name) {
@@ -69,7 +69,7 @@ $input-sizes: (
     min-width: 0;
     cursor: text;
     user-select: none;
-    font-size: var(--font-size);
+    font-size: var(--fs);
 
     border: 1px solid var(--border);
     background: var(--bg);
@@ -207,15 +207,16 @@ $input-sizes: (
             height: auto; // override input behavior
             min-height: 3em; // base height (~3 rows)
             display: block; // avoids flex issues
+            margin-top: -2px;
         }
 
         @each $size, $value in $textarea-sizes {
             &.#{$compPrefix}--size-#{$size} {
-                --gap: #{map.get($value, slotGap)};
-                --font-size: #{map.get($value, fontSize)};
-                --x-offset: #{map.get($value, slotSpacingX)};
-                --top-offset: #{map.get($value, slotSpacingTop)};
-                --pt: #{map.get($value, fieldYSpacing)};
+                --gap: #{map.get($value, gap)};
+                --fs: #{map.get($value, fontSize)};
+                --x-offset: #{map.get($value, spacingX)};
+                --top-offset: #{map.get($value, spacingTop)};
+                --pt: var(--top-offset);
 
                 &.#{$compPrefix}--has-start-adornment {
                     @include field-p('--field-pl', '--start-slot-count');
@@ -228,7 +229,7 @@ $input-sizes: (
         }
     }
 
-    &--field-input {
+    &--field-input, &--select-input {
         --icon-adjust: 2px; // adjust icon to look consistent, its just fix
         --slot-align: center;
         --slot-h: 100%;
@@ -236,15 +237,15 @@ $input-sizes: (
             &.#{$compPrefix}--size-#{$size} {
 
                 // Slot vars
-                --x-offset: #{map.get($value, slotSpacingX)}; // slot x axis offset
+                --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
                 --top-offset: 0px;
-                --gap: #{map.get($value, slotGap)};
+                --gap: #{map.get($value, gap)};
 
                 // Field vars
                 --field-pl: var(--x-offset); // default field padding left
                 --field-pr: var(--x-offset); // default field padding right
                 --height: #{map.get($value, height)};
-                --field-fs: #{map.get($value, fontSize)};
+                --fs: #{map.get($value, fontSize)};
 
                 &.#{$compPrefix}--has-start-adornment {
                     @include field-p('--field-pl', '--start-slot-count');
@@ -255,6 +256,20 @@ $input-sizes: (
                 }
 
             }
+        }
+    }
+
+    &--select-input {
+        cursor: pointer;
+        user-select: none;
+        .#{$compPrefix}__field {
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .#{$compPrefix}__slot {
+            pointer-events: none;
         }
     }
 

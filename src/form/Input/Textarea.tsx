@@ -149,6 +149,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
                 rounded={rounded}
+                onClick={() => {
+                    if (disabled) return;
+                    textareaRef.current?.focus();
+                }}
                 style={
                     {
                         '--start-slot-count': startCount,
@@ -174,6 +178,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                     disabled={disabled}
                     readOnly={readOnly}
                     aria-invalid={invalid || undefined}
+                    aria-disabled={disabled || undefined}
                     {...rest}
                     {...textareaProps}
                 />
