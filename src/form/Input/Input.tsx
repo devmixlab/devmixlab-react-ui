@@ -6,6 +6,7 @@ import { prefix } from './input.helpers';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { Close } from '../../Icon/Close';
+import { IconWrapper } from '../../Icon/IconWrapper';
 
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
     variant?: Variant;
@@ -17,6 +18,7 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
     endAdornment?: React.ReactNode;
 
     clearable?: boolean;
+    clearIcon?: React.ReactNode;
     onClear?: () => void;
     onValueChange?: (value: string) => void;
 };
@@ -59,6 +61,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             readOnly,
 
             clearable = false,
+            clearIcon,
             onClear,
             onValueChange,
 
@@ -74,6 +77,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                   'aria-invalid': ctx.hasError || invalid || undefined,
               }
             : {};
+
+        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
 
         const isControlled = value !== undefined;
 
@@ -212,7 +217,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                                     className={prefix(`__clear-button`)}
                                     tabIndex={-1} // prevent focus steal
                                 >
-                                    <Close />
+                                    {finalClearIcon}
                                 </button>
                             </span>
                         )}
