@@ -23,6 +23,22 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);
 
+const getCount = (node: React.ReactNode): number => {
+    if (!node) return 0;
+
+    const children = React.Children.toArray(node);
+
+    return children.reduce<number>((acc, child) => {
+        if (React.isValidElement(child)) {
+            if (child.props?.children) {
+                return acc + getCount(child.props.children);
+            }
+            return acc + 1;
+        }
+        return acc;
+    }, 0);
+};
+
 const Input = forwardRef<HTMLInputElement, InputProps>(
     (
         {
@@ -108,13 +124,32 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             onKeyDown?.(e);
         };
 
-        const cl = clsx(className, prefix(), prefix(`--${variant}`), prefix(`--size-${size}`), {
-            [prefix(`--invalid`)]: invalid,
-            [prefix(`--disabled`)]: disabled,
-            [prefix(`--clearable`)]: clearable,
-        });
+        const showClearable = clearable && isTextLike && hasValue && !disabled && !readOnly;
+
+        const cl = clsx(
+            className,
+            prefix(),
+            prefix('--field-input'),
+            prefix(`--${variant}`),
+            prefix(`--size-${size}`),
+            {
+                [prefix(`--invalid`)]: invalid,
+                [prefix(`--disabled`)]: disabled,
+                [prefix(`--clearable`)]: clearable,
+                [prefix(`--has-start-adornment`)]: startAdornment,
+                [prefix(`--has-end-adornment`)]: endAdornment,
+            },
+        );
 
         const combinedRef = mergeRefs(inputRef, ref);
+
+        const startCount = getCount(startAdornment);
+        const endCount = getCount(endAdornment) + (clearable ? 1 : 0);
+
+        // const startCount = startAdornment ? React.Children.count(startAdornment) : 0;
+        //
+        // const endCount =
+        //     (endAdornment ? React.Children.count(endAdornment) : 0) + (clearable ? 1 : 0);
 
         return (
             <Box
@@ -122,9 +157,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
                 rounded={rounded}
+                style={
+                    {
+                        '--start-slot-count': startCount,
+                        '--end-slot-count': endCount,
+                    } as React.CSSProperties
+                }
             >
                 {startAdornment != null && (
-                    <span className={prefix(`__icon`)}>{startAdornment}</span>
+                    <div className={clsx(prefix(`__slot`), prefix(`__slot-start`))}>
+                        <span className={prefix(`__icon`)}>{startAdornment}</span>
+                    </div>
                 )}
 
                 <Box
@@ -144,21 +187,27 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     {...inputProps}
                 />
 
-                {endAdornment != null && <span className={prefix(`__icon`)}>{endAdornment}</span>}
+                {(endAdornment != null || showClearable) && (
+                    <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>
+                        {endAdornment != null && (
+                            <span className={prefix(`__icon`)}>{endAdornment}</span>
+                        )}
 
-                {clearable && isTextLike && hasValue && !disabled && !readOnly && (
-                    <span className={prefix(`__clear`)}>
-                        <button
-                            type="button"
-                            aria-label="Clear input"
-                            onClick={handleClear}
-                            onMouseDown={(e) => e.preventDefault()}
-                            className={prefix(`__clear-button`)}
-                            tabIndex={-1} // prevent focus steal
-                        >
-                            <Close />
-                        </button>
-                    </span>
+                        {showClearable && (
+                            <span className={prefix(`__clear`)}>
+                                <button
+                                    type="button"
+                                    aria-label="Clear input"
+                                    onClick={handleClear}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    className={prefix(`__clear-button`)}
+                                    tabIndex={-1} // prevent focus steal
+                                >
+                                    <Close />
+                                </button>
+                            </span>
+                        )}
+                    </div>
                 )}
             </Box>
         );

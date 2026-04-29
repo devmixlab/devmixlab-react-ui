@@ -6,6 +6,18 @@
 
 $compPrefix: 'dru--input';
 
+$textarea-sizes: (
+    sm: (fontSize: 14px, slotSpacingX: 8px, slotSpacingTop: 8px, fieldYSpacing: 6px, slotGap: 4px),
+    md: (fontSize: 16px, slotSpacingX: 16px, slotSpacingTop: 12px, fieldYSpacing: 9px, slotGap: 6px),
+    lg: (fontSize: 18px, slotSpacingX: 24px, slotSpacingTop: 16px, fieldYSpacing: 12px, slotGap: 8px),
+);
+
+$input-sizes: (
+    sm: (height: 32px, fontSize: 14px, slotSpacingX: 8px, fieldXSpacing: 8px, slotGap: 4px),
+    md: (height: 40px, fontSize: 16px, slotSpacingX: 16px, fieldXSpacing: 12px, slotGap: 6px),
+    lg: (height: 48px, fontSize: 18px, slotSpacingX: 24px, fieldXSpacing: 16px, slotGap: 8px),
+);
+
 @mixin intent-vars($palette, $palette-name) {
     @each $step, $value in $palette {
         --intent-#{
@@ -20,6 +32,7 @@ $compPrefix: 'dru--input';
     @include intent-vars($neutral, neutral);
     @include intent-vars($gray, gray);
 
+    --icon-size: 1.1em;
     --focus-ring: #{rgba(map.get($blue, 500), 0.25)};
     --text: var(--intent-gray-900);
     --danger: var(--intent-red-500);
@@ -48,26 +61,24 @@ $compPrefix: 'dru--input';
 
     }
 
+    position: relative;
     box-sizing: border-box;
     display: inline-flex;
     vertical-align: middle;
     align-items: center;
-    gap: 8px;
     min-width: 0;
     cursor: text;
     user-select: none;
+    font-size: var(--font-size);
 
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
 
-    //.#{$compPrefix}:focus-within {
-    //    /* fallback */
-    //}
-    //
-    //.#{$compPrefix}:has(input:focus-visible) {
-    //    /* keyboard-only focus */
-    //}
+    padding-left: var(--pl, 0);
+    padding-right: var(--pr, 0);
+    padding-top: var(--pt, 0);
+    padding-bottom: var(--pb, 0);
 
     // Chrome autofill will break your design.
     //input:-webkit-autofill {
@@ -75,8 +86,9 @@ $compPrefix: 'dru--input';
     //    -webkit-text-fill-color: var(--text);
     //}
 
-    padding: 0 12px;
-    height: 40px;
+    min-height: var(--min-height, 40px);
+    height: var(--height, auto);
+
 
     transition: border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -88,7 +100,6 @@ $compPrefix: 'dru--input';
         background: var(--bg-hover); // or token
     }
 
-    /* focus */
     &:focus-within {
         border-color: var(--border-focus);
         box-shadow: 0 0 0 3px var(--focus-ring);
@@ -111,17 +122,30 @@ $compPrefix: 'dru--input';
     &[data-disabled] {
         opacity: 0.6;
         cursor: not-allowed;
+
+        .#{$compPrefix}__icon,
+        .#{$compPrefix}__clear {
+            pointer-events: none;
+        }
     }
 
-    &[data-disabled] .#{$compPrefix}__icon,
-    &[data-disabled] .#{$compPrefix}__clear {
-        pointer-events: none;
+    &__slot {
+        position: absolute;
+        top: 0;
+
+        display: flex;
+        height: var(--slot-h, auto);
+        gap: var(--gap);
+        align-items: var(--slot-align, start);
+        padding: var(--top-offset) var(--x-offset) 0px;
     }
 
-    .#{$compPrefix}__field:focus,
-    .#{$compPrefix}__field:focus-visible {
-        outline: none;
-        box-shadow: none;
+    &__slot-start {
+        left: 0;
+    }
+
+    &__slot-end {
+        right: 0;
     }
 
     .#{$compPrefix}__field {
@@ -129,17 +153,21 @@ $compPrefix: 'dru--input';
         border: none;
         background: transparent;
         user-select: text;
+        font-size: var(--field-fs, inherit);
 
-        padding: 0;
+        padding-left: var(--field-pl, 0);
+        padding-right: var(--field-pr, 0);
+        padding-top: var(--field-pt, 0);
+        padding-bottom: var(--field-pb, 0);
+
         margin: 0;
 
-        height: 100%;
+        height: var(--field-h, 100%);
         width: 100%;
         min-width: 0;
 
         flex: 1;
 
-        font: inherit;
         line-height: 1;
         color: inherit;
 
@@ -152,7 +180,84 @@ $compPrefix: 'dru--input';
         &:disabled {
             cursor: not-allowed;
         }
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
     }
+
+    // calculate padding (left/right) based on number of icons in slot (start slot/end slot + clear btn)
+    @mixin field-p($field-p-var, $slot-count-var) {
+        #{$field-p-var}: #{calc(
+            var(--x-offset) +
+            ((var(--gap) + var(--icon-size) + var(--icon-adjust)) * var(#{$slot-count-var}))
+        )};
+    }
+
+    &--textarea-input {
+        --icon-adjust: 2px;
+        --slot-h: auto;
+        align-items: stretch;
+
+        .#{$compPrefix}__field {
+            line-height: 1.4; // key difference
+            resize: vertical; // allow vertical resize
+            height: auto; // override input behavior
+            min-height: 3em; // base height (~3 rows)
+            display: block; // avoids flex issues
+        }
+
+        @each $size, $value in $textarea-sizes {
+            &.#{$compPrefix}--size-#{$size} {
+                --gap: #{map.get($value, slotGap)};
+                --font-size: #{map.get($value, fontSize)};
+                --x-offset: #{map.get($value, slotSpacingX)};
+                --top-offset: #{map.get($value, slotSpacingTop)};
+                --pt: #{map.get($value, fieldYSpacing)};
+
+                &.#{$compPrefix}--has-start-adornment {
+                    @include field-p('--field-pl', '--start-slot-count');
+                }
+
+                &.#{$compPrefix}--has-end-adornment, &.#{$compPrefix}--clearable {
+                    @include field-p('--field-pr', '--end-slot-count');
+                }
+            }
+        }
+    }
+
+    &--field-input {
+        --icon-adjust: 2px; // adjust icon to look consistent, its just fix
+        --slot-align: center;
+        --slot-h: 100%;
+        @each $size, $value in $input-sizes {
+            &.#{$compPrefix}--size-#{$size} {
+
+                // Slot vars
+                --x-offset: #{map.get($value, slotSpacingX)}; // slot x axis offset
+                --top-offset: 0px;
+                --gap: #{map.get($value, slotGap)};
+
+                // Field vars
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+                --height: #{map.get($value, height)};
+                --field-fs: #{map.get($value, fontSize)};
+
+                &.#{$compPrefix}--has-start-adornment {
+                    @include field-p('--field-pl', '--start-slot-count');
+                }
+
+                &.#{$compPrefix}--has-end-adornment {
+                    @include field-p('--field-pr', '--end-slot-count');
+                }
+
+            }
+        }
+    }
+
 
     &__toggle {
         appearance: none;
@@ -179,14 +284,15 @@ $compPrefix: 'dru--input';
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: var(--gap);
 
         color: var(--text-muted);
 
         > svg,
         > .MuiSvgIcon-root {
-            width: 1.1em;
-            height: 1.1em;
-            font-size: 1.1em;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            font-size: var(--icon-size);
             display: block;
         }
     }
@@ -241,23 +347,6 @@ $compPrefix: 'dru--input';
         }
     }
 
-    &--size-sm {
-        height: 32px;
-        font-size: 14px;
-    }
-
-    &--size-md {
-        height: 40px;
-        font-size: 16px;
-    }
-
-    &--size-lg {
-        height: 48px;
-        font-size: 18px;
-    }
-
-    &--outlined {}
-
     &--filled {
         --bg: var(--intent-gray-200);
         --bg-hover: var(--intent-gray-300);
@@ -278,7 +367,8 @@ $compPrefix: 'dru--input';
 
     @include dark {
 
-        &--outlined {}
+        &--outlined {
+        }
 
         &--filled {
             --bg: var(--intent-gray-800);

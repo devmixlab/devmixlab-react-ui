@@ -46,12 +46,14 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 ref={ref}
                 type={visible ? 'text' : 'password'}
                 endAdornment={
-                    <>
-                        {endAdornment}
-                        {showToggle && (
-                            <ToggleButton toggle={toggle} visible={visible} id={inputId} />
-                        )}
-                    </>
+                    endAdornment != null || showToggle ? (
+                        <>
+                            {endAdornment}
+                            {showToggle && (
+                                <ToggleButton toggle={toggle} visible={visible} id={inputId} />
+                            )}
+                        </>
+                    ) : undefined
                 }
             />
         );

@@ -13,8 +13,10 @@ export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 // Form
 export { Input } from './src/form/Input/Input';
 export { PasswordInput } from './src/form/Input/PasswordInput';
-export { Textarea } from './src/form/Textarea/Textarea';
+export { Textarea } from './src/form/Input/Textarea';
 export { FormField } from './src/form/FormField';
+
+export { Warning as WarningIcon } from './src/Icon/Warning';
 
 export { Badge } from './src/Badge/Badge';
 export { Chip } from './src/Chip/Chip';
