@@ -6,6 +6,26 @@
 
 $compPrefix: 'dru--input';
 
+$input-gaps: (
+    sm: (
+        gap: 4px,        // 👈 inside group (suffix ↔ unit, action ↔ clear)
+        actionsGap: 8px,   // 👈 between groups (end ↔ actions)
+        controlGap: 12px // 👈 before controls (actions ↔ stepper)
+    ),
+
+    md: (
+        gap: 6px,
+        actionsGap: 10px,
+        controlGap: 14px
+    ),
+
+    lg: (
+        gap: 8px,
+        actionsGap: 12px,
+        controlGap: 16px
+    )
+);
+
 $textarea-sizes: (
     sm: (fontSize: 14px, spacingX: 8px, spacingTop: 8px, gap: 4px),
     md: (fontSize: 16px, spacingX: 16px, spacingTop: 12px, gap: 6px),
@@ -135,7 +155,7 @@ $input-sizes: (
 
         display: flex;
         height: var(--slot-h, auto);
-        gap: var(--gap);
+        //gap: var(--gap);
         align-items: var(--slot-align, start);
         padding: var(--top-offset) var(--x-offset) 0px;
     }
@@ -234,12 +254,15 @@ $input-sizes: (
         --slot-align: center;
         --slot-h: 100%;
         @each $size, $value in $input-sizes {
+            $gaps: map.get($input-gaps, $size);
             &.#{$compPrefix}--size-#{$size} {
 
                 // Slot vars
                 --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
                 --top-offset: 0px;
-                --gap: #{map.get($value, gap)};
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --control-gap: #{map.get($gaps, controlGap)};
 
                 // Field vars
                 --field-pl: var(--x-offset); // default field padding left
@@ -295,7 +318,7 @@ $input-sizes: (
         }
     }
 
-    .#{$compPrefix}__icon {
+    &__group {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -312,7 +335,15 @@ $input-sizes: (
         }
     }
 
-    .#{$compPrefix}__clear {
+    &__actions-group {
+        margin-left: var(--actions-gap);
+    }
+
+    &__control-group {
+        margin-left: var(--control-gap);
+    }
+
+    &__clear {
         appearance: none;
         border: none;
         background: transparent;

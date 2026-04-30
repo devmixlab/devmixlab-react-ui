@@ -17,6 +17,9 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
     startAdornment?: React.ReactNode;
     endAdornment?: React.ReactNode;
 
+    actions?: React.ReactNode; // 👈 NEW
+    controls?: React.ReactNode; // 👈 optional (for NumberInput later)
+
     clearable?: boolean;
     clearIcon?: React.ReactNode;
     onClear?: () => void;
@@ -51,6 +54,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             rounded = 'md',
             startAdornment,
             endAdornment,
+
+            actions,
+            controls,
+
             disabled,
             value,
             defaultValue,
@@ -179,7 +186,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             >
                 {startAdornment != null && (
                     <div className={clsx(prefix(`__slot`), prefix(`__slot-start`))}>
-                        <span className={prefix(`__icon`)}>{startAdornment}</span>
+                        <span className={prefix(`__group`)}>{startAdornment}</span>
                     </div>
                 )}
 
@@ -201,24 +208,68 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     {...inputProps}
                 />
 
-                {(endAdornment != null || showClearable) && (
+                {/*{(endAdornment != null || showClearable) && (*/}
+                {/*    <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>*/}
+                {/*        {endAdornment != null && (*/}
+                {/*            <span className={prefix(`__icon`)}>{endAdornment}</span>*/}
+                {/*        )}*/}
+
+                {/*        {showClearable && (*/}
+                {/*            <span className={prefix(`__clear`)}>*/}
+                {/*                <button*/}
+                {/*                    type="button"*/}
+                {/*                    aria-label="Clear input"*/}
+                {/*                    onClick={handleClearClick}*/}
+                {/*                    onMouseDown={(e) => e.preventDefault()}*/}
+                {/*                    className={prefix(`__clear-button`)}*/}
+                {/*                    tabIndex={-1} // prevent focus steal*/}
+                {/*                >*/}
+                {/*                    {finalClearIcon}*/}
+                {/*                </button>*/}
+                {/*            </span>*/}
+                {/*        )}*/}
+                {/*    </div>*/}
+                {/*)}*/}
+
+                {(endAdornment != null || showClearable || actions || controls) && (
                     <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>
+                        {/* 1. VALUE / CONTEXT */}
+                        {/*{endAdornment != null && (*/}
+                        {/*    <span className={prefix(`__end-group`)}>{endAdornment}</span>*/}
+                        {/*)}*/}
+
                         {endAdornment != null && (
-                            <span className={prefix(`__icon`)}>{endAdornment}</span>
+                            <span className={clsx(prefix(`__group`), prefix(`__adornment-group`))}>
+                                {endAdornment}
+                            </span>
                         )}
 
-                        {showClearable && (
-                            <span className={prefix(`__clear`)}>
-                                <button
-                                    type="button"
-                                    aria-label="Clear input"
-                                    onClick={handleClearClick}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    className={prefix(`__clear-button`)}
-                                    tabIndex={-1} // prevent focus steal
-                                >
-                                    {finalClearIcon}
-                                </button>
+                        {/* 2. ACTIONS (clear + custom actions) */}
+                        {(actions || showClearable) && (
+                            <span className={clsx(prefix(`__group`), prefix(`__actions-group`))}>
+                                {/* custom actions FIRST */}
+                                {actions}
+
+                                {/* built-in clear AFTER */}
+                                {showClearable && (
+                                    <button
+                                        type="button"
+                                        aria-label="Clear input"
+                                        onClick={handleClearClick}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        className={prefix(`__clear-button`)}
+                                        tabIndex={-1}
+                                    >
+                                        {finalClearIcon}
+                                    </button>
+                                )}
+                            </span>
+                        )}
+
+                        {/* 3. CONTROLS */}
+                        {controls && (
+                            <span className={clsx(prefix(`__group`), prefix(`__control-group`))}>
+                                {controls}
                             </span>
                         )}
                     </div>

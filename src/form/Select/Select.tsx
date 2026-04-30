@@ -61,7 +61,6 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                 data-disabled={disabled || undefined}
                 onMouseDown={(e) => {
                     if (disabled) return;
-                    e.preventDefault();
                     selectRef.current?.focus();
                 }}
                 rounded={rounded}
@@ -74,7 +73,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             >
                 {startAdornment && (
                     <div className={clsx(prefix(`__slot`), prefix(`__slot-start`))}>
-                        <span className={prefix(`__icon`)}>{startAdornment}</span>
+                        <span className={prefix(`__group`)}>{startAdornment}</span>
                     </div>
                 )}
 
@@ -95,11 +94,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                 </Box>
 
                 <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>
-                    <span className={prefix(`__icon`)}>
+                    <span className={prefix(`__group`)}>
                         <TriangleDownIcon />
                     </span>
 
-                    {endAdornment && <span className={prefix(`__icon`)}>{endAdornment}</span>}
+                    {endAdornment && <span className={prefix(`__group`)}>{endAdornment}</span>}
                 </div>
             </Box>
         );
