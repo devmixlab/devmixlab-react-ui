@@ -6,6 +6,8 @@ import { prefix } from './input.helpers';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { Close } from '../../Icon/Close';
+import { IconWrapper } from '../../Icon';
+import { FieldRoot } from '../FieldRoot/FieldRoot';
 
 export type TextareaProps = Omit<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -16,30 +18,17 @@ export type TextareaProps = Omit<
     invalid?: boolean;
     rounded?: BoxProps['rounded'];
 
-    startAdornment?: React.ReactNode;
-    endAdornment?: React.ReactNode;
+    start?: React.ReactNode;
+    end?: React.ReactNode;
+    actions?: React.ReactNode; // 👈 NEW
+    controls?: React.ReactNode; // 👈 optional (for NumberInput later)
 
     clearable?: boolean;
+    clearIcon?: React.ReactNode;
     onClear?: () => void;
     onValueChange?: (value: string) => void;
 
     rows?: number;
-};
-
-const getCount = (node: React.ReactNode): number => {
-    if (!node) return 0;
-
-    const children = React.Children.toArray(node);
-
-    return children.reduce<number>((acc, child) => {
-        if (React.isValidElement(child)) {
-            if (child.props?.children) {
-                return acc + getCount(child.props.children);
-            }
-            return acc + 1;
-        }
-        return acc;
-    }, 0);
 };
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -50,8 +39,12 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             size = 'md',
             invalid = false,
             rounded = 'md',
-            startAdornment,
-            endAdornment,
+
+            start,
+            end,
+            actions,
+            controls,
+
             disabled,
             value,
             defaultValue,
@@ -60,6 +53,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             readOnly,
 
             clearable = false,
+            clearIcon,
             onClear,
             onValueChange,
 
@@ -69,19 +63,19 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         },
         ref,
     ) => {
-        const ctx = useFormFieldContext();
+        const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+        const isControlled = value !== undefined;
+        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
+
+        const ctx = useFormFieldContext();
         const textareaProps = ctx
             ? {
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
                   'aria-invalid': ctx.hasError || invalid || undefined,
               }
-            : {};
-
-        const isControlled = value !== undefined;
-
-        const textareaRef = useRef<HTMLTextAreaElement>(null);
+            : { 'aria-invalid': invalid || undefined };
 
         const [hasValueState, setHasValueState] = useState(
             () => defaultValue != null && String(defaultValue).length > 0,
@@ -98,9 +92,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             onValueChange?.(e.target.value);
         };
 
-        const handleClear = () => {
+        const clearValue = () => {
             if (isControlled) {
                 onValueChange?.('');
+
                 onChange?.({
                     target: { value: '' },
                 } as React.ChangeEvent<HTMLTextAreaElement>);
@@ -112,60 +107,66 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             onClear?.();
         };
 
+        const handleClearClick = (e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation();
+            clearValue();
+        };
+
         const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
             const isClearShortcut = e.key === 'Backspace' && (e.ctrlKey || e.metaKey);
 
             if (isClearShortcut && clearable && hasValue && !disabled && !readOnly) {
                 e.preventDefault();
-                handleClear();
+                clearValue();
             }
 
             onKeyDown?.(e);
         };
 
-        const cl = clsx(
-            className,
-            prefix(),
-            prefix('--textarea-input'),
-            prefix(`--${variant}`),
-            prefix(`--size-${size}`),
-            {
-                [prefix(`--invalid`)]: invalid,
-                [prefix(`--disabled`)]: disabled,
-                [prefix(`--clearable`)]: clearable,
-                [prefix(`--has-start-adornment`)]: startAdornment,
-                [prefix(`--has-end-adornment`)]: endAdornment,
-            },
-        );
+        const showClearable = clearable && hasValue && !disabled && !readOnly;
+
+        const cl = clsx(className, prefix('--textarea-input'), {
+            [prefix(`--clearable`)]: clearable,
+        });
 
         const combinedRef = mergeRefs(textareaRef, ref);
 
-        const startCount = getCount(startAdornment);
-        const endCount = getCount(endAdornment) + (clearable ? 1 : 0);
+        const clearButton = (
+            <button
+                type="button"
+                aria-label="Clear input"
+                onClick={handleClearClick}
+                onMouseDown={(e) => e.preventDefault()}
+                className={prefix(`__clear-button`)}
+                tabIndex={-1}
+            >
+                {finalClearIcon}
+            </button>
+        );
+
+        const hasActions = actions || showClearable;
+
+        const finalActions = hasActions ? (
+            <>
+                {actions}
+                {showClearable && clearButton}
+            </>
+        ) : undefined;
 
         return (
-            <Box
+            <FieldRoot
                 className={cl}
-                data-invalid={invalid || undefined}
-                data-disabled={disabled || undefined}
+                invalid={invalid}
+                disabled={disabled}
                 rounded={rounded}
-                onClick={() => {
-                    if (disabled) return;
-                    textareaRef.current?.focus();
-                }}
-                style={
-                    {
-                        '--start-slot-count': startCount,
-                        '--end-slot-count': endCount,
-                    } as React.CSSProperties
-                }
+                focusTargetRef={textareaRef}
+                start={start}
+                end={end}
+                actions={finalActions}
+                controls={controls}
+                variant={variant}
+                size={size}
             >
-                {startAdornment != null && (
-                    <div className={clsx(prefix(`__slot`), prefix(`__slot-start`))}>
-                        <span className={prefix(`__icon`)}>{startAdornment}</span>
-                    </div>
-                )}
-
                 <Box
                     ref={combinedRef}
                     as="textarea"
@@ -177,33 +178,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                     onKeyDown={handleKeyDown}
                     disabled={disabled}
                     readOnly={readOnly}
-                    aria-invalid={invalid || undefined}
                     aria-disabled={disabled || undefined}
                     {...rest}
                     {...textareaProps}
                 />
-
-                <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>
-                    {endAdornment != null && (
-                        <span className={prefix(`__icon`)}>{endAdornment}</span>
-                    )}
-
-                    {clearable && hasValue && !disabled && !readOnly && (
-                        <span className={prefix(`__clear`)}>
-                            <button
-                                type="button"
-                                aria-label="Clear textarea"
-                                onClick={handleClear}
-                                onMouseDown={(e) => e.preventDefault()}
-                                className={prefix(`__clear-button`)}
-                                tabIndex={-1}
-                            >
-                                <Close />
-                            </button>
-                        </span>
-                    )}
-                </div>
-            </Box>
+            </FieldRoot>
         );
     },
 );
