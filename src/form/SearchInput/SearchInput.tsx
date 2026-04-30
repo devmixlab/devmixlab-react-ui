@@ -46,40 +46,48 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         const [innerValue, setInnerValue] = useState('');
 
         const value = isControlled ? (props.value as string) : innerValue;
-
-        // handle typing (immediate)
-        const handleValueChange = (v: string) => {
-            if (!isControlled) {
-                setInnerValue(v);
-            }
-
-            if (!debounce) {
-                onSearch?.(v);
-            }
-
-            props.onValueChange?.(v); // preserve original behavior
-        };
+        const latestValueRef = useRef(value);
 
         const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
         useEffect(() => {
-            if (!onSearch || !debounce || value === '' || loading) return;
+            latestValueRef.current = value;
+        }, [value]);
 
+        useEffect(() => {
+            return () => {
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                }
+            };
+        }, []);
+
+        const handleValueChange = (v: string) => {
+            latestValueRef.current = v;
+
+            if (!isControlled) {
+                setInnerValue(v);
+            }
+
+            props.onValueChange?.(v);
+
+            if (!onSearch) return;
+
+            // immediate mode
+            if (!debounce) {
+                onSearch(v);
+                return;
+            }
+
+            // debounce mode
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
             }
 
             timeoutRef.current = setTimeout(() => {
-                onSearch?.(value);
+                onSearch(latestValueRef.current); // always latest value
             }, debounce);
-
-            return () => {
-                if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
-                }
-            };
-        }, [value, debounce, onSearch, loading]);
+        };
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter' && !loading) {
@@ -87,7 +95,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
                     clearTimeout(timeoutRef.current);
                     timeoutRef.current = null;
                 }
-                onSearch?.(value);
+                onSearch?.(latestValueRef.current);
             }
 
             props.onKeyDown?.(e);
@@ -96,7 +104,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         return (
             <Input
                 {...props}
-                clearable={!loading && clearable}
+                clearable={clearable}
                 clearIcon={clearIcon}
                 id={inputId}
                 ref={combinedRef}
