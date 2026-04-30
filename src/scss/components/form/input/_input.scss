@@ -155,8 +155,9 @@ $input-sizes: (
 
         display: flex;
         height: var(--slot-h, auto);
+        line-height: 1em;
         //gap: var(--gap);
-        align-items: var(--slot-align, start);
+        align-items: var(--slot-align, center);
     }
 
     &__slot-start {
@@ -232,19 +233,25 @@ $input-sizes: (
         }
 
         @each $size, $value in $textarea-sizes {
+            $gaps: map.get($input-gaps, $size);
             &.#{$compPrefix}--size-#{$size} {
-                --gap: #{map.get($value, gap)};
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --control-gap: #{map.get($gaps, controlGap)};
                 --fs: #{map.get($value, fontSize)};
                 --x-offset: #{map.get($value, spacingX)};
                 --top-offset: #{map.get($value, spacingTop)};
                 --pt: var(--top-offset);
 
-                &.#{$compPrefix}--has-start-adornment {
-                    @include field-p('--field-pl', '--start-slot-count');
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+
+                &.#{$compPrefix}--has-start-slot {
+                    --field-pl: calc(var(--start-width) + var(--gap));
                 }
 
-                &.#{$compPrefix}--has-end-adornment, &.#{$compPrefix}--clearable {
-                    @include field-p('--field-pr', '--end-slot-count');
+                &.#{$compPrefix}--has-end-slot {
+                    --field-pr: calc(var(--end-width) + var(--gap));
                 }
             }
         }
@@ -272,12 +279,10 @@ $input-sizes: (
                 --fs: #{map.get($value, fontSize)};
 
                 &.#{$compPrefix}--has-start-slot {
-                    //@include field-p('--field-pl', '--start-slot-count');
                     --field-pl: calc(var(--start-width) + var(--gap));
                 }
 
                 &.#{$compPrefix}--has-end-slot {
-                    //@include field-p('--field-pr', '--end-slot-count');
                     --field-pr: calc(var(--end-width) + var(--gap));
                 }
 
