@@ -113,6 +113,22 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             onClick?.(e);
         };
 
+        const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+            if (disabled) return;
+
+            if (
+                (e.target as HTMLElement).closest(
+                    'button, a, input, textarea, select, [role="button"], [role="switch"]',
+                )
+            ) {
+                return;
+            }
+
+            if (focusTargetRef?.current) {
+                focusTargetRef.current.focus();
+            }
+        };
+
         return (
             <Box
                 ref={combinedRef}
@@ -121,6 +137,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 data-disabled={disabled || undefined}
                 rounded={rounded}
                 onClick={handleClick}
+                onMouseDown={handleMouseDown}
                 {...rest}
             >
                 {hasStart && (

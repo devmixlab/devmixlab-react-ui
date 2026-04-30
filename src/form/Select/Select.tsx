@@ -2,81 +2,81 @@ import React, { forwardRef, useRef } from 'react';
 import clsx from 'clsx';
 import { Box, type BoxProps } from '../../Box/Box';
 import { Size, Variant } from '../Input/input.tokens';
-import { prefix, getCount } from '../Input/input.helpers';
+import { prefix } from '../Input/input.helpers';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { TriangleDown as TriangleDownIcon } from '../../Icon';
 import { mergeRefs } from '../../utils/mergeRefs';
+import { FieldRoot } from '../FieldRoot/FieldRoot';
 
-export type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
+export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> & {
     variant?: Variant;
     size?: Size;
     invalid?: boolean;
     rounded?: BoxProps['rounded'];
-    startAdornment?: React.ReactNode;
-    endAdornment?: React.ReactNode;
+
+    start?: React.ReactNode;
+    end?: React.ReactNode;
+    actions?: React.ReactNode; // 👈 NEW
+    controls?: React.ReactNode; // 👈 optional (for NumberInput later)
 };
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
     (
         {
             className,
+            children,
+
             variant = 'outlined',
             size = 'md',
             invalid = false,
+            disabled = false,
             rounded = 'md',
-            startAdornment,
-            endAdornment,
-            disabled,
-            children,
+
+            start,
+            end,
+            actions,
+            controls,
+
             ...rest
         },
         ref,
     ) => {
-        const ctx = useFormFieldContext();
-
         const selectRef = useRef<HTMLSelectElement>(null);
+
+        const ctx = useFormFieldContext();
+        const selectProps = ctx
+            ? {
+                  id: rest.id ?? ctx.id,
+                  'aria-describedby': ctx.describedBy,
+                  'aria-invalid': ctx.hasError || invalid || undefined,
+              }
+            : { 'aria-invalid': invalid || undefined };
+
         const combinedRef = mergeRefs(selectRef, ref);
 
-        const cl = clsx(
-            className,
-            prefix(),
-            prefix('--select-input'),
-            prefix(`--${variant}`),
-            prefix(`--size-${size}`),
-            {
-                [prefix(`--invalid`)]: invalid,
-                [prefix(`--disabled`)]: disabled,
-                [prefix(`--has-start-adornment`)]: startAdornment,
-                [prefix(`--has-end-adornment`)]: true, // always has arrow
-            },
+        const cl = clsx(className, prefix('--select-input'));
+
+        const finalControls = (
+            <>
+                {controls}
+                <TriangleDownIcon />
+            </>
         );
 
-        const startCount = getCount(startAdornment);
-        const endCount = getCount(endAdornment) + 1;
-
         return (
-            <Box
+            <FieldRoot
                 className={cl}
-                data-invalid={invalid || undefined}
-                data-disabled={disabled || undefined}
-                onMouseDown={(e) => {
-                    if (disabled) return;
-                    selectRef.current?.focus();
-                }}
+                invalid={invalid}
+                disabled={disabled}
                 rounded={rounded}
-                style={
-                    {
-                        '--start-slot-count': startCount,
-                        '--end-slot-count': endCount,
-                    } as React.CSSProperties
-                }
+                focusTargetRef={selectRef}
+                start={start}
+                end={end}
+                actions={actions}
+                controls={finalControls}
+                variant={variant}
+                size={size}
             >
-                {startAdornment && (
-                    <div className={clsx(prefix(`__slot`), prefix(`__slot-start`))}>
-                        <span className={prefix(`__group`)}>{startAdornment}</span>
-                    </div>
-                )}
-
                 <Box
                     as="select"
                     ref={combinedRef}
@@ -84,23 +84,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                     disabled={disabled}
                     aria-disabled={disabled || undefined}
                     {...rest}
-                    {...(ctx && {
-                        id: rest.id ?? ctx.id,
-                        'aria-describedby': ctx.describedBy,
-                        'aria-invalid': ctx.hasError || invalid || undefined,
-                    })}
+                    {...selectProps}
                 >
                     {children}
                 </Box>
-
-                <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>
-                    <span className={prefix(`__group`)}>
-                        <TriangleDownIcon />
-                    </span>
-
-                    {endAdornment && <span className={prefix(`__group`)}>{endAdornment}</span>}
-                </div>
-            </Box>
+            </FieldRoot>
         );
     },
 );
