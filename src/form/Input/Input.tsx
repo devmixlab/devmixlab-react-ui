@@ -7,6 +7,7 @@ import { mergeRefs } from '../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon/IconWrapper';
+import { FieldRoot } from '../FieldRoot/FieldRoot';
 
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
     variant?: Variant;
@@ -14,9 +15,9 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
     htmlSize?: number;
     invalid?: boolean;
     rounded?: BoxProps['rounded'];
-    startAdornment?: React.ReactNode;
-    endAdornment?: React.ReactNode;
 
+    start?: React.ReactNode;
+    end?: React.ReactNode;
     actions?: React.ReactNode; // 👈 NEW
     controls?: React.ReactNode; // 👈 optional (for NumberInput later)
 
@@ -28,22 +29,6 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);
 
-const getCount = (node: React.ReactNode): number => {
-    if (!node) return 0;
-
-    const children = React.Children.toArray(node);
-
-    return children.reduce<number>((acc, child) => {
-        if (React.isValidElement(child)) {
-            if (child.props?.children) {
-                return acc + getCount(child.props.children);
-            }
-            return acc + 1;
-        }
-        return acc;
-    }, 0);
-};
-
 const Input = forwardRef<HTMLInputElement, InputProps>(
     (
         {
@@ -52,9 +37,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             size = 'md',
             invalid = false,
             rounded = 'md',
-            startAdornment,
-            endAdornment,
 
+            start,
+            end,
             actions,
             controls,
 
@@ -76,6 +61,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         },
         ref,
     ) => {
+        const inputRef = useRef<HTMLInputElement>(null);
+
+        const isControlled = value !== undefined;
+        const isTextLike = TEXT_INPUT_TYPES.has(type);
+        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
+
         const ctx = useFormFieldContext();
         const inputProps = ctx
             ? {
@@ -83,15 +74,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                   'aria-describedby': ctx.describedBy,
                   'aria-invalid': ctx.hasError || invalid || undefined,
               }
-            : {};
-
-        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
-
-        const isControlled = value !== undefined;
-
-        const isTextLike = TEXT_INPUT_TYPES.has(type);
-
-        const inputRef = useRef<HTMLInputElement>(null);
+            : { 'aria-invalid': invalid || undefined };
 
         // minimal UI state (only for uncontrolled)
         const [hasValueState, setHasValueState] = useState(
@@ -142,54 +125,48 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         const showClearable = clearable && isTextLike && hasValue && !disabled && !readOnly;
 
-        const cl = clsx(
-            className,
-            prefix(),
-            prefix('--field-input'),
-            prefix(`--${variant}`),
-            prefix(`--size-${size}`),
-            {
-                [prefix(`--invalid`)]: invalid,
-                [prefix(`--disabled`)]: disabled,
-                [prefix(`--clearable`)]: clearable,
-                [prefix(`--has-start-adornment`)]: startAdornment,
-                [prefix(`--has-end-adornment`)]: endAdornment,
-            },
-        );
+        const cl = clsx(className, prefix('--field-input'), {
+            [prefix(`--clearable`)]: clearable,
+        });
 
         const combinedRef = mergeRefs(inputRef, ref);
 
-        const startCount = getCount(startAdornment);
-        const endCount = getCount(endAdornment) + (clearable ? 1 : 0);
+        const clearButton = (
+            <button
+                type="button"
+                aria-label="Clear input"
+                onClick={handleClearClick}
+                onMouseDown={(e) => e.preventDefault()}
+                className={prefix(`__clear-button`)}
+                tabIndex={-1}
+            >
+                {finalClearIcon}
+            </button>
+        );
 
-        // const startCount = startAdornment ? React.Children.count(startAdornment) : 0;
-        //
-        // const endCount =
-        //     (endAdornment ? React.Children.count(endAdornment) : 0) + (clearable ? 1 : 0);
+        const hasActions = actions || showClearable;
+
+        const finalActions = hasActions ? (
+            <>
+                {actions}
+                {showClearable && clearButton}
+            </>
+        ) : undefined;
 
         return (
-            <Box
+            <FieldRoot
                 className={cl}
-                data-invalid={invalid || undefined}
-                data-disabled={disabled || undefined}
+                invalid={invalid}
+                disabled={disabled}
                 rounded={rounded}
-                onClick={() => {
-                    if (disabled) return;
-                    inputRef.current?.focus();
-                }}
-                style={
-                    {
-                        '--start-slot-count': startCount,
-                        '--end-slot-count': endCount,
-                    } as React.CSSProperties
-                }
+                focusTargetRef={inputRef}
+                start={start}
+                end={end}
+                actions={finalActions}
+                controls={controls}
+                variant={variant}
+                size={size}
             >
-                {startAdornment != null && (
-                    <div className={clsx(prefix(`__slot`), prefix(`__slot-start`))}>
-                        <span className={prefix(`__group`)}>{startAdornment}</span>
-                    </div>
-                )}
-
                 <Box
                     ref={combinedRef}
                     as="input"
@@ -202,79 +179,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     onKeyDown={handleKeyDown}
                     disabled={disabled}
                     readOnly={readOnly}
-                    aria-invalid={invalid || undefined}
                     aria-disabled={disabled || undefined}
                     {...rest}
                     {...inputProps}
                 />
-
-                {/*{(endAdornment != null || showClearable) && (*/}
-                {/*    <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>*/}
-                {/*        {endAdornment != null && (*/}
-                {/*            <span className={prefix(`__icon`)}>{endAdornment}</span>*/}
-                {/*        )}*/}
-
-                {/*        {showClearable && (*/}
-                {/*            <span className={prefix(`__clear`)}>*/}
-                {/*                <button*/}
-                {/*                    type="button"*/}
-                {/*                    aria-label="Clear input"*/}
-                {/*                    onClick={handleClearClick}*/}
-                {/*                    onMouseDown={(e) => e.preventDefault()}*/}
-                {/*                    className={prefix(`__clear-button`)}*/}
-                {/*                    tabIndex={-1} // prevent focus steal*/}
-                {/*                >*/}
-                {/*                    {finalClearIcon}*/}
-                {/*                </button>*/}
-                {/*            </span>*/}
-                {/*        )}*/}
-                {/*    </div>*/}
-                {/*)}*/}
-
-                {(endAdornment != null || showClearable || actions || controls) && (
-                    <div className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>
-                        {/* 1. VALUE / CONTEXT */}
-                        {/*{endAdornment != null && (*/}
-                        {/*    <span className={prefix(`__end-group`)}>{endAdornment}</span>*/}
-                        {/*)}*/}
-
-                        {endAdornment != null && (
-                            <span className={clsx(prefix(`__group`), prefix(`__adornment-group`))}>
-                                {endAdornment}
-                            </span>
-                        )}
-
-                        {/* 2. ACTIONS (clear + custom actions) */}
-                        {(actions || showClearable) && (
-                            <span className={clsx(prefix(`__group`), prefix(`__actions-group`))}>
-                                {/* custom actions FIRST */}
-                                {actions}
-
-                                {/* built-in clear AFTER */}
-                                {showClearable && (
-                                    <button
-                                        type="button"
-                                        aria-label="Clear input"
-                                        onClick={handleClearClick}
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        className={prefix(`__clear-button`)}
-                                        tabIndex={-1}
-                                    >
-                                        {finalClearIcon}
-                                    </button>
-                                )}
-                            </span>
-                        )}
-
-                        {/* 3. CONTROLS */}
-                        {controls && (
-                            <span className={clsx(prefix(`__group`), prefix(`__control-group`))}>
-                                {controls}
-                            </span>
-                        )}
-                    </div>
-                )}
-            </Box>
+            </FieldRoot>
         );
     },
 );

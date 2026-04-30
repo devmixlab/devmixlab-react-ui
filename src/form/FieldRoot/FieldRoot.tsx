@@ -20,7 +20,8 @@ export type FieldRootProps = BoxProps & {
     children: React.ReactNode;
     className?: string;
 
-    focusRef?: React.RefObject<HTMLElement>;
+    focusTargetRef?: React.RefObject<HTMLElement | null>;
+    onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
@@ -40,7 +41,8 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             children,
             className,
 
-            focusRef,
+            focusTargetRef,
+            onClick,
 
             ...rest
         },
@@ -90,10 +92,26 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             [prefix(`--disabled`)]: disabled,
             [prefix(`--has-start-slot`)]: hasStart,
             [prefix(`--has-end-slot`)]: hasEnd,
-            // [prefix(`--has-end-group`)]: hasEndGroup,
-            // [prefix(`--has-actions-group`)]: hasActionsGroup,
-            // [prefix(`--has-controls-group`)]: hasControlsGroup,
         });
+
+        const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            if (disabled) return;
+
+            // avoid stealing focus from interactive children (buttons, etc.)
+            if (
+                (e.target as HTMLElement).closest(
+                    'button, a, input, textarea, select, [role="button"], [role="switch"]',
+                )
+            ) {
+                return;
+            }
+
+            // focusTargetRef?.current?.focus();
+            if (focusTargetRef?.current && document.activeElement !== focusTargetRef.current) {
+                focusTargetRef.current.focus();
+            }
+            onClick?.(e);
+        };
 
         return (
             <Box
@@ -102,20 +120,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
                 rounded={rounded}
-                onClick={(e) => {
-                    if (disabled) return;
-
-                    // avoid stealing focus from interactive children (buttons, etc.)
-                    if (
-                        (e.target as HTMLElement).closest(
-                            'button, a, input, textarea, select, [role="button"], [role="switch"]',
-                        )
-                    ) {
-                        return;
-                    }
-
-                    focusRef?.current?.focus();
-                }}
+                onClick={handleClick}
                 {...rest}
             >
                 {hasStart && (

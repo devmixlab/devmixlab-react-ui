@@ -31,7 +31,7 @@ const ToggleButton = ({ toggle, visible, id }: ToogleButtonProps) => (
 );
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-    ({ showToggle = false, endAdornment, id: idProp, ...props }, ref) => {
+    ({ showToggle = false, end, id: idProp, ...props }, ref) => {
         const [visible, setVisible] = useState(false);
         const ctx = useFormFieldContext();
 
@@ -45,10 +45,10 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 id={inputId}
                 ref={ref}
                 type={visible ? 'text' : 'password'}
-                endAdornment={
-                    endAdornment != null || showToggle ? (
+                end={
+                    end != null || showToggle ? (
                         <>
-                            {endAdornment}
+                            {end}
                             {showToggle && (
                                 <ToggleButton toggle={toggle} visible={visible} id={inputId} />
                             )}

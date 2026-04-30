@@ -157,15 +157,16 @@ $input-sizes: (
         height: var(--slot-h, auto);
         //gap: var(--gap);
         align-items: var(--slot-align, start);
-        padding: var(--top-offset) var(--x-offset) 0px;
     }
 
     &__slot-start {
         left: 0;
+        padding: var(--top-offset) 0px 0px  var(--x-offset);
     }
 
     &__slot-end {
         right: 0;
+        padding: var(--top-offset) var(--x-offset) 0px 0px;
     }
 
     .#{$compPrefix}__field {
@@ -270,12 +271,14 @@ $input-sizes: (
                 --height: #{map.get($value, height)};
                 --fs: #{map.get($value, fontSize)};
 
-                &.#{$compPrefix}--has-start-adornment {
-                    @include field-p('--field-pl', '--start-slot-count');
+                &.#{$compPrefix}--has-start-slot {
+                    //@include field-p('--field-pl', '--start-slot-count');
+                    --field-pl: calc(var(--start-width) + var(--gap));
                 }
 
-                &.#{$compPrefix}--has-end-adornment {
-                    @include field-p('--field-pr', '--end-slot-count');
+                &.#{$compPrefix}--has-end-slot {
+                    //@include field-p('--field-pr', '--end-slot-count');
+                    --field-pr: calc(var(--end-width) + var(--gap));
                 }
 
             }
@@ -339,7 +342,7 @@ $input-sizes: (
         margin-left: var(--actions-gap);
     }
 
-    &__control-group {
+    &__controls-group {
         margin-left: var(--control-gap);
     }
 

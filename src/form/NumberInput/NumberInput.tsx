@@ -25,8 +25,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 id={inputId}
                 ref={ref}
                 type={'text'}
-                startAdornment={prefix}
-                endAdornment={
+                start={prefix}
+                end={
                     <>
                         {suffix}
                         {unit}

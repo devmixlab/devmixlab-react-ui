@@ -101,7 +101,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
                 id={inputId}
                 ref={combinedRef}
                 type={'text'}
-                startAdornment={finalSearchIcon}
+                start={finalSearchIcon}
                 onValueChange={handleValueChange}
                 onKeyDown={handleKeyDown}
             />
