@@ -9,13 +9,13 @@ export type PasswordInputProps = Omit<InputProps, 'type'> & {
     showToggle?: boolean;
 };
 
-type ToogleButtonProps = {
+type ToggleButtonProps = {
     toggle: () => void;
     visible: boolean;
     id?: string;
 };
 
-const ToggleButton = ({ toggle, visible, id }: ToogleButtonProps) => (
+const ToggleButton = ({ toggle, visible, id }: ToggleButtonProps) => (
     <button
         type="button"
         onClick={toggle}
@@ -26,12 +26,12 @@ const ToggleButton = ({ toggle, visible, id }: ToogleButtonProps) => (
         // tabIndex={-1} // prevent stealing focus
         className={prefix('__toggle')}
     >
-        {visible ? <EyeOff /> : <Eye />}
+        <span aria-hidden="true">{visible ? <EyeOff /> : <Eye />}</span>
     </button>
 );
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-    ({ showToggle = false, end, id: idProp, ...props }, ref) => {
+    ({ showToggle = false, actions, id: idProp, ...props }, ref) => {
         const [visible, setVisible] = useState(false);
         const ctx = useFormFieldContext();
 
@@ -45,15 +45,15 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 id={inputId}
                 ref={ref}
                 type={visible ? 'text' : 'password'}
-                end={
-                    end != null || showToggle ? (
+                actions={
+                    showToggle ? (
                         <>
-                            {end}
-                            {showToggle && (
-                                <ToggleButton toggle={toggle} visible={visible} id={inputId} />
-                            )}
+                            {actions}
+                            <ToggleButton toggle={toggle} visible={visible} id={inputId} />
                         </>
-                    ) : undefined
+                    ) : (
+                        actions
+                    )
                 }
             />
         );
