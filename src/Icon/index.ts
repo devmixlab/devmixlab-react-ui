@@ -6,3 +6,5 @@ export { Info } from './Info';
 export { Success } from './Success';
 export { Warning } from './Warning';
 export { TriangleDown } from './TriangleDown';
+export { ChevronUp } from './ChevronUp';
+export { ChevronDown } from './ChevronDown';

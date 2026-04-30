@@ -5,6 +5,10 @@ export const prefix = (name: string = '') => {
     return `${CLASS_PREFIX}--input${name}`;
 };
 
+export const renderGroupItem = (content: React.ReactNode) => (
+    <span className={prefix('__group-item')}>{content}</span>
+);
+
 export const getCount = (node: React.ReactNode): number => {
     if (!node) return 0;
 

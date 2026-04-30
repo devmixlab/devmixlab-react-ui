@@ -149,13 +149,48 @@ $input-sizes: (
         }
     }
 
+    &__stepper {
+        display: flex;
+        flex-direction: column;
+        width: var(--stepper-width);
+        //background-color: red;
+        //height: 100%;            // match input height
+    }
+    &__stepper button {
+        flex: 1;                 // split height evenly
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        user-select: none;
+
+        padding: 0;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+
+        line-height: 0;          // prevent extra space from inline content
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        &:active {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        &:first-child {
+            border-bottom: 1px solid var(--border);
+        }
+    }
+
     &__slot {
         position: absolute;
         top: 0;
 
         display: flex;
         height: var(--slot-h, auto);
-        line-height: 1em;
+        line-height: 1;
         //gap: var(--gap);
         align-items: var(--slot-align, center);
     }
@@ -277,6 +312,7 @@ $input-sizes: (
                 --field-pr: var(--x-offset); // default field padding right
                 --height: #{map.get($value, height)};
                 --fs: #{map.get($value, fontSize)};
+                --stepper-width: calc(var(--height) * 0.6);
 
                 &.#{$compPrefix}--has-start-slot {
                     --field-pl: calc(var(--start-width) + var(--gap));
@@ -333,6 +369,12 @@ $input-sizes: (
         gap: var(--gap);
 
         color: var(--text-muted);
+
+        .#{$compPrefix}__group-item {
+            height: 1em;
+            display: inline-flex;
+            align-items: center;
+        }
 
         > svg,
         > .MuiSvgIcon-root {
