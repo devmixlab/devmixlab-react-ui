@@ -11,10 +11,25 @@ import { Size, Variant } from '../Input/input.tokens';
 import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon';
 
+type RenderTagParams = {
+    value: string;
+    index: number;
+    remove: () => void;
+    disabled?: boolean;
+};
+
+// type TagsInputProps = {
+//     value: string[];
+//     onChange: (tags: string[]) => void;
+//     renderTag?: (params: RenderTagParams) => React.ReactNode;
+// };
+
 export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChange'> & {
     value?: string[];
     defaultValue?: string[];
     onValueChange?: (tags: string[]) => void;
+
+    renderTag?: (params: RenderTagParams) => React.ReactNode;
 
     invalid?: boolean;
     rounded?: BoxProps['rounded'];
@@ -48,6 +63,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             value,
             defaultValue = [],
             onValueChange,
+
+            renderTag,
 
             invalid,
             disabled,
@@ -274,11 +291,28 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     </>
                 }
             >
-                {tags.map((tag, i) => (
-                    <Chip size={size} removable onRemove={() => removeTag(i)} key={tag + i}>
-                        {tag}
-                    </Chip>
-                ))}
+                {tags.map((tag, i) => {
+                    const remove = () => removeTag(i);
+
+                    if (renderTag) {
+                        return (
+                            <React.Fragment key={tag + i}>
+                                {renderTag({
+                                    value: tag,
+                                    index: i,
+                                    remove,
+                                    disabled,
+                                })}
+                            </React.Fragment>
+                        );
+                    }
+
+                    return (
+                        <Chip key={tag + i} size={size} removable onRemove={remove}>
+                            {tag}
+                        </Chip>
+                    );
+                })}
                 <span ref={mirrorRef} className={prefix(`__mirror`)} aria-hidden />
                 <input
                     ref={combinedRef}
