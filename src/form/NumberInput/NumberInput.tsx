@@ -32,6 +32,7 @@ export type NumberInputProps = Omit<InputProps, 'type'> & {
     defaultValue?: number;
     integerOnly?: boolean;
     fixedDecimals?: number;
+    thousandSeparator?: boolean;
 
     min?: number;
     max?: number;
@@ -51,6 +52,42 @@ const toNumber = (val: number | string | undefined) => {
     return Number.isFinite(n) ? n : null;
 };
 
+const formatWithSeparator = (val: string) => {
+    if (!val) return val;
+
+    const [int, dec] = val.split('.');
+
+    const formattedInt = int
+        .replace('-', '') // handle negative separately
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    const sign = int.startsWith('-') ? '-' : '';
+
+    return dec != null ? `${sign}${formattedInt}.${dec}` : `${sign}${formattedInt}`;
+};
+
+const formatDisplay = (d: Decimal, fixed?: number, thousandSeparator?: boolean) => {
+    let str = fixed != null ? d.toFixed(fixed) : d.toString();
+
+    if (thousandSeparator) {
+        str = formatWithSeparator(str);
+    }
+
+    return str;
+};
+
+const sanitizeInput = (val: string) => {
+    if (!val) return val;
+
+    return (
+        val
+            // remove common separators
+            .replace(/[\s,_]/g, '')
+            // remove currency symbols
+            .replace(/[$€£¥]/g, '')
+    );
+};
+
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     (
         {
@@ -62,6 +99,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             defaultValue,
             integerOnly = false,
             fixedDecimals,
+            thousandSeparator,
 
             onChange,
 
@@ -130,7 +168,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
             inputValueRef.current = clamped;
 
-            const str = formatDecimal(clamped, fixedDecimals);
+            const str = formatDisplay(clamped, fixedDecimals, thousandSeparator);
 
             if (!isControlled) {
                 setInnerValue(str);
@@ -212,9 +250,11 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const input = e.target;
             const raw = input.value;
+            const clean = sanitizeInput(raw);
             const cursor = input.selectionStart ?? raw.length;
 
-            const normalizedValue = normalizeValue(raw);
+            // const normalizedValue = normalizeValue(raw);
+            const normalizedValue = normalizeValue(clean);
 
             // force DOM sync immediately
             input.value = normalizedValue;
@@ -237,7 +277,10 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
             requestAnimationFrame(() => {
                 const before = raw.slice(0, cursor);
-                const normalizedBefore = normalizeValue(before);
+
+                const beforeClean = sanitizeInput(before); // ✅ add this
+                const normalizedBefore = normalizeValue(beforeClean); // ✅ fix
+
                 const removedBeforeCursor = before.length - normalizedBefore.length;
 
                 const nextCursor = cursor - removedBeforeCursor;
@@ -285,7 +328,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             // inputValueRef.current = normalizedValue;
             // inputValueRef.current = new Decimal(normalizedValue);
             inputValueRef.current = clamped;
-            const str = formatDecimal(clamped, fixedDecimals);
+            const str = formatDisplay(clamped, fixedDecimals, thousandSeparator);
 
             if (!isControlled) {
                 setInnerValue(str);
