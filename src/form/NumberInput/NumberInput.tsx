@@ -81,8 +81,8 @@ const sanitizeInput = (val: string) => {
 
     return (
         val
-            // remove common separators
-            .replace(/[\s,_]/g, '')
+            // remove group separators (IMPORTANT: add comma)
+            .replace(/[,\s_]/g, '') // ✅ comma added
             // remove currency symbols
             .replace(/[$€£¥]/g, '')
     );
