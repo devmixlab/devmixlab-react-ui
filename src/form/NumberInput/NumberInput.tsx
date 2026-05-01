@@ -137,6 +137,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         );
         // const inputValueRef = useRef<number>(toNumber(value ?? 0) ?? 0);
         const inputValueRef = useRef<Decimal>(new Decimal(toNumber(value ?? 0) ?? 0));
+        const prevValueRef = useRef('');
 
         const isControlled = value !== undefined;
 
@@ -309,33 +310,90 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         //     });
         // };
 
+        // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        //     const input = e.target;
+        //     const prev = prevValueRef.current;
+        //     const raw = input.value;
+        //     const cursor = input.selectionStart ?? raw.length;
+        //
+        //     const native = e.nativeEvent as InputEvent;
+        //
+        //     const isBackspace = native.inputType === 'deleteContentBackward';
+        //     const isDeleteForward = native.inputType === 'deleteContentForward';
+        //
+        //     let digitsBeforeCursor = countDigits(raw.slice(0, cursor));
+        //
+        //     if (isDeleteForward && prev[cursor] === ',') {
+        //         // skip comma → move forward by one digit
+        //         digitsBeforeCursor += 1;
+        //     }
+        //
+        //     const clean = sanitizeInput(raw);
+        //     const normalizedValue = normalizeValue(clean);
+        //
+        //     const dec = toDecimal(normalizedValue);
+        //
+        //     if (dec !== null) {
+        //         inputValueRef.current = dec;
+        //     }
+        //
+        //     const formatted = dec
+        //         ? formatDisplay(dec, fixedDecimals, thousandSeparator)
+        //         : normalizedValue;
+        //
+        //     input.value = formatted;
+        //
+        //     if (!isControlled) {
+        //         setInnerValue(formatted);
+        //     }
+        //
+        //     props.onValueChange?.(formatted);
+        //     onChange?.(e);
+        //
+        //     // 🔥 store AFTER formatting
+        //     prevValueRef.current = formatted;
+        //
+        //     requestAnimationFrame(() => {
+        //         let nextCursor = findCursorFromDigits(formatted, digitsBeforeCursor);
+        //         if (isDeleteForward && prev[cursor] === ',') {
+        //             nextCursor -= 1;
+        //         }
+        //         input.setSelectionRange(nextCursor, nextCursor);
+        //     });
+        // };
+
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const input = e.target;
+            const prev = prevValueRef.current;
             const raw = input.value;
             const cursor = input.selectionStart ?? raw.length;
 
-            // 1. how many digits before cursor
-            const digitsBeforeCursor = countDigits(raw.slice(0, cursor));
+            const native = e.nativeEvent as InputEvent;
+            const isBackspace = native.inputType === 'deleteContentBackward';
+            const isDeleteForward = native.inputType === 'deleteContentForward';
 
-            // 2. sanitize + normalize
+            let digitsBeforeCursor = countDigits(raw.slice(0, cursor));
+
+            if (isDeleteForward && prev[cursor] === ',') {
+                // skip comma → move forward by one digit
+                digitsBeforeCursor += 1;
+            }
+
             const clean = sanitizeInput(raw);
             const normalizedValue = normalizeValue(clean);
 
-            // 3. decimal
             const dec = toDecimal(normalizedValue);
 
             if (dec !== null) {
                 inputValueRef.current = dec;
             }
 
-            // 4. format ALWAYS
             const formatted = dec
                 ? formatDisplay(dec, fixedDecimals, thousandSeparator)
                 : normalizedValue;
 
             input.value = formatted;
 
-            // 5. update UI
             if (!isControlled) {
                 setInnerValue(formatted);
             }
@@ -343,9 +401,16 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             props.onValueChange?.(formatted);
             onChange?.(e);
 
-            // 6. restore cursor based on digits
+            // store AFTER formatting
+            prevValueRef.current = formatted;
+
             requestAnimationFrame(() => {
-                const nextCursor = findCursorFromDigits(formatted, digitsBeforeCursor);
+                let nextCursor = findCursorFromDigits(formatted, digitsBeforeCursor);
+
+                if (isDeleteForward && prev[cursor] === ',') {
+                    nextCursor -= 1;
+                }
+
                 input.setSelectionRange(nextCursor, nextCursor);
             });
         };
