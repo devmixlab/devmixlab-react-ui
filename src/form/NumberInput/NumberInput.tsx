@@ -88,6 +88,26 @@ const sanitizeInput = (val: string) => {
     );
 };
 
+const countDigits = (str: string) => {
+    return str.replace(/\D/g, '').length;
+};
+
+const findCursorFromDigits = (formatted: string, digitIndex: number) => {
+    let count = 0;
+
+    for (let i = 0; i < formatted.length; i++) {
+        if (/\d/.test(formatted[i])) {
+            count++;
+        }
+
+        if (count >= digitIndex) {
+            return i + 1;
+        }
+    }
+
+    return formatted.length;
+};
+
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     (
         {
@@ -247,45 +267,86 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             return normalized;
         };
 
+        // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        //     const input = e.target;
+        //     const raw = input.value;
+        //     const clean = sanitizeInput(raw);
+        //     const cursor = input.selectionStart ?? raw.length;
+        //
+        //     // const normalizedValue = normalizeValue(raw);
+        //     const normalizedValue = normalizeValue(clean);
+        //
+        //     // force DOM sync immediately
+        //     input.value = normalizedValue;
+        //
+        //     // const num = toNumber(normalizedValue);
+        //     // if (num !== null) {
+        //     //     inputValueRef.current = num;
+        //     // }
+        //     const dec = toDecimal(normalizedValue);
+        //     if (dec !== null) {
+        //         inputValueRef.current = dec;
+        //     }
+        //
+        //     if (!isControlled) {
+        //         setInnerValue(normalizedValue);
+        //     }
+        //
+        //     props.onValueChange?.(normalizedValue);
+        //     onChange?.(e);
+        //
+        //     requestAnimationFrame(() => {
+        //         const before = raw.slice(0, cursor);
+        //
+        //         const beforeClean = sanitizeInput(before); // ✅ add this
+        //         const normalizedBefore = normalizeValue(beforeClean); // ✅ fix
+        //
+        //         const removedBeforeCursor = before.length - normalizedBefore.length;
+        //
+        //         const nextCursor = cursor - removedBeforeCursor;
+        //         const safeCursor = Math.max(0, Math.min(nextCursor, normalizedValue.length));
+        //         input.setSelectionRange(safeCursor, safeCursor);
+        //     });
+        // };
+
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const input = e.target;
             const raw = input.value;
-            const clean = sanitizeInput(raw);
             const cursor = input.selectionStart ?? raw.length;
 
-            // const normalizedValue = normalizeValue(raw);
+            // 1. how many digits before cursor
+            const digitsBeforeCursor = countDigits(raw.slice(0, cursor));
+
+            // 2. sanitize + normalize
+            const clean = sanitizeInput(raw);
             const normalizedValue = normalizeValue(clean);
 
-            // force DOM sync immediately
-            input.value = normalizedValue;
-
-            // const num = toNumber(normalizedValue);
-            // if (num !== null) {
-            //     inputValueRef.current = num;
-            // }
+            // 3. decimal
             const dec = toDecimal(normalizedValue);
+
             if (dec !== null) {
                 inputValueRef.current = dec;
             }
 
+            // 4. format ALWAYS
+            const formatted = dec
+                ? formatDisplay(dec, fixedDecimals, thousandSeparator)
+                : normalizedValue;
+
+            input.value = formatted;
+
+            // 5. update UI
             if (!isControlled) {
-                setInnerValue(normalizedValue);
+                setInnerValue(formatted);
             }
 
-            props.onValueChange?.(normalizedValue);
+            props.onValueChange?.(formatted);
             onChange?.(e);
 
+            // 6. restore cursor based on digits
             requestAnimationFrame(() => {
-                const before = raw.slice(0, cursor);
-
-                const beforeClean = sanitizeInput(before); // ✅ add this
-                const normalizedBefore = normalizeValue(beforeClean); // ✅ fix
-
-                const removedBeforeCursor = before.length - normalizedBefore.length;
-
-                const nextCursor = cursor - removedBeforeCursor;
-                const safeCursor = Math.max(0, Math.min(nextCursor, normalizedValue.length));
-                input.setSelectionRange(safeCursor, safeCursor);
+                const nextCursor = findCursorFromDigits(formatted, digitsBeforeCursor);
+                input.setSelectionRange(nextCursor, nextCursor);
             });
         };
 
@@ -305,8 +366,11 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 return;
             }
 
+            // ✅ FIX: sanitize before parsing
+            const clean = sanitizeInput(String(displayValue));
+            const dec = toDecimal(clean);
             // const num = Number(displayValue);
-            const dec = toDecimal(displayValue);
+            // const dec = toDecimal(displayValue);
 
             // if (!Number.isFinite(num)) {
             if (!dec) {
