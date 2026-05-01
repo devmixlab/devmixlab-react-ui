@@ -12,16 +12,20 @@ export type NumberInputProps = Omit<InputProps, 'type'> & {
     showStepper?: boolean;
     value?: number | string;
     defaultValue?: number;
+    integerOnly?: boolean;
 
     min?: number;
     max?: number;
     step?: number;
 };
 
-const toNumber = (val: number | string | undefined) => {
+const toNumber = (val: number | string) => {
     const n = typeof val === 'number' ? val : Number(val);
-    return isNaN(n) ? 0 : n;
+    return Number.isFinite(n) ? n : null;
 };
+
+const toInt = (n: number) => Math.round(n);
+const hasDecimal = (n) => !Number.isInteger(n);
 
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     (
@@ -32,6 +36,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             suffix,
             value,
             defaultValue,
+            integerOnly = true,
 
             min = 0,
             max = 999,
@@ -42,8 +47,9 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         },
         ref,
     ) => {
-        const [innerValue, setInnerValue] = useState(defaultValue ?? 0);
-        const inputValueRef = useRef(toNumber(value ?? 0));
+        const [innerValue, setInnerValue] = useState<number | string>(defaultValue ?? 0);
+        // const inputValueRef = useRef<number | string>(toNumber(value ?? 0));
+        const inputValueRef = useRef<number>(toNumber(value ?? 0) ?? 0);
 
         const isControlled = value !== undefined;
 
@@ -124,17 +130,80 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const isAtMin = current <= min;
         const isAtMax = current >= max;
 
+        const normalizeValue = (val) => {
+            if (!val) return '';
+
+            // 1. normalize comma → dot
+            let normalized = val.replace(',', '.');
+
+            // 2. remove all invalid chars (keep digits, dot, minus)
+            normalized = normalized.replace(/[^\d.-]/g, '');
+
+            // 3. allow only ONE minus at the start
+            normalized = normalized
+                .replace(/(?!^)-/g, '') // remove all '-' not at start
+                .replace(/^(-)+/, '-'); // collapse multiple '-' to one
+
+            // 4. allow only ONE dot
+            const parts = normalized.split('.');
+            if (parts.length > 2) {
+                normalized = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // 5. integer mode → remove decimals
+            if (integerOnly && normalized.includes('.')) {
+                normalized = normalized.split('.')[0];
+            }
+
+            return normalized;
+        };
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const normalizedValue = normalizeValue(e.target.value);
+
+            // only convert when it’s a "real number"
+            const num = toNumber(normalizedValue);
+
+            if (Number.isFinite(num)) {
+                inputValueRef.current = num;
+            }
+
+            if (!isControlled) {
+                setInnerValue(normalizedValue); // keep raw, not num
+            }
+
+            props.onValueChange?.(normalizedValue);
+        };
+
+        const onInputBlur = () => {
+            clearTimeRefs();
+
+            const num = Number(displayValue);
+            if (!Number.isFinite(num)) return;
+
+            const normalizedValue = clamp(num);
+
+            inputValueRef.current = normalizedValue;
+
+            if (!isControlled) {
+                setInnerValue(normalizedValue);
+            }
+
+            props.onValueChange?.(String(normalizedValue));
+        };
+
         return (
             <Input
                 {...props}
                 inputMode="numeric"
                 value={displayValue}
-                onBlur={clearTimeRefs}
+                onBlur={onInputBlur}
                 id={inputId}
                 ref={ref}
                 type={'text'}
                 start={prefix}
                 onKeyDown={handleKeyDown}
+                onChange={handleChange}
                 end={
                     <>
                         {renderGroupItem(suffix)}
