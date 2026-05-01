@@ -15,6 +15,7 @@ export { Input } from './src/form/Input/Input';
 export { PasswordInput } from './src/form/Input/PasswordInput';
 export { SearchInput } from './src/form/SearchInput/SearchInput';
 export { NumberInput } from './src/form/NumberInput/NumberInput';
+export { TagsInput } from './src/form/TagsInput/TagsInput';
 export { Textarea } from './src/form/Input/Textarea';
 export { Select } from './src/form/Select/Select';
 export { FormField } from './src/form/FormField';

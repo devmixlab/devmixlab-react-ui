@@ -38,6 +38,12 @@ $input-sizes: (
     lg: (height: 48px, fontSize: 18px, spacingX: 24px, gap: 8px),
 );
 
+$tag-input-sizes: (
+    sm: (height: 32px, fontSize: 14px, spacingX: 8px, spacingY: 3px, spacingTop: 6px, gap: 4px),
+    md: (height: 40px, fontSize: 16px, spacingX: 16px, spacingY: 6px, spacingTop: 10px, gap: 6px),
+    lg: (height: 48px, fontSize: 18px, spacingX: 24px, spacingY: 9px, spacingTop: 12px, gap: 8px),
+);
+
 @mixin intent-vars($palette, $palette-name) {
     @each $step, $value in $palette {
         --intent-#{
@@ -327,6 +333,7 @@ $input-sizes: (
                 --field-pl: var(--x-offset); // default field padding left
                 --field-pr: var(--x-offset); // default field padding right
                 --height: #{map.get($value, height)};
+                --min-height: auto;
                 --fs: #{map.get($value, fontSize)};
                 --stepper-width: calc(var(--height) * 0.6);
 
@@ -339,6 +346,81 @@ $input-sizes: (
                 }
 
             }
+        }
+    }
+
+
+    &--tags-input {
+        display: flex;
+        flex-wrap: wrap;
+        //--height: auto;
+        //min-height: var(--height);
+        //align-items: flex-start;
+        --icon-adjust: 2px; // adjust icon to look consistent, its just fix
+        --slot-align: center;
+        --slot-h: auto;
+        gap: var(--gap);
+        @each $size, $value in $tag-input-sizes {
+            $gaps: map.get($input-gaps, $size);
+            &.#{$compPrefix}--size-#{$size} {
+
+                // Slot vars
+                //--top-offset: 0px;
+                --top-offset: #{map.get($value, spacingTop)};
+                --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
+                --y-offset: #{map.get($value, spacingY)};
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --control-gap: #{map.get($gaps, controlGap)};
+
+                --pt: var(--y-offset);
+                --pb: var(--y-offset);
+
+                // Field vars
+                //--pl: 100px;
+                //--pl: var(--x-offset); // default field padding left
+                --pr: var(--x-offset); // default field padding right
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+                //--field-pl: 20px;
+                --min-height: #{map.get($value, height)};
+                //--min-height: 100px;
+                //--height: 100%;
+                --fs: #{map.get($value, fontSize)};
+                //--stepper-width: calc(var(--height) * 0.6);
+
+                &.#{$compPrefix}--has-start-slot {
+                    --pl: calc(var(--start-width) + var(--gap));
+                }
+
+                &.#{$compPrefix}--has-end-slot {
+                    --pr: calc(var(--end-width) + var(--gap));
+                }
+            }
+        }
+
+        .#{$compPrefix}__field {
+            flex: 0 0 auto;   // 👈 force override
+            width: auto;      // 👈 CRITICAL
+            min-width: 20px;
+
+            //min-width: 60px;    // keep cursor visible
+            max-width: 100%;
+
+            height: auto;
+            padding: 0;
+        }
+
+        .#{$compPrefix}__mirror {
+            position: absolute;
+            visibility: hidden;
+            white-space: pre;
+
+            font: inherit;         // 👈 VERY important
+            letter-spacing: inherit;
+
+            padding: 0;
+            margin: 0;
         }
     }
 
