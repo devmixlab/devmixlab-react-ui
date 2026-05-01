@@ -4,6 +4,24 @@ import { prefix as inputPrefix, renderGroupItem } from '../Input/input.helpers';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { ChevronUp } from '../../Icon/ChevronUp';
 import { ChevronDown } from '../../Icon/ChevronDown';
+import Decimal from 'decimal.js';
+
+const isAtBound = (value: Decimal, bound: number | undefined, cmp: 'lte' | 'gte') => {
+    if (bound === undefined) return false;
+    return value[cmp](bound);
+};
+
+const toDecimal = (val: number | string | undefined) => {
+    if (val === '' || val === '-' || val === '.' || val === '-.') {
+        return null;
+    }
+
+    try {
+        return new Decimal(val ?? 0);
+    } catch {
+        return null;
+    }
+};
 
 export type NumberInputProps = Omit<InputProps, 'type'> & {
     unit?: string;
@@ -13,18 +31,25 @@ export type NumberInputProps = Omit<InputProps, 'type'> & {
     value?: number | string;
     defaultValue?: number;
     integerOnly?: boolean;
+    fixedDecimals?: number;
 
     min?: number;
     max?: number;
     step?: number;
 };
 
+const formatDecimal = (d: Decimal, fixed?: number) => {
+    if (fixed != null) {
+        return d.toFixed(fixed);
+    }
+
+    return d.toString();
+};
+
 const toNumber = (val: number | string | undefined) => {
     const n = typeof val === 'number' ? val : Number(val);
     return Number.isFinite(n) ? n : null;
 };
-
-const isNumber = (n: number | null): n is number => n !== null;
 
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     (
@@ -36,11 +61,12 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             value,
             defaultValue,
             integerOnly = false,
+            fixedDecimals,
 
             onChange,
 
-            min = 0,
-            max = 999,
+            min,
+            max,
             step = 1,
 
             id: idProp,
@@ -51,13 +77,20 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const [innerValue, setInnerValue] = useState<string>(
             defaultValue != null ? String(defaultValue) : '',
         );
-        const inputValueRef = useRef<number>(toNumber(value ?? 0) ?? 0);
+        // const inputValueRef = useRef<number>(toNumber(value ?? 0) ?? 0);
+        const inputValueRef = useRef<Decimal>(new Decimal(toNumber(value ?? 0) ?? 0));
 
         const isControlled = value !== undefined;
 
         const clamp = (v: number) => {
             if (min !== undefined) v = Math.max(min, v);
             if (max !== undefined) v = Math.min(max, v);
+            return v;
+        };
+
+        const clampDecimal = (v: Decimal) => {
+            if (min !== undefined) v = Decimal.max(v, min);
+            if (max !== undefined) v = Decimal.min(v, max);
             return v;
         };
 
@@ -68,23 +101,42 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         useEffect(() => {
             if (isControlled) {
                 const n = toNumber(value);
-                if (n !== null) inputValueRef.current = n;
+                // if (n !== null) inputValueRef.current = n;
+                if (n !== null) inputValueRef.current = new Decimal(n);
             }
         }, [value]);
 
         const ctx = useFormFieldContext();
         const inputId = idProp ?? ctx?.id;
 
-        const handleIncrDecr = (dir = true) => {
-            const next = clamp(dir ? inputValueRef.current + step : inputValueRef.current - step);
+        // const handleIncrDecr = (dir = true) => {
+        //     const next = clamp(dir ? inputValueRef.current + step : inputValueRef.current - step);
+        //
+        //     inputValueRef.current = next;
+        //
+        //     if (!isControlled) {
+        //         setInnerValue(String(next));
+        //     }
+        //
+        //     props.onValueChange?.(String(next));
+        // };
 
-            inputValueRef.current = next;
+        const handleIncrDecr = (dir = true) => {
+            const current = inputValueRef.current;
+
+            const nextDecimal = dir ? current.plus(step) : current.minus(step);
+
+            const clamped = clampDecimal(nextDecimal);
+
+            inputValueRef.current = clamped;
+
+            const str = formatDecimal(clamped, fixedDecimals);
 
             if (!isControlled) {
-                setInnerValue(String(next));
+                setInnerValue(str);
             }
 
-            props.onValueChange?.(String(next));
+            props.onValueChange?.(str);
         };
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -121,10 +173,13 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         };
 
         const displayValue = isControlled ? value : innerValue;
-        const current = toNumber(displayValue) ?? 0;
+        // const current = inputValueRef.current.toNumber();
+        //
+        // const isAtMin = current <= min;
+        // const isAtMax = current >= max;
 
-        const isAtMin = current <= min;
-        const isAtMax = current >= max;
+        const isAtMin = isAtBound(inputValueRef.current, min, 'lte');
+        const isAtMax = isAtBound(inputValueRef.current, max, 'gte');
 
         const normalizeValue = (val: string) => {
             if (!val) return '';
@@ -164,9 +219,13 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             // force DOM sync immediately
             input.value = normalizedValue;
 
-            const num = toNumber(normalizedValue);
-            if (num !== null) {
-                inputValueRef.current = num;
+            // const num = toNumber(normalizedValue);
+            // if (num !== null) {
+            //     inputValueRef.current = num;
+            // }
+            const dec = toDecimal(normalizedValue);
+            if (dec !== null) {
+                inputValueRef.current = dec;
             }
 
             if (!isControlled) {
@@ -192,7 +251,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
             // handle empty explicitly
             if (displayValue === '') {
-                inputValueRef.current = min ?? 0;
+                // inputValueRef.current = min ?? 0;
+                inputValueRef.current = new Decimal(min ?? 0);
 
                 if (!isControlled) {
                     setInnerValue('');
@@ -202,10 +262,13 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 return;
             }
 
-            const num = Number(displayValue);
+            // const num = Number(displayValue);
+            const dec = toDecimal(displayValue);
 
-            if (!Number.isFinite(num)) {
-                inputValueRef.current = min ?? 0;
+            // if (!Number.isFinite(num)) {
+            if (!dec) {
+                // inputValueRef.current = min ?? 0;
+                inputValueRef.current = new Decimal(min ?? 0);
 
                 if (!isControlled) {
                     setInnerValue('');
@@ -215,15 +278,20 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 return;
             }
 
-            const normalizedValue = clamp(num);
+            // const normalizedValue = clamp(num);
+            // const normalizedValue = clamp(dec.toNumber());
+            const clamped = clampDecimal(dec);
 
-            inputValueRef.current = normalizedValue;
+            // inputValueRef.current = normalizedValue;
+            // inputValueRef.current = new Decimal(normalizedValue);
+            inputValueRef.current = clamped;
+            const str = formatDecimal(clamped, fixedDecimals);
 
             if (!isControlled) {
-                setInnerValue(String(normalizedValue));
+                setInnerValue(str);
             }
 
-            props.onValueChange?.(String(normalizedValue));
+            props.onValueChange?.(str);
         };
 
         return (
