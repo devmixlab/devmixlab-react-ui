@@ -34,10 +34,17 @@ export type NumberInputProps = Omit<InputProps, 'type'> & {
     fixedDecimals?: number;
     thousandSeparator?: boolean;
     stepAcceleration?: boolean;
+    stickToStep?: boolean;
 
     min?: number;
     max?: number;
     step?: number;
+};
+
+const snapToStep = (value: Decimal, step: number) => {
+    const s = new Decimal(step);
+
+    return value.div(s).round().mul(s);
 };
 
 const formatDecimal = (d: Decimal, fixed?: number) => {
@@ -137,7 +144,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const [innerValue, setInnerValue] = useState<string>(
             defaultValue != null ? String(defaultValue) : '',
         );
-        // const inputValueRef = useRef<number>(toNumber(value ?? 0) ?? 0);
+
         const inputValueRef = useRef<Decimal>(new Decimal(toNumber(value ?? 0) ?? 0));
         const prevValueRef = useRef('');
         const pressCountRef = useRef(0);
@@ -170,36 +177,6 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
         const ctx = useFormFieldContext();
         const inputId = idProp ?? ctx?.id;
-
-        // const handleIncrDecr = (dir = true) => {
-        //     const next = clamp(dir ? inputValueRef.current + step : inputValueRef.current - step);
-        //
-        //     inputValueRef.current = next;
-        //
-        //     if (!isControlled) {
-        //         setInnerValue(String(next));
-        //     }
-        //
-        //     props.onValueChange?.(String(next));
-        // };
-
-        // const handleIncrDecr = (dir = true) => {
-        //     const current = inputValueRef.current;
-        //
-        //     const nextDecimal = dir ? current.plus(step) : current.minus(step);
-        //
-        //     const clamped = clampDecimal(nextDecimal);
-        //
-        //     inputValueRef.current = clamped;
-        //
-        //     const str = formatDisplay(clamped, fixedDecimals, thousandSeparator);
-        //
-        //     if (!isControlled) {
-        //         setInnerValue(str);
-        //     }
-        //
-        //     props.onValueChange?.(str);
-        // };
 
         const handleIncrDecr = (dir = true, multiplier = 1) => {
             const current = inputValueRef.current;
@@ -272,10 +249,6 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         };
 
         const displayValue = isControlled ? value : innerValue;
-        // const current = inputValueRef.current.toNumber();
-        //
-        // const isAtMin = current <= min;
-        // const isAtMax = current >= max;
 
         const isAtMin = isAtBound(inputValueRef.current, min, 'lte');
         const isAtMax = isAtBound(inputValueRef.current, max, 'gte');
@@ -307,100 +280,6 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
             return normalized;
         };
-
-        // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        //     const input = e.target;
-        //     const raw = input.value;
-        //     const clean = sanitizeInput(raw);
-        //     const cursor = input.selectionStart ?? raw.length;
-        //
-        //     // const normalizedValue = normalizeValue(raw);
-        //     const normalizedValue = normalizeValue(clean);
-        //
-        //     // force DOM sync immediately
-        //     input.value = normalizedValue;
-        //
-        //     // const num = toNumber(normalizedValue);
-        //     // if (num !== null) {
-        //     //     inputValueRef.current = num;
-        //     // }
-        //     const dec = toDecimal(normalizedValue);
-        //     if (dec !== null) {
-        //         inputValueRef.current = dec;
-        //     }
-        //
-        //     if (!isControlled) {
-        //         setInnerValue(normalizedValue);
-        //     }
-        //
-        //     props.onValueChange?.(normalizedValue);
-        //     onChange?.(e);
-        //
-        //     requestAnimationFrame(() => {
-        //         const before = raw.slice(0, cursor);
-        //
-        //         const beforeClean = sanitizeInput(before); // ✅ add this
-        //         const normalizedBefore = normalizeValue(beforeClean); // ✅ fix
-        //
-        //         const removedBeforeCursor = before.length - normalizedBefore.length;
-        //
-        //         const nextCursor = cursor - removedBeforeCursor;
-        //         const safeCursor = Math.max(0, Math.min(nextCursor, normalizedValue.length));
-        //         input.setSelectionRange(safeCursor, safeCursor);
-        //     });
-        // };
-
-        // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        //     const input = e.target;
-        //     const prev = prevValueRef.current;
-        //     const raw = input.value;
-        //     const cursor = input.selectionStart ?? raw.length;
-        //
-        //     const native = e.nativeEvent as InputEvent;
-        //
-        //     const isBackspace = native.inputType === 'deleteContentBackward';
-        //     const isDeleteForward = native.inputType === 'deleteContentForward';
-        //
-        //     let digitsBeforeCursor = countDigits(raw.slice(0, cursor));
-        //
-        //     if (isDeleteForward && prev[cursor] === ',') {
-        //         // skip comma → move forward by one digit
-        //         digitsBeforeCursor += 1;
-        //     }
-        //
-        //     const clean = sanitizeInput(raw);
-        //     const normalizedValue = normalizeValue(clean);
-        //
-        //     const dec = toDecimal(normalizedValue);
-        //
-        //     if (dec !== null) {
-        //         inputValueRef.current = dec;
-        //     }
-        //
-        //     const formatted = dec
-        //         ? formatDisplay(dec, fixedDecimals, thousandSeparator)
-        //         : normalizedValue;
-        //
-        //     input.value = formatted;
-        //
-        //     if (!isControlled) {
-        //         setInnerValue(formatted);
-        //     }
-        //
-        //     props.onValueChange?.(formatted);
-        //     onChange?.(e);
-        //
-        //     // 🔥 store AFTER formatting
-        //     prevValueRef.current = formatted;
-        //
-        //     requestAnimationFrame(() => {
-        //         let nextCursor = findCursorFromDigits(formatted, digitsBeforeCursor);
-        //         if (isDeleteForward && prev[cursor] === ',') {
-        //             nextCursor -= 1;
-        //         }
-        //         input.setSelectionRange(nextCursor, nextCursor);
-        //     });
-        // };
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const input = e.target;
@@ -477,12 +356,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             // ✅ FIX: sanitize before parsing
             const clean = sanitizeInput(String(displayValue));
             const dec = toDecimal(clean);
-            // const num = Number(displayValue);
-            // const dec = toDecimal(displayValue);
 
-            // if (!Number.isFinite(num)) {
             if (!dec) {
-                // inputValueRef.current = min ?? 0;
                 inputValueRef.current = new Decimal(min ?? 0);
 
                 if (!isControlled) {
@@ -493,13 +368,18 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 return;
             }
 
-            // const normalizedValue = clamp(num);
-            // const normalizedValue = clamp(dec.toNumber());
-            const clamped = clampDecimal(dec);
+            let next = dec;
 
-            // inputValueRef.current = normalizedValue;
-            // inputValueRef.current = new Decimal(normalizedValue);
+            // snap to step (only here)
+            if (props.stickToStep && step) {
+                next = snapToStep(next, step);
+            }
+
+            // clamp AFTER snapping
+            const clamped = clampDecimal(next);
+
             inputValueRef.current = clamped;
+
             const str = formatDisplay(clamped, fixedDecimals, thousandSeparator);
 
             if (!isControlled) {
@@ -534,7 +414,6 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                             <button
                                 type="button"
                                 disabled={isAtMax}
-                                // onMouseDown={() => startPress(() => handleIncrDecr())}
                                 onMouseDown={() => startPress((m) => handleIncrDecr(true, m))}
                                 onMouseUp={clearTimeRefs}
                                 onMouseLeave={clearTimeRefs}
