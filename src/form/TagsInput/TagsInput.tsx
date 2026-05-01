@@ -25,13 +25,17 @@ export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChan
     unique?: boolean;
     onDuplicate?: (tag: string, existing: string) => void;
 
+    onTagAdd?: (tag: string) => void;
+    onTagRemove?: (tag: string, index: number) => void;
+
     clearable?: boolean;
     clearIcon?: React.ReactNode;
-    // onClearAll?: (tags: string[]) => void;
     onClearAll?: (tags: string[]) => boolean | void | Promise<boolean | void>;
 
     separator?: RegExp; // default: /[,\n]/
     maxTags?: number;
+    maxLength?: number;
+    onInvalidTag?: (tag: string, reason: 'maxLength' | 'empty') => void;
 };
 
 const DEFAULT_SEPARATOR = /[,\n]/;
@@ -55,12 +59,17 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             unique = false, // 👈 default
             onDuplicate,
 
+            onTagAdd,
+            onTagRemove,
+
             clearable,
             clearIcon,
             onClearAll,
 
             separator = DEFAULT_SEPARATOR,
             maxTags,
+            maxLength,
+            onInvalidTag,
             ...props
         },
         ref,
@@ -124,7 +133,17 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
 
         const addTag = (raw: string) => {
-            const trimmed = raw.trim();
+            let trimmed = raw.trim();
+            if (!trimmed) {
+                onInvalidTag?.(raw, 'empty');
+                return;
+            }
+
+            if (maxLength && trimmed.length > maxLength) {
+                onInvalidTag?.(trimmed, 'maxLength');
+                trimmed = trimmed.slice(0, maxLength);
+            }
+
             if (!trimmed) return;
 
             if (maxTags && tags.length >= maxTags) return;
@@ -139,12 +158,16 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             }
 
             setTags([...tags, trimmed]);
+            onTagAdd?.(trimmed);
             setInputValue('');
         };
 
         const removeTag = (index: number) => {
+            const removed = tags[index];
             const next = tags.filter((_, i) => i !== index);
+
             setTags(next);
+            onTagRemove?.(removed, index);
         };
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -163,7 +186,12 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const raw = e.target.value;
+            let raw = e.target.value;
+
+            if (maxLength && raw.length > maxLength) {
+                onInvalidTag?.(raw, 'maxLength');
+                raw = raw.slice(0, maxLength);
+            }
 
             // handle split typing (e.g. "a,b")
             if (separator.test(raw)) {
@@ -195,7 +223,17 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             let next = [...tags];
 
             for (const part of parts) {
-                const trimmed = part.trim();
+                let trimmed = part.trim();
+                if (!trimmed) {
+                    onInvalidTag?.(part, 'empty');
+                    continue;
+                }
+
+                if (maxLength && trimmed.length > maxLength) {
+                    onInvalidTag?.(trimmed, 'maxLength');
+                    trimmed = trimmed.slice(0, maxLength);
+                }
+
                 if (!trimmed) continue;
 
                 if (unique) {
@@ -208,6 +246,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 }
 
                 next.push(trimmed);
+                onTagAdd?.(trimmed);
 
                 if (maxTags && next.length >= maxTags) break;
             }
@@ -246,6 +285,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     value={inputValue}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
+                    onPaste={handlePaste}
                     className={prefix(`__field`)}
                 />
             </FieldRoot>
