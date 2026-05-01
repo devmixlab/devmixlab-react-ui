@@ -37,6 +37,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             defaultValue,
             integerOnly = false,
 
+            onChange,
+
             min = 0,
             max = 999,
             step = 1,
@@ -65,7 +67,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
         useEffect(() => {
             if (isControlled) {
-                inputValueRef.current = toNumber(value) ?? 0;
+                const n = toNumber(value);
+                if (n !== null) inputValueRef.current = n;
             }
         }, [value]);
 
@@ -123,7 +126,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const isAtMin = current <= min;
         const isAtMax = current >= max;
 
-        const normalizeValue = (val) => {
+        const normalizeValue = (val: string) => {
             if (!val) return '';
 
             // 1. normalize comma → dot
@@ -171,10 +174,12 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             }
 
             props.onValueChange?.(normalizedValue);
+            onChange?.(e);
 
             requestAnimationFrame(() => {
-                const removedBeforeCursor =
-                    raw.slice(0, cursor).length - normalizeValue(raw.slice(0, cursor)).length;
+                const before = raw.slice(0, cursor);
+                const normalizedBefore = normalizeValue(before);
+                const removedBeforeCursor = before.length - normalizedBefore.length;
 
                 const nextCursor = cursor - removedBeforeCursor;
                 const safeCursor = Math.max(0, Math.min(nextCursor, normalizedValue.length));
