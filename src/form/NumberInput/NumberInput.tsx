@@ -282,14 +282,40 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         };
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const input = e.target;
+            const input = e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
+
+            if (!input) {
+                const raw = (e.target as any)?.value ?? '';
+
+                const clean = sanitizeInput(raw);
+                const normalizedValue = normalizeValue(clean);
+
+                const dec = toDecimal(normalizedValue);
+
+                if (dec !== null) {
+                    inputValueRef.current = dec;
+                }
+
+                if (!isControlled) {
+                    setInnerValue(normalizedValue);
+                }
+
+                props.onValueChange?.(normalizedValue);
+                onChange?.(e);
+
+                return; // stop here (no cursor logic)
+            }
+
             const prev = prevValueRef.current;
             const raw = input.value;
             const cursor = input.selectionStart ?? raw.length;
 
-            const native = e.nativeEvent as InputEvent;
-            const isBackspace = native.inputType === 'deleteContentBackward';
-            const isDeleteForward = native.inputType === 'deleteContentForward';
+            const native = e.nativeEvent as InputEvent | undefined;
+
+            const inputType = native && 'inputType' in native ? native.inputType : undefined;
+
+            const isBackspace = inputType === 'deleteContentBackward';
+            const isDeleteForward = inputType === 'deleteContentForward';
 
             let digitsBeforeCursor = countDigits(raw.slice(0, cursor));
 
@@ -336,6 +362,10 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 input.setSelectionRange(nextCursor, nextCursor);
             });
         };
+
+        // const handleClear = () => {
+        //     console.log(1111);
+        // };
 
         const onInputBlur = () => {
             clearTimeRefs();
@@ -401,6 +431,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 start={prefix}
                 onKeyDown={handleKeyDown}
                 onChange={handleChange}
+                // onClear={handleClear}
                 end={
                     <>
                         {renderGroupItem(suffix)}
