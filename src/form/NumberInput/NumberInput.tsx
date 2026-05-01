@@ -19,13 +19,12 @@ export type NumberInputProps = Omit<InputProps, 'type'> & {
     step?: number;
 };
 
-const toNumber = (val: number | string) => {
+const toNumber = (val: number | string | undefined) => {
     const n = typeof val === 'number' ? val : Number(val);
     return Number.isFinite(n) ? n : null;
 };
 
-const toInt = (n: number) => Math.round(n);
-const hasDecimal = (n) => !Number.isInteger(n);
+const isNumber = (n: number | null): n is number => n !== null;
 
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     (
@@ -36,7 +35,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             suffix,
             value,
             defaultValue,
-            integerOnly = true,
+            integerOnly = false,
 
             min = 0,
             max = 999,
@@ -47,8 +46,9 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         },
         ref,
     ) => {
-        const [innerValue, setInnerValue] = useState<number | string>(defaultValue ?? 0);
-        // const inputValueRef = useRef<number | string>(toNumber(value ?? 0));
+        const [innerValue, setInnerValue] = useState<string>(
+            defaultValue != null ? String(defaultValue) : '',
+        );
         const inputValueRef = useRef<number>(toNumber(value ?? 0) ?? 0);
 
         const isControlled = value !== undefined;
@@ -65,7 +65,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
         useEffect(() => {
             if (isControlled) {
-                inputValueRef.current = toNumber(value);
+                inputValueRef.current = toNumber(value) ?? 0;
             }
         }, [value]);
 
@@ -73,22 +73,15 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const inputId = idProp ?? ctx?.id;
 
         const handleIncrDecr = (dir = true) => {
-            const onChange = (prev: number) => {
-                const next = clamp(dir ? prev + step : prev - step);
+            const next = clamp(dir ? inputValueRef.current + step : inputValueRef.current - step);
 
-                inputValueRef.current = next;
-
-                props.onValueChange?.(String(next));
-                return next;
-            };
+            inputValueRef.current = next;
 
             if (!isControlled) {
-                setInnerValue((prev) => {
-                    return onChange(prev);
-                });
-            } else {
-                inputValueRef.current = onChange(inputValueRef.current);
+                setInnerValue(String(next));
             }
+
+            props.onValueChange?.(String(next));
         };
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -125,7 +118,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         };
 
         const displayValue = isControlled ? value : innerValue;
-        const current = toNumber(displayValue);
+        const current = toNumber(displayValue) ?? 0;
 
         const isAtMin = current <= min;
         const isAtMax = current >= max;
@@ -159,34 +152,70 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         };
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const normalizedValue = normalizeValue(e.target.value);
+            const input = e.target;
+            const raw = input.value;
+            const cursor = input.selectionStart ?? raw.length;
 
-            // only convert when it’s a "real number"
+            const normalizedValue = normalizeValue(raw);
+
+            // force DOM sync immediately
+            input.value = normalizedValue;
+
             const num = toNumber(normalizedValue);
-
-            if (Number.isFinite(num)) {
+            if (num !== null) {
                 inputValueRef.current = num;
             }
 
             if (!isControlled) {
-                setInnerValue(normalizedValue); // keep raw, not num
+                setInnerValue(normalizedValue);
             }
 
             props.onValueChange?.(normalizedValue);
+
+            requestAnimationFrame(() => {
+                const removedBeforeCursor =
+                    raw.slice(0, cursor).length - normalizeValue(raw.slice(0, cursor)).length;
+
+                const nextCursor = cursor - removedBeforeCursor;
+                const safeCursor = Math.max(0, Math.min(nextCursor, normalizedValue.length));
+                input.setSelectionRange(safeCursor, safeCursor);
+            });
         };
 
         const onInputBlur = () => {
             clearTimeRefs();
 
+            // handle empty explicitly
+            if (displayValue === '') {
+                inputValueRef.current = min ?? 0;
+
+                if (!isControlled) {
+                    setInnerValue('');
+                }
+
+                props.onValueChange?.('');
+                return;
+            }
+
             const num = Number(displayValue);
-            if (!Number.isFinite(num)) return;
+
+            if (!Number.isFinite(num)) {
+                inputValueRef.current = min ?? 0;
+
+                if (!isControlled) {
+                    setInnerValue('');
+                }
+
+                props.onValueChange?.('');
+                return;
+            }
 
             const normalizedValue = clamp(num);
 
             inputValueRef.current = normalizedValue;
 
             if (!isControlled) {
-                setInnerValue(normalizedValue);
+                setInnerValue(String(normalizedValue));
             }
 
             props.onValueChange?.(String(normalizedValue));
@@ -195,7 +224,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         return (
             <Input
                 {...props}
-                inputMode="numeric"
+                inputMode={integerOnly ? 'numeric' : 'decimal'}
                 value={displayValue}
                 onBlur={onInputBlur}
                 id={inputId}
