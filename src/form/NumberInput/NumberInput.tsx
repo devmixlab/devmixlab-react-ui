@@ -33,6 +33,7 @@ export type NumberInputProps = Omit<InputProps, 'type'> & {
     integerOnly?: boolean;
     fixedDecimals?: number;
     thousandSeparator?: boolean;
+    stepAcceleration?: boolean;
 
     min?: number;
     max?: number;
@@ -120,6 +121,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             integerOnly = false,
             fixedDecimals,
             thousandSeparator,
+            stepAcceleration,
 
             onChange,
 
@@ -138,6 +140,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         // const inputValueRef = useRef<number>(toNumber(value ?? 0) ?? 0);
         const inputValueRef = useRef<Decimal>(new Decimal(toNumber(value ?? 0) ?? 0));
         const prevValueRef = useRef('');
+        const pressCountRef = useRef(0);
 
         const isControlled = value !== undefined;
 
@@ -180,10 +183,30 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         //     props.onValueChange?.(String(next));
         // };
 
-        const handleIncrDecr = (dir = true) => {
+        // const handleIncrDecr = (dir = true) => {
+        //     const current = inputValueRef.current;
+        //
+        //     const nextDecimal = dir ? current.plus(step) : current.minus(step);
+        //
+        //     const clamped = clampDecimal(nextDecimal);
+        //
+        //     inputValueRef.current = clamped;
+        //
+        //     const str = formatDisplay(clamped, fixedDecimals, thousandSeparator);
+        //
+        //     if (!isControlled) {
+        //         setInnerValue(str);
+        //     }
+        //
+        //     props.onValueChange?.(str);
+        // };
+
+        const handleIncrDecr = (dir = true, multiplier = 1) => {
             const current = inputValueRef.current;
 
-            const nextDecimal = dir ? current.plus(step) : current.minus(step);
+            const delta = new Decimal(step).times(multiplier);
+
+            const nextDecimal = dir ? current.plus(delta) : current.minus(delta);
 
             const clamped = clampDecimal(nextDecimal);
 
@@ -215,14 +238,31 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         const intervalRef = useRef<number | null>(null);
         const timeoutRef = useRef<number | null>(null);
 
-        const startPress = (run: () => void) => {
-            run();
+        const startPress = (run: (multiplier: number) => void) => {
+            pressCountRef.current = 0;
+
+            const getMultiplier = (count: number) => {
+                if (!stepAcceleration) return 1;
+
+                if (count > 20) return 10;
+                if (count > 10) return 5;
+                if (count > 5) return 2;
+                return 1;
+            };
+
+            const tick = () => {
+                pressCountRef.current += 1;
+
+                const multiplier = getMultiplier(pressCountRef.current);
+
+                run(multiplier);
+            };
+
+            tick();
             clearTimeRefs();
 
             timeoutRef.current = setTimeout(() => {
-                intervalRef.current = setInterval(() => {
-                    run();
-                }, 80);
+                intervalRef.current = setInterval(tick, 80);
             }, 300);
         };
 
@@ -411,6 +451,9 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                     nextCursor -= 1;
                 }
 
+                // clamp
+                nextCursor = Math.max(0, Math.min(nextCursor, formatted.length));
+
                 input.setSelectionRange(nextCursor, nextCursor);
             });
         };
@@ -491,7 +534,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                             <button
                                 type="button"
                                 disabled={isAtMax}
-                                onMouseDown={() => startPress(() => handleIncrDecr())}
+                                // onMouseDown={() => startPress(() => handleIncrDecr())}
+                                onMouseDown={() => startPress((m) => handleIncrDecr(true, m))}
                                 onMouseUp={clearTimeRefs}
                                 onMouseLeave={clearTimeRefs}
                             >
@@ -500,7 +544,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                             <button
                                 type="button"
                                 disabled={isAtMin}
-                                onMouseDown={() => startPress(() => handleIncrDecr(false))}
+                                onMouseDown={() => startPress((m) => handleIncrDecr(false, m))}
                                 onMouseUp={clearTimeRefs}
                                 onMouseLeave={clearTimeRefs}
                             >
