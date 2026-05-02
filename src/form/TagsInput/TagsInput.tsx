@@ -18,6 +18,12 @@ type RenderTagParams = {
     disabled?: boolean;
 };
 
+type TagItem = {
+    id?: string | number;
+    label: string; // UI
+    value: string; // normalized / unique
+};
+
 // type TagsInputProps = {
 //     value: string[];
 //     onChange: (tags: string[]) => void;
@@ -25,9 +31,9 @@ type RenderTagParams = {
 // };
 
 export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChange'> & {
-    value?: string[];
-    defaultValue?: string[];
-    onValueChange?: (tags: string[]) => void;
+    value?: TagItem[];
+    defaultValue?: TagItem[];
+    onValueChange?: (tags: TagItem[]) => void;
 
     renderTag?: (params: RenderTagParams) => React.ReactNode;
 
@@ -45,7 +51,7 @@ export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChan
 
     clearable?: boolean;
     clearIcon?: React.ReactNode;
-    onClearAll?: (tags: string[]) => boolean | void | Promise<boolean | void>;
+    onClearAll?: (tags: TagItem[]) => boolean | void | Promise<boolean | void>;
 
     separator?: RegExp; // default: /[,\n]/
     maxTags?: number;
@@ -54,6 +60,8 @@ export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChan
 };
 
 const DEFAULT_SEPARATOR = /[,\n]/;
+
+const normalize = (str: string) => str.toLowerCase().trim();
 
 const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
     (
@@ -99,7 +107,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
         const isControlled = value !== undefined;
 
-        const [innerTags, setInnerTags] = useState<string[]>(defaultValue);
+        const [innerTags, setInnerTags] = useState<TagItem[]>(defaultValue);
         const [inputValue, setInputValue] = useState('');
 
         const tags = isControlled ? value! : innerTags;
@@ -144,13 +152,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 </button>
             ) : null;
 
-        const setTags = (next: string[]) => {
+        const setTags = (next: TagItem[]) => {
             if (!isControlled) setInnerTags(next);
             onValueChange?.(next);
         };
-
         const addTag = (raw: string) => {
             let trimmed = raw.trim();
+
             if (!trimmed) {
                 onInvalidTag?.(raw, 'empty');
                 return;
@@ -162,31 +170,38 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             }
 
             if (!trimmed) return;
-
             if (maxTags && tags.length >= maxTags) return;
 
+            const value = normalize(trimmed);
+
             if (unique) {
-                const existing = tags.find((t) => t.toLowerCase() === trimmed.toLowerCase());
+                const existing = tags.find((t) => t.value === value);
 
                 if (existing) {
-                    onDuplicate?.(trimmed, existing);
+                    onDuplicate?.(trimmed, existing.label);
                     return;
                 }
             }
 
-            setTags([...tags, trimmed]);
+            const newTag: TagItem = {
+                id: crypto.randomUUID(),
+                label: trimmed,
+                value,
+            };
+
+            const next = [...tags, newTag];
+
+            setTags(next);
             onTagAdd?.(trimmed);
             setInputValue('');
         };
-
         const removeTag = (index: number) => {
             const removed = tags[index];
             const next = tags.filter((_, i) => i !== index);
 
             setTags(next);
-            onTagRemove?.(removed, index);
+            onTagRemove?.(removed.label, index);
         };
-
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter' || e.key === ',') {
                 e.preventDefault();
@@ -253,16 +268,17 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                 if (!trimmed) continue;
 
-                if (unique) {
-                    const existing = next.find((t) => t.toLowerCase() === trimmed.toLowerCase());
+                const value = normalize(trimmed);
 
+                if (unique) {
+                    const existing = next.find((t) => t.value === value);
                     if (existing) {
-                        onDuplicate?.(trimmed, existing);
+                        onDuplicate?.(trimmed, existing.label);
                         continue;
                     }
                 }
 
-                next.push(trimmed);
+                next.push({ label: trimmed, value });
                 onTagAdd?.(trimmed);
 
                 if (maxTags && next.length >= maxTags) break;
@@ -295,21 +311,21 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     const remove = () => removeTag(i);
 
                     if (renderTag) {
-                        return (
-                            <React.Fragment key={tag + i}>
-                                {renderTag({
-                                    value: tag,
-                                    index: i,
-                                    remove,
-                                    disabled,
-                                })}
-                            </React.Fragment>
-                        );
+                        const node = renderTag({
+                            value: tag.label,
+                            index: i,
+                            remove,
+                            disabled,
+                        });
+
+                        return React.isValidElement(node)
+                            ? React.cloneElement(node, { key: tag.id ?? tag.value })
+                            : node;
                     }
 
                     return (
-                        <Chip key={tag + i} size={size} removable onRemove={remove}>
-                            {tag}
+                        <Chip key={tag.id ?? tag.value} size={size} removable onRemove={remove}>
+                            {tag.label}
                         </Chip>
                     );
                 })}
