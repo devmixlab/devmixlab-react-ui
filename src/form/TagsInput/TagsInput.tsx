@@ -846,7 +846,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                                 removable={!tag.disabled}
                                 disabled={tag.disabled}
                                 onRemove={remove}
-                                intent="info"
+                                intent="primary"
                                 selected={isSelected(i)}
                                 focused={!tag.disabled && activeId === id}
                             >
