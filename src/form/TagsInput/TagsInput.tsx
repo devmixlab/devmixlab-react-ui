@@ -21,6 +21,7 @@ type TagItem = {
     id?: string | number;
     label: string; // UI
     value: string; // normalized / unique
+    disabled?: boolean;
 };
 
 export const slugify = (str: string) =>
@@ -38,7 +39,7 @@ export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChan
     defaultValue?: TagItem[];
     onValueChange?: (tags: TagItem[]) => void;
 
-    editable?: boolean;
+    editable?: boolean | ((tag: TagItem, index: number) => boolean);
 
     normalizeTag?: (label: string) => string;
     renderTag?: (params: RenderTagParams) => React.ReactNode;
@@ -112,7 +113,15 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const mirrorRef = useRef<HTMLSpanElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
-        const canEdit = editable && !disabled;
+        const isEditable = (tag: TagItem, index: number) => {
+            if (disabled || tag.disabled) return false;
+
+            if (typeof editable === 'function') {
+                return editable(tag, index);
+            }
+
+            return editable !== false;
+        };
 
         // Edit refs
         const editInputRef = useRef<HTMLInputElement>(null);
@@ -131,9 +140,10 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const tags = isControlled ? value! : innerTags;
 
         const startEdit = (index: number) => {
-            if (!canEdit) return;
-
             const tag = tags[index];
+
+            if (!isEditable(tag, index)) return;
+
             setEditingIndex(index);
             setEditingValue(tag.label);
         };
@@ -300,6 +310,9 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
         const removeTag = (index: number) => {
             const removed = tags[index];
+
+            if (removed.disabled) return;
+
             const next = tags.filter((_, i) => i !== index);
 
             setTags(next);
@@ -424,7 +437,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     const remove = () => removeTag(i);
 
                     // 🔥 EDIT MODE
-                    if (editingIndex === i && canEdit) {
+                    if (editingIndex === i && isEditable(tag, i)) {
                         return (
                             <React.Fragment key={tag.id ?? tag.value}>
                                 <span
@@ -453,13 +466,15 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             tag,
                             index: i,
                             remove,
-                            disabled,
+                            disabled: disabled || tag.disabled,
                         });
 
                         return React.isValidElement(node)
                             ? React.cloneElement(node, {
                                   key: tag.id ?? tag.value,
-                                  onDoubleClick: canEdit ? () => startEdit(i) : undefined,
+                                  onDoubleClick: isEditable(tag, i)
+                                      ? () => startEdit(i)
+                                      : undefined,
                               })
                             : node;
                     }
@@ -468,10 +483,15 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     return (
                         <div
                             key={tag.id ?? tag.value}
-                            onDoubleClick={canEdit ? () => startEdit(i) : undefined}
+                            onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                             style={{ display: 'inline-flex' }}
                         >
-                            <Chip size={size} removable onRemove={remove}>
+                            <Chip
+                                size={size}
+                                removable={!tag.disabled}
+                                disabled={tag.disabled}
+                                onRemove={remove}
+                            >
                                 {tag.label}
                             </Chip>
                         </div>
