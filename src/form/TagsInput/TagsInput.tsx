@@ -113,6 +113,9 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const mirrorRef = useRef<HTMLSpanElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
+        const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
+        const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
         const isEditable = (tag: TagItem, index: number) => {
             if (disabled || tag.disabled) return false;
 
@@ -195,6 +198,12 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 inputRef.current?.focus();
             });
         };
+
+        useEffect(() => {
+            if (activeIndex !== null) {
+                tagRefs.current[activeIndex]?.focus();
+            }
+        }, [activeIndex]);
 
         useLayoutEffect(() => {
             if (editingIndex !== null) {
@@ -319,6 +328,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             onTagRemove?.(removed, index);
         };
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+            // ⬅️ move to last tag
+            if (e.key === 'ArrowLeft' && !inputValue && tags.length) {
+                e.preventDefault();
+                setActiveIndex(tags.length - 1);
+                return;
+            }
+
             if (e.key === 'Enter' || e.key === ',') {
                 e.preventDefault();
                 addTag(inputValue);
@@ -332,7 +348,39 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
             props.onKeyDown?.(e);
         };
+        const handleTagKeyDown = (e: React.KeyboardEvent, index: number) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                setActiveIndex(index > 0 ? index - 1 : null);
+                if (index === 0) inputRef.current?.focus();
+            }
 
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+
+                if (index < tags.length - 1) {
+                    setActiveIndex(index + 1);
+                } else {
+                    setActiveIndex(null);
+                    inputRef.current?.focus();
+                }
+            }
+
+            if (e.key === 'Backspace') {
+                e.preventDefault();
+
+                if (!tags[index].disabled) {
+                    removeTag(index);
+                    setActiveIndex(index > 0 ? index - 1 : null);
+                }
+            }
+
+            if (e.key === 'Enter') {
+                if (isEditable(tags[index], index)) {
+                    startEdit(index);
+                }
+            }
+        };
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             let raw = e.target.value;
 
@@ -471,10 +519,18 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                         return React.isValidElement(node)
                             ? React.cloneElement(node, {
+                                  ref: (el) => (tagRefs.current[i] = el),
                                   key: tag.id ?? tag.value,
+                                  tabIndex: activeIndex === i ? 0 : -1,
+                                  onFocus: () => setActiveIndex(i),
+                                  onKeyDown: (e) => handleTagKeyDown(e, i),
                                   onDoubleClick: isEditable(tag, i)
                                       ? () => startEdit(i)
                                       : undefined,
+                                  style: { display: 'inline-flex' },
+                                  className: clsx(prefix('__tag'), {
+                                      [prefix('__tag--active')]: activeIndex === i,
+                                  }),
                               })
                             : node;
                     }
@@ -482,9 +538,16 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     // 🔥 DEFAULT CHIP
                     return (
                         <div
+                            ref={(el) => (tagRefs.current[i] = el)}
                             key={tag.id ?? tag.value}
+                            tabIndex={activeIndex === i ? 0 : -1}
+                            onFocus={() => setActiveIndex(i)}
+                            onKeyDown={(e) => handleTagKeyDown(e, i)}
                             onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                             style={{ display: 'inline-flex' }}
+                            className={clsx(prefix('__tag'), {
+                                [prefix('__tag--active')]: activeIndex === i,
+                            })}
                         >
                             <Chip
                                 size={size}

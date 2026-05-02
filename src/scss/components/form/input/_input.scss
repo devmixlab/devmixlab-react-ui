@@ -423,6 +423,15 @@ $tag-input-sizes: (
             margin: 0;
         }
 
+        .#{$compPrefix}__tag{
+
+        }
+
+        .#{$compPrefix}__tag--active {
+            outline: 2px solid var(currentColor);
+            outline-offset: 2px;
+        }
+
         .#{$compPrefix}__tag-edit {
             flex: 0 0 auto;
             min-width: 20px;
