@@ -658,7 +658,11 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             <div
                                 ref={(el) => {
                                     if (tag.id != null) {
-                                        tagRefs.current[tag.id] = el;
+                                        if (el) {
+                                            tagRefs.current[tag.id] = el;
+                                        } else {
+                                            delete tagRefs.current[tag.id];
+                                        }
                                     }
                                 }}
                                 key={id}
@@ -688,7 +692,11 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         <div
                             ref={(el) => {
                                 if (tag.id != null) {
-                                    tagRefs.current[tag.id] = el;
+                                    if (el) {
+                                        tagRefs.current[tag.id] = el;
+                                    } else {
+                                        delete tagRefs.current[tag.id];
+                                    }
                                 }
                             }}
                             key={tag.id ?? tag.value}
