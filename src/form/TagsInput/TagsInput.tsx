@@ -38,6 +38,8 @@ export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChan
     defaultValue?: TagItem[];
     onValueChange?: (tags: TagItem[]) => void;
 
+    editable?: boolean;
+
     normalizeTag?: (label: string) => string;
     renderTag?: (params: RenderTagParams) => React.ReactNode;
 
@@ -76,6 +78,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             defaultValue = [],
             onValueChange,
 
+            editable = false,
+
             normalizeTag,
             renderTag,
 
@@ -108,6 +112,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const mirrorRef = useRef<HTMLSpanElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
+        const canEdit = editable && !disabled;
+
         // Edit refs
         const editInputRef = useRef<HTMLInputElement>(null);
         const editMirrorRef = useRef<HTMLSpanElement>(null);
@@ -125,6 +131,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const tags = isControlled ? value! : innerTags;
 
         const startEdit = (index: number) => {
+            if (!canEdit) return;
+
             const tag = tags[index];
             setEditingIndex(index);
             setEditingValue(tag.label);
@@ -416,7 +424,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     const remove = () => removeTag(i);
 
                     // 🔥 EDIT MODE
-                    if (editingIndex === i) {
+                    if (editingIndex === i && canEdit) {
                         return (
                             <React.Fragment key={tag.id ?? tag.value}>
                                 <span
@@ -451,7 +459,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         return React.isValidElement(node)
                             ? React.cloneElement(node, {
                                   key: tag.id ?? tag.value,
-                                  onDoubleClick: () => startEdit(i),
+                                  onDoubleClick: canEdit ? () => startEdit(i) : undefined,
                               })
                             : node;
                     }
@@ -460,7 +468,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     return (
                         <div
                             key={tag.id ?? tag.value}
-                            onDoubleClick={() => startEdit(i)}
+                            onDoubleClick={canEdit ? () => startEdit(i) : undefined}
                             style={{ display: 'inline-flex' }}
                         >
                             <Chip size={size} removable onRemove={remove}>
