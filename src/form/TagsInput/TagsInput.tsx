@@ -113,6 +113,9 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const mirrorRef = useRef<HTMLSpanElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
+        const isCancellingRef = useRef(false);
+        const originalValueRef = useRef<string>('');
+
         const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
         const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -147,11 +150,15 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
             if (!isEditable(tag, index)) return;
 
+            originalValueRef.current = tag.label; // 👈 SAVE ORIGINAL
+
             setEditingIndex(index);
             setEditingValue(tag.label);
         };
 
         const commitEdit = () => {
+            if (isCancellingRef.current) return;
+
             if (editingIndex === null) return;
 
             let trimmed = editingValue.trim();
@@ -193,12 +200,18 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
 
         const cancelEdit = () => {
+            isCancellingRef.current = true;
+
+            if (editingIndex !== null) {
+                setEditingValue(originalValueRef.current); // 👈 RESTORE
+            }
+
             setEditingIndex(null);
-            setActiveIndex(null);
             setActiveIndex(null);
 
             requestAnimationFrame(() => {
                 inputRef.current?.focus();
+                isCancellingRef.current = false;
             });
         };
 
@@ -210,11 +223,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
         useLayoutEffect(() => {
             if (editingIndex !== null) {
-                const el = editInputRef.current;
-                if (!el) return;
+                requestAnimationFrame(() => {
+                    const el = editInputRef.current;
+                    if (!el) return;
 
-                el.focus();
-                el.setSelectionRange(0, el.value.length);
+                    el.focus();
+                    el.setSelectionRange(0, el.value.length);
+                });
             }
         }, [editingIndex]);
 
@@ -502,8 +517,17 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                                     onChange={(e) => setEditingValue(e.target.value)}
                                     onBlur={commitEdit}
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Enter') commitEdit();
-                                        if (e.key === 'Escape') cancelEdit();
+                                        // commit (normal Enter)
+                                        if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+                                            e.preventDefault();
+                                            commitEdit();
+                                        }
+
+                                        // cancel (Ctrl+Enter / Cmd+Enter)
+                                        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                            e.preventDefault();
+                                            cancelEdit();
+                                        }
                                     }}
                                     className={prefix('__tag-edit')}
                                 />
