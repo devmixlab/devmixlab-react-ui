@@ -1,3 +1,6 @@
+/**
+ * @see tagsInputDocumentation.md
+ */
 import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { type InputProps } from '../Input/Input';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
