@@ -425,12 +425,13 @@ $tag-input-sizes: (
 
         .#{$compPrefix}__tag{
             &--selected {
-                background: var(--color-primary-soft);
-                outline: 2px solid red;
+                //background: var(--color-primary-soft);
+                //outline: 2px solid red;
             }
             &--active {
-                outline: 2px solid red;
-                outline-offset: 2px;
+                outline: none;
+                //outline: 2px solid var(--border-hover);
+                //outline-offset: 2px;
             }
             //&:focus {
             //    outline: 2px solid var(currentColor);

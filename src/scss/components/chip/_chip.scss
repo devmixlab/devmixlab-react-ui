@@ -89,6 +89,7 @@ $compPrefix: 'dru--chip';
         transform: scale(0.97);
     }
 
+    &--focused,
     &:focus-visible {
         outline: 2px solid var(--ring-color);
         outline-offset: 2px;

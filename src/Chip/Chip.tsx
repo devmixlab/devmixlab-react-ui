@@ -18,6 +18,8 @@ export type ChipProps = {
     startIcon?: React.ReactNode;
     endIcon?: React.ReactNode;
 
+    focused?: boolean;
+
     removable?: boolean;
     onRemove?: () => void;
 
@@ -43,6 +45,8 @@ const Chip = forwardRef(
             rounded = 'md',
             startIcon,
             endIcon,
+
+            focused,
 
             removable = false,
             onRemove,
@@ -78,6 +82,7 @@ const Chip = forwardRef(
                 [prefix(`--disabled`)]: disabled,
                 [prefix(`--selected`)]: selected,
                 [prefix(`--interactive`)]: isInteractive,
+                [prefix(`--focused`)]: focused,
             },
         );
 
