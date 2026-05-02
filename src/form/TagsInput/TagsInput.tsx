@@ -125,13 +125,6 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const tagRefs = useRef<Record<string | number, HTMLDivElement | null>>({});
         const [activeId, setActiveId] = useState<string | number | null>(null);
 
-        useEffect(() => {
-            if (activeId != null) {
-                tagRefs.current[activeId]?.focus();
-                console.log(tagRefs.current);
-            }
-        }, [activeId]);
-
         // Selection
         const [selectionStart, setSelectionStart] = useState<number | null>(null);
         const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
@@ -175,7 +168,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const [innerTags, setInnerTags] = useState<TagItem[]>(normalizeTags(defaultValue));
         const [inputValue, setInputValue] = useState('');
 
-        const tags = isControlled ? normalizeTags(value!) : innerTags;
+        const tags = isControlled ? value! : innerTags;
 
         const getId = (i: number) => tags[i]?.id ?? tags[i]?.value;
         const getIndexById = (id: string | number | null) => {
@@ -396,11 +389,16 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 e.preventDefault();
 
                 const nextIndex = findNextEnabled(tags.length - 1, -1);
-
                 if (nextIndex !== null) {
-                    setActiveId(getId(nextIndex));
+                    const nextId = getId(nextIndex);
+
+                    setActiveId(nextId);
+
+                    requestAnimationFrame(() => {
+                        tagRefs.current[nextId]?.focus();
+                    });
+                    return;
                 }
-                return;
             }
 
             if (e.key === 'Enter' || e.key === ',') {
@@ -448,6 +446,10 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         const nextId = getId(nextIndex);
 
                         setActiveId(nextId);
+
+                        requestAnimationFrame(() => {
+                            tagRefs.current[nextId]?.focus();
+                        });
                     } else {
                         setActiveId(null);
                         inputRef.current?.focus();
@@ -473,7 +475,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         const nextIndex = findNextEnabled(index + 1, 1);
 
                         if (nextIndex !== null) {
-                            setActiveId(getId(nextIndex));
+                            const nextId = getId(nextIndex);
+
+                            setActiveId(nextId);
+
+                            requestAnimationFrame(() => {
+                                tagRefs.current[nextId]?.focus();
+                            });
                         } else {
                             setActiveId(null);
                             inputRef.current?.focus();
@@ -513,8 +521,12 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                     const nextTag = next[nextIndex];
 
+                    const nextId = nextTag.id ?? nextTag.value;
+
+                    setActiveId(nextId);
+
                     requestAnimationFrame(() => {
-                        setActiveId(nextTag.id ?? nextTag.value);
+                        tagRefs.current[nextId]?.focus();
                     });
                 }
             }
@@ -550,8 +562,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 requestAnimationFrame(() => inputRef.current?.focus());
             } else {
                 const nextTag = next[nextIndex];
+
+                const nextId = nextTag.id ?? nextTag.value;
+
+                setActiveId(nextId);
+
                 requestAnimationFrame(() => {
-                    setActiveId(nextTag.id ?? nextTag.value);
+                    tagRefs.current[nextId]?.focus();
                 });
             }
         };
