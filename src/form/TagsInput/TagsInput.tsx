@@ -175,12 +175,11 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             return tags.findIndex((t) => (t.id ?? t.value) === id);
         };
 
-        const findNextEnabled = (start: number, direction: -1 | 1) => {
+        const findNextEnabled = (arr: TagItem[], start: number, direction: -1 | 1) => {
             let i = start;
 
-            while (i >= 0 && i < tags.length) {
-                const tag = tags[i];
-                if (!tag.disabled) return i;
+            while (i >= 0 && i < arr.length) {
+                if (!arr[i].disabled) return i;
                 i += direction;
             }
 
@@ -388,7 +387,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             if (e.key === 'ArrowLeft' && !inputValue && tags.length) {
                 e.preventDefault();
 
-                const nextIndex = findNextEnabled(tags.length - 1, -1);
+                const nextIndex = findNextEnabled(tags, tags.length - 1, -1);
                 if (nextIndex !== null) {
                     const nextId = getId(nextIndex);
 
@@ -408,8 +407,36 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             }
 
             if (e.key === 'Backspace' && !inputValue && tags.length) {
-                removeTag(tags.length - 1);
-                return;
+                e.preventDefault();
+
+                // 1. find deletable
+                const targetIndex = findNextEnabled(tags, tags.length - 1, -1);
+                if (targetIndex === null) return;
+
+                const next = tags.filter((_, i) => i !== targetIndex);
+
+                setTags(next);
+
+                if (next.length === 0) {
+                    requestAnimationFrame(() => inputRef.current?.focus());
+                    return;
+                }
+
+                // 2. find focus target (LEFT of deleted)
+                const focusIndex = findNextEnabled(next, targetIndex - 1, -1);
+
+                if (focusIndex === null) {
+                    requestAnimationFrame(() => inputRef.current?.focus());
+                    return;
+                }
+
+                const nextId = next[focusIndex].id ?? next[focusIndex].value;
+
+                setActiveId(nextId);
+
+                requestAnimationFrame(() => {
+                    tagRefs.current[nextId]?.focus();
+                });
             }
 
             props.onKeyDown?.(e);
@@ -440,7 +467,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         setSelectionEnd((prev) => clamp(prev !== null ? prev - 1 : index - 1));
                     }
                 } else {
-                    const nextIndex = findNextEnabled(index - 1, -1);
+                    const nextIndex = findNextEnabled(tags, index - 1, -1);
 
                     if (nextIndex !== null) {
                         const nextId = getId(nextIndex);
@@ -472,7 +499,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     }
                 } else {
                     if (index < tags.length - 1) {
-                        const nextIndex = findNextEnabled(index + 1, 1);
+                        const nextIndex = findNextEnabled(tags, index + 1, 1);
 
                         if (nextIndex !== null) {
                             const nextId = getId(nextIndex);
@@ -505,30 +532,67 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     return;
                 }
 
-                // fallback: single delete
-                if (!tags[index].disabled) {
-                    const next = tags.filter((_, i) => i !== index);
+                // 👇 find nearest enabled tag to delete
+                let targetIndex: number | null = null;
 
-                    setTags(next);
+                // prefer previous for Backspace
+                if (e.key === 'Backspace') {
+                    targetIndex = findNextEnabled(tags, index - 1, -1);
 
-                    if (next.length === 0) {
+                    // 👇 nothing to delete on the left
+                    if (targetIndex === null) {
                         setActiveId(null);
                         requestAnimationFrame(() => inputRef.current?.focus());
                         return;
                     }
-
-                    const nextIndex = index < next.length ? index : next.length - 1;
-
-                    const nextTag = next[nextIndex];
-
-                    const nextId = nextTag.id ?? nextTag.value;
-
-                    setActiveId(nextId);
-
-                    requestAnimationFrame(() => {
-                        tagRefs.current[nextId]?.focus();
-                    });
+                } else {
+                    targetIndex = findNextEnabled(tags, index, 1);
                 }
+
+                // fallback: try opposite direction
+                if (targetIndex === null) {
+                    targetIndex =
+                        e.key === 'Backspace'
+                            ? findNextEnabled(tags, index, 1)
+                            : findNextEnabled(tags, index, -1);
+                }
+
+                if (targetIndex === null) return; // nothing to delete
+
+                const next = tags.filter((_, i) => i !== targetIndex);
+
+                setTags(next);
+
+                if (next.length === 0) {
+                    setActiveId(null);
+                    requestAnimationFrame(() => inputRef.current?.focus());
+                    return;
+                }
+
+                let nextIndexTemp: number | null;
+                if (e.key === 'Backspace') {
+                    nextIndexTemp = findNextEnabled(next, index - 1, 1);
+                } else {
+                    nextIndexTemp = findNextEnabled(next, index, 1);
+                }
+
+                if (nextIndexTemp == null) {
+                    requestAnimationFrame(() => {
+                        inputRef.current?.focus();
+                    });
+                    return;
+                }
+
+                const nextIndex = nextIndexTemp;
+
+                const nextTag = next[nextIndex];
+                const nextId = nextTag.id ?? nextTag.value;
+
+                setActiveId(nextId);
+
+                requestAnimationFrame(() => {
+                    tagRefs.current[nextId]?.focus();
+                });
             }
 
             if (e.key === 'Enter') {
