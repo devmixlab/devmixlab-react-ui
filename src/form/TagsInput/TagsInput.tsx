@@ -70,6 +70,12 @@ const DEFAULT_SEPARATOR = /[,\n]/;
 
 const defaultNormalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' '); // collapse spaces only
 
+const normalizeTags = (tags: TagItem[]): TagItem[] =>
+    tags.map((tag) => ({
+        ...tag,
+        id: tag.id ?? crypto.randomUUID(),
+    }));
+
 const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
     (
         {
@@ -122,6 +128,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         useEffect(() => {
             if (activeId != null) {
                 tagRefs.current[activeId]?.focus();
+                console.log(tagRefs.current);
             }
         }, [activeId]);
 
@@ -165,12 +172,27 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
         const isControlled = value !== undefined;
 
-        const [innerTags, setInnerTags] = useState<TagItem[]>(defaultValue);
+        const [innerTags, setInnerTags] = useState<TagItem[]>(normalizeTags(defaultValue));
         const [inputValue, setInputValue] = useState('');
 
-        const tags = isControlled ? value! : innerTags;
+        const tags = isControlled ? normalizeTags(value!) : innerTags;
 
         const getId = (i: number) => tags[i]?.id ?? tags[i]?.value;
+        const getIndexById = (id: string | number | null) => {
+            return tags.findIndex((t) => (t.id ?? t.value) === id);
+        };
+
+        const findNextEnabled = (start: number, direction: -1 | 1) => {
+            let i = start;
+
+            while (i >= 0 && i < tags.length) {
+                const tag = tags[i];
+                if (!tag.disabled) return i;
+                i += direction;
+            }
+
+            return null;
+        };
 
         const startEdit = (index: number) => {
             const tag = tags[index];
@@ -373,7 +395,11 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             if (e.key === 'ArrowLeft' && !inputValue && tags.length) {
                 e.preventDefault();
 
-                setActiveId(getId(tags.length - 1));
+                const nextIndex = findNextEnabled(tags.length - 1, -1);
+
+                if (nextIndex !== null) {
+                    setActiveId(getId(nextIndex));
+                }
                 return;
             }
 
@@ -392,7 +418,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
 
         const clamp = (value: number) => Math.max(0, Math.min(tags.length - 1, value));
-        const handleTagKeyDown = (e: React.KeyboardEvent, index: number) => {
+        const handleTagKeyDown = (e: React.KeyboardEvent) => {
+            const index = getIndexById(activeId);
+
+            if (index === -1) return;
+
+            const tag = tags[index];
+
             if (e.key === 'a' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 setSelectionStart(0);
@@ -410,11 +442,19 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         setSelectionEnd((prev) => clamp(prev !== null ? prev - 1 : index - 1));
                     }
                 } else {
-                    setActiveId(index > 0 ? getId(index - 1) : null);
+                    const nextIndex = findNextEnabled(index - 1, -1);
+
+                    if (nextIndex !== null) {
+                        const nextId = getId(nextIndex);
+
+                        setActiveId(nextId);
+                    } else {
+                        setActiveId(null);
+                        inputRef.current?.focus();
+                    }
+
                     setSelectionStart(null);
                     setSelectionEnd(null);
-
-                    if (index === 0) inputRef.current?.focus();
                 }
             }
 
@@ -430,7 +470,14 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     }
                 } else {
                     if (index < tags.length - 1) {
-                        setActiveId(getId(index + 1));
+                        const nextIndex = findNextEnabled(index + 1, 1);
+
+                        if (nextIndex !== null) {
+                            setActiveId(getId(nextIndex));
+                        } else {
+                            setActiveId(null);
+                            inputRef.current?.focus();
+                        }
                     } else {
                         setActiveId(null);
                         inputRef.current?.focus();
@@ -658,26 +705,24 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             <div
                                 ref={(el) => {
                                     if (tag.id != null) {
-                                        if (el) {
-                                            tagRefs.current[tag.id] = el;
-                                        } else {
-                                            delete tagRefs.current[tag.id];
-                                        }
+                                        tagRefs.current[tag.id] = el;
                                     }
                                 }}
                                 key={id}
-                                tabIndex={activeId === id ? 0 : -1}
+                                tabIndex={!tag.disabled && activeId === id ? 0 : -1}
                                 onFocus={() => {
+                                    if (tag.disabled) return;
                                     setActiveId(id);
                                     setSelectionStart(null);
                                     setSelectionEnd(null);
                                 }}
-                                onKeyDown={(e) => handleTagKeyDown(e, i)}
+                                onKeyDown={(e) => handleTagKeyDown(e)}
                                 onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                                 style={{ display: 'inline-flex' }}
                                 className={clsx(prefix('__tag'), {
                                     [prefix('__tag--active')]: activeId === id,
                                     [prefix('__tag--selected')]: isSelected(i),
+                                    [prefix('__tag--disabled')]: tag.disabled,
                                 })}
                             >
                                 {node}
@@ -692,26 +737,24 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         <div
                             ref={(el) => {
                                 if (tag.id != null) {
-                                    if (el) {
-                                        tagRefs.current[tag.id] = el;
-                                    } else {
-                                        delete tagRefs.current[tag.id];
-                                    }
+                                    tagRefs.current[tag.id] = el;
                                 }
                             }}
                             key={tag.id ?? tag.value}
-                            tabIndex={activeId === id ? 0 : -1}
+                            tabIndex={!tag.disabled && activeId === id ? 0 : -1}
                             onFocus={() => {
+                                if (tag.disabled) return;
                                 setActiveId(id);
                                 setSelectionStart(null);
                                 setSelectionEnd(null);
                             }}
-                            onKeyDown={(e) => handleTagKeyDown(e, i)}
+                            onKeyDown={(e) => handleTagKeyDown(e)}
                             onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                             style={{ display: 'inline-flex' }}
                             className={clsx(prefix('__tag'), {
                                 [prefix('__tag--active')]: activeId === id,
                                 [prefix('__tag--selected')]: isSelected(i),
+                                [prefix('__tag--disabled')]: tag.disabled,
                             })}
                         >
                             <Chip

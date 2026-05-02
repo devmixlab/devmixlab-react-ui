@@ -429,9 +429,12 @@ $tag-input-sizes: (
                 outline: 2px solid red;
             }
             &--active {
-                outline: 2px solid var(currentColor);
+                outline: 2px solid red;
                 outline-offset: 2px;
             }
+            //&:focus {
+            //    outline: 2px solid var(currentColor);
+            //}
         }
 
         //.#{$compPrefix}__tag--active {
