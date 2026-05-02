@@ -116,8 +116,14 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const isCancellingRef = useRef(false);
         const originalValueRef = useRef<string>('');
 
-        const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
-        const [activeIndex, setActiveIndex] = useState<number | null>(null);
+        const tagRefs = useRef<Record<string | number, HTMLDivElement | null>>({});
+        const [activeId, setActiveId] = useState<string | number | null>(null);
+
+        useEffect(() => {
+            if (activeId != null) {
+                tagRefs.current[activeId]?.focus();
+            }
+        }, [activeId]);
 
         // Selection
         const [selectionStart, setSelectionStart] = useState<number | null>(null);
@@ -163,6 +169,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const [inputValue, setInputValue] = useState('');
 
         const tags = isControlled ? value! : innerTags;
+
+        const getId = (i: number) => tags[i]?.id ?? tags[i]?.value;
 
         const startEdit = (index: number) => {
             const tag = tags[index];
@@ -213,7 +221,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
             setTags(updated);
             setEditingIndex(null);
-            setActiveIndex(null);
+            setActiveId(null);
 
             requestAnimationFrame(() => {
                 inputRef.current?.focus();
@@ -228,19 +236,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             }
 
             setEditingIndex(null);
-            setActiveIndex(null);
+            setActiveId(null);
 
             requestAnimationFrame(() => {
                 inputRef.current?.focus();
                 isCancellingRef.current = false;
             });
         };
-
-        useEffect(() => {
-            if (activeIndex !== null) {
-                tagRefs.current[activeIndex]?.focus();
-            }
-        }, [activeIndex]);
 
         useLayoutEffect(() => {
             if (editingIndex !== null) {
@@ -370,7 +372,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             // ⬅️ move to last tag
             if (e.key === 'ArrowLeft' && !inputValue && tags.length) {
                 e.preventDefault();
-                setActiveIndex(tags.length - 1);
+
+                setActiveId(getId(tags.length - 1));
                 return;
             }
 
@@ -407,7 +410,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         setSelectionEnd((prev) => clamp(prev !== null ? prev - 1 : index - 1));
                     }
                 } else {
-                    setActiveIndex(index > 0 ? index - 1 : null);
+                    setActiveId(index > 0 ? getId(index - 1) : null);
                     setSelectionStart(null);
                     setSelectionEnd(null);
 
@@ -427,9 +430,9 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     }
                 } else {
                     if (index < tags.length - 1) {
-                        setActiveIndex(index + 1);
+                        setActiveId(getId(index + 1));
                     } else {
-                        setActiveIndex(null);
+                        setActiveId(null);
                         inputRef.current?.focus();
                     }
 
@@ -437,15 +440,6 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     setSelectionEnd(null);
                 }
             }
-
-            // if (e.key === 'Backspace') {
-            //     e.preventDefault();
-            //
-            //     if (!tags[index].disabled) {
-            //         removeTag(index);
-            //         setActiveIndex(index > 0 ? index - 1 : null);
-            //     }
-            // }
 
             if (e.key === 'Backspace' || e.key === 'Delete') {
                 const range = getSelectedRange();
@@ -458,8 +452,23 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                 // fallback: single delete
                 if (!tags[index].disabled) {
-                    removeTag(index);
-                    setActiveIndex(index > 0 ? index - 1 : null);
+                    const next = tags.filter((_, i) => i !== index);
+
+                    setTags(next);
+
+                    if (next.length === 0) {
+                        setActiveId(null);
+                        requestAnimationFrame(() => inputRef.current?.focus());
+                        return;
+                    }
+
+                    const nextIndex = index < next.length ? index : next.length - 1;
+
+                    const nextTag = next[nextIndex];
+
+                    requestAnimationFrame(() => {
+                        setActiveId(nextTag.id ?? nextTag.value);
+                    });
                 }
             }
 
@@ -490,10 +499,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             setSelectionEnd(null);
 
             if (next.length === 0) {
-                setActiveIndex(null);
+                setActiveId(null);
                 requestAnimationFrame(() => inputRef.current?.focus());
             } else {
-                setActiveIndex(nextIndex);
+                const nextTag = next[nextIndex];
+                requestAnimationFrame(() => {
+                    setActiveId(nextTag.id ?? nextTag.value);
+                });
             }
         };
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -598,6 +610,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             >
                 {tags.map((tag, i) => {
                     const remove = () => removeTag(i);
+                    const id = tag.id ?? tag.value;
 
                     // 🔥 EDIT MODE
                     if (editingIndex === i && isEditable(tag, i)) {
@@ -643,22 +656,23 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                         return React.isValidElement(node) ? (
                             <div
-                                ref={(el) => (tagRefs.current[i] = el)}
-                                key={tag.id ?? tag.value}
-                                tabIndex={activeIndex === i ? 0 : -1}
+                                ref={(el) => {
+                                    if (tag.id != null) {
+                                        tagRefs.current[tag.id] = el;
+                                    }
+                                }}
+                                key={id}
+                                tabIndex={activeId === id ? 0 : -1}
                                 onFocus={() => {
-                                    setActiveIndex(i);
+                                    setActiveId(id);
                                     setSelectionStart(null);
                                     setSelectionEnd(null);
                                 }}
                                 onKeyDown={(e) => handleTagKeyDown(e, i)}
                                 onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                                 style={{ display: 'inline-flex' }}
-                                // className={clsx(prefix('__tag'), {
-                                //     [prefix('__tag--active')]: activeIndex === i,
-                                // })}
                                 className={clsx(prefix('__tag'), {
-                                    [prefix('__tag--active')]: activeIndex === i,
+                                    [prefix('__tag--active')]: activeId === id,
                                     [prefix('__tag--selected')]: isSelected(i),
                                 })}
                             >
@@ -672,22 +686,23 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     // 🔥 DEFAULT CHIP
                     return (
                         <div
-                            ref={(el) => (tagRefs.current[i] = el)}
+                            ref={(el) => {
+                                if (tag.id != null) {
+                                    tagRefs.current[tag.id] = el;
+                                }
+                            }}
                             key={tag.id ?? tag.value}
-                            tabIndex={activeIndex === i ? 0 : -1}
+                            tabIndex={activeId === id ? 0 : -1}
                             onFocus={() => {
-                                setActiveIndex(i);
+                                setActiveId(id);
                                 setSelectionStart(null);
                                 setSelectionEnd(null);
                             }}
                             onKeyDown={(e) => handleTagKeyDown(e, i)}
                             onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                             style={{ display: 'inline-flex' }}
-                            // className={clsx(prefix('__tag'), {
-                            //     [prefix('__tag--active')]: activeIndex === i,
-                            // })}
                             className={clsx(prefix('__tag'), {
-                                [prefix('__tag--active')]: activeIndex === i,
+                                [prefix('__tag--active')]: activeId === id,
                                 [prefix('__tag--selected')]: isSelected(i),
                             })}
                         >
