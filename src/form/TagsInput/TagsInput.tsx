@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { type InputProps } from '../Input/Input';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
 import { prefix } from '../Input/input.helpers';
@@ -108,6 +108,13 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const mirrorRef = useRef<HTMLSpanElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
+        // Edit refs
+        const editInputRef = useRef<HTMLInputElement>(null);
+        const editMirrorRef = useRef<HTMLSpanElement>(null);
+
+        const [editingIndex, setEditingIndex] = useState<number | null>(null);
+        const [editingValue, setEditingValue] = useState('');
+
         const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
 
         const isControlled = value !== undefined;
@@ -117,7 +124,71 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
         const tags = isControlled ? value! : innerTags;
 
-        React.useEffect(() => {
+        const startEdit = (index: number) => {
+            const tag = tags[index];
+            setEditingIndex(index);
+            setEditingValue(tag.label);
+        };
+
+        const commitEdit = () => {
+            if (editingIndex === null) return;
+
+            let trimmed = editingValue.trim();
+            if (!trimmed) {
+                setEditingIndex(null);
+                return;
+            }
+
+            const normalizeFn = normalizeTag ?? defaultNormalize;
+            const value = normalizeFn(trimmed);
+
+            const updated = [...tags];
+            updated[editingIndex] = {
+                ...updated[editingIndex],
+                label: trimmed,
+                value,
+            };
+
+            if (unique) {
+                const exists = tags.find(
+                    (t, idx) =>
+                        idx !== editingIndex &&
+                        t.value.localeCompare(value, undefined, { sensitivity: 'base' }) === 0,
+                );
+
+                if (exists) {
+                    onDuplicate?.(updated[editingIndex], exists);
+                    return;
+                }
+            }
+
+            setTags(updated);
+            setEditingIndex(null);
+
+            requestAnimationFrame(() => {
+                inputRef.current?.focus();
+            });
+        };
+
+        const cancelEdit = () => {
+            setEditingIndex(null);
+
+            requestAnimationFrame(() => {
+                inputRef.current?.focus();
+            });
+        };
+
+        useLayoutEffect(() => {
+            if (editingIndex !== null) {
+                const el = editInputRef.current;
+                if (!el) return;
+
+                el.focus();
+                el.setSelectionRange(0, el.value.length);
+            }
+        }, [editingIndex]);
+
+        useEffect(() => {
             if (!inputRef.current || !mirrorRef.current) return;
 
             const text = inputValue || ' '; // 👈 avoid 0 width
@@ -128,6 +199,22 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             // inputRef.current.style.width = `${width + 2}px`; // small buffer
             inputRef.current.style.width = `${Math.min(width + 2, 300)}px`;
         }, [inputValue]);
+
+        useLayoutEffect(() => {
+            if (!editInputRef.current || !editMirrorRef.current) return;
+
+            const text = editingValue || ' ';
+            editMirrorRef.current.textContent = text;
+
+            const mirrorWidth = editMirrorRef.current.scrollWidth;
+
+            const style = getComputedStyle(editInputRef.current);
+            const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+
+            const width = mirrorWidth + padding + 2;
+
+            editInputRef.current.style.width = `${Math.min(width, 300)}px`;
+        }, [editingValue, editingIndex]);
 
         const handleClearAll = async () => {
             if (disabled) return;
@@ -328,6 +415,31 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 {tags.map((tag, i) => {
                     const remove = () => removeTag(i);
 
+                    // 🔥 EDIT MODE
+                    if (editingIndex === i) {
+                        return (
+                            <React.Fragment key={tag.id ?? tag.value}>
+                                <span
+                                    ref={editMirrorRef}
+                                    className={prefix('__mirror')}
+                                    aria-hidden
+                                />
+                                <input
+                                    ref={editInputRef}
+                                    value={editingValue}
+                                    onChange={(e) => setEditingValue(e.target.value)}
+                                    onBlur={commitEdit}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') commitEdit();
+                                        if (e.key === 'Escape') cancelEdit();
+                                    }}
+                                    className={prefix('__tag-edit')}
+                                />
+                            </React.Fragment>
+                        );
+                    }
+
+                    // 🔥 CUSTOM RENDER
                     if (renderTag) {
                         const node = renderTag({
                             tag,
@@ -337,14 +449,24 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         });
 
                         return React.isValidElement(node)
-                            ? React.cloneElement(node, { key: tag.id ?? tag.value })
+                            ? React.cloneElement(node, {
+                                  key: tag.id ?? tag.value,
+                                  onDoubleClick: () => startEdit(i),
+                              })
                             : node;
                     }
 
+                    // 🔥 DEFAULT CHIP
                     return (
-                        <Chip key={tag.id ?? tag.value} size={size} removable onRemove={remove}>
-                            {tag.label}
-                        </Chip>
+                        <div
+                            key={tag.id ?? tag.value}
+                            onDoubleClick={() => startEdit(i)}
+                            style={{ display: 'inline-flex' }}
+                        >
+                            <Chip size={size} removable onRemove={remove}>
+                                {tag.label}
+                            </Chip>
+                        </div>
                     );
                 })}
                 <span ref={mirrorRef} className={prefix(`__mirror`)} aria-hidden />

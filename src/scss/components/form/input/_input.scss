@@ -422,6 +422,49 @@ $tag-input-sizes: (
             padding: 0;
             margin: 0;
         }
+
+        .#{$compPrefix}__tag-edit {
+            flex: 0 0 auto;
+            min-width: 20px;
+            max-width: 100%;
+            width: auto;
+
+            caret-color: currentColor;
+            transition: background 0.15s ease;
+
+            height: auto;
+            padding: 0;
+
+            // 🔥 remove default input styles
+            border: none;
+            outline: none;
+            background: transparent;
+
+            // 🔥 inherit text styles
+            font: inherit;
+            color: inherit;
+            line-height: inherit;
+
+            // 🔥 spacing to match chip
+            padding-inline: calc(var(--gap) * 0.75);
+
+            // 🔥 prevent layout shift
+            display: inline-flex;
+            align-items: center;
+
+            // 🔥 optional subtle editing state
+            border-radius: 6px;
+
+            &:focus {
+                outline: none;
+                background: rgba(0, 0, 0, 0.05); // or use your token
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
     }
 
     &--select-input {
