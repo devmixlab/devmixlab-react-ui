@@ -119,6 +119,25 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
         const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+        // Selection
+        const [selectionStart, setSelectionStart] = useState<number | null>(null);
+        const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
+
+        const getSelectedRange = () => {
+            if (selectionStart === null || selectionEnd === null) return null;
+
+            const start = Math.min(selectionStart, selectionEnd);
+            const end = Math.max(selectionStart, selectionEnd);
+
+            return { start, end };
+        };
+
+        const isSelected = (index: number) => {
+            const range = getSelectedRange();
+            if (!range) return false;
+            return index >= range.start && index <= range.end;
+        };
+
         const isEditable = (tag: TagItem, index: number) => {
             if (disabled || tag.disabled) return false;
 
@@ -153,6 +172,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             originalValueRef.current = tag.label; // 👈 SAVE ORIGINAL
 
             setEditingIndex(index);
+            setSelectionStart(null);
+            setSelectionEnd(null);
             setEditingValue(tag.label);
         };
 
@@ -366,27 +387,76 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
             props.onKeyDown?.(e);
         };
+
+        const clamp = (value: number) => Math.max(0, Math.min(tags.length - 1, value));
         const handleTagKeyDown = (e: React.KeyboardEvent, index: number) => {
+            if (e.key === 'a' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                setSelectionStart(0);
+                setSelectionEnd(tags.length - 1);
+            }
+
             if (e.key === 'ArrowLeft') {
                 e.preventDefault();
-                setActiveIndex(index > 0 ? index - 1 : null);
-                if (index === 0) inputRef.current?.focus();
+
+                if (e.shiftKey) {
+                    if (selectionStart === null) {
+                        setSelectionStart(index);
+                        setSelectionEnd(index - 1);
+                    } else {
+                        setSelectionEnd((prev) => clamp(prev !== null ? prev - 1 : index - 1));
+                    }
+                } else {
+                    setActiveIndex(index > 0 ? index - 1 : null);
+                    setSelectionStart(null);
+                    setSelectionEnd(null);
+
+                    if (index === 0) inputRef.current?.focus();
+                }
             }
 
             if (e.key === 'ArrowRight') {
                 e.preventDefault();
 
-                if (index < tags.length - 1) {
-                    setActiveIndex(index + 1);
+                if (e.shiftKey) {
+                    if (selectionStart === null) {
+                        setSelectionStart(index);
+                        setSelectionEnd(index + 1);
+                    } else {
+                        setSelectionEnd((prev) => clamp(prev !== null ? prev + 1 : index + 1));
+                    }
                 } else {
-                    setActiveIndex(null);
-                    inputRef.current?.focus();
+                    if (index < tags.length - 1) {
+                        setActiveIndex(index + 1);
+                    } else {
+                        setActiveIndex(null);
+                        inputRef.current?.focus();
+                    }
+
+                    setSelectionStart(null);
+                    setSelectionEnd(null);
                 }
             }
 
-            if (e.key === 'Backspace') {
-                e.preventDefault();
+            // if (e.key === 'Backspace') {
+            //     e.preventDefault();
+            //
+            //     if (!tags[index].disabled) {
+            //         removeTag(index);
+            //         setActiveIndex(index > 0 ? index - 1 : null);
+            //     }
+            // }
 
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                const range = getSelectedRange();
+
+                if (range) {
+                    e.preventDefault();
+                    removeSelected();
+                    return;
+                }
+
+                // fallback: single delete
                 if (!tags[index].disabled) {
                     removeTag(index);
                     setActiveIndex(index > 0 ? index - 1 : null);
@@ -397,6 +467,33 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 if (isEditable(tags[index], index)) {
                     startEdit(index);
                 }
+            }
+        };
+        const removeSelected = () => {
+            const range = getSelectedRange();
+            if (!range) return;
+
+            const next = tags.filter((tag, i) => {
+                const inRange = i >= range.start && i <= range.end;
+                return !inRange || tag.disabled;
+            });
+
+            setTags(next);
+
+            // 👇 NEW: compute next focus
+            const nextIndex =
+                range.start < next.length
+                    ? range.start // next item shifts into this position
+                    : next.length - 1; // fallback to last item
+
+            setSelectionStart(null);
+            setSelectionEnd(null);
+
+            if (next.length === 0) {
+                setActiveIndex(null);
+                requestAnimationFrame(() => inputRef.current?.focus());
+            } else {
+                setActiveIndex(nextIndex);
             }
         };
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -549,12 +646,20 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                                 ref={(el) => (tagRefs.current[i] = el)}
                                 key={tag.id ?? tag.value}
                                 tabIndex={activeIndex === i ? 0 : -1}
-                                onFocus={() => setActiveIndex(i)}
+                                onFocus={() => {
+                                    setActiveIndex(i);
+                                    setSelectionStart(null);
+                                    setSelectionEnd(null);
+                                }}
                                 onKeyDown={(e) => handleTagKeyDown(e, i)}
                                 onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                                 style={{ display: 'inline-flex' }}
+                                // className={clsx(prefix('__tag'), {
+                                //     [prefix('__tag--active')]: activeIndex === i,
+                                // })}
                                 className={clsx(prefix('__tag'), {
                                     [prefix('__tag--active')]: activeIndex === i,
+                                    [prefix('__tag--selected')]: isSelected(i),
                                 })}
                             >
                                 {node}
@@ -570,12 +675,20 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             ref={(el) => (tagRefs.current[i] = el)}
                             key={tag.id ?? tag.value}
                             tabIndex={activeIndex === i ? 0 : -1}
-                            onFocus={() => setActiveIndex(i)}
+                            onFocus={() => {
+                                setActiveIndex(i);
+                                setSelectionStart(null);
+                                setSelectionEnd(null);
+                            }}
                             onKeyDown={(e) => handleTagKeyDown(e, i)}
                             onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                             style={{ display: 'inline-flex' }}
+                            // className={clsx(prefix('__tag'), {
+                            //     [prefix('__tag--active')]: activeIndex === i,
+                            // })}
                             className={clsx(prefix('__tag'), {
                                 [prefix('__tag--active')]: activeIndex === i,
+                                [prefix('__tag--selected')]: isSelected(i),
                             })}
                         >
                             <Chip

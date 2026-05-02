@@ -424,13 +424,26 @@ $tag-input-sizes: (
         }
 
         .#{$compPrefix}__tag{
-
+            &--selected {
+                background: var(--color-primary-soft);
+                outline: 2px solid red;
+            }
+            &--active {
+                outline: 2px solid var(currentColor);
+                outline-offset: 2px;
+            }
         }
 
-        .#{$compPrefix}__tag--active {
-            outline: 2px solid var(currentColor);
-            outline-offset: 2px;
-        }
+        //.#{$compPrefix}__tag--active {
+        //    outline: 2px solid var(currentColor);
+        //    outline-offset: 2px;
+        //}
+
+        //.#{$compPrefix}__tag--select {
+        //    outline: 2px solid red;
+        //    outline-offset: 2px;
+        //    display: none;
+        //}
 
         .#{$compPrefix}__tag-edit {
             flex: 0 0 auto;
