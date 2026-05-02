@@ -185,6 +185,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
             setTags(updated);
             setEditingIndex(null);
+            setActiveIndex(null);
 
             requestAnimationFrame(() => {
                 inputRef.current?.focus();
@@ -193,6 +194,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
         const cancelEdit = () => {
             setEditingIndex(null);
+            setActiveIndex(null);
+            setActiveIndex(null);
 
             requestAnimationFrame(() => {
                 inputRef.current?.focus();
@@ -517,22 +520,24 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             disabled: disabled || tag.disabled,
                         });
 
-                        return React.isValidElement(node)
-                            ? React.cloneElement(node, {
-                                  ref: (el) => (tagRefs.current[i] = el),
-                                  key: tag.id ?? tag.value,
-                                  tabIndex: activeIndex === i ? 0 : -1,
-                                  onFocus: () => setActiveIndex(i),
-                                  onKeyDown: (e) => handleTagKeyDown(e, i),
-                                  onDoubleClick: isEditable(tag, i)
-                                      ? () => startEdit(i)
-                                      : undefined,
-                                  style: { display: 'inline-flex' },
-                                  className: clsx(prefix('__tag'), {
-                                      [prefix('__tag--active')]: activeIndex === i,
-                                  }),
-                              })
-                            : node;
+                        return React.isValidElement(node) ? (
+                            <div
+                                ref={(el) => (tagRefs.current[i] = el)}
+                                key={tag.id ?? tag.value}
+                                tabIndex={activeIndex === i ? 0 : -1}
+                                onFocus={() => setActiveIndex(i)}
+                                onKeyDown={(e) => handleTagKeyDown(e, i)}
+                                onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
+                                style={{ display: 'inline-flex' }}
+                                className={clsx(prefix('__tag'), {
+                                    [prefix('__tag--active')]: activeIndex === i,
+                                })}
+                            >
+                                {node}
+                            </div>
+                        ) : (
+                            node
+                        );
                     }
 
                     // 🔥 DEFAULT CHIP
