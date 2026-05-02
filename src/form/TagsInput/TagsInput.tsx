@@ -1,7 +1,6 @@
 import React, { forwardRef, useRef, useState } from 'react';
-import { Input, type InputProps } from '../Input/Input';
+import { type InputProps } from '../Input/Input';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
-import { renderGroupItem } from '../Input/input.helpers';
 import { prefix } from '../Input/input.helpers';
 import clsx from 'clsx';
 import { Chip } from '../../Chip/Chip';
@@ -12,7 +11,7 @@ import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon';
 
 type RenderTagParams = {
-    value: string;
+    tag: TagItem;
     index: number;
     remove: () => void;
     disabled?: boolean;
@@ -24,17 +23,22 @@ type TagItem = {
     value: string; // normalized / unique
 };
 
-// type TagsInputProps = {
-//     value: string[];
-//     onChange: (tags: string[]) => void;
-//     renderTag?: (params: RenderTagParams) => React.ReactNode;
-// };
+export const slugify = (str: string) =>
+    str
+        .toLowerCase()
+        .trim()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '') // remove accents
+        .replace(/[^\w\s-]/g, '') // remove symbols
+        .replace(/\s+/g, '-') // spaces → dash
+        .replace(/-+/g, '-');
 
 export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChange'> & {
     value?: TagItem[];
     defaultValue?: TagItem[];
     onValueChange?: (tags: TagItem[]) => void;
 
+    normalizeTag?: (label: string) => string;
     renderTag?: (params: RenderTagParams) => React.ReactNode;
 
     invalid?: boolean;
@@ -44,10 +48,10 @@ export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChan
     start?: React.ReactNode;
     actions?: React.ReactNode; // 👈 NEW
     unique?: boolean;
-    onDuplicate?: (tag: string, existing: string) => void;
+    onDuplicate?: (tag: TagItem, existing: TagItem) => void;
 
-    onTagAdd?: (tag: string) => void;
-    onTagRemove?: (tag: string, index: number) => void;
+    onTagAdd?: (tag: TagItem) => void;
+    onTagRemove?: (tag: TagItem, index: number) => void;
 
     clearable?: boolean;
     clearIcon?: React.ReactNode;
@@ -61,7 +65,7 @@ export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChan
 
 const DEFAULT_SEPARATOR = /[,\n]/;
 
-const normalize = (str: string) => str.toLowerCase().trim();
+const defaultNormalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' '); // collapse spaces only
 
 const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
     (
@@ -72,6 +76,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             defaultValue = [],
             onValueChange,
 
+            normalizeTag,
             renderTag,
 
             invalid,
@@ -172,16 +177,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             if (!trimmed) return;
             if (maxTags && tags.length >= maxTags) return;
 
-            const value = normalize(trimmed);
-
-            if (unique) {
-                const existing = tags.find((t) => t.value === value);
-
-                if (existing) {
-                    onDuplicate?.(trimmed, existing.label);
-                    return;
-                }
-            }
+            const normalizeFn = normalizeTag ?? defaultNormalize;
+            const value = normalizeFn(trimmed);
 
             const newTag: TagItem = {
                 id: crypto.randomUUID(),
@@ -189,10 +186,21 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 value,
             };
 
+            if (unique) {
+                const existing = tags.find(
+                    (t) => t.value.localeCompare(value, undefined, { sensitivity: 'base' }) === 0,
+                );
+
+                if (existing) {
+                    onDuplicate?.(newTag, existing);
+                    return;
+                }
+            }
+
             const next = [...tags, newTag];
 
             setTags(next);
-            onTagAdd?.(trimmed);
+            onTagAdd?.(newTag);
             setInputValue('');
         };
         const removeTag = (index: number) => {
@@ -200,7 +208,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             const next = tags.filter((_, i) => i !== index);
 
             setTags(next);
-            onTagRemove?.(removed.label, index);
+            onTagRemove?.(removed, index);
         };
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter' || e.key === ',') {
@@ -268,18 +276,28 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                 if (!trimmed) continue;
 
-                const value = normalize(trimmed);
+                const normalizeFn = normalizeTag ?? defaultNormalize;
+                const value = normalizeFn(trimmed);
+
+                const newTag: TagItem = {
+                    id: crypto.randomUUID(),
+                    label: trimmed,
+                    value,
+                };
 
                 if (unique) {
-                    const existing = next.find((t) => t.value === value);
+                    const existing = next.find(
+                        (t) =>
+                            t.value.localeCompare(value, undefined, { sensitivity: 'base' }) === 0,
+                    );
                     if (existing) {
-                        onDuplicate?.(trimmed, existing.label);
+                        onDuplicate?.(newTag, existing);
                         continue;
                     }
                 }
 
-                next.push({ label: trimmed, value });
-                onTagAdd?.(trimmed);
+                next.push(newTag);
+                onTagAdd?.(newTag);
 
                 if (maxTags && next.length >= maxTags) break;
             }
@@ -312,7 +330,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                     if (renderTag) {
                         const node = renderTag({
-                            value: tag.label,
+                            tag,
                             index: i,
                             remove,
                             disabled,
