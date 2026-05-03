@@ -4,30 +4,30 @@ import { CheckboxGroupProvider } from './checkboxGroup.context';
 
 export type Value = string | number;
 
-type CheckboxGroupProps = {
-    value?: Value[];
-    defaultValue?: Value[];
-    onChange?: (values: Value[]) => void;
+type CheckboxGroupProps<T> = {
+    value?: T[];
+    defaultValue?: T[];
+    onChange?: (values: T[]) => void;
     name?: string;
     disabled?: boolean;
     children: React.ReactNode;
 };
 
-export const CheckboxGroup = ({
+export function CheckboxGroup<T>({
     value,
     defaultValue = [],
     onChange,
     name,
     disabled,
     children,
-}: CheckboxGroupProps) => {
+}: CheckboxGroupProps<T>) {
     const isControlled = Array.isArray(value);
-    const [inner, setInner] = useState<Value[]>(() => defaultValue);
+    const [inner, setInner] = useState<T[]>(() => defaultValue);
 
     const current = isControlled ? value! : inner;
 
     const toggle = useCallback(
-        (val: Value) => {
+        (val: T) => {
             const exists = current.includes(val);
 
             const next = exists ? current.filter((v) => v !== val) : [...current, val];
@@ -53,4 +53,4 @@ export const CheckboxGroup = ({
             </div>
         </CheckboxGroupProvider>
     );
-};
+}

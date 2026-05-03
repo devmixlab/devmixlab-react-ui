@@ -1,22 +1,26 @@
 // CheckboxGroup.context.ts
-import React, { useContext } from 'react';
-import { Value } from './CheckboxGroup';
+import React, { useContext, createContext } from 'react';
 
-export type CheckboxGroupContextValue = {
-    value: Value[];
-    toggle: (val: Value) => void;
+export type CheckboxGroupContextValue<T> = {
+    value: T[];
+    toggle: (val: T) => void;
     name?: string;
     disabled?: boolean;
 };
 
-const CheckboxGroupContext = React.createContext<CheckboxGroupContextValue | undefined>(undefined);
+const CheckboxGroupContext = createContext<CheckboxGroupContextValue<any> | undefined>(undefined);
 
-export const useCheckboxGroupContext = (): CheckboxGroupContextValue | undefined => {
-    const context = useContext(CheckboxGroupContext);
-    // if (!context) {
-    //     throw new Error('CheckboxGroupContextValue must be used within a <Checkbox.Provider>');
-    // }
-    return context;
-};
+// const CheckboxGroupContext = createContext<CheckboxGroupContextValue | undefined>(undefined);
+
+// export const useCheckboxGroupContext = (): CheckboxGroupContextValue | undefined => {
+//     const context = useContext(CheckboxGroupContext);
+//     // if (!context) {
+//     //     throw new Error('CheckboxGroupContextValue must be used within a <Checkbox.Provider>');
+//     // }
+//     return context;
+// };
+export function useCheckboxGroupContext<T>() {
+    return useContext(CheckboxGroupContext) as CheckboxGroupContextValue<T> | undefined;
+}
 
 export const CheckboxGroupProvider = CheckboxGroupContext.Provider;

@@ -7,7 +7,6 @@ import { Check as CheckIcon } from '../../Icon/Check';
 import { Indeterminate as IndeterminateIcon } from '../../Icon/Indeterminate';
 import { CLASS_PREFIX } from '../../constants';
 import { useCheckboxGroupContext } from './checkboxGroup.context';
-import { Value } from './CheckboxGroup';
 
 type CheckboxProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: Size;
@@ -49,8 +48,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         const inputRef = useRef<HTMLInputElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
-        const group = useCheckboxGroupContext();
-        const valueProp = rest.value as Value | undefined;
+        const group = useCheckboxGroupContext<any>();
+        const valueProp = rest.value as unknown;
 
         const [uncontrolledChecked, setUncontrolledChecked] = useState(() =>
             Boolean(defaultChecked),
