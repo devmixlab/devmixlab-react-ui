@@ -14,7 +14,7 @@ $compPrefix: 'dru--input-control';
     }
 }
 
-$control-sizes: (
+$checkbox-sizes: (
     sm: (
         size: 16px,
         icon: 10px,
@@ -35,13 +35,55 @@ $control-sizes: (
     )
 );
 
-@mixin control-size($size) {
-    $conf: map.get($control-sizes, $size);
+$switch-sizes: (
+    sm: (
+        height: 16px,
+        width: 28px,
+        thumb: 12px,
+        padding: 2px,
+        gap: 6px,
+        offset: 0.5px,
+        xOffset: 1px
+    ),
+    md: (
+        height: 18px,
+        width: 32px,
+        thumb: 14px,
+        padding: 2px,
+        gap: 8px,
+        offset: 0.5px,
+        xOffset: 0px
+    ),
+    lg: (
+        height: 22px,
+        width: 40px,
+        thumb: 18px,
+        padding: 2px,
+        gap: 10px,
+        offset: 0px,
+        xOffset: 0px
+    )
+);
 
-    --control-size: #{map.get($conf, size)};
-    --control-icon-size: #{map.get($conf, icon)};
-    --control-stroke: #{map.get($conf, stroke)};
-    --control-gap: #{map.get($conf, gap)};
+@mixin checkbox-size($size) {
+    $conf: map.get($checkbox-sizes, $size);
+
+    --checkbox-size: #{map.get($conf, size)};
+    --checkbox-icon-size: #{map.get($conf, icon)};
+    --checkbox-stroke: #{map.get($conf, stroke)};
+    --checkbox-gap: #{map.get($conf, gap)};
+}
+
+@mixin switch-size($size) {
+    $conf: map.get($switch-sizes, $size);
+
+    --switch-height: #{map.get($conf, height)};
+    --switch-width: #{map.get($conf, width)};
+    --switch-thumb: #{map.get($conf, thumb)};
+    --switch-gap: #{map.get($conf, gap)};
+    --switch-padding: #{map.get($conf, padding)};
+    --switch-offset: #{map.get($conf, offset)};
+    --switch-x-offset: #{map.get($conf, xOffset)};
 }
 
 .#{$compPrefix} {
@@ -51,22 +93,19 @@ $control-sizes: (
     @include intent-vars($neutral, neutral);
     @include intent-vars($gray, gray);
 
-    @media (prefers-reduced-motion: reduce) {
-        .#{$compPrefix}__checkmark,
-        .#{$compPrefix}__checkmark path,
-        .#{$compPrefix}__control {
-            transition: none;
-        }
-    }
-
-
-
-    &--size-sm { @include control-size(sm); }
-    &--size-md { @include control-size(md); }
-    &--size-lg { @include control-size(lg); }
-
     &--checkbox {
-        @include control-size(md);
+        &--size-sm { @include checkbox-size(sm); }
+        &--size-md { @include checkbox-size(md); }
+        &--size-lg { @include checkbox-size(lg); }
+        @include checkbox-size(md);
+
+        @media (prefers-reduced-motion: reduce) {
+            .#{$compPrefix}__checkmark,
+            .#{$compPrefix}__checkmark path,
+            .#{$compPrefix}__control {
+                transition: none;
+            }
+        }
 
         --control-bg: var(--intent-neutral-100);
         --control-border: var(--intent-gray-400);
@@ -74,7 +113,7 @@ $control-sizes: (
 
         display: inline-flex;
         align-items: center;
-        gap: var(--control-gap);
+        gap: var(--checkbox-gap);
         cursor: pointer;
         position: relative;
 
@@ -91,8 +130,8 @@ $control-sizes: (
         }
 
         .#{$compPrefix}__control {
-            width: var(--control-size);
-            height: var(--control-size);
+            width: var(--checkbox-size);
+            height: var(--checkbox-size);
             border: 2px solid var(--control-border);
             border-radius: 6px;
             display: inline-flex;
@@ -113,8 +152,8 @@ $control-sizes: (
         }
 
         .#{$compPrefix}__checkmark {
-            width: var(--control-icon-size);
-            height: var(--control-icon-size);
+            width: var(--checkbox-icon-size);
+            height: var(--checkbox-icon-size);
 
             opacity: 0;
             transform: scale(0.85) translateY(0.5px);
@@ -145,7 +184,7 @@ $control-sizes: (
         .#{$compPrefix}__checkmark polyline,
         .#{$compPrefix}__checkmark line {
             stroke: currentColor;
-            stroke-width: var(--control-stroke, 2);
+            stroke-width: var(--checkbox-stroke, 2);
             stroke-linecap: round;
             stroke-linejoin: round;
             fill: none;
@@ -197,6 +236,83 @@ $control-sizes: (
 
         &.#{$compPrefix}--disabled {
             cursor: not-allowed;
+        }
+    }
+
+    &--switch {
+        //@include switch-size(md);
+
+        &.#{$compPrefix}--size-sm { @include switch-size(sm); }
+        &.#{$compPrefix}--size-md { @include switch-size(md); }
+        &.#{$compPrefix}--size-lg { @include switch-size(lg); }
+
+        display: inline-flex;
+        align-items: center;
+        gap: var(--switch-gap);
+        cursor: pointer;
+
+        .#{$compPrefix}__input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .#{$compPrefix}__track {
+            width: var(--switch-width);
+            height: var(--switch-height);
+            background: #ccc;
+            border-radius: 999px;
+            position: relative;
+            transition: background 0.2s;
+        }
+
+        //.#{$compPrefix}__thumb {
+
+        //    position: absolute;
+        //
+        //    top: 50%;
+        //    left: var(--switch-padding);
+        //
+        //    transform: translate(0, -50%);
+        //    transition: transform 0.2s ease;
+        //}
+
+        .#{$compPrefix}__thumb {
+            width: var(--switch-thumb);
+            height: var(--switch-thumb);
+            background: white;
+            border-radius: 50%;
+
+            position: absolute;
+            top: 50%;
+            left: 0;
+
+            transform: translate(
+                var(--switch-padding),
+                calc(-50% + var(--switch-offset, 0px))
+            );
+
+            transition: transform 0.2s ease;
+        }
+
+        .#{$compPrefix}__input:checked + .#{$compPrefix}__track {
+            background: #4f46e5;
+        }
+
+        //.#{$compPrefix}__input:checked + .#{$compPrefix}__track .#{$compPrefix}__thumb {
+        //    transform: translateX(calc(var(--switch-width) - var(--switch-thumb) - (var(--switch-padding) * 2))) translateY(-50%);
+        //}
+
+        .#{$compPrefix}__input:checked + .#{$compPrefix}__track .#{$compPrefix}__thumb {
+            transform: translate(
+                calc(
+                    var(--switch-width)
+                    - var(--switch-thumb)
+                    - var(--switch-padding)
+                    + var(--switch-x-offset, 0px) // 👈 HERE
+                ),
+                calc(-50% + var(--switch-offset, 0px))
+            );
         }
     }
 

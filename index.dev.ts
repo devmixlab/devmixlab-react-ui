@@ -20,6 +20,7 @@ export { Textarea } from './src/form/Input/Textarea';
 export { Select } from './src/form/Select/Select';
 export { Checkbox } from './src/form/Checkbox/Checkbox';
 export { CheckboxGroup } from './src/form/Checkbox/CheckboxGroup';
+export { Switch } from './src/form/Switch/Switch';
 export { FormField } from './src/form/FormField';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';

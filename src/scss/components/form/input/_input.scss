@@ -294,7 +294,7 @@ $tag-input-sizes: (
             &.#{$compPrefix}--size-#{$size} {
                 --gap: #{map.get($gaps, gap)};
                 --actions-gap: #{map.get($gaps, actionsGap)};
-                --control-gap: #{map.get($gaps, controlGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
                 --fs: #{map.get($value, fontSize)};
                 --x-offset: #{map.get($value, spacingX)};
                 --top-offset: #{map.get($value, spacingTop)};
@@ -327,7 +327,7 @@ $tag-input-sizes: (
                 --top-offset: 0px;
                 --gap: #{map.get($gaps, gap)};
                 --actions-gap: #{map.get($gaps, actionsGap)};
-                --control-gap: #{map.get($gaps, controlGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
 
                 // Field vars
                 --field-pl: var(--x-offset); // default field padding left
@@ -371,7 +371,7 @@ $tag-input-sizes: (
                 --y-offset: #{map.get($value, spacingY)};
                 --gap: #{map.get($gaps, gap)};
                 --actions-gap: #{map.get($gaps, actionsGap)};
-                --control-gap: #{map.get($gaps, controlGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
 
                 --pt: var(--y-offset);
                 --pb: var(--y-offset);
@@ -557,7 +557,7 @@ $tag-input-sizes: (
     }
 
     &__controls-group {
-        margin-left: var(--control-gap);
+        margin-left: var(--checkbox-gap);
     }
 
     &__clear {
