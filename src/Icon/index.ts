@@ -8,3 +8,4 @@ export { Warning } from './Warning';
 export { TriangleDown } from './TriangleDown';
 export { ChevronUp } from './ChevronUp';
 export { ChevronDown } from './ChevronDown';
+export { Indeterminate } from './Indeterminate';

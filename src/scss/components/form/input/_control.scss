@@ -1,0 +1,203 @@
+@use '../../../abstracts/config' as *;
+@use '../../../abstracts/mixins' as *;
+
+@use '../../../abstracts/palette' as *;
+@use 'sass:map';
+
+$compPrefix: 'dru--input-control';
+
+@mixin intent-vars($palette, $palette-name) {
+    @each $step, $value in $palette {
+        --intent-#{
+            $palette-name
+        }-#{$step}: #{$value};
+    }
+}
+
+$control-sizes: (
+    sm: (
+        size: 16px,
+        icon: 10px,
+        stroke: 2,
+        gap: 6px
+    ),
+    md: (
+        size: 18px,
+        icon: 12px,
+        stroke: 2.5,
+        gap: 8px
+    ),
+    lg: (
+        size: 22px,
+        icon: 14px,
+        stroke: 3,
+        gap: 10px
+    )
+);
+
+@mixin control-size($size) {
+    $conf: map.get($control-sizes, $size);
+
+    --control-size: #{map.get($conf, size)};
+    --control-icon-size: #{map.get($conf, icon)};
+    --control-stroke: #{map.get($conf, stroke)};
+    --control-gap: #{map.get($conf, gap)};
+}
+
+.#{$compPrefix} {
+
+    @include intent-vars($red, red);
+    @include intent-vars($blue, blue);
+    @include intent-vars($neutral, neutral);
+    @include intent-vars($gray, gray);
+
+    @media (prefers-reduced-motion: reduce) {
+        .#{$compPrefix}__checkmark,
+        .#{$compPrefix}__checkmark path,
+        .#{$compPrefix}__control {
+            transition: none;
+        }
+    }
+
+
+
+    &--size-sm { @include control-size(sm); }
+    &--size-md { @include control-size(md); }
+    &--size-lg { @include control-size(lg); }
+
+    &--checkbox {
+        @include control-size(md);
+
+        --control-bg: var(--intent-neutral-100);
+        --control-border: var(--intent-gray-400);
+        --control-accent: var(--intent-blue-500);
+
+        display: inline-flex;
+        align-items: center;
+        gap: var(--control-gap);
+        cursor: pointer;
+        position: relative;
+
+        .#{$compPrefix}__input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: inherit;
+            z-index: 1;
+        }
+
+        .#{$compPrefix}__label {
+            user-select: none;
+        }
+
+        .#{$compPrefix}__control {
+            width: var(--control-size);
+            height: var(--control-size);
+            border: 2px solid var(--control-border);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--control-bg);
+            position: relative;
+            z-index: 0;
+            will-change: transform;
+
+            transition:
+                border-color 0.2s ease,
+                background 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.1s ease;
+
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+
+        .#{$compPrefix}__checkmark {
+            width: var(--control-icon-size);
+            height: var(--control-icon-size);
+
+            opacity: 0;
+            transform: scale(0.85) translateY(0.5px);
+
+            transition:
+                opacity 0.15s ease,
+                transform 0.15s ease;
+
+            color: white; // uses currentColor in SVG
+            pointer-events: none;
+
+            // optional: smoother rendering
+            display: block;
+        }
+
+        .#{$compPrefix}__control--indeterminate .#{$compPrefix}__checkmark {
+            opacity: 1;
+            transform: scale(1) translateY(0.5px);
+            transform-origin: center;
+        }
+
+        .#{$compPrefix}__control--indeterminate {
+            background: var(--control-accent);
+            border-color: var(--control-accent);
+        }
+
+        .#{$compPrefix}__checkmark path,
+        .#{$compPrefix}__checkmark polyline,
+        .#{$compPrefix}__checkmark line {
+            stroke: currentColor;
+            stroke-width: var(--control-stroke, 2);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+
+            transition: stroke-dashoffset 0.2s ease;
+        }
+
+        .#{$compPrefix}__input:checked + .#{$compPrefix}__control {
+            background: var(--control-accent);
+            border-color: var(--control-accent);
+        }
+
+        .#{$compPrefix}__input:checked + .#{$compPrefix}__control .#{$compPrefix}__checkmark {
+            opacity: 1;
+            transform: scale(1) translate(0px, 0.5px);
+            transform-origin: center;
+        }
+
+        .#{$compPrefix}__input:checked + .#{$compPrefix}__control .#{$compPrefix}__checkmark path {
+            stroke-dashoffset: 0;
+        }
+
+        // hover
+        &:not(.#{$compPrefix}--disabled):hover .#{$compPrefix}__control {
+            border-color: var(--control-accent);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+
+        // active (press)
+        &:not(.#{$compPrefix}--disabled):active .#{$compPrefix}__control {
+            transform: scale(0.95);
+        }
+
+        // focus
+        .#{$compPrefix}__input:focus-visible + .#{$compPrefix}__control {
+            box-shadow:
+                0 0 0 2px var(--control-bg),
+                0 0 0 4px color-mix(in srgb, var(--control-accent) 40%, transparent);
+        }
+
+        // disabled
+        .#{$compPrefix}__input:disabled + .#{$compPrefix}__control {
+            opacity: 0.5;
+        }
+
+        .#{$compPrefix}__input:disabled ~ * {
+            cursor: not-allowed;
+        }
+
+        &.#{$compPrefix}--disabled {
+            cursor: not-allowed;
+        }
+    }
+
+}

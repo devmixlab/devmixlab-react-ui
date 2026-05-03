@@ -18,6 +18,8 @@ export { NumberInput } from './src/form/NumberInput/NumberInput';
 export { TagsInput } from './src/form/TagsInput/TagsInput';
 export { Textarea } from './src/form/Input/Textarea';
 export { Select } from './src/form/Select/Select';
+export { Checkbox } from './src/form/Checkbox/Checkbox';
+export { CheckboxGroup } from './src/form/Checkbox/CheckboxGroup';
 export { FormField } from './src/form/FormField';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';
