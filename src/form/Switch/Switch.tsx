@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useEffect, useId, useState } from 'react';
+import React, { forwardRef, useRef, useEffect, useId, useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Box } from '../../Box/Box';
 import { mergeRefs } from '../../utils/mergeRefs';
@@ -45,15 +45,40 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
 
         const id = rest.id ?? useId();
         const descriptionId = description ? `${id}-desc` : undefined;
+        const labelId = children ? `${id}-label` : undefined;
+
+        useEffect(() => {
+            if (!isControlled) {
+                setUncontrolledChecked(Boolean(defaultChecked));
+            }
+        }, [defaultChecked, isControlled]);
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             if (!isControlled) {
                 setUncontrolledChecked(e.target.checked);
             }
 
+            const next = e.target.checked;
+
             onChange?.(e);
-            onCheckedChange?.(e.target.checked);
+            onCheckedChange?.(next);
         };
+
+        const labelNode =
+            children || description ? (
+                <span className={prefix('__text')}>
+                    {children && (
+                        <span id={labelId} className={prefix('__label')}>
+                            {children}
+                        </span>
+                    )}
+                    {description && (
+                        <span id={descriptionId} className={prefix('__description')}>
+                            {description}
+                        </span>
+                    )}
+                </span>
+            ) : null;
 
         return (
             <label
@@ -62,23 +87,22 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 })}
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={disabled || undefined}
-                aria-checked={isChecked}
-                aria-disabled={disabled || undefined}
+                data-size={size}
             >
-                {labelPosition === 'left' && children && (
-                    <span className={prefix('__label')}>{children}</span>
-                )}
+                {labelPosition === 'left' && labelNode}
 
                 <Box
                     as="input"
-                    {...rest}
                     type="checkbox"
+                    id={id}
+                    {...rest}
                     role="switch"
                     aria-checked={isChecked}
+                    aria-labelledby={labelId || undefined}
+                    aria-label={labelId ? undefined : rest['aria-label']}
                     aria-describedby={descriptionId}
-                    checked={isChecked}
+                    {...(isControlled ? { checked } : { defaultChecked })}
                     onChange={handleChange}
-                    id={id}
                     ref={combinedRef}
                     disabled={disabled}
                     className={prefix('__input')}
@@ -88,15 +112,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                     <span className={prefix('__thumb')} />
                 </span>
 
-                {labelPosition === 'right' && children && (
-                    <span className={prefix('__label')}>{children}</span>
-                )}
-
-                {description && (
-                    <span id={descriptionId} className={prefix('__description')}>
-                        {description}
-                    </span>
-                )}
+                {labelPosition === 'right' && labelNode}
             </label>
         );
     },

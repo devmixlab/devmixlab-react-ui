@@ -42,10 +42,11 @@ $switch-sizes: (
         thumb: 12px,
         padding: 2px,
         gap: 6px,
-        offset: 0.5px,
+        offset: -0.5px,
         disabledOffset: -0.5px,
         //offset: -0.5px,
-        xOffset: 1px
+        xOffset: 1px,
+        font-size: 13px
     ),
     md: (
         height: 18px,
@@ -53,10 +54,11 @@ $switch-sizes: (
         thumb: 14px,
         padding: 2px,
         gap: 8px,
-        offset: 0.5px,
-        disabledOffset: -0.5px,
+        offset: 0px,
+        disabledOffset: 0px,
         //offset: -0.5px,
-        xOffset: 0px
+        xOffset: 0px,
+        font-size: 14px
     ),
     lg: (
         height: 22px,
@@ -66,7 +68,8 @@ $switch-sizes: (
         gap: 10px,
         offset: 0px,
         disabledOffset: 0px,
-        xOffset: 0px
+        xOffset: 0px,
+        font-size: 16px
     )
 );
 
@@ -90,6 +93,8 @@ $switch-sizes: (
     --switch-offset: #{map.get($conf, offset)};
     --switch-disabled-offset: #{map.get($conf, disabledOffset)};
     --switch-x-offset: #{map.get($conf, xOffset)};
+
+    font-size: map-get($conf, font-size);
 }
 
 .#{$compPrefix} {
@@ -100,9 +105,18 @@ $switch-sizes: (
     @include intent-vars($gray, gray);
 
     &--checkbox {
-        &--size-sm { @include checkbox-size(sm); }
-        &--size-md { @include checkbox-size(md); }
-        &--size-lg { @include checkbox-size(lg); }
+        &--size-sm {
+            @include checkbox-size(sm);
+        }
+
+        &--size-md {
+            @include checkbox-size(md);
+        }
+
+        &--size-lg {
+            @include checkbox-size(lg);
+        }
+
         @include checkbox-size(md);
 
         @media (prefers-reduced-motion: reduce) {
@@ -148,13 +162,12 @@ $switch-sizes: (
             z-index: 0;
             will-change: transform;
 
-            transition:
-                border-color 0.2s ease,
-                background 0.2s ease,
-                box-shadow 0.2s ease,
-                transform 0.1s ease;
+            transition: border-color 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease,
+            transform 0.1s ease;
 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
         }
 
         .#{$compPrefix}__checkmark {
@@ -164,9 +177,8 @@ $switch-sizes: (
             opacity: 0;
             transform: scale(0.85) translateY(0.5px);
 
-            transition:
-                opacity 0.15s ease,
-                transform 0.15s ease;
+            transition: opacity 0.15s ease,
+            transform 0.15s ease;
 
             color: white; // uses currentColor in SVG
             pointer-events: none;
@@ -216,7 +228,7 @@ $switch-sizes: (
         // hover
         &:not(.#{$compPrefix}--disabled):hover .#{$compPrefix}__control {
             border-color: var(--control-accent);
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
         }
 
         // active (press)
@@ -226,9 +238,8 @@ $switch-sizes: (
 
         // focus
         .#{$compPrefix}__input:focus-visible + .#{$compPrefix}__control {
-            box-shadow:
-                0 0 0 2px var(--control-bg),
-                0 0 0 4px color-mix(in srgb, var(--control-accent) 40%, transparent);
+            box-shadow: 0 0 0 2px var(--control-bg),
+            0 0 0 4px color-mix(in srgb, var(--control-accent) 40%, transparent);
         }
 
         // disabled
@@ -254,13 +265,23 @@ $switch-sizes: (
             }
         }
 
-        &.#{$compPrefix}--size-sm { @include switch-size(sm); }
-        &.#{$compPrefix}--size-md { @include switch-size(md); }
-        &.#{$compPrefix}--size-lg { @include switch-size(lg); }
+        &.#{$compPrefix}--size-sm {
+            @include switch-size(sm);
+        }
+
+        &.#{$compPrefix}--size-md {
+            @include switch-size(md);
+        }
+
+        &.#{$compPrefix}--size-lg {
+            @include switch-size(lg);
+        }
 
         --switch-track-bg: var(--intent-gray-300);
         --switch-track-bg-checked: var(--intent-blue-500);
         --switch-thumb-bg: #ffffff;
+        --switch-text-disabled: var(--intent-gray-400);
+        --switch-description-color: var(--intent-gray-500);
 
         --switch-focus-ring: color-mix(
             in srgb,
@@ -276,6 +297,8 @@ $switch-sizes: (
             --switch-track-bg: var(--intent-gray-600);
             --switch-track-bg-checked: var(--intent-blue-400);
             --switch-thumb-bg: var(--intent-gray-100);
+            --switch-text-disabled: var(--intent-gray-500);
+            --switch-description-color: var(--intent-gray-400);
 
             --switch-focus-ring: color-mix(
                 in srgb,
@@ -289,9 +312,14 @@ $switch-sizes: (
         }
 
         display: inline-flex;
-        align-items: center;
+        //align-items: flex-start;
+        align-items: center; // 👈 critical
+        //vertical-align: middle;
+        line-height: 1; // 👈 ADD THIS
         gap: var(--switch-gap);
         cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
 
         .#{$compPrefix}__input {
             position: absolute;
@@ -300,10 +328,27 @@ $switch-sizes: (
             cursor: inherit;
 
             &:focus-visible + .#{$compPrefix}__track {
-                box-shadow:
-                    0 0 0 2px var(--switch-focus-offset-color, #fff),
-                    0 0 0 4px color-mix(in srgb, var(--switch-track-bg-checked) 40%, transparent);
+                box-shadow: 0 0 0 2px var(--switch-focus-offset-color, #fff),
+                0 0 0 4px var(--switch-focus-ring);
             }
+        }
+
+        .#{$compPrefix}__label {
+            line-height: 1;
+            font-size: 1em;
+        }
+
+        .#{$compPrefix}__text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .#{$compPrefix}__description {
+            font-size: 0.85em;
+            color: var(--switch-description-color);
+            margin-top: 2px;
         }
 
         .#{$compPrefix}__track {
@@ -312,16 +357,14 @@ $switch-sizes: (
             background: var(--switch-track-bg);
             border-radius: 999px;
             position: relative;
-            transition: background 0.2s;
+            transition: background 0.2s, box-shadow 0.2s;
         }
 
         &:active .#{$compPrefix}__thumb {
-            transform:
-                translate(
-                    var(--_thumb-x, var(--switch-padding)),
-                    calc(-50% + var(--switch-offset, 0px))
-                )
-                scale(0.95);
+            transform: translate(
+                var(--_thumb-x, var(--switch-padding)),
+                calc(-50% + var(--switch-offset, 0px))
+            ) scale(0.95);
         }
 
         .#{$compPrefix}__thumb {
@@ -353,21 +396,33 @@ $switch-sizes: (
             );
         }
 
+        &:not(.#{$compPrefix}--disabled):active .#{$compPrefix}__thumb {
+            transform: translate(
+                var(--_thumb-x, var(--switch-padding)),
+                calc(-50% + var(--switch-offset, 0px))
+            ) scale(0.95);
+        }
+
         &:not(.#{$compPrefix}--disabled):not(:focus-within):hover .#{$compPrefix}__track {
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
         }
 
         &.#{$compPrefix}--disabled {
             cursor: not-allowed;
+            --switch-offset: var(--switch-disabled-offset, 0px);
+            --switch-description-color: var(--switch-text-disabled);
 
             .#{$compPrefix}__track {
                 pointer-events: none;
                 background: var(--switch-track-bg-disabled);
             }
+
             .#{$compPrefix}__thumb {
                 background: var(--switch-thumb-bg-disabled);
-                //transform: translate(var(--_thumb-x), calc(-50% + var(--switch-disabled-offset, 0px)));
-                transform: translate(var(--_thumb-x), calc(-50% + var(--switch-disabled-offset, 0px)));
+            }
+
+            .#{$compPrefix}__label, .#{$compPrefix}__description {
+                color: var(--switch-text-disabled);
             }
         }
     }
