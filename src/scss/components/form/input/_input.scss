@@ -507,6 +507,117 @@ $tag-input-sizes: (
         }
     }
 
+    .#{$compPrefix}__value {
+        appearance: none;
+        border: none;
+        background: transparent;
+        user-select: text;
+        font-size: var(--field-fs, inherit);
+
+        padding-left: var(--field-pl, 0);
+        padding-right: var(--field-pr, 0);
+        padding-top: var(--field-pt, 0);
+        padding-bottom: var(--field-pb, 0);
+
+        margin: 0;
+
+        height: var(--field-h, 100%);
+        width: 100%;
+        min-width: 0;
+
+        flex: 1;
+
+        line-height: 1;
+        color: inherit;
+
+        outline: none; /* wrapper handles focus */
+
+        &::placeholder {
+            color: var(--text-muted);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    &--file-upload {
+        --icon-adjust: 2px; // adjust icon to look consistent, its just fix
+        --slot-align: center;
+        --slot-h: 100%;
+        @each $size, $value in $input-sizes {
+            $gaps: map.get($input-gaps, $size);
+            &.#{$compPrefix}--size-#{$size} {
+
+                // Slot vars
+                --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
+                --top-offset: 0px;
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
+
+                // Field vars
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+                --height: #{map.get($value, height)};
+                --min-height: auto;
+                --fs: #{map.get($value, fontSize)};
+                --stepper-width: calc(var(--height) * 0.6);
+
+                &.#{$compPrefix}--has-start-slot {
+                    --field-pl: calc(var(--start-width) + var(--gap));
+                }
+
+                &.#{$compPrefix}--has-end-slot {
+                    --field-pr: calc(var(--end-width) + var(--gap));
+                }
+
+            }
+        }
+
+        cursor: pointer;
+        user-select: none;
+
+        // makes whole field clickable
+        & * {
+            pointer-events: none;
+        }
+
+        // but allow buttons (clear / actions)
+        & button {
+            pointer-events: auto;
+        }
+
+        // value text
+        //.#{$compPrefix}__value {
+        //    display: flex;
+        //    align-items: center;
+        //    gap: 4px;
+        //
+        //    color: var(--field-fg-muted);
+        //
+        //    white-space: nowrap;
+        //    overflow: hidden;
+        //    text-overflow: ellipsis;
+        //}
+
+        // when has files
+        .#{$compPrefix}--has-value .#{$compPrefix}__value {
+            color: var(--field-fg);
+        }
+
+        // drag state (you’ll toggle via state later)
+        .#{$compPrefix}--dragging {
+            --field-border: var(--color-primary);
+            --field-bg: var(--color-primary-soft);
+        }
+    }
 
     &__toggle {
         appearance: none;
