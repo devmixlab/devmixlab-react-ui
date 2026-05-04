@@ -383,11 +383,11 @@ $switch-sizes: (
             transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .#{$compPrefix}__input:checked + .#{$compPrefix}__track {
+        &[data-state='checked'] .#{$compPrefix}__track {
             background: var(--switch-track-bg-checked);
         }
 
-        .#{$compPrefix}__input:checked + .#{$compPrefix}__track .#{$compPrefix}__thumb {
+        &[data-state='checked'] .#{$compPrefix}__thumb {
             --_thumb-x: calc(
                 var(--switch-width)
                 - var(--switch-thumb)

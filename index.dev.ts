@@ -21,6 +21,7 @@ export { Select } from './src/form/Select/Select';
 export { Checkbox } from './src/form/Checkbox/Checkbox';
 export { CheckboxGroup } from './src/form/Checkbox/CheckboxGroup';
 export { Switch } from './src/form/Switch/Switch';
+export { SwitchGroup } from './src/form/Switch/SwitchGroup';
 export { FormField } from './src/form/FormField';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';

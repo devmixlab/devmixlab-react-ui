@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { Box } from '../../Box/Box';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { CLASS_PREFIX } from '../../constants';
+import { useSwitchGroup } from './switchGroup.context';
 
 type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: 'sm' | 'md' | 'lg';
@@ -41,24 +42,32 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         );
 
         const isControlled = typeof checked === 'boolean';
-        const isChecked = isControlled ? checked : uncontrolledChecked;
+
+        const group = useSwitchGroup();
+        const name = rest.name;
+
+        const isDisabled = disabled || group?.disabled;
+        const isChecked =
+            group && name
+                ? (group.value[name] ?? false)
+                : isControlled
+                  ? checked
+                  : uncontrolledChecked;
 
         const id = rest.id ?? useId();
         const descriptionId = description ? `${id}-desc` : undefined;
         const labelId = children ? `${id}-label` : undefined;
 
-        useEffect(() => {
-            if (!isControlled) {
-                setUncontrolledChecked(Boolean(defaultChecked));
-            }
-        }, [defaultChecked, isControlled]);
-
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (!isControlled) {
-                setUncontrolledChecked(e.target.checked);
-            }
-
             const next = e.target.checked;
+
+            if (group && name) {
+                group.toggle(name, next);
+            } else {
+                if (!isControlled) {
+                    setUncontrolledChecked(next);
+                }
+            }
 
             onChange?.(e);
             onCheckedChange?.(next);
@@ -83,10 +92,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         return (
             <label
                 className={clsx(prefix(), prefix('--switch'), prefix(`--size-${size}`), className, {
-                    [prefix('--disabled')]: disabled,
+                    [prefix('--disabled')]: isDisabled,
                 })}
                 data-state={isChecked ? 'checked' : 'unchecked'}
-                data-disabled={disabled || undefined}
+                data-disabled={isDisabled || undefined}
                 data-size={size}
             >
                 {labelPosition === 'left' && labelNode}
@@ -101,10 +110,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                     aria-labelledby={labelId || undefined}
                     aria-label={labelId ? undefined : rest['aria-label']}
                     aria-describedby={descriptionId}
-                    {...(isControlled ? { checked } : { defaultChecked })}
+                    checked={isChecked}
                     onChange={handleChange}
                     ref={combinedRef}
-                    disabled={disabled}
+                    disabled={isDisabled}
                     className={prefix('__input')}
                 />
 
