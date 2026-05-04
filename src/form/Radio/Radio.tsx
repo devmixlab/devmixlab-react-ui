@@ -42,24 +42,22 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 
         const group = useRadioGroup();
 
-        if (!group) {
-            console.warn('Radio must be used inside RadioGroup');
-        }
+        // if (!group) {
+        //     console.warn('Radio should be used inside RadioGroup for proper behavior');
+        // }
 
         const finalSize = size ?? group?.size ?? 'sm';
-        const name = rest.name ?? group?.name;
+        const name = rest.name ?? group?.name ?? undefined;
 
         const isDisabled = disabled || group?.disabled;
-        const isChecked = group?.value === value;
+        const isChecked = group ? group.value === value : rest.checked === true;
 
         const id = rest.id ?? useId();
         const descriptionId = description ? `${id}-desc` : undefined;
         const labelId = children ? `${id}-label` : undefined;
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (!group) return;
-
-            group.onValueChange?.(value);
+            if (group) group.onValueChange?.(value);
             onChange?.(e);
         };
 
@@ -96,13 +94,14 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                     name={name}
                     value={value}
                     {...rest}
-                    checked={isChecked}
+                    {...(group ? { checked: isChecked } : {})}
                     onChange={handleChange}
                     ref={combinedRef}
                     disabled={isDisabled}
-                    aria-checked={isChecked}
+                    // aria-checked={isChecked}
                     aria-labelledby={labelId || undefined}
                     aria-describedby={descriptionId}
+                    aria-label={labelId ? undefined : rest['aria-label']}
                     className={prefix('__input')}
                 />
 
