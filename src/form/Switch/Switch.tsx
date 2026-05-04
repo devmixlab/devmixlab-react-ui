@@ -60,6 +60,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 className={clsx(prefix(), prefix('--switch'), prefix(`--size-${size}`), className, {
                     [prefix('--disabled')]: disabled,
                 })}
+                data-state={isChecked ? 'checked' : 'unchecked'}
+                data-disabled={disabled || undefined}
+                aria-checked={isChecked}
+                aria-disabled={disabled || undefined}
             >
                 {labelPosition === 'left' && children && (
                     <span className={prefix('__label')}>{children}</span>

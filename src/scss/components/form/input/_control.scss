@@ -43,6 +43,8 @@ $switch-sizes: (
         padding: 2px,
         gap: 6px,
         offset: 0.5px,
+        disabledOffset: -0.5px,
+        //offset: -0.5px,
         xOffset: 1px
     ),
     md: (
@@ -52,6 +54,8 @@ $switch-sizes: (
         padding: 2px,
         gap: 8px,
         offset: 0.5px,
+        disabledOffset: -0.5px,
+        //offset: -0.5px,
         xOffset: 0px
     ),
     lg: (
@@ -61,6 +65,7 @@ $switch-sizes: (
         padding: 2px,
         gap: 10px,
         offset: 0px,
+        disabledOffset: 0px,
         xOffset: 0px
     )
 );
@@ -83,6 +88,7 @@ $switch-sizes: (
     --switch-gap: #{map.get($conf, gap)};
     --switch-padding: #{map.get($conf, padding)};
     --switch-offset: #{map.get($conf, offset)};
+    --switch-disabled-offset: #{map.get($conf, disabledOffset)};
     --switch-x-offset: #{map.get($conf, xOffset)};
 }
 
@@ -241,10 +247,46 @@ $switch-sizes: (
 
     &--switch {
         //@include switch-size(md);
+        @media (prefers-reduced-motion: reduce) {
+            .#{$compPrefix}__thumb,
+            .#{$compPrefix}__track {
+                transition: none;
+            }
+        }
 
         &.#{$compPrefix}--size-sm { @include switch-size(sm); }
         &.#{$compPrefix}--size-md { @include switch-size(md); }
         &.#{$compPrefix}--size-lg { @include switch-size(lg); }
+
+        --switch-track-bg: var(--intent-gray-300);
+        --switch-track-bg-checked: var(--intent-blue-500);
+        --switch-thumb-bg: #ffffff;
+
+        --switch-focus-ring: color-mix(
+            in srgb,
+            var(--switch-track-bg-checked) 40%,
+            transparent
+        );
+        --switch-focus-offset-color: #ffffff;
+
+        --switch-track-bg-disabled: var(--intent-gray-300);
+        --switch-thumb-bg-disabled: var(--intent-gray-200);
+
+        @include dark {
+            --switch-track-bg: var(--intent-gray-600);
+            --switch-track-bg-checked: var(--intent-blue-400);
+            --switch-thumb-bg: var(--intent-gray-100);
+
+            --switch-focus-ring: color-mix(
+                in srgb,
+                var(--switch-track-bg-checked) 50%,
+                transparent
+            );
+            --switch-focus-offset-color: var(--intent-gray-900);
+
+            --switch-track-bg-disabled: var(--intent-gray-700);
+            --switch-thumb-bg-disabled: var(--intent-gray-600);
+        }
 
         display: inline-flex;
         align-items: center;
@@ -253,66 +295,80 @@ $switch-sizes: (
 
         .#{$compPrefix}__input {
             position: absolute;
+            inset: 0;
             opacity: 0;
-            pointer-events: none;
+            cursor: inherit;
+
+            &:focus-visible + .#{$compPrefix}__track {
+                box-shadow:
+                    0 0 0 2px var(--switch-focus-offset-color, #fff),
+                    0 0 0 4px color-mix(in srgb, var(--switch-track-bg-checked) 40%, transparent);
+            }
         }
 
         .#{$compPrefix}__track {
             width: var(--switch-width);
             height: var(--switch-height);
-            background: #ccc;
+            background: var(--switch-track-bg);
             border-radius: 999px;
             position: relative;
             transition: background 0.2s;
         }
 
-        //.#{$compPrefix}__thumb {
-
-        //    position: absolute;
-        //
-        //    top: 50%;
-        //    left: var(--switch-padding);
-        //
-        //    transform: translate(0, -50%);
-        //    transition: transform 0.2s ease;
-        //}
+        &:active .#{$compPrefix}__thumb {
+            transform:
+                translate(
+                    var(--_thumb-x, var(--switch-padding)),
+                    calc(-50% + var(--switch-offset, 0px))
+                )
+                scale(0.95);
+        }
 
         .#{$compPrefix}__thumb {
             width: var(--switch-thumb);
             height: var(--switch-thumb);
-            background: white;
+            background: var(--switch-thumb-bg);
             border-radius: 50%;
 
             position: absolute;
             top: 50%;
             left: 0;
 
-            transform: translate(
-                var(--switch-padding),
-                calc(-50% + var(--switch-offset, 0px))
-            );
-
-            transition: transform 0.2s ease;
+            --_thumb-x: var(--switch-padding);
+            transform: translate(var(--_thumb-x), calc(-50% + var(--switch-offset, 0px)));
+            //transform: translate(var(--_thumb-x), -50%);
+            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .#{$compPrefix}__input:checked + .#{$compPrefix}__track {
-            background: #4f46e5;
+            background: var(--switch-track-bg-checked);
         }
 
-        //.#{$compPrefix}__input:checked + .#{$compPrefix}__track .#{$compPrefix}__thumb {
-        //    transform: translateX(calc(var(--switch-width) - var(--switch-thumb) - (var(--switch-padding) * 2))) translateY(-50%);
-        //}
-
         .#{$compPrefix}__input:checked + .#{$compPrefix}__track .#{$compPrefix}__thumb {
-            transform: translate(
-                calc(
-                    var(--switch-width)
-                    - var(--switch-thumb)
-                    - var(--switch-padding)
-                    + var(--switch-x-offset, 0px) // 👈 HERE
-                ),
-                calc(-50% + var(--switch-offset, 0px))
+            --_thumb-x: calc(
+                var(--switch-width)
+                - var(--switch-thumb)
+                - var(--switch-padding)
+                + var(--switch-x-offset, 0px)
             );
+        }
+
+        &:not(.#{$compPrefix}--disabled):not(:focus-within):hover .#{$compPrefix}__track {
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+
+        &.#{$compPrefix}--disabled {
+            cursor: not-allowed;
+
+            .#{$compPrefix}__track {
+                pointer-events: none;
+                background: var(--switch-track-bg-disabled);
+            }
+            .#{$compPrefix}__thumb {
+                background: var(--switch-thumb-bg-disabled);
+                //transform: translate(var(--_thumb-x), calc(-50% + var(--switch-disabled-offset, 0px)));
+                transform: translate(var(--_thumb-x), calc(-50% + var(--switch-disabled-offset, 0px)));
+            }
         }
     }
 
