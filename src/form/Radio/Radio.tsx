@@ -47,6 +47,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
         }
 
         const finalSize = size ?? group?.size ?? 'sm';
+        const name = rest.name ?? group?.name;
 
         const isDisabled = disabled || group?.disabled;
         const isChecked = group?.value === value;
@@ -92,6 +93,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                     as="input"
                     type="radio"
                     id={id}
+                    name={name}
+                    value={value}
                     {...rest}
                     checked={isChecked}
                     onChange={handleChange}

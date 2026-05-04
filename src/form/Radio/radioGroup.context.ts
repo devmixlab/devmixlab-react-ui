@@ -3,6 +3,7 @@ import { Size } from './Radio';
 
 export type radioGroupContextValue = {
     value?: string;
+    name?: string;
     onValueChange?: (value: string) => void;
     disabled?: boolean;
     size?: Size;

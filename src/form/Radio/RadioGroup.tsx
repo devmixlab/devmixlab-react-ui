@@ -4,15 +4,23 @@ import { Size } from './Radio';
 
 type RadioGroupProps = {
     value?: string;
+    name?: string;
     size?: Size;
     onValueChange?: (value: string) => void;
     disabled?: boolean;
     children: React.ReactNode;
 };
 
-export const RadioGroup = ({ value, size, onValueChange, children, disabled }: RadioGroupProps) => {
+export const RadioGroup = ({
+    value,
+    name,
+    size,
+    onValueChange,
+    children,
+    disabled,
+}: RadioGroupProps) => {
     return (
-        <RadioGroupProvider value={{ value, size, onValueChange, disabled }}>
+        <RadioGroupProvider value={{ value, name, size, onValueChange, disabled }}>
             <div role="radiogroup">{children}</div>
         </RadioGroupProvider>
     );
