@@ -297,6 +297,8 @@ $switch-sizes: (
             --switch-thumb-bg-disabled: var(--intent-gray-600);
         }
 
+        --switch-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+
         display: inline-flex;
         //align-items: flex-start;
         align-items: center; // 👈 critical
@@ -343,7 +345,7 @@ $switch-sizes: (
             background: var(--switch-track-bg);
             border-radius: 999px;
             position: relative;
-            transition: background 0.2s, box-shadow 0.2s;
+            transition: background var(--switch-transition), box-shadow var(--switch-transition);
         }
 
         .#{$compPrefix}__thumb {
@@ -359,7 +361,7 @@ $switch-sizes: (
             --_thumb-x: var(--switch-padding);
             transform: translate(var(--_thumb-x), calc(-50%));
             //transform: translate(var(--_thumb-x), -50%);
-            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform var(--switch-transition);
         }
 
         &[data-state='checked'] .#{$compPrefix}__track {
@@ -374,18 +376,18 @@ $switch-sizes: (
             );
         }
 
-        &:not(.#{$compPrefix}--disabled):active .#{$compPrefix}__thumb {
+        &:not([data-disabled]):active .#{$compPrefix}__thumb {
             transform: translate(
                 var(--_thumb-x, var(--switch-padding)),
                 calc(-50%)
             ) scale(0.95);
         }
 
-        &:not(.#{$compPrefix}--disabled):not(:focus-within):hover .#{$compPrefix}__track {
+        &:not([data-disabled]):not(:focus-within):hover .#{$compPrefix}__track {
             box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
         }
 
-        &.#{$compPrefix}--disabled {
+        &[data-disabled] {
             cursor: not-allowed;
             --switch-description-color: var(--switch-text-disabled);
 
