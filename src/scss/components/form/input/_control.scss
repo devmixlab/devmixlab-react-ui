@@ -62,6 +62,37 @@ $switch-sizes: (
     )
 );
 
+$radio-sizes: (
+    sm: (
+        size: 16px, // match switch height
+        indicator: 7px, // ~50%
+        gap: 6px, // same as switch
+        font-size: 13px
+    ),
+    md: (
+        size: 18px,
+        indicator: 9px,
+        gap: 8px,
+        font-size: 14px
+    ),
+    lg: (
+        size: 22px,
+        indicator: 11px,
+        gap: 10px,
+        font-size: 16px
+    )
+);
+
+@mixin radio-size($size) {
+    $conf: map.get($radio-sizes, $size);
+
+    --radio-size: #{map.get($conf, size)};
+    --radio-indicator: #{map.get($conf, indicator)};
+    --radio-gap: #{map.get($conf, gap)};
+
+    font-size: map-get($conf, font-size);
+}
+
 @mixin checkbox-size($size) {
     $conf: map.get($checkbox-sizes, $size);
 
@@ -89,6 +120,8 @@ $switch-sizes: (
     @include intent-vars($blue, blue);
     @include intent-vars($neutral, neutral);
     @include intent-vars($gray, gray);
+    @include intent-vars($green, green);
+    @include intent-vars($amber, amber);
 
     &--checkbox {
         &--size-sm {
@@ -403,6 +436,180 @@ $switch-sizes: (
             .#{$compPrefix}__label, .#{$compPrefix}__description {
                 color: var(--switch-text-disabled);
             }
+        }
+    }
+
+    &--radio {
+
+        --radio-control-border: var(--intent-gray-400); // off
+        --radio-control-bg: #ffffff;
+
+        --radio-accent: var(--intent-blue-500); // on
+        --radio-indicator-bg: var(--radio-accent);
+
+        --radio-focus-ring: color-mix(
+            in srgb,
+            var(--radio-accent) 40%,
+            transparent
+        );
+        --radio-hover-ring: rgba(0, 0, 0, 0.04);
+
+        --radio-focus-offset: #ffffff;
+
+        // disabled
+        --radio-control-border-disabled: var(--intent-gray-300);
+        --radio-indicator-bg-disabled: var(--intent-gray-300);
+
+        // intent danger
+        --radio-accent-danger: var(--intent-red-500); // indicator
+        --radio-border-danger: var(--intent-red-600); // border
+        // intent success
+        --radio-accent-success: var(--intent-green-500);
+        --radio-border-success: var(--intent-green-600);
+        // intent warning
+        --radio-accent-warning: var(--intent-amber-500);
+        --radio-border-warning: var(--intent-amber-600);
+
+        @include dark {
+            --radio-control-border: var(--intent-gray-500);
+            --radio-control-bg: var(--intent-gray-900);
+
+            --radio-accent: var(--intent-blue-400);
+            --radio-indicator-bg: var(--radio-accent);
+
+            --radio-focus-ring: color-mix(
+                in srgb,
+                var(--radio-accent) 50%,
+                transparent
+            );
+            --radio-hover-ring: rgba(255, 255, 255, 0.06);
+
+            --radio-focus-offset: var(--intent-gray-900);
+
+            --radio-control-border-disabled: var(--intent-gray-600);
+            --radio-indicator-bg-disabled: var(--intent-gray-600);
+
+            // intent danger
+            --radio-accent-danger: var(--intent-red-400);
+            --radio-border-danger: var(--intent-red-400);
+            // intent success
+            --radio-accent-success: var(--intent-green-400);
+            --radio-border-success: var(--intent-green-400);
+            // intent warning
+            --radio-accent-warning: var(--intent-amber-400);
+            --radio-border-warning: var(--intent-amber-400);
+        }
+
+
+        --radio-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &[data-size='sm'] {
+            @include radio-size(sm);
+        }
+
+        &[data-size='md'] {
+            @include radio-size(md);
+        }
+
+        &[data-size='lg'] {
+            @include radio-size(lg);
+        }
+
+        display: inline-flex;
+        align-items: center;
+        gap: var(--radio-gap);
+        cursor: pointer;
+        user-select: none;
+
+        .#{$compPrefix}__input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: inherit;
+        }
+
+        .#{$compPrefix}__input:focus-visible + .#{$compPrefix}__control {
+            box-shadow: 0 0 0 2px var(--radio-focus-offset),
+            0 0 0 4px var(--radio-focus-ring);
+        }
+
+        .#{$compPrefix}__control {
+            position: relative;
+            z-index: 0;
+            pointer-events: none;
+            --control_scale: 1;
+            width: var(--radio-size);
+            height: var(--radio-size);
+
+            background: var(--radio-control-bg);
+            border: 2px solid var(--radio-control-border);
+
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(var(--control_scale));
+
+            transition: border-color var(--radio-transition),
+            box-shadow var(--radio-transition),
+            transform var(--radio-transition),
+            background-color var(--radio-transition);
+        }
+
+        .#{$compPrefix}__indicator {
+            width: var(--radio-indicator);
+            height: var(--radio-indicator);
+            border-radius: 50%;
+            //background: var(--radio-indicator-bg);
+            background: var(--radio-accent);
+            will-change: transform;
+
+            --_scale: 0;
+            transform: scale(var(--_scale));
+            transition: transform var(--radio-transition);
+        }
+
+        &:not([data-disabled]):not(:focus-within):hover .#{$compPrefix}__control {
+            box-shadow: 0 0 0 3px var(--radio-hover-ring);
+        }
+
+        &:not([data-disabled]):active .#{$compPrefix}__control {
+            --control_scale: 0.97;
+        }
+
+        &[data-disabled] {
+            cursor: not-allowed;
+
+            .#{$compPrefix}__control {
+                border-color: var(--radio-control-border-disabled);
+            }
+
+            .#{$compPrefix}__indicator {
+                background: var(--radio-indicator-bg-disabled);
+            }
+        }
+
+        &[data-state='checked'] .#{$compPrefix}__indicator {
+            --_scale: 1;
+        }
+
+        &[data-state='checked'] .#{$compPrefix}__control {
+            border-color: var(--radio-border-accent, var(--radio-accent));
+        }
+
+        &[data-intent='danger'] {
+            --radio-accent: var(--radio-accent-danger);
+            --radio-border-accent: var(--radio-border-danger);
+        }
+
+        &[data-intent='success'] {
+            --radio-accent: var(--radio-accent-success);
+            --radio-border-accent: var(--radio-border-success);
+        }
+
+        &[data-intent='warning'] {
+            --radio-accent: var(--radio-accent-warning);
+            --radio-border-accent: var(--radio-border-warning);
         }
     }
 
