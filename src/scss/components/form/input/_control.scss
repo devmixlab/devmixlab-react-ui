@@ -298,6 +298,7 @@ $switch-sizes: (
         }
 
         --switch-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+        --switch-hover-ring: color-mix(in srgb, currentColor 10%, transparent);
 
         display: inline-flex;
         //align-items: flex-start;
@@ -353,6 +354,7 @@ $switch-sizes: (
             height: var(--switch-thumb);
             background: var(--switch-thumb-bg);
             border-radius: 50%;
+            will-change: transform;
 
             position: absolute;
             top: 50%;
@@ -360,7 +362,6 @@ $switch-sizes: (
 
             --_thumb-x: var(--switch-padding);
             transform: translate(var(--_thumb-x), calc(-50%));
-            //transform: translate(var(--_thumb-x), -50%);
             transition: transform var(--switch-transition);
         }
 
@@ -379,12 +380,12 @@ $switch-sizes: (
         &:not([data-disabled]):active .#{$compPrefix}__thumb {
             transform: translate(
                 var(--_thumb-x, var(--switch-padding)),
-                calc(-50%)
+                -50%
             ) scale(0.95);
         }
 
         &:not([data-disabled]):not(:focus-within):hover .#{$compPrefix}__track {
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 0 0 3px var(--switch-hover-ring);
         }
 
         &[data-disabled] {
