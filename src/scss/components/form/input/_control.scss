@@ -42,10 +42,6 @@ $switch-sizes: (
         thumb: 12px,
         padding: 2px,
         gap: 6px,
-        offset: -0.5px,
-        disabledOffset: -0.5px,
-        //offset: -0.5px,
-        xOffset: 1px,
         font-size: 13px
     ),
     md: (
@@ -54,10 +50,6 @@ $switch-sizes: (
         thumb: 14px,
         padding: 2px,
         gap: 8px,
-        offset: 0px,
-        disabledOffset: 0px,
-        //offset: -0.5px,
-        xOffset: 0px,
         font-size: 14px
     ),
     lg: (
@@ -66,9 +58,6 @@ $switch-sizes: (
         thumb: 18px,
         padding: 2px,
         gap: 10px,
-        offset: 0px,
-        disabledOffset: 0px,
-        xOffset: 0px,
         font-size: 16px
     )
 );
@@ -90,9 +79,6 @@ $switch-sizes: (
     --switch-thumb: #{map.get($conf, thumb)};
     --switch-gap: #{map.get($conf, gap)};
     --switch-padding: #{map.get($conf, padding)};
-    --switch-offset: #{map.get($conf, offset)};
-    --switch-disabled-offset: #{map.get($conf, disabledOffset)};
-    --switch-x-offset: #{map.get($conf, xOffset)};
 
     font-size: map-get($conf, font-size);
 }
@@ -360,13 +346,6 @@ $switch-sizes: (
             transition: background 0.2s, box-shadow 0.2s;
         }
 
-        &:active .#{$compPrefix}__thumb {
-            transform: translate(
-                var(--_thumb-x, var(--switch-padding)),
-                calc(-50% + var(--switch-offset, 0px))
-            ) scale(0.95);
-        }
-
         .#{$compPrefix}__thumb {
             width: var(--switch-thumb);
             height: var(--switch-thumb);
@@ -378,7 +357,7 @@ $switch-sizes: (
             left: 0;
 
             --_thumb-x: var(--switch-padding);
-            transform: translate(var(--_thumb-x), calc(-50% + var(--switch-offset, 0px)));
+            transform: translate(var(--_thumb-x), calc(-50%));
             //transform: translate(var(--_thumb-x), -50%);
             transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -392,14 +371,13 @@ $switch-sizes: (
                 var(--switch-width)
                 - var(--switch-thumb)
                 - var(--switch-padding)
-                + var(--switch-x-offset, 0px)
             );
         }
 
         &:not(.#{$compPrefix}--disabled):active .#{$compPrefix}__thumb {
             transform: translate(
                 var(--_thumb-x, var(--switch-padding)),
-                calc(-50% + var(--switch-offset, 0px))
+                calc(-50%)
             ) scale(0.95);
         }
 
@@ -409,7 +387,6 @@ $switch-sizes: (
 
         &.#{$compPrefix}--disabled {
             cursor: not-allowed;
-            --switch-offset: var(--switch-disabled-offset, 0px);
             --switch-description-color: var(--switch-text-disabled);
 
             .#{$compPrefix}__track {
