@@ -251,15 +251,15 @@ $switch-sizes: (
             }
         }
 
-        &.#{$compPrefix}--size-sm {
+        &[data-size='sm'] {
             @include switch-size(sm);
         }
 
-        &.#{$compPrefix}--size-md {
+        &[data-size='md'] {
             @include switch-size(md);
         }
 
-        &.#{$compPrefix}--size-lg {
+        &[data-size='lg'] {
             @include switch-size(lg);
         }
 
@@ -360,8 +360,10 @@ $switch-sizes: (
             top: 50%;
             left: 0;
 
+            --_thumb-scale: 1;
             --_thumb-x: var(--switch-padding);
-            transform: translate(var(--_thumb-x), calc(-50%));
+            --_thumb-y: -50%;
+            transform: translate(var(--_thumb-x), var(--_thumb-y)) scale(var(--_thumb-scale));
             transition: transform var(--switch-transition);
         }
 
@@ -378,10 +380,7 @@ $switch-sizes: (
         }
 
         &:not([data-disabled]):active .#{$compPrefix}__thumb {
-            transform: translate(
-                var(--_thumb-x, var(--switch-padding)),
-                -50%
-            ) scale(0.95);
+            --_thumb-scale: 0.95;
         }
 
         &:not([data-disabled]):not(:focus-within):hover .#{$compPrefix}__track {

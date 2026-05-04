@@ -46,6 +46,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         const group = useSwitchGroup();
         const name = rest.name;
 
+        if (group && !name) {
+            console.warn('Switch inside SwitchGroup requires a "name" prop');
+        }
+
         const isDisabled = disabled || group?.disabled;
         const isChecked =
             group && name
@@ -91,12 +95,12 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
 
         return (
             <label
-                className={clsx(prefix(), prefix('--switch'), prefix(`--size-${size}`), className, {
-                    [prefix('--disabled')]: isDisabled,
-                })}
+                className={clsx(prefix(), prefix('--switch'), className)}
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={isDisabled || undefined}
                 data-size={size}
+                data-testid="switch"
+                data-name={name}
             >
                 {labelPosition === 'left' && labelNode}
 
