@@ -333,7 +333,7 @@ $switch-sizes: (
         }
 
         --switch-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-        --switch-hover-ring: color-mix(in srgb, currentColor 10%, transparent);
+        --switch-hover-ring: color-mix(in srgb, currentColor 6%, transparent);
 
         display: inline-flex;
         //align-items: flex-start;
