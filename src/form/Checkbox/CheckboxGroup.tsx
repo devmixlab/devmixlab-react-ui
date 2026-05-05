@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { CheckboxGroupProvider } from './checkboxGroup.context';
+import { CheckboxGroupProvider, CheckboxGroupContextValue } from './checkboxGroup.context';
 import { Size } from './Checkbox';
 
 export type Value = string | number;
@@ -58,16 +58,17 @@ export function CheckboxGroup<T extends Value>({
         [isControlled, current, onChange],
     );
 
-    const ctx = useMemo(
-        () => ({
+    const ctx = useMemo(() => {
+        const value = {
             value: current,
             toggle,
             name,
             disabled: !!disabled,
             size,
-        }),
-        [current, toggle, name, disabled, size],
-    );
+        } satisfies CheckboxGroupContextValue<T>;
+
+        return value as CheckboxGroupContextValue<unknown>;
+    }, [current, toggle, name, disabled, size]);
 
     return (
         <CheckboxGroupProvider value={ctx}>
