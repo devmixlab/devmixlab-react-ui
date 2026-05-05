@@ -57,7 +57,7 @@ $checkbox-sizes: (
     --text-disabled: var(--#{$p}-text-disabled);
     --text-muted: var(--#{$p}-text-muted);
 
-    --checkmark-color: #fff;
+    --checkmark-color: var(--#{$p}-control-foreground);
     --bg: var(--#{$p}-control-bg);
     --accent: var(--#{$p}-control-accent);
     --border: var(--#{$p}-control-border);
@@ -87,6 +87,20 @@ $checkbox-sizes: (
 
     .#{$checkbox-prefix}__label {
         user-select: none;
+        color: var(--text);
+    }
+
+    .#{$checkbox-prefix}__text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1;
+        gap: 2px;
+    }
+
+    .#{$checkbox-prefix}__description {
+        font-size: 0.85em;
+        color: var(--text-muted);
     }
 
     .#{$checkbox-prefix}__control {
@@ -190,6 +204,8 @@ $checkbox-sizes: (
     &[data-disabled] {
         cursor: not-allowed;
         --opacity: var(--opacity-disabled);
+        --text: var(--text-disabled);
+        --text-muted: var(--text-disabled);
     }
 
 }

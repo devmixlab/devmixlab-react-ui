@@ -1,5 +1,5 @@
 $prefix: 'dru' !default;
-$dark-mode: ('attribute', 'media') !default;
+$dark-mode: ('class') !default;
 $dark-selector: 'dark' !default;
 
 @mixin dark {
@@ -27,19 +27,21 @@ $dark-selector: 'dark' !default;
 @mixin dark-root {
     @each $mode in $dark-mode {
         @if $mode == 'class' {
-            .#{$dark-selector} {
+            :root.#{$dark-selector} {
                 @content;
             }
         }
 
         @if $mode == 'media' {
             @media (prefers-color-scheme: dark) {
-                @content;
+                :root {
+                    @content;
+                }
             }
         }
 
         @if $mode == 'attribute' {
-            [data-mode="dark"] {
+            :root[data-mode="dark"] {
                 @content;
             }
         }

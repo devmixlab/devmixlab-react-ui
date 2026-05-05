@@ -1,12 +1,14 @@
-import React, { forwardRef, useRef, useEffect, useId, useState } from 'react';
+import React, { forwardRef, useRef, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Box, type BoxProps } from '../../Box/Box';
-import { Size } from '../Input/input.tokens';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { Check as CheckIcon } from '../../Icon/Check';
 import { Indeterminate as IndeterminateIcon } from '../../Icon/Indeterminate';
 import { CLASS_PREFIX } from '../../constants';
 import { useCheckboxGroupContext } from './checkboxGroup.context';
+import { useStableId } from '../../utils/useStableId';
+
+export type Size = 'sm' | 'md' | 'lg';
 
 type CheckboxProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: Size;
@@ -28,7 +30,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     (
         {
             className,
-            size = 'md',
+            size,
             disabled,
             invalid,
             children,
@@ -66,7 +68,11 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               ? checked
               : uncontrolledChecked;
 
-        const id = rest.id ?? useId();
+        // const id = rest.id ?? useId();
+        const id = useStableId(prefix(), rest.id);
+        const descriptionId = description && id ? `${id}-desc` : undefined;
+        const labelId = children ? `${id}-label` : undefined;
+        const finalSize = group?.size ?? size ?? 'md';
 
         useEffect(() => {
             if (inputRef.current) {
@@ -92,16 +98,32 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             }
         };
 
-        const descriptionId = description && id ? `${id}-desc` : undefined;
+        const labelNode =
+            children || description ? (
+                <span className={prefix('__text')}>
+                    {children && (
+                        <span id={labelId} className={prefix('__label')}>
+                            {children}
+                        </span>
+                    )}
+                    {description && (
+                        <span id={descriptionId} className={prefix('__description')}>
+                            {description}
+                        </span>
+                    )}
+                </span>
+            ) : null;
 
         return (
             <label
                 className={clsx(prefix(), className)}
-                data-size={size}
+                data-size={finalSize}
                 data-disabled={isDisabled || undefined}
                 data-state={indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'}
                 data-invalid={invalid || undefined}
             >
+                {labelPosition === 'left' && labelNode}
+
                 <Box
                     as="input"
                     {...rest}
@@ -118,9 +140,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                     checked={isChecked}
                 />
 
-                {labelPosition === 'left' && children && (
-                    <span className={prefix('__label')}>{children}</span>
-                )}
+                {/*{labelPosition === 'left' && children && (*/}
+                {/*    <span className={prefix('__label')}>{children}</span>*/}
+                {/*)}*/}
 
                 <span className={prefix('__control')}>
                     {indeterminate ? (
@@ -130,15 +152,17 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                     )}
                 </span>
 
-                {labelPosition === 'right' && children && (
-                    <span className={prefix('__label')}>{children}</span>
-                )}
+                {labelPosition === 'right' && labelNode}
 
-                {description && descriptionId && (
-                    <span id={descriptionId} className={prefix('__description')}>
-                        {description}
-                    </span>
-                )}
+                {/*{labelPosition === 'right' && children && (*/}
+                {/*    <span className={prefix('__label')}>{children}</span>*/}
+                {/*)}*/}
+
+                {/*{description && descriptionId && (*/}
+                {/*    <span id={descriptionId} className={prefix('__description')}>*/}
+                {/*        {description}*/}
+                {/*    </span>*/}
+                {/*)}*/}
             </label>
         );
     },
