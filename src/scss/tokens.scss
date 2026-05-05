@@ -5,14 +5,52 @@
 
 $p: cfg.$prefix;
 
-:root {
+//:root {
+//
+//    // transition
+//    --dru-duration-fast: 120ms;
+//    --dru-duration-normal: 180ms;
+//    --dru-duration-slow: 240ms;
+//    --dru-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+//    --dru-ease-press: cubic-bezier(0.3, 0, 0.2, 1);
+//
+//    // intent palette
+//    @include mixins.intent-vars($blue, 'primary');
+//    @include mixins.intent-vars($red, 'danger');
+//    @include mixins.intent-vars($amber, 'warning');
+//    @include mixins.intent-vars($green, 'success');
+//    @include mixins.intent-vars($cyan, 'info');
+//    @include mixins.intent-vars($gray, 'gray');
+//    @include mixins.intent-vars($gray, 'neutral');
+//    @include mixins.intent-vars($gray, 'zinc');
+//
+//    // control tokens (light mode)
+//    --#{$p}-control-bg: #{functions.intent-color('neutral', 100)};
+//    --#{$p}-control-border: #{functions.intent-color('gray', 400)};
+//    --#{$p}-control-border-hover: #{functions.intent-color('primary', 500)};
+//    --#{$p}-control-border-focus: #{functions.intent-color('primary', 500)};
+//    --#{$p}-control-accent: #{functions.intent-color('primary', 500)};
+//    --#{$p}-control-shadow: 0 1px 2px color-mix(in srgb, black 10%, transparent);
+//    --#{$p}-control-shadow-hover: 0 0 0 3px color-mix(
+//        in srgb,
+//        var(--#{$p}-control-accent) 20%,
+//        transparent
+//    );
+//    --#{$p}-control-shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
+//    0 0 0 4px color-mix(in srgb, var(--#{$p}-control-accent) 50%, transparent);
+//    --#{$p}-control-opacity-disabled: 0.5;
+//    --#{$p}-control-foreground: #fff;
+//
+//}
 
-    // transition
-    --dru-duration-fast: 120ms;
-    --dru-duration-normal: 180ms;
-    --dru-duration-slow: 240ms;
-    --dru-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-    --dru-ease-press: cubic-bezier(0.3, 0, 0.2, 1);
+:root {
+    // motion
+    --#{$p}-duration-fast: 120ms;
+    --#{$p}-duration-normal: 180ms;
+    --#{$p}-duration-slow: 240ms;
+
+    --#{$p}-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --#{$p}-ease-press: cubic-bezier(0.3, 0, 0.2, 1);
 
     // intent palette
     @include mixins.intent-vars($blue, 'primary');
@@ -24,20 +62,39 @@ $p: cfg.$prefix;
     @include mixins.intent-vars($gray, 'neutral');
     @include mixins.intent-vars($gray, 'zinc');
 
+    // general
+    --#{$p}-text: inherit;
+    --#{$p}-text-disabled: var(--intent-gray-400);
+    --#{$p}-text-muted: var(--intent-gray-500);
+
     // control tokens (light mode)
     --#{$p}-control-bg: #{functions.intent-color('neutral', 100)};
     --#{$p}-control-border: #{functions.intent-color('gray', 400)};
-    --#{$p}-control-border-hover: #{functions.intent-color('primary', 500)};
-    --#{$p}-control-border-focus: #{functions.intent-color('primary', 600)};
-    --#{$p}-control-accent: #{functions.intent-color('primary', 500)};
-    --#{$p}-control-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-    --#{$p}-control-shadow-hover: 0 0 0 3px rgba(0, 0, 0, 0.05);
-    --#{$p}-control-shadow-focus: 0 0 0 2px var(--#{$p}-bg),
-    0 0 0 4px color-mix(in srgb, var(--#{$p}-accent) 50%, transparent);
-    --#{$p}-control-opacity-disabled: 0.5;
-    --#{$p}-control-foreground: #fff;
-    //--dru-control-border-width: 2px;
-    //--dru-control-focus-ring: ...;
-    //--dru-control-shadow-hover: ...;
+    --#{$p}-control-border-hover: #{functions.intent-color('gray', 500)};
+    --#{$p}-control-border-focus: #{functions.intent-color('primary', 500)};
 
+    --#{$p}-control-accent: #{functions.intent-color('primary', 500)};
+    --#{$p}-control-accent-hover: #{functions.intent-color('primary', 600)};
+
+    --#{$p}-control-shadow: 0 1px 2px color-mix(
+        in srgb,
+        var(--#{$p}-control-border) 25%,
+        transparent
+    );
+
+    --#{$p}-control-shadow-hover: 0 0 0 3px color-mix(
+        in srgb,
+        var(--#{$p}-control-accent) 20%,
+        transparent
+    );
+
+    --#{$p}-control-shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
+    0 0 0 4px color-mix(
+        in srgb,
+        var(--#{$p}-control-accent) 50%,
+        transparent
+    );
+
+    --#{$p}-control-opacity-disabled: 0.5;
+    --#{$p}-control-foreground: #{functions.intent-color('neutral', 0)};
 }

@@ -53,17 +53,23 @@ $checkbox-sizes: (
         }
     }
 
-    --checkmark-color: var(--#{$p}-control-foreground);
+    --text: var(--#{$p}-text);
+    --text-disabled: var(--#{$p}-text-disabled);
+    --text-muted: var(--#{$p}-text-muted);
+
+    --checkmark-color: #fff;
     --bg: var(--#{$p}-control-bg);
-    --border: var(--#{$p}-control-border);
-    --border-hover: var(--#{$p}-control-border-hover);
-    --border-focus: var(--#{$p}-control-border-focus);
     --accent: var(--#{$p}-control-accent);
+    --border: var(--#{$p}-control-border);
+    --border-hover: var(--accent);
+    --border-focus: var(--#{$p}-control-border-focus);
     --shadow: var(--#{$p}-control-shadow);
     --shadow-hover: var(--#{$p}-control-shadow-hover);
     --shadow-focus: var(--#{$p}-control-shadow-focus);
     --opacity-disabled: var(--#{$p}-control-opacity-disabled);
     --opacity: 1;
+
+
 
     display: inline-flex;
     align-items: center;
