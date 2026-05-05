@@ -1,4 +1,5 @@
-import './index.css';
+// import './index.css';
+import './scss/all.css';
 
 import * as buttonTokens from './src/tokens/button';
 import * as commonTokens from './src/tokens/common';

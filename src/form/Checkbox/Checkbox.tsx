@@ -51,6 +51,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         const group = useCheckboxGroupContext<any>();
         const valueProp = rest.value as unknown;
 
+        const isDisabled = group?.disabled ?? disabled;
+
         const [uncontrolledChecked, setUncontrolledChecked] = useState(() =>
             Boolean(defaultChecked),
         );
@@ -99,17 +101,19 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                     prefix('--checkbox'),
                     prefix(`--size-${size}`),
                     className,
-                    {
-                        [prefix(`--disabled`)]: disabled,
-                    },
+                    // {
+                    //     [prefix(`--disabled`)]: isDisabled,
+                    // },
                 )}
+                data-size={size}
+                data-disabled={isDisabled || undefined}
             >
                 <Box
                     as="input"
                     {...rest}
                     type="checkbox"
                     name={group?.name ?? rest.name}
-                    disabled={group?.disabled ?? disabled}
+                    disabled={isDisabled}
                     onChange={handleChange}
                     id={id}
                     ref={combinedRef}
@@ -119,7 +123,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                     data-state={
                         indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'
                     }
-                    data-disabled={disabled || undefined}
+                    data-disabled={isDisabled || undefined}
                     data-invalid={invalid || undefined}
                     aria-describedby={descriptionId}
                     checked={isChecked}

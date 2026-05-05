@@ -22,6 +22,25 @@ $prefix: cfg.$prefix;
     opacity: 0.6;
 }
 
+//[data-disabled] {
+//    cursor: not-allowed;
+//    opacity: var(--#{$prefix}-disabled-opacity, 0.6);
+//}
+
+
+//.dru--control {
+//    position: relative;
+//}
+//
+//.dru--control[data-disabled] {
+//    cursor: not-allowed;
+//    opacity: var(--dru-disabled-opacity, 0.6);
+//}
+//
+//.dru--control:focus-within {
+//    outline: none;
+//}
+
 // Focus-visible helper
 .#{$prefix}--focus {
     outline: none;

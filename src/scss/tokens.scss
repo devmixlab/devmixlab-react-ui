@@ -1,6 +1,9 @@
 @use 'palette' as *;
-@use 'config' as *;
+@use 'config' as cfg;
 @use './mixins' as mixins;
+@use 'functions' as functions;
+
+$p: cfg.$prefix;
 
 :root {
     @include mixins.intent-vars($blue, 'primary');
@@ -11,4 +14,13 @@
     @include mixins.intent-vars($gray, 'gray');
     @include mixins.intent-vars($gray, 'neutral');
     @include mixins.intent-vars($gray, 'zinc');
+
+    --#{$p}-bg: #{functions.intent-color('neutral', 100)};
+    --#{$p}-border: #{functions.intent-color('gray', 400)};
+    --#{$p}-accent: #{functions.intent-color('primary', 500)};
+    --#{$p}-shadow-hover: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    --#{$p}-shadow-focus: 0 0 0 2px var(--#{$p}-bg),
+    0 0 0 4px color-mix(in srgb, var(--#{$p}-accent) 50%, transparent);
+    --#{$p}-opacity-disabled: 0.5;
+
 }
