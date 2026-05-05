@@ -1,4 +1,4 @@
-import React, { useContext, createContext } from 'react';
+import { useContext, createContext } from 'react';
 import { Size } from './Checkbox';
 
 export type CheckboxGroupContextValue<T> = {

@@ -1,4 +1,3 @@
-// CheckboxGroup.tsx
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { CheckboxGroupProvider } from './checkboxGroup.context';
 import { Size } from './Checkbox';
