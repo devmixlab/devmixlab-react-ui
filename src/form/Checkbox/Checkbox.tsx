@@ -21,7 +21,7 @@ type CheckboxProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 
 };
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--input-control${name}`;
+    return `${CLASS_PREFIX}--checkbox${name}`;
 };
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
@@ -96,17 +96,11 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
         return (
             <label
-                className={clsx(
-                    prefix(),
-                    prefix('--checkbox'),
-                    prefix(`--size-${size}`),
-                    className,
-                    // {
-                    //     [prefix(`--disabled`)]: isDisabled,
-                    // },
-                )}
+                className={clsx(prefix(), className)}
                 data-size={size}
                 data-disabled={isDisabled || undefined}
+                data-state={indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'}
+                data-invalid={invalid || undefined}
             >
                 <Box
                     as="input"
@@ -120,11 +114,6 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                     className={prefix('__input')}
                     aria-invalid={invalid || undefined}
                     aria-checked={indeterminate ? 'mixed' : isChecked}
-                    data-state={
-                        indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'
-                    }
-                    data-disabled={isDisabled || undefined}
-                    data-invalid={invalid || undefined}
                     aria-describedby={descriptionId}
                     checked={isChecked}
                 />
@@ -133,11 +122,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                     <span className={prefix('__label')}>{children}</span>
                 )}
 
-                <span
-                    className={clsx(prefix('__control'), {
-                        [prefix('__control--indeterminate')]: indeterminate,
-                    })}
-                >
+                <span className={prefix('__control')}>
                     {indeterminate ? (
                         <IndeterminateIcon className={prefix('__checkmark')} />
                     ) : (

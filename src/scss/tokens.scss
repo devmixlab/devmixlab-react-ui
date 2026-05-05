@@ -6,6 +6,15 @@
 $p: cfg.$prefix;
 
 :root {
+
+    // transition
+    --dru-duration-fast: 120ms;
+    --dru-duration-normal: 180ms;
+    --dru-duration-slow: 240ms;
+    --dru-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --dru-ease-press: cubic-bezier(0.3, 0, 0.2, 1);
+
+    // intent palette
     @include mixins.intent-vars($blue, 'primary');
     @include mixins.intent-vars($red, 'danger');
     @include mixins.intent-vars($amber, 'warning');
@@ -15,12 +24,17 @@ $p: cfg.$prefix;
     @include mixins.intent-vars($gray, 'neutral');
     @include mixins.intent-vars($gray, 'zinc');
 
-    --#{$p}-bg: #{functions.intent-color('neutral', 100)};
-    --#{$p}-border: #{functions.intent-color('gray', 400)};
-    --#{$p}-accent: #{functions.intent-color('primary', 500)};
-    --#{$p}-shadow-hover: 0 0 0 3px rgba(0, 0, 0, 0.05);
-    --#{$p}-shadow-focus: 0 0 0 2px var(--#{$p}-bg),
+    // control tokens (light mode)
+    --#{$p}-control-bg: #{functions.intent-color('neutral', 100)};
+    --#{$p}-control-border: #{functions.intent-color('gray', 400)};
+    --#{$p}-control-accent: #{functions.intent-color('primary', 500)};
+    --#{$p}-control-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --#{$p}-control-shadow-hover: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    --#{$p}-control-shadow-focus: 0 0 0 2px var(--#{$p}-bg),
     0 0 0 4px color-mix(in srgb, var(--#{$p}-accent) 50%, transparent);
-    --#{$p}-opacity-disabled: 0.5;
+    --#{$p}-control-opacity-disabled: 0.5;
+    //--dru-control-border-width: 2px;
+    //--dru-control-focus-ring: ...;
+    //--dru-control-shadow-hover: ...;
 
 }

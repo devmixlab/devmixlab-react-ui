@@ -3,7 +3,7 @@
 @use '../../functions/intent' as intent;
 
 $p: cfg.$prefix;
-$control-prefix: #{$p}--input-control;
+$checkbox-prefix: #{$p}--checkbox;
 
 $checkbox-sizes: (
     sm: (
@@ -35,157 +35,152 @@ $checkbox-sizes: (
     --checkbox-gap: #{map.get($conf, gap)};
 }
 
-.#{$control-prefix} {
+.#{$checkbox-prefix} {
 
-    &--checkbox {
-        &--size-sm {
-            @include checkbox-size(sm);
+    @include checkbox-size(md);
+
+    @each $size, $conf in $checkbox-sizes {
+        &[data-size="#{$size}"] {
+            @include checkbox-size($size);
         }
+    }
 
-        &--size-md {
-            @include checkbox-size(md);
+    @media (prefers-reduced-motion: reduce) {
+        .#{$checkbox-prefix}__checkmark,
+        .#{$checkbox-prefix}__checkmark path,
+        .#{$checkbox-prefix}__control {
+            transition: none;
         }
+    }
 
-        &--size-lg {
-            @include checkbox-size(lg);
-        }
+    --bg: var(--#{$p}-control-bg);
+    --border: var(--#{$p}-control-border);
+    --accent: var(--#{$p}-control-accent);
+    --shadow: var(--#{$p}-control-shadow);
+    --shadow-hover: var(--#{$p}-control-shadow-hover);
+    --shadow-focus: var(--#{$p}-control-shadow-focus);
+    --opacity-disabled: var(--#{$p}-control-opacity-disabled);
+    --opacity: 1;
 
-        @include checkbox-size(md);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--checkbox-gap);
+    cursor: pointer;
+    position: relative;
 
-        @media (prefers-reduced-motion: reduce) {
-            .#{$control-prefix}__checkmark,
-            .#{$control-prefix}__checkmark path,
-            .#{$control-prefix}__control {
-                transition: none;
-            }
-        }
+    .#{$checkbox-prefix}__input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: inherit;
+        z-index: 1;
+    }
 
-        --control-bg: var(--#{$p}-bg);
-        --control-border: var(--#{$p}-border);
-        --control-accent: var(--#{$p}-accent);
-        --control-shadow-hover: var(--#{$p}-shadow-hover);
-        --control-shadow-focus: var(--#{$p}-shadow-focus);
-        --control-opacity-disabled: var(--#{$p}-opacity-disabled);
-        --control-opacity: 1;
+    .#{$checkbox-prefix}__label {
+        user-select: none;
+    }
 
+    .#{$checkbox-prefix}__control {
+        width: var(--checkbox-size);
+        height: var(--checkbox-size);
+        border: 2px solid var(--border);
+        border-radius: 6px;
         display: inline-flex;
         align-items: center;
-        gap: var(--checkbox-gap);
-        cursor: pointer;
+        justify-content: center;
+        background: var(--bg);
         position: relative;
+        z-index: 0;
+        will-change: transform;
+        opacity: var(--opacity);
 
-        .#{$control-prefix}__input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: inherit;
-            z-index: 1;
-        }
+        transition:
+            border-color var(--dru-duration-normal) var(--dru-ease-standard),
+            background var(--dru-duration-normal) var(--dru-ease-standard),
+            box-shadow var(--dru-duration-normal) var(--dru-ease-standard),
+            transform var(--dru-duration-fast) var(--dru-ease-press);
 
-        .#{$control-prefix}__label {
-            user-select: none;
-        }
+        box-shadow: var(--shadow);
+    }
 
-        .#{$control-prefix}__control {
-            width: var(--checkbox-size);
-            height: var(--checkbox-size);
-            border: 2px solid var(--control-border);
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--control-bg);
-            position: relative;
-            z-index: 0;
-            will-change: transform;
-            opacity: var(--control-opacity);
+    .#{$checkbox-prefix}__checkmark {
+        width: var(--checkbox-icon-size);
+        height: var(--checkbox-icon-size);
 
-            transition: border-color 0.2s ease,
-            background 0.2s ease,
-            box-shadow 0.2s ease,
-            transform 0.1s ease;
+        opacity: 0;
+        transform: scale(0.85) translateY(0.5px);
 
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-        }
+        transition:
+            opacity var(--dru-duration-fast) var(--dru-ease-standard),
+            transform var(--dru-duration-fast) var(--dru-ease-standard);
 
-        .#{$control-prefix}__checkmark {
-            width: var(--checkbox-icon-size);
-            height: var(--checkbox-icon-size);
+        color: white; // uses currentColor in SVG
+        pointer-events: none;
 
-            opacity: 0;
-            transform: scale(0.85) translateY(0.5px);
+        // optional: smoother rendering
+        display: block;
+    }
 
-            transition: opacity 0.15s ease,
-            transform 0.15s ease;
-
-            color: white; // uses currentColor in SVG
-            pointer-events: none;
-
-            // optional: smoother rendering
-            display: block;
-        }
-
-        .#{$control-prefix}__control--indeterminate .#{$control-prefix}__checkmark {
+    &[data-state="indeterminate"] {
+        .#{$checkbox-prefix}__checkmark {
             opacity: 1;
             transform: scale(1) translateY(0.5px);
             transform-origin: center;
         }
 
-        .#{$control-prefix}__control--indeterminate {
-            background: var(--control-accent);
-            border-color: var(--control-accent);
+        .#{$checkbox-prefix}__control {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+    }
+
+    .#{$checkbox-prefix}__checkmark path,
+    .#{$checkbox-prefix}__checkmark polyline,
+    .#{$checkbox-prefix}__checkmark line {
+        stroke: currentColor;
+        stroke-width: var(--checkbox-stroke, 2);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+        transition:
+            stroke-dashoffset var(--dru-duration-normal) var(--dru-ease-standard);
+    }
+
+    &[data-state="checked"] {
+        .#{$checkbox-prefix}__control {
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
-        .#{$control-prefix}__checkmark path,
-        .#{$control-prefix}__checkmark polyline,
-        .#{$control-prefix}__checkmark line {
-            stroke: currentColor;
-            stroke-width: var(--checkbox-stroke, 2);
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            fill: none;
-            transition: stroke-dashoffset 0.2s ease;
-        }
-
-        .#{$control-prefix}__input:checked + .#{$control-prefix}__control {
-            background: var(--control-accent);
-            border-color: var(--control-accent);
-        }
-
-        .#{$control-prefix}__input:checked + .#{$control-prefix}__control .#{$control-prefix}__checkmark {
+        .#{$checkbox-prefix}__checkmark {
             opacity: 1;
             transform: scale(1) translate(0px, 0.5px);
             transform-origin: center;
+            path {
+                stroke-dashoffset: 0;
+            }
         }
+    }
 
-        .#{$control-prefix}__input:checked + .#{$control-prefix}__control .#{$control-prefix}__checkmark path {
-            stroke-dashoffset: 0;
-        }
+    // hover
+    &:not([data-disabled]):hover .#{$checkbox-prefix}__control {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-hover);
+    }
 
-        // hover
-        &:not([data-disabled]):hover .#{$control-prefix}__control {
-            border-color: var(--control-accent);
-            box-shadow: var(--control-shadow-hover);
-        }
+    // active (press)
+    &:not([data-disabled]):active .#{$checkbox-prefix}__control {
+        transform: scale(0.95);
+    }
 
-        // active (press)
-        &:not([data-disabled]):active .#{$control-prefix}__control {
-            transform: scale(0.95);
-        }
+    // focus
+    .#{$checkbox-prefix}__input:focus-visible + .#{$checkbox-prefix}__control {
+        box-shadow: var(--shadow-focus);
+    }
 
-        // focus
-        .#{$control-prefix}__input:focus-visible + .#{$control-prefix}__control {
-            box-shadow: var(--control-shadow-focus);
-        }
-
-        &[data-disabled],
-        &[data-disabled] .#{$control-prefix}__input ~ * {
-            cursor: not-allowed;
-        }
-
-        &[data-disabled] {
-            --control-opacity: var(--control-opacity-disabled);
-        }
+    &[data-disabled] {
+        cursor: not-allowed;
+        --opacity: var(--opacity-disabled);
     }
 
 }
