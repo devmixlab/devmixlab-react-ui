@@ -53,8 +53,11 @@ $checkbox-sizes: (
         }
     }
 
+    --checkmark-color: var(--#{$p}-control-foreground);
     --bg: var(--#{$p}-control-bg);
     --border: var(--#{$p}-control-border);
+    --border-hover: var(--#{$p}-control-border-hover);
+    --border-focus: var(--#{$p}-control-border-focus);
     --accent: var(--#{$p}-control-accent);
     --shadow: var(--#{$p}-control-shadow);
     --shadow-hover: var(--#{$p}-control-shadow-hover);
@@ -114,7 +117,7 @@ $checkbox-sizes: (
             opacity var(--dru-duration-fast) var(--dru-ease-standard),
             transform var(--dru-duration-fast) var(--dru-ease-standard);
 
-        color: white; // uses currentColor in SVG
+        color: var(--checkmark-color);
         pointer-events: none;
 
         // optional: smoother rendering
@@ -164,7 +167,7 @@ $checkbox-sizes: (
 
     // hover
     &:not([data-disabled]):hover .#{$checkbox-prefix}__control {
-        border-color: var(--accent);
+        border-color: var(--border-hover);
         box-shadow: var(--shadow-hover);
     }
 
