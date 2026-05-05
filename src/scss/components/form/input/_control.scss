@@ -335,6 +335,7 @@ $switch-sizes: (
         --switch-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         --switch-hover-ring: color-mix(in srgb, currentColor 6%, transparent);
 
+        position: relative;
         display: inline-flex;
         //align-items: flex-start;
         align-items: center; // 👈 critical
@@ -350,6 +351,7 @@ $switch-sizes: (
             inset: 0;
             opacity: 0;
             cursor: inherit;
+            z-index: 1;
 
             &:focus-visible + .#{$compPrefix}__track {
                 box-shadow: 0 0 0 2px var(--switch-focus-offset-color, #fff),

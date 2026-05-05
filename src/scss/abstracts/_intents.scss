@@ -1,0 +1,21 @@
+@use './config' as *;
+@use './palette' as *;
+@use 'sass:map';
+
+@mixin intent-vars($palette, $palette-name) {
+    @each $step, $value in $palette {
+        #{$p}-intent-#{
+            $palette-name
+        }-#{$step}: #{$value};
+    }
+}
+
+:root{
+    @include intent-vars($red, red);
+    @include intent-vars($blue, blue);
+    @include intent-vars($green, green);
+    @include intent-vars($amber, amber);
+    @include intent-vars($cyan, cyan);
+    @include intent-vars($neutral, neutral);
+    @include intent-vars($gray, gray);
+}

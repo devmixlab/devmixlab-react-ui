@@ -4,6 +4,7 @@ import { Box } from '../../Box/Box';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { CLASS_PREFIX } from '../../constants';
 import { useSwitchGroup } from './switchGroup.context';
+import { useStableId } from '../../utils/useStableId';
 
 type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: 'sm' | 'md' | 'lg';
@@ -58,7 +59,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                   ? checked
                   : uncontrolledChecked;
 
-        const id = rest.id ?? useId();
+        const id = useStableId('dru-switch', rest.id);
         const descriptionId = description ? `${id}-desc` : undefined;
         const labelId = children ? `${id}-label` : undefined;
 
