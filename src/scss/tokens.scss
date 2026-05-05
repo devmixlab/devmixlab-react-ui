@@ -1,0 +1,14 @@
+@use 'palette' as *;
+@use 'config' as *;
+@use './mixins' as mixins;
+
+:root {
+    @include mixins.intent-vars($blue, 'primary');
+    @include mixins.intent-vars($red, 'danger');
+    @include mixins.intent-vars($amber, 'warning');
+    @include mixins.intent-vars($green, 'success');
+    @include mixins.intent-vars($cyan, 'info');
+    @include mixins.intent-vars($gray, 'gray');
+    @include mixins.intent-vars($gray, 'neutral');
+    @include mixins.intent-vars($gray, 'zinc');
+}

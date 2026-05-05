@@ -1,0 +1,9 @@
+@use '../config' as cfg;
+
+@mixin vars($palette, $name) {
+    @each $step, $value in $palette {
+        --#{$cfg.$prefix}-intent-#{
+            $name
+        }-#{$step}: #{$value};
+    }
+}

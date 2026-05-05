@@ -1,0 +1,47 @@
+$prefix: 'dru' !default;
+$dark-mode: ('attribute', 'media') !default;
+$dark-selector: 'dark' !default;
+
+@mixin dark {
+    @each $mode in $dark-mode {
+        @if $mode == 'class' {
+            .#{$dark-selector} & {
+                @content;
+            }
+        }
+
+        @if $mode == 'media' {
+            @media (prefers-color-scheme: dark) {
+                @content;
+            }
+        }
+
+        @if $mode == 'attribute' {
+            [data-mode="dark"] & {
+                @content;
+            }
+        }
+    }
+}
+
+@mixin dark-root {
+    @each $mode in $dark-mode {
+        @if $mode == 'class' {
+            .#{$dark-selector} {
+                @content;
+            }
+        }
+
+        @if $mode == 'media' {
+            @media (prefers-color-scheme: dark) {
+                @content;
+            }
+        }
+
+        @if $mode == 'attribute' {
+            [data-mode="dark"] {
+                @content;
+            }
+        }
+    }
+}

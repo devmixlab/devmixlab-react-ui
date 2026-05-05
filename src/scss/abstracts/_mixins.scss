@@ -9,8 +9,29 @@
         @media (prefers-color-scheme: dark) {
             @content;
         }
+    } @else if $dark-mode == 'attribute' {
+        [data-mode="dark"] & {
+            @content;
+        }
     }
 }
+
+//@mixin dark {
+//    // attribute-based
+//    [data-mode="dark"] & {
+//        @content;
+//    }
+//
+//    // class fallback (optional)
+//    .dark & {
+//        @content;
+//    }
+//
+//    // system preference
+//    @media (prefers-color-scheme: dark) {
+//        @content;
+//    }
+//}
 
 @mixin iconOnly($size) {
     padding: 0;

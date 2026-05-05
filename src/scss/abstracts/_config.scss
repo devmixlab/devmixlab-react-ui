@@ -1,3 +1,19 @@
 $p: '.dru--' !default;
 $dark-mode: 'class' !default;
 $dark-selector: 'dark' !default;
+
+//@mixin dark {
+//    @if $dark-mode == 'class' {
+//        .#{$dark-selector} & {
+//            @content;
+//        }
+//    } @else if $dark-mode == 'media' {
+//        @media (prefers-color-scheme: dark) {
+//            @content;
+//        }
+//    } @else if $dark-mode == 'attribute' {
+//        [data-mode="dark"] & {
+//            @content;
+//        }
+//    }
+//}
