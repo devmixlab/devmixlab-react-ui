@@ -6,8 +6,11 @@ import { CLASS_PREFIX } from '../../constants';
 import { useSwitchGroup } from './switchGroup.context';
 import { useStableId } from '../../utils/useStableId';
 
+export type Intent = 'danger' | 'warning' | 'success' | 'info';
+
 type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: 'sm' | 'md' | 'lg';
+    intent?: Intent;
     children?: React.ReactNode;
     description?: React.ReactNode;
     labelPosition?: 'left' | 'right';
@@ -27,6 +30,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             children,
             description,
             labelPosition = 'right',
+            intent,
             onChange,
             checked,
             defaultChecked,
@@ -102,6 +106,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 data-size={size}
                 data-testid="switch"
                 data-name={name}
+                {...(intent ? { ['data-intent']: intent } : {})}
             >
                 {labelPosition === 'left' && labelNode}
 

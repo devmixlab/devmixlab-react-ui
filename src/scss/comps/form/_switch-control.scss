@@ -68,9 +68,18 @@ $switch-sizes: (
 
     // Shadows
     --shadow: var(--#{$p}-control-shadow);
-    --shadow-hover: var(--#{$p}-control-shadow-hover);
+    --shadow-hover: 0 0 0 3px color-mix(
+        in srgb,
+        var(--switch-track-bg-checked) 20%,
+        transparent
+    );
     --shadow-hover-secondary: var(--#{$p}-control-shadow-hover-secondary);
-    --shadow-focus: var(--#{$p}-control-shadow-focus);
+    --shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
+    0 0 0 4px color-mix(
+        in srgb,
+        var(--switch-track-bg-checked) 50%,
+        transparent
+    );
 
     // Track/thumb colors
     --switch-track-bg: #{intent.color('gray', 300)};
@@ -78,6 +87,12 @@ $switch-sizes: (
     --switch-thumb-bg: #ffffff;
     --switch-track-bg-disabled: #{intent.color('gray', 300)};
     --switch-thumb-bg-disabled: #{intent.color('gray', 200)};
+
+    // Intent colors
+    --switch-track-bg-danger: var(--#{$p}-control-accent-danger);
+    --switch-track-bg-success: var(--#{$p}-control-accent-success);
+    --switch-track-bg-warning: var(--#{$p}-control-accent-warning);
+    --switch-track-bg-info: var(--#{$p}-control-accent-info);
 
     @include cfg.dark {
         // Track/thumb colors dark
@@ -179,6 +194,22 @@ $switch-sizes: (
 
     &[data-state='checked']:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {
         --shadow: var(--shadow-hover);
+    }
+
+    &[data-intent='danger'] {
+        --switch-track-bg-checked: var(--switch-track-bg-danger);
+    }
+
+    &[data-intent='success'] {
+        --switch-track-bg-checked: var(--switch-track-bg-success);
+    }
+
+    &[data-intent='warning'] {
+        --switch-track-bg-checked: var(--switch-track-bg-warning);
+    }
+
+    &[data-intent='info'] {
+        --switch-track-bg-checked: var(--switch-track-bg-info);
     }
 
     &[data-disabled] {
