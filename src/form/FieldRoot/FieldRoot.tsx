@@ -147,6 +147,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 className={cl}
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
+                data-size={size}
                 {...(variant ? { ['data-variant']: variant } : {})}
                 rounded={rounded}
                 onClick={handleClick}
