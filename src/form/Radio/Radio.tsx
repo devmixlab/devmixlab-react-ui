@@ -6,7 +6,7 @@ import { CLASS_PREFIX } from '../../constants';
 import { useRadioGroup } from './radioGroup.context';
 
 export type Size = 'sm' | 'md' | 'lg';
-export type Intent = 'danger' | 'warning' | 'success';
+export type Intent = 'danger' | 'warning' | 'success' | 'info';
 
 type RadioProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     value: string;

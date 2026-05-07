@@ -73,6 +73,8 @@ $radio-sizes: (
     --radio-border-success: var(--#{$p}-control-accent-success-active);
     --radio-accent-warning: var(--#{$p}-control-accent-warning);
     --radio-border-warning: var(--#{$p}-control-accent-warning-active);
+    --radio-accent-info: var(--#{$p}-control-accent-info);
+    --radio-border-info: var(--#{$p}-control-accent-info-active);
 
     --radio-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
 
@@ -211,5 +213,10 @@ $radio-sizes: (
     &[data-intent='warning'] {
         --radio-accent: var(--radio-accent-warning);
         --radio-border-accent: var(--radio-border-warning);
+    }
+
+    &[data-intent='info'] {
+        --radio-accent: var(--radio-accent-info);
+        --radio-border-accent: var(--radio-border-info);
     }
 }
