@@ -52,6 +52,12 @@ $p: cfg.$prefix;
         transparent
     );
 
+    --#{$p}-control-shadow-hover-secondary: 0 0 0 3px color-mix(
+        in srgb,
+        currentColor 6%,
+        transparent
+    );
+
     --#{$p}-control-shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
     0 0 0 4px color-mix(
         in srgb,

@@ -15,7 +15,7 @@ type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 's
 };
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--input-control${name}`;
+    return `${CLASS_PREFIX}--switch${name}`;
 };
 
 const Switch = forwardRef<HTMLInputElement, SwitchProps>(
@@ -96,7 +96,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
 
         return (
             <label
-                className={clsx(prefix(), prefix('--switch'), className)}
+                className={clsx(prefix(), className)}
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={isDisabled || undefined}
                 data-size={size}

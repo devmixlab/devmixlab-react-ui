@@ -1,0 +1,188 @@
+@use '../../config' as cfg;
+@use 'sass:map';
+@use '../../functions/intent' as intent;
+
+$p: cfg.$prefix;
+$switch-prefix: #{$p}--switch;
+
+$switch-sizes: (
+    sm: (
+        height: 16px,
+        width: 28px,
+        thumb: 12px,
+        padding: 2px,
+        gap: 6px,
+        font-size: 13px
+    ),
+    md: (
+        height: 18px,
+        width: 32px,
+        thumb: 14px,
+        padding: 2px,
+        gap: 8px,
+        font-size: 14px
+    ),
+    lg: (
+        height: 22px,
+        width: 40px,
+        thumb: 18px,
+        padding: 2px,
+        gap: 10px,
+        font-size: 16px
+    )
+);
+
+@mixin switch-size($size) {
+    $conf: map.get($switch-sizes, $size);
+
+    --switch-height: #{map.get($conf, height)};
+    --switch-width: #{map.get($conf, width)};
+    --switch-thumb: #{map.get($conf, thumb)};
+    --switch-gap: #{map.get($conf, gap)};
+    --switch-padding: #{map.get($conf, padding)};
+
+    font-size: map.get($conf, font-size);
+}
+
+.#{$switch-prefix} {
+
+    @include switch-size(md);
+
+    @each $size, $conf in $switch-sizes {
+        &[data-size="#{$size}"] {
+            @include switch-size($size);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .#{$switch-prefix}__thumb,
+        .#{$switch-prefix}__track {
+            transition: none;
+        }
+    }
+
+    --text: var(--#{$p}-text);
+    --text-disabled: var(--#{$p}-text-disabled);
+    --text-muted: var(--#{$p}-text-muted);
+
+    --shadow: var(--#{$p}-control-shadow);
+    --shadow-hover: var(--#{$p}-control-shadow-hover);
+    --shadow-hover-secondary: var(--#{$p}-control-shadow-hover-secondary);
+    --shadow-focus: var(--#{$p}-control-shadow-focus);
+
+    // background
+    --switch-track-bg: #{intent.color('gray', 300)};
+    --switch-track-bg-checked: var(--#{$p}-control-accent);
+    --switch-thumb-bg: #ffffff;
+    --switch-track-bg-disabled: #{intent.color('gray', 300)};
+    --switch-thumb-bg-disabled: #{intent.color('gray', 200)};
+
+    @include cfg.dark {
+        // background dark
+        --switch-track-bg: #{intent.color('gray', 600)};
+        --switch-track-bg-checked: #{intent.color('primary', 400)};
+        --switch-thumb-bg: #{intent.color('gray', 100)};
+        --switch-track-bg-disabled: #{intent.color('gray', 700)};
+        --switch-thumb-bg-disabled: #{intent.color('gray', 600)};
+    }
+
+    --_thumb-x: var(--switch-padding);
+    --_thumb-scale: 1;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    gap: var(--switch-gap);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    .#{$switch-prefix}__input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: inherit;
+        z-index: 1;
+
+        &:focus-visible + .#{$switch-prefix}__track {
+            box-shadow: var(--shadow-focus);
+        }
+    }
+
+    .#{$switch-prefix}__label {
+        line-height: 1;
+        font-size: 1em;
+        color: var(--text);
+    }
+
+    .#{$switch-prefix}__text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .#{$switch-prefix}__description {
+        font-size: 0.85em;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    .#{$switch-prefix}__track {
+        width: var(--switch-width);
+        height: var(--switch-height);
+        background: var(--switch-track-bg);
+        border-radius: 999px;
+        position: relative;
+        transition: background var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
+        box-shadow var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+        box-shadow: var(--shadow);
+    }
+
+    .#{$switch-prefix}__thumb {
+        width: var(--switch-thumb);
+        height: var(--switch-thumb);
+        background: var(--switch-thumb-bg);
+        border-radius: 50%;
+        will-change: transform;
+
+        position: absolute;
+        top: 50%;
+        left: 0;
+
+        --_thumb-y: -50%;
+        transform: translate(var(--_thumb-x), var(--_thumb-y)) scale(var(--_thumb-scale));
+        transition: transform var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+    }
+
+    &[data-state='checked'] {
+        --switch-track-bg: var(--switch-track-bg-checked);
+        --_thumb-x: calc(
+            var(--switch-width)
+            - var(--switch-thumb)
+            - var(--switch-padding)
+        );
+    }
+
+    &:not([data-disabled]):active {
+        --_thumb-scale: 0.95;
+    }
+
+    &:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {
+        --shadow: var(--shadow-hover-secondary);
+    }
+
+    &[data-state='checked']:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {
+        --shadow: var(--shadow-hover);
+    }
+
+    &[data-disabled] {
+        cursor: not-allowed;
+        --switch-track-bg: var(--switch-track-bg-disabled);
+        --switch-thumb-bg: var(--switch-thumb-bg-disabled);
+        --text: var(--text-disabled);
+        --text-muted: var(--text-disabled);
+    }
+
+}
