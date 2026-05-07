@@ -1,0 +1,215 @@
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$radio-prefix: #{$p}--radio;
+
+$radio-sizes: (
+    sm: (
+        size: 16px,
+        indicator: 6px,
+        gap: 6px,
+        font-size: 13px
+    ),
+    md: (
+        size: 18px,
+        indicator: 9px,
+        gap: 8px,
+        font-size: 14px
+    ),
+    lg: (
+        size: 22px,
+        indicator: 11px,
+        gap: 10px,
+        font-size: 16px
+    )
+);
+
+@mixin radio-size($size) {
+    $conf: map.get($radio-sizes, $size);
+
+    --radio-size: #{map.get($conf, size)};
+    --radio-indicator: #{map.get($conf, indicator)};
+    --radio-gap: #{map.get($conf, gap)};
+
+    font-size: map.get($conf, font-size);
+}
+
+.#{$radio-prefix} {
+
+    // Text
+    --text: var(--#{$p}-text);
+    --text-disabled: var(--#{$p}-text-disabled);
+    --text-muted: var(--#{$p}-text-muted);
+
+    // Control colors
+    --radio-control-border: var(--#{$p}-control-border);
+    --radio-control-bg: var(--#{$p}-control-bg);
+    --radio-accent: var(--#{$p}-control-accent);
+
+    // Shadows
+    --shadow: var(--#{$p}-control-shadow);
+    --shadow-hover: 0 0 0 3px color-mix(
+        in srgb,
+        var(--radio-accent) 20%,
+        transparent
+    );
+    --shadow-hover-secondary: var(--#{$p}-control-shadow-hover-secondary);
+    --shadow-focus: 0 0 0 2px var(--radio-control-bg),
+    0 0 0 4px color-mix(
+        in srgb,
+        var(--radio-accent) 50%,
+        transparent
+    );
+
+    // Disabled
+    --radio-control-border-disabled: var(--#{$p}-surface-disabled);
+    --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
+
+    // Intent colors
+    --radio-accent-danger: var(--#{$p}-control-accent-danger); // indicator
+    --radio-border-danger: var(--#{$p}-control-accent-danger-active); // border
+    --radio-accent-success: var(--#{$p}-control-accent-success);
+    --radio-border-success: var(--#{$p}-control-accent-success-active);
+    --radio-accent-warning: var(--#{$p}-control-accent-warning);
+    --radio-border-warning: var(--#{$p}-control-accent-warning-active);
+
+    --radio-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+
+    @include radio-size(md);
+
+    @each $name, $value in $radio-sizes {
+        &[data-size=#{$name}] {
+            @include radio-size($name);
+        }
+    }
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--radio-gap);
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    position: relative;
+
+    --radio-control-scale: 1;
+
+    .#{$radio-prefix}__input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: inherit;
+        z-index: 1;
+    }
+
+    .#{$radio-prefix}__input:focus-visible + .#{$radio-prefix}__control {
+        --shadow: var(--shadow-focus);
+    }
+
+    .#{$radio-prefix}__control {
+        position: relative;
+        z-index: 0;
+        pointer-events: none;
+        width: var(--radio-size);
+        height: var(--radio-size);
+
+        background: var(--radio-control-bg);
+        border: 2px solid var(--radio-control-border);
+
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: scale(var(--radio-control-scale));
+
+        transition:
+            border-color var(--radio-transition),
+            box-shadow var(--radio-transition),
+            transform var(--radio-transition),
+            background-color var(--radio-transition);
+
+        box-shadow: var(--shadow);
+    }
+
+    .#{$radio-prefix}__indicator {
+        width: var(--radio-indicator);
+        height: var(--radio-indicator);
+        border-radius: 50%;
+        background: var(--radio-accent);
+        will-change: transform;
+
+        --radio-indicator-scale: 0;
+        transform: scale(var(--radio-indicator-scale));
+        transition:
+            transform var(--radio-transition);
+    }
+
+    .#{$radio-prefix}__label {
+        line-height: 1;
+        font-size: 1em;
+        color: var(--text);
+    }
+
+    .#{$radio-prefix}__text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .#{$radio-prefix}__description {
+        font-size: 0.85em;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    &:not([data-disabled]):not(:focus-within):hover {
+        --shadow: var(--shadow-hover-secondary);
+    }
+
+    &[data-state='checked']:not([data-disabled]):not(:focus-within):hover {
+        --shadow: var(--shadow-hover);
+    }
+
+    &:not([data-disabled]):active {
+        --radio-control-scale: 0.97;
+    }
+
+    &[data-disabled] {
+        cursor: not-allowed;
+
+        .#{$radio-prefix}__control {
+            border-color: var(--radio-control-border-disabled);
+        }
+
+        .#{$radio-prefix}__indicator {
+            background: var(--radio-indicator-bg-disabled);
+        }
+
+        --text: var(--text-disabled);
+        --text-muted: var(--text-disabled);
+    }
+
+    &[data-state='checked'] .#{$radio-prefix}__indicator {
+        --radio-indicator-scale: 1;
+    }
+
+    &[data-state='checked']:not([data-disabled]) .#{$radio-prefix}__control {
+        border-color: var(--radio-border-accent, var(--radio-accent));
+    }
+
+    &[data-intent='danger'] {
+        --radio-accent: var(--radio-accent-danger);
+        --radio-border-accent: var(--radio-border-danger);
+    }
+
+    &[data-intent='success'] {
+        --radio-accent: var(--radio-accent-success);
+        --radio-border-accent: var(--radio-border-success);
+    }
+
+    &[data-intent='warning'] {
+        --radio-accent: var(--radio-accent-warning);
+        --radio-border-accent: var(--radio-border-warning);
+    }
+}

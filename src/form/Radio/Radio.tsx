@@ -18,7 +18,7 @@ type RadioProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'si
 };
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--input-control${name}`;
+    return `${CLASS_PREFIX}--radio${name}`;
 };
 
 const Radio = forwardRef<HTMLInputElement, RadioProps>(
@@ -79,7 +79,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 
         return (
             <label
-                className={clsx(prefix(), prefix('--radio'), className)}
+                className={clsx(prefix(), className)}
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={isDisabled || undefined}
                 data-size={finalSize}
