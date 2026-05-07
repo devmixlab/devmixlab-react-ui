@@ -61,16 +61,18 @@ $switch-sizes: (
         }
     }
 
+    // Text
     --text: var(--#{$p}-text);
     --text-disabled: var(--#{$p}-text-disabled);
     --text-muted: var(--#{$p}-text-muted);
 
+    // Shadows
     --shadow: var(--#{$p}-control-shadow);
     --shadow-hover: var(--#{$p}-control-shadow-hover);
     --shadow-hover-secondary: var(--#{$p}-control-shadow-hover-secondary);
     --shadow-focus: var(--#{$p}-control-shadow-focus);
 
-    // background
+    // Track/thumb colors
     --switch-track-bg: #{intent.color('gray', 300)};
     --switch-track-bg-checked: var(--#{$p}-control-accent);
     --switch-thumb-bg: #ffffff;
@@ -78,7 +80,7 @@ $switch-sizes: (
     --switch-thumb-bg-disabled: #{intent.color('gray', 200)};
 
     @include cfg.dark {
-        // background dark
+        // Track/thumb colors dark
         --switch-track-bg: #{intent.color('gray', 600)};
         --switch-track-bg-checked: #{intent.color('primary', 400)};
         --switch-thumb-bg: #{intent.color('gray', 100)};
@@ -86,8 +88,8 @@ $switch-sizes: (
         --switch-thumb-bg-disabled: #{intent.color('gray', 600)};
     }
 
-    --_thumb-x: var(--switch-padding);
-    --_thumb-scale: 1;
+    --switch-thumb-x: var(--switch-padding);
+    --switch-thumb-scale: 1;
 
     position: relative;
     display: inline-flex;
@@ -135,8 +137,9 @@ $switch-sizes: (
         background: var(--switch-track-bg);
         border-radius: 999px;
         position: relative;
-        transition: background var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
-        box-shadow var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+        transition:
+            background var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
+            box-shadow var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
         box-shadow: var(--shadow);
     }
 
@@ -151,14 +154,15 @@ $switch-sizes: (
         top: 50%;
         left: 0;
 
-        --_thumb-y: -50%;
-        transform: translate(var(--_thumb-x), var(--_thumb-y)) scale(var(--_thumb-scale));
-        transition: transform var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+        --switch-thumb-y: -50%;
+        transform: translate(var(--switch-thumb-x), var(--switch-thumb-y)) scale(var(--switch-thumb-scale));
+        transition:
+            transform var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
     }
 
     &[data-state='checked'] {
         --switch-track-bg: var(--switch-track-bg-checked);
-        --_thumb-x: calc(
+        --switch-thumb-x: calc(
             var(--switch-width)
             - var(--switch-thumb)
             - var(--switch-padding)
@@ -166,7 +170,7 @@ $switch-sizes: (
     }
 
     &:not([data-disabled]):active {
-        --_thumb-scale: 0.95;
+        --switch-thumb-scale: 0.95;
     }
 
     &:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {

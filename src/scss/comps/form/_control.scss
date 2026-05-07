@@ -277,171 +277,171 @@ $switch-sizes: (
         }
     }
 
-    &--switch {
-        //@include switch-size(md);
-        @media (prefers-reduced-motion: reduce) {
-            .#{$compPrefix}__thumb,
-            .#{$compPrefix}__track {
-                transition: none;
-            }
-        }
-
-        &[data-size='sm'] {
-            @include switch-size(sm);
-        }
-
-        &[data-size='md'] {
-            @include switch-size(md);
-        }
-
-        &[data-size='lg'] {
-            @include switch-size(lg);
-        }
-
-        --switch-track-bg: var(--intent-gray-300);
-        --switch-track-bg-checked: var(--intent-blue-500);
-        --switch-thumb-bg: #ffffff;
-        --switch-text-disabled: var(--intent-gray-400);
-        --switch-description-color: var(--intent-gray-500);
-
-        --switch-focus-ring: color-mix(
-            in srgb,
-            var(--switch-track-bg-checked) 40%,
-            transparent
-        );
-        --switch-focus-offset-color: #ffffff;
-
-        --switch-track-bg-disabled: var(--intent-gray-300);
-        --switch-thumb-bg-disabled: var(--intent-gray-200);
-
-        @include dark {
-            --switch-track-bg: var(--intent-gray-600);
-            --switch-track-bg-checked: var(--intent-blue-400);
-            --switch-thumb-bg: var(--intent-gray-100);
-            --switch-text-disabled: var(--intent-gray-500);
-            --switch-description-color: var(--intent-gray-400);
-
-            --switch-focus-ring: color-mix(
-                in srgb,
-                var(--switch-track-bg-checked) 50%,
-                transparent
-            );
-            --switch-focus-offset-color: var(--intent-gray-900);
-
-            --switch-track-bg-disabled: var(--intent-gray-700);
-            --switch-thumb-bg-disabled: var(--intent-gray-600);
-        }
-
-        --switch-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-        --switch-hover-ring: color-mix(in srgb, currentColor 6%, transparent);
-
-        position: relative;
-        display: inline-flex;
-        //align-items: flex-start;
-        align-items: center; // 👈 critical
-        //vertical-align: middle;
-        line-height: 1; // 👈 ADD THIS
-        gap: var(--switch-gap);
-        cursor: pointer;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-
-        .#{$compPrefix}__input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: inherit;
-            z-index: 1;
-
-            &:focus-visible + .#{$compPrefix}__track {
-                box-shadow: 0 0 0 2px var(--switch-focus-offset-color, #fff),
-                0 0 0 4px var(--switch-focus-ring);
-            }
-        }
-
-        .#{$compPrefix}__label {
-            line-height: 1;
-            font-size: 1em;
-        }
-
-        .#{$compPrefix}__text {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            line-height: 1;
-        }
-
-        .#{$compPrefix}__description {
-            font-size: 0.85em;
-            color: var(--switch-description-color);
-            margin-top: 2px;
-        }
-
-        .#{$compPrefix}__track {
-            width: var(--switch-width);
-            height: var(--switch-height);
-            background: var(--switch-track-bg);
-            border-radius: 999px;
-            position: relative;
-            transition: background var(--switch-transition), box-shadow var(--switch-transition);
-        }
-
-        .#{$compPrefix}__thumb {
-            width: var(--switch-thumb);
-            height: var(--switch-thumb);
-            background: var(--switch-thumb-bg);
-            border-radius: 50%;
-            will-change: transform;
-
-            position: absolute;
-            top: 50%;
-            left: 0;
-
-            --_thumb-scale: 1;
-            --_thumb-x: var(--switch-padding);
-            --_thumb-y: -50%;
-            transform: translate(var(--_thumb-x), var(--_thumb-y)) scale(var(--_thumb-scale));
-            transition: transform var(--switch-transition);
-        }
-
-        &[data-state='checked'] .#{$compPrefix}__track {
-            background: var(--switch-track-bg-checked);
-        }
-
-        &[data-state='checked'] .#{$compPrefix}__thumb {
-            --_thumb-x: calc(
-                var(--switch-width)
-                - var(--switch-thumb)
-                - var(--switch-padding)
-            );
-        }
-
-        &:not([data-disabled]):active .#{$compPrefix}__thumb {
-            --_thumb-scale: 0.95;
-        }
-
-        &:not([data-disabled]):not(:focus-within):hover .#{$compPrefix}__track {
-            box-shadow: 0 0 0 3px var(--switch-hover-ring);
-        }
-
-        &[data-disabled] {
-            cursor: not-allowed;
-            --switch-description-color: var(--switch-text-disabled);
-
-            .#{$compPrefix}__track {
-                pointer-events: none;
-                background: var(--switch-track-bg-disabled);
-            }
-
-            .#{$compPrefix}__thumb {
-                background: var(--switch-thumb-bg-disabled);
-            }
-
-            .#{$compPrefix}__label, .#{$compPrefix}__description {
-                color: var(--switch-text-disabled);
-            }
-        }
-    }
+    //&--switch {
+    //    //@include switch-size(md);
+    //    @media (prefers-reduced-motion: reduce) {
+    //        .#{$compPrefix}__thumb,
+    //        .#{$compPrefix}__track {
+    //            transition: none;
+    //        }
+    //    }
+    //
+    //    &[data-size='sm'] {
+    //        @include switch-size(sm);
+    //    }
+    //
+    //    &[data-size='md'] {
+    //        @include switch-size(md);
+    //    }
+    //
+    //    &[data-size='lg'] {
+    //        @include switch-size(lg);
+    //    }
+    //
+    //    --switch-track-bg: var(--intent-gray-300);
+    //    --switch-track-bg-checked: var(--intent-blue-500);
+    //    --switch-thumb-bg: #ffffff;
+    //    --switch-text-disabled: var(--intent-gray-400);
+    //    --switch-description-color: var(--intent-gray-500);
+    //
+    //    --switch-focus-ring: color-mix(
+    //        in srgb,
+    //        var(--switch-track-bg-checked) 40%,
+    //        transparent
+    //    );
+    //    --switch-focus-offset-color: #ffffff;
+    //
+    //    --switch-track-bg-disabled: var(--intent-gray-300);
+    //    --switch-thumb-bg-disabled: var(--intent-gray-200);
+    //
+    //    @include dark {
+    //        --switch-track-bg: var(--intent-gray-600);
+    //        --switch-track-bg-checked: var(--intent-blue-400);
+    //        --switch-thumb-bg: var(--intent-gray-100);
+    //        --switch-text-disabled: var(--intent-gray-500);
+    //        --switch-description-color: var(--intent-gray-400);
+    //
+    //        --switch-focus-ring: color-mix(
+    //            in srgb,
+    //            var(--switch-track-bg-checked) 50%,
+    //            transparent
+    //        );
+    //        --switch-focus-offset-color: var(--intent-gray-900);
+    //
+    //        --switch-track-bg-disabled: var(--intent-gray-700);
+    //        --switch-thumb-bg-disabled: var(--intent-gray-600);
+    //    }
+    //
+    //    --switch-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    //    --switch-hover-ring: color-mix(in srgb, currentColor 6%, transparent);
+    //
+    //    position: relative;
+    //    display: inline-flex;
+    //    //align-items: flex-start;
+    //    align-items: center; // 👈 critical
+    //    //vertical-align: middle;
+    //    line-height: 1; // 👈 ADD THIS
+    //    gap: var(--switch-gap);
+    //    cursor: pointer;
+    //    user-select: none;
+    //    -webkit-tap-highlight-color: transparent;
+    //
+    //    .#{$compPrefix}__input {
+    //        position: absolute;
+    //        inset: 0;
+    //        opacity: 0;
+    //        cursor: inherit;
+    //        z-index: 1;
+    //
+    //        &:focus-visible + .#{$compPrefix}__track {
+    //            box-shadow: 0 0 0 2px var(--switch-focus-offset-color, #fff),
+    //            0 0 0 4px var(--switch-focus-ring);
+    //        }
+    //    }
+    //
+    //    .#{$compPrefix}__label {
+    //        line-height: 1;
+    //        font-size: 1em;
+    //    }
+    //
+    //    .#{$compPrefix}__text {
+    //        display: flex;
+    //        flex-direction: column;
+    //        justify-content: center;
+    //        line-height: 1;
+    //    }
+    //
+    //    .#{$compPrefix}__description {
+    //        font-size: 0.85em;
+    //        color: var(--switch-description-color);
+    //        margin-top: 2px;
+    //    }
+    //
+    //    .#{$compPrefix}__track {
+    //        width: var(--switch-width);
+    //        height: var(--switch-height);
+    //        background: var(--switch-track-bg);
+    //        border-radius: 999px;
+    //        position: relative;
+    //        transition: background var(--switch-transition), box-shadow var(--switch-transition);
+    //    }
+    //
+    //    .#{$compPrefix}__thumb {
+    //        width: var(--switch-thumb);
+    //        height: var(--switch-thumb);
+    //        background: var(--switch-thumb-bg);
+    //        border-radius: 50%;
+    //        will-change: transform;
+    //
+    //        position: absolute;
+    //        top: 50%;
+    //        left: 0;
+    //
+    //        --_thumb-scale: 1;
+    //        --_thumb-x: var(--switch-padding);
+    //        --_thumb-y: -50%;
+    //        transform: translate(var(--_thumb-x), var(--_thumb-y)) scale(var(--_thumb-scale));
+    //        transition: transform var(--switch-transition);
+    //    }
+    //
+    //    &[data-state='checked'] .#{$compPrefix}__track {
+    //        background: var(--switch-track-bg-checked);
+    //    }
+    //
+    //    &[data-state='checked'] .#{$compPrefix}__thumb {
+    //        --_thumb-x: calc(
+    //            var(--switch-width)
+    //            - var(--switch-thumb)
+    //            - var(--switch-padding)
+    //        );
+    //    }
+    //
+    //    &:not([data-disabled]):active .#{$compPrefix}__thumb {
+    //        --_thumb-scale: 0.95;
+    //    }
+    //
+    //    &:not([data-disabled]):not(:focus-within):hover .#{$compPrefix}__track {
+    //        box-shadow: 0 0 0 3px var(--switch-hover-ring);
+    //    }
+    //
+    //    &[data-disabled] {
+    //        cursor: not-allowed;
+    //        --switch-description-color: var(--switch-text-disabled);
+    //
+    //        .#{$compPrefix}__track {
+    //            pointer-events: none;
+    //            background: var(--switch-track-bg-disabled);
+    //        }
+    //
+    //        .#{$compPrefix}__thumb {
+    //            background: var(--switch-thumb-bg-disabled);
+    //        }
+    //
+    //        .#{$compPrefix}__label, .#{$compPrefix}__description {
+    //            color: var(--switch-text-disabled);
+    //        }
+    //    }
+    //}
 
     //&--radio {
     //
