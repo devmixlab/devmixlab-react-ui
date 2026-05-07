@@ -1,0 +1,765 @@
+@use '../../../abstracts/config' as *;
+@use '../../../abstracts/mixins' as *;
+
+@use '../../../abstracts/palette' as *;
+@use 'sass:map';
+
+$compPrefix: 'dru--input';
+
+$input-gaps: (
+    sm: (
+        gap: 4px,        // 👈 inside group (suffix ↔ unit, action ↔ clear)
+        actionsGap: 8px,   // 👈 between groups (end ↔ actions)
+        controlGap: 12px // 👈 before controls (actions ↔ stepper)
+    ),
+
+    md: (
+        gap: 6px,
+        actionsGap: 10px,
+        controlGap: 14px
+    ),
+
+    lg: (
+        gap: 8px,
+        actionsGap: 12px,
+        controlGap: 16px
+    )
+);
+
+$textarea-sizes: (
+    sm: (fontSize: 14px, spacingX: 8px, spacingTop: 8px, gap: 4px),
+    md: (fontSize: 16px, spacingX: 16px, spacingTop: 12px, gap: 6px),
+    lg: (fontSize: 18px, spacingX: 24px, spacingTop: 16px, gap: 8px),
+);
+
+$input-sizes: (
+    sm: (height: 32px, fontSize: 14px, spacingX: 8px, gap: 4px),
+    md: (height: 40px, fontSize: 16px, spacingX: 16px, gap: 6px),
+    lg: (height: 48px, fontSize: 18px, spacingX: 24px, gap: 8px),
+);
+
+$tag-input-sizes: (
+    sm: (height: 32px, fontSize: 14px, spacingX: 8px, spacingY: 3px, spacingTop: 6px, gap: 4px),
+    md: (height: 40px, fontSize: 16px, spacingX: 16px, spacingY: 6px, spacingTop: 10px, gap: 6px),
+    lg: (height: 48px, fontSize: 18px, spacingX: 24px, spacingY: 9px, spacingTop: 12px, gap: 8px),
+);
+
+@mixin intent-vars($palette, $palette-name) {
+    @each $step, $value in $palette {
+        --intent-#{
+            $palette-name
+        }-#{$step}: #{$value};
+    }
+}
+
+.#{$compPrefix} {
+    @include intent-vars($red, red);
+    @include intent-vars($blue, blue);
+    @include intent-vars($neutral, neutral);
+    @include intent-vars($gray, gray);
+
+    --icon-size: 1.1em;
+    --focus-ring: #{rgba(map.get($blue, 500), 0.25)};
+    --text: var(--intent-gray-900);
+    --danger: var(--intent-red-500);
+    --text-muted: var(--intent-gray-500);
+
+    --bg: transparent;
+    --bg-hover: var(--intent-neutral-50);
+
+    --border: var(--intent-neutral-300);
+    --border-hover: var(--intent-blue-400);
+    --border-focus: var(--intent-blue-500);
+
+    @include dark {
+
+        --focus-ring: #{rgba(map.get($blue, 400), 0.35)};
+        --text: var(--intent-gray-100);
+        --danger: var(--intent-red-400);
+        --text-muted: var(--intent-gray-400);
+
+        --bg: transparent;
+        --bg-hover: var(--intent-gray-800);
+
+        --border: var(--intent-neutral-700);
+        --border-hover: var(--intent-blue-500);
+        --border-focus: var(--intent-blue-400);
+
+    }
+
+    position: relative;
+    box-sizing: border-box;
+    display: inline-flex;
+    vertical-align: middle;
+    align-items: center;
+    min-width: 0;
+    cursor: text;
+    user-select: none;
+    font-size: var(--fs);
+
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+
+    padding-left: var(--pl, 0);
+    padding-right: var(--pr, 0);
+    padding-top: var(--pt, 0);
+    padding-bottom: var(--pb, 0);
+
+    // Chrome autofill will break your design.
+    //input:-webkit-autofill {
+    //    box-shadow: 0 0 0 1000px var(--bg) inset;
+    //    -webkit-text-fill-color: var(--text);
+    //}
+
+    min-height: var(--min-height, 40px);
+    height: var(--height, auto);
+
+
+    transition: border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+
+    &:hover:not([data-disabled]) {
+        border-color: var(--border-hover);
+        background: var(--bg-hover); // or token
+    }
+
+    &:focus-within {
+        border-color: var(--border-focus);
+        box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    /* states */
+    &[data-invalid] {
+        border-color: var(--danger);
+
+        &:focus-within {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px #{rgba(map.get($red, 500), 0.25)};
+        }
+
+        &:hover:not([data-disabled]) {
+            border-color: var(--danger);
+        }
+    }
+
+    &[data-disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+
+        .#{$compPrefix}__icon,
+        .#{$compPrefix}__clear {
+            pointer-events: none;
+        }
+    }
+
+    &__stepper {
+        display: flex;
+        flex-direction: column;
+        width: var(--stepper-width);
+        //background-color: red;
+        //height: 100%;            // match input height
+    }
+    &__stepper button {
+        flex: 1;                 // split height evenly
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        user-select: none;
+
+        padding: 0;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+
+        line-height: 0;          // prevent extra space from inline content
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        &:active {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        &:first-child {
+            border-bottom: 1px solid var(--border);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.4;
+            background: transparent;
+            color: var(--text-muted);
+            svg {
+                opacity: 0.5;
+            }
+        }
+
+        &:disabled:hover,
+        &:disabled:active {
+            background: transparent; // no interaction feedback
+        }
+    }
+
+    &__slot {
+        position: absolute;
+        top: 0;
+
+        display: flex;
+        height: var(--slot-h, auto);
+        line-height: 1;
+        //gap: var(--gap);
+        align-items: var(--slot-align, center);
+    }
+
+    &__slot-start {
+        left: 0;
+        padding: var(--top-offset) 0px 0px  var(--x-offset);
+    }
+
+    &__slot-end {
+        right: 0;
+        padding: var(--top-offset) var(--x-offset) 0px 0px;
+    }
+
+    .#{$compPrefix}__field {
+        appearance: none;
+        border: none;
+        background: transparent;
+        user-select: text;
+        font-size: var(--field-fs, inherit);
+
+        padding-left: var(--field-pl, 0);
+        padding-right: var(--field-pr, 0);
+        padding-top: var(--field-pt, 0);
+        padding-bottom: var(--field-pb, 0);
+
+        margin: 0;
+
+        height: var(--field-h, 100%);
+        width: 100%;
+        min-width: 0;
+
+        flex: 1;
+
+        line-height: 1;
+        color: inherit;
+
+        outline: none; /* wrapper handles focus */
+
+        &::placeholder {
+            color: var(--text-muted);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    // calculate padding (left/right) based on number of icons in slot (start slot/end slot + clear btn)
+    @mixin field-p($field-p-var, $slot-count-var) {
+        #{$field-p-var}: #{calc(
+            var(--x-offset) +
+            ((var(--gap) + var(--icon-size) + var(--icon-adjust)) * var(#{$slot-count-var}))
+        )};
+    }
+
+    &--textarea-input {
+        --icon-adjust: 2px;
+        --slot-h: auto;
+        align-items: stretch;
+
+        .#{$compPrefix}__field {
+            line-height: 1.4; // key difference
+            resize: vertical; // allow vertical resize
+            height: auto; // override input behavior
+            min-height: 3em; // base height (~3 rows)
+            display: block; // avoids flex issues
+            margin-top: -2px;
+        }
+
+        @each $size, $value in $textarea-sizes {
+            $gaps: map.get($input-gaps, $size);
+            &.#{$compPrefix}--size-#{$size} {
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
+                --fs: #{map.get($value, fontSize)};
+                --x-offset: #{map.get($value, spacingX)};
+                --top-offset: #{map.get($value, spacingTop)};
+                --pt: var(--top-offset);
+
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+
+                &.#{$compPrefix}--has-start-slot {
+                    --field-pl: calc(var(--start-width) + var(--gap));
+                }
+
+                &.#{$compPrefix}--has-end-slot {
+                    --field-pr: calc(var(--end-width) + var(--gap));
+                }
+            }
+        }
+    }
+
+    &--field-input, &--select-input {
+        --icon-adjust: 2px; // adjust icon to look consistent, its just fix
+        --slot-align: center;
+        --slot-h: 100%;
+        @each $size, $value in $input-sizes {
+            $gaps: map.get($input-gaps, $size);
+            &.#{$compPrefix}--size-#{$size} {
+
+                // Slot vars
+                --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
+                --top-offset: 0px;
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
+
+                // Field vars
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+                --height: #{map.get($value, height)};
+                --min-height: auto;
+                --fs: #{map.get($value, fontSize)};
+                --stepper-width: calc(var(--height) * 0.6);
+
+                &.#{$compPrefix}--has-start-slot {
+                    --field-pl: calc(var(--start-width) + var(--gap));
+                }
+
+                &.#{$compPrefix}--has-end-slot {
+                    --field-pr: calc(var(--end-width) + var(--gap));
+                }
+
+            }
+        }
+    }
+
+
+    &--tags-input {
+        display: flex;
+        flex-wrap: wrap;
+        //--height: auto;
+        //min-height: var(--height);
+        //align-items: flex-start;
+        --icon-adjust: 2px; // adjust icon to look consistent, its just fix
+        --slot-align: center;
+        --slot-h: auto;
+        gap: var(--gap);
+        @each $size, $value in $tag-input-sizes {
+            $gaps: map.get($input-gaps, $size);
+            &.#{$compPrefix}--size-#{$size} {
+
+                // Slot vars
+                //--top-offset: 0px;
+                --top-offset: #{map.get($value, spacingTop)};
+                --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
+                --y-offset: #{map.get($value, spacingY)};
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
+
+                --pt: var(--y-offset);
+                --pb: var(--y-offset);
+
+                // Field vars
+                //--pl: 100px;
+                //--pl: var(--x-offset); // default field padding left
+                --pr: var(--x-offset); // default field padding right
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+                //--field-pl: 20px;
+                --min-height: #{map.get($value, height)};
+                //--min-height: 100px;
+                //--height: 100%;
+                --fs: #{map.get($value, fontSize)};
+                //--stepper-width: calc(var(--height) * 0.6);
+
+                &.#{$compPrefix}--has-start-slot {
+                    --pl: calc(var(--start-width) + var(--gap));
+                }
+
+                &.#{$compPrefix}--has-end-slot {
+                    --pr: calc(var(--end-width) + var(--gap));
+                }
+            }
+        }
+
+        .#{$compPrefix}__field {
+            flex: 0 0 auto;   // 👈 force override
+            width: auto;      // 👈 CRITICAL
+            min-width: 20px;
+
+            //min-width: 60px;    // keep cursor visible
+            max-width: 100%;
+
+            height: auto;
+            padding: 0;
+        }
+
+        .#{$compPrefix}__mirror {
+            position: absolute;
+            visibility: hidden;
+            white-space: pre;
+
+            font: inherit;         // 👈 VERY important
+            letter-spacing: inherit;
+
+            padding: 0;
+            margin: 0;
+        }
+
+        .#{$compPrefix}__tag{
+            &--selected {
+                //background: var(--color-primary-soft);
+                //outline: 2px solid red;
+            }
+            &--active {
+                outline: none;
+                //outline: 2px solid var(--border-hover);
+                //outline-offset: 2px;
+            }
+            //&:focus {
+            //    outline: 2px solid var(currentColor);
+            //}
+        }
+
+        //.#{$compPrefix}__tag--active {
+        //    outline: 2px solid var(currentColor);
+        //    outline-offset: 2px;
+        //}
+
+        //.#{$compPrefix}__tag--select {
+        //    outline: 2px solid red;
+        //    outline-offset: 2px;
+        //    display: none;
+        //}
+
+        .#{$compPrefix}__tag-edit {
+            flex: 0 0 auto;
+            min-width: 20px;
+            max-width: 100%;
+            width: auto;
+
+            caret-color: currentColor;
+            transition: background 0.15s ease;
+
+            height: auto;
+            padding: 0;
+
+            // 🔥 remove default input styles
+            border: none;
+            outline: none;
+            background: transparent;
+
+            // 🔥 inherit text styles
+            font: inherit;
+            color: inherit;
+            line-height: inherit;
+
+            // 🔥 spacing to match chip
+            padding-inline: calc(var(--gap) * 0.75);
+
+            // 🔥 prevent layout shift
+            display: inline-flex;
+            align-items: center;
+
+            // 🔥 optional subtle editing state
+            border-radius: 6px;
+
+            &:focus {
+                outline: none;
+                background: rgba(0, 0, 0, 0.05); // or use your token
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    &--select-input {
+        cursor: pointer;
+        user-select: none;
+        .#{$compPrefix}__field {
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .#{$compPrefix}__slot {
+            pointer-events: none;
+        }
+    }
+
+    .#{$compPrefix}__value {
+        appearance: none;
+        border: none;
+        background: transparent;
+        user-select: text;
+        font-size: var(--field-fs, inherit);
+
+        padding-left: var(--field-pl, 0);
+        padding-right: var(--field-pr, 0);
+        padding-top: var(--field-pt, 0);
+        padding-bottom: var(--field-pb, 0);
+
+        margin: 0;
+
+        height: var(--field-h, 100%);
+        width: 100%;
+        min-width: 0;
+
+        flex: 1;
+
+        line-height: 1;
+        color: inherit;
+
+        outline: none; /* wrapper handles focus */
+
+        &::placeholder {
+            color: var(--text-muted);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    &--file-upload {
+        --icon-adjust: 2px; // adjust icon to look consistent, its just fix
+        --slot-align: center;
+        --slot-h: 100%;
+        @each $size, $value in $input-sizes {
+            $gaps: map.get($input-gaps, $size);
+            &.#{$compPrefix}--size-#{$size} {
+
+                // Slot vars
+                --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
+                --top-offset: 0px;
+                --gap: #{map.get($gaps, gap)};
+                --actions-gap: #{map.get($gaps, actionsGap)};
+                --checkbox-gap: #{map.get($gaps, controlGap)};
+
+                // Field vars
+                --field-pl: var(--x-offset); // default field padding left
+                --field-pr: var(--x-offset); // default field padding right
+                --height: #{map.get($value, height)};
+                --min-height: auto;
+                --fs: #{map.get($value, fontSize)};
+                --stepper-width: calc(var(--height) * 0.6);
+
+                &.#{$compPrefix}--has-start-slot {
+                    --field-pl: calc(var(--start-width) + var(--gap));
+                }
+
+                &.#{$compPrefix}--has-end-slot {
+                    --field-pr: calc(var(--end-width) + var(--gap));
+                }
+
+            }
+        }
+
+        cursor: pointer;
+        user-select: none;
+
+        // makes whole field clickable
+        & * {
+            pointer-events: none;
+        }
+
+        // but allow buttons (clear / actions)
+        & button {
+            pointer-events: auto;
+        }
+
+        // value text
+        //.#{$compPrefix}__value {
+        //    display: flex;
+        //    align-items: center;
+        //    gap: 4px;
+        //
+        //    color: var(--field-fg-muted);
+        //
+        //    white-space: nowrap;
+        //    overflow: hidden;
+        //    text-overflow: ellipsis;
+        //}
+
+        // when has files
+        .#{$compPrefix}--has-value .#{$compPrefix}__value {
+            color: var(--field-fg);
+        }
+
+        // drag state (you’ll toggle via state later)
+        .#{$compPrefix}--dragging {
+            --field-border: var(--color-primary);
+            --field-bg: var(--color-primary-soft);
+        }
+    }
+
+    &__toggle {
+        appearance: none;
+        border: none;
+        background: transparent;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+        color: var(--text-muted);
+
+        &:hover {
+            color: var(--text);
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 2px var(--focus-ring);
+        }
+    }
+
+    &__group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--gap);
+
+        color: var(--text-muted);
+
+        .#{$compPrefix}__group-item {
+            height: 1em;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        > svg,
+        > .MuiSvgIcon-root {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            font-size: var(--icon-size);
+            display: block;
+        }
+    }
+
+    &__actions-group {
+        margin-left: var(--actions-gap);
+    }
+
+    &__controls-group {
+        margin-left: var(--checkbox-gap);
+    }
+
+    &__clear {
+        appearance: none;
+        border: none;
+        background: transparent;
+        position: relative;
+
+        padding: 0;
+        margin: 0;
+
+        width: 1em;
+        height: 1em;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+        color: var(--text-muted);
+
+        &::before {
+            content: '';
+            position: absolute;
+
+            inset: -0.4em; // 👈 expand clickable area
+            border-radius: 50%;
+        }
+
+        &:hover {
+            color: var(--text);
+        }
+
+        &-button {
+            //position: absolute;
+
+            //top: 50%;
+            //left: 50%;
+            //
+            //transform: translate(-50%, -50%) scale(1.2);
+            transform: scale(1.2);
+
+            line-height: 1;
+
+            &:focus-visible {
+                box-shadow: 0 0 0 2px var(--focus-ring);
+            }
+        }
+    }
+
+    &--filled {
+        --bg: var(--intent-gray-200);
+        --bg-hover: var(--intent-gray-300);
+
+        --border: var(--intent-gray-300);
+        --border-hover: var(--intent-gray-400);
+        --border-focus: var(--intent-blue-500);
+    }
+
+    &--ghost {
+        --bg: transparent;
+        --bg-hover: var(--intent-neutral-50);
+
+        --border: transparent;
+        --border-hover: transparent;
+        --border-focus: transparent;
+    }
+
+    @include dark {
+
+        &--outlined {
+        }
+
+        &--filled {
+            --bg: var(--intent-gray-800);
+            --bg-hover: var(--intent-gray-700);
+
+            --border: var(--intent-gray-700);
+            --border-hover: var(--intent-gray-600);
+            --border-focus: var(--intent-blue-400);
+        }
+
+        &--ghost {
+            --bg: transparent;
+            --bg-hover: var(--intent-gray-800);
+
+            --border: transparent;
+            --border-hover: transparent;
+            --border-focus: transparent;
+        }
+    }
+}

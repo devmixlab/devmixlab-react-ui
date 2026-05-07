@@ -2,8 +2,10 @@ import React, { forwardRef, useRef, useLayoutEffect } from 'react';
 import clsx from 'clsx';
 import { Box, type BoxProps } from '../../Box/Box';
 import { Size, Variant } from '../Input/input.tokens';
-import { prefix } from '../Input/input.helpers';
+// import { prefix } from '../Input/input.helpers';
 import { mergeRefs } from '../../utils/mergeRefs';
+// import { CLASS_PREFIX } from '../../constants';
+import { classPrefix } from '../../utils/classPrefix';
 
 export type FieldRootProps = BoxProps & {
     start?: React.ReactNode;
@@ -22,6 +24,10 @@ export type FieldRootProps = BoxProps & {
 
     focusTargetRef?: React.RefObject<HTMLElement | null>;
     onClick?: React.MouseEventHandler<HTMLDivElement>;
+};
+
+export const prefix = (name: string = '') => {
+    return classPrefix(`--field-root${name}`);
 };
 
 const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
@@ -87,12 +93,18 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             return () => ro.disconnect();
         }, [start, end, actions, controls]);
 
-        const cl = clsx(className, prefix(), prefix(`--${variant}`), prefix(`--size-${size}`), {
-            [prefix(`--invalid`)]: invalid,
-            [prefix(`--disabled`)]: disabled,
-            [prefix(`--has-start-slot`)]: hasStart,
-            [prefix(`--has-end-slot`)]: hasEnd,
-        });
+        const cl = clsx(
+            className,
+            prefix(),
+            classPrefix(`--${variant}`),
+            // classPrefix(`--size-${size}`),
+            {
+                [classPrefix(`--invalid`)]: invalid,
+                [classPrefix(`--disabled`)]: disabled,
+                [classPrefix(`--has-start-slot`)]: hasStart,
+                [classPrefix(`--has-end-slot`)]: hasEnd,
+            },
+        );
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (disabled) return;
@@ -135,6 +147,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 className={cl}
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
+                {...(variant ? { ['data-variant']: variant } : {})}
                 rounded={rounded}
                 onClick={handleClick}
                 onMouseDown={handleMouseDown}

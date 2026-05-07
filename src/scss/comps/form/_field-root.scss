@@ -1,0 +1,286 @@
+@use '../../functions' as functions;
+
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$field-root-prefix: #{$p}--field-root;
+
+$sizes: (
+    sm: (
+        gap: 4px,
+        actionsGap: 8px,
+        controlGap: 12px,
+        spacingX: 8px,
+    ),
+    md: (
+        gap: 6px,
+        actionsGap: 10px,
+        controlGap: 14px,
+        spacingX: 16px,
+    ),
+    lg: (
+        gap: 8px,
+        actionsGap: 12px,
+        controlGap: 16px,
+        spacingX: 24px,
+    )
+);
+
+@mixin applySize($size) {
+    $conf: map.get($sizes, $size);
+
+    --gap: #{map.get($conf, gap)};
+    --action-gap: #{map.get($conf, actionsGap)};
+    --control-gap: #{map.get($conf, controlGap)};
+    --spacing-x: #{map.get($conf, spacingX)};
+}
+
+.#{$field-root-prefix} {
+
+    @include applySize(md);
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            @include applySize($size);
+        }
+    }
+
+    --transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+    --icon-size: 1.1em;
+
+    // field
+    --field-pl: calc(var(--spacing-x) + var(--start-width) + var(--gap));
+    --field-pr: calc(var(--spacing-x) + var(--end-width) + var(--gap));
+
+    // focus
+    --focus-ring: #{color-mix(
+        in srgb,
+        #{functions.intent-color('primary', 500)} 28%,
+        transparent
+    )};
+    --focus-ring-danger: #{color-mix(
+        in srgb,
+        #{functions.intent-color('danger', 500)} 28%,
+        transparent
+    )};
+
+    // text
+    --text: #{functions.intent-color('gray', 900)};
+    --text-muted: var(--#{$p}-text-muted);
+    --text-disabled: var(--#{$p}-text-disabled);
+
+    // background
+    --bg: transparent;
+    --bg-hover: #{functions.intent-color('gray', 50)};
+
+    // border
+    --border: #{functions.intent-color('gray', 300)};
+    --border-danger: #{functions.intent-color('danger', 300)};
+    --border-hover: #{functions.intent-color('primary', 400)};
+    --border-danger-hover: #{functions.intent-color('danger', 400)};
+    --border-focus: #{functions.intent-color('primary', 500)};
+    --border-danger-focus: #{functions.intent-color('danger', 500)};
+
+    //filled surface;
+    --filled-surface-1: #{functions.intent-color('gray', 200)};
+    --filled-surface-2: #{functions.intent-color('gray', 300)};
+    --filled-surface-3: #{functions.intent-color('gray',400)};
+
+    @include cfg.dark {
+        // focus
+        --focus-ring: #{color-mix(
+            in srgb,
+            #{functions.intent-color('primary', 400)} 40%,
+            transparent
+        )};
+
+        --focus-ring-danger: #{color-mix(
+            in srgb,
+            #{functions.intent-color('danger', 400)} 40%,
+            transparent
+        )};
+
+        // text
+        --text: var(--intent-gray-100);
+        --text-muted: var(--intent-gray-400);
+
+        // background
+        --bg-hover: #{functions.intent-color('gray', 800)};
+
+        // border
+        --border: #{functions.intent-color('gray', 700)};
+        --border-danger: #{functions.intent-color('danger', 700)};
+        --border-hover: #{functions.intent-color('primary', 500)};
+        --border-danger-hover: #{functions.intent-color('danger', 500)};
+        --border-focus: #{functions.intent-color('primary', 400)};
+        --border-danger-focus: #{functions.intent-color('danger', 400)};
+
+        //filled surface
+        --filled-surface-1: #{functions.intent-color('gray', 800)};
+        --filled-surface-2: #{functions.intent-color('gray', 700)};
+        --filled-surface-3: #{functions.intent-color('gray',600)};
+
+    }
+
+    position: relative;
+    box-sizing: border-box;
+    display: inline-flex;
+    gap: var(--gap);
+    vertical-align: middle;
+    align-items: center;
+    min-width: 0;
+    cursor: text;
+    user-select: none;
+    font-size: var(--fs);
+
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+
+    padding: 0;
+
+    min-height: var(--min-height, 40px);
+    height: var(--height, auto);
+
+    transition: border-color var(--transition),
+    box-shadow var(--transition),
+    background var(--transition),
+    color var(--transition);
+
+    &:hover:not([data-disabled]) {
+        border-color: var(--border-hover);
+        background: var(--bg-hover);
+    }
+
+    &:focus-within {
+        border-color: var(--border-focus);
+        box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    /* states */
+    &[data-invalid] {
+        --focus-ring: var(--focus-ring-danger);
+        --border: var(--border-danger);
+        --border-hover: var(--border-danger-hover);
+        --border-focus: var(--border-danger-focus);
+    }
+
+    &[data-disabled] {
+        cursor: not-allowed;
+        --text: var(--text-disabled);
+        --text-muted: var(--text-disabled);
+
+        .#{$field-root-prefix}__slot {
+            pointer-events: none;
+        }
+    }
+
+    /* SLOT */
+    .#{$field-root-prefix}__slot {
+        position: absolute;
+        top: 0;
+
+        display: flex;
+        height: var(--slot-h, 100%);
+        line-height: 1;
+        align-items: var(--slot-align, center);
+
+        padding-left: var(--slot-pl, 0);
+        padding-right: var(--slot-pr, 0);
+        padding-top: var(--slot-pt, 0);
+        padding-bottom: var(--slot-pb, 0);
+    }
+
+    .#{$field-root-prefix}__slot-start {
+        left: var(--spacing-x);
+    }
+
+    .#{$field-root-prefix}__slot-end {
+        right: var(--spacing-x);
+    }
+
+    .#{$field-root-prefix}__group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--gap);
+        color: var(--text-muted);
+
+        .#{$field-root-prefix}__group-item {
+            height: 1em;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        > svg,
+        > .MuiSvgIcon-root {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            font-size: var(--icon-size);
+            display: block;
+        }
+    }
+
+    .#{$field-root-prefix}__actions-group {
+        margin-left: var(--action-gap);
+    }
+
+    .#{$field-root-prefix}__controls-group {
+        margin-left: var(--control-gap);
+    }
+
+    .#{$p}--field {
+        appearance: none;
+        border: none;
+        background: transparent;
+        user-select: text;
+        font-size: var(--field-fs, inherit);
+
+        padding-left: var(--field-pl, 0);
+        padding-right: var(--field-pr, 0);
+        padding-top: var(--field-pt, 0);
+        padding-bottom: var(--field-pb, 0);
+
+        margin: 0;
+
+        height: var(--field-h, 100%);
+        width: 100%;
+        min-width: 0;
+
+        flex: 1;
+
+        line-height: 1;
+        color: var(--text);
+
+        outline: none; /* wrapper handles focus */
+
+        &::placeholder {
+            color: var(--text-muted);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    &[data-variant='filled'] {
+        --bg: var(--filled-surface-1);
+        --bg-hover: var(--filled-surface-2);
+
+        --border: var(--filled-surface-2);
+    }
+
+    &[data-variant='ghost']:not([data-invalid]) {
+        --bg: transparent;
+
+        --border: transparent;
+        --border-hover: transparent;
+        --border-focus: transparent;
+    }
+}

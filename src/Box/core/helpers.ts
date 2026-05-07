@@ -2,7 +2,7 @@ import { CSSProperties } from 'react';
 import { classPrefix } from '../../utils/classPrefix';
 
 export const prefix = (name: string = '') => {
-    return classPrefix(`--box${name}`);
+    return prefix(`--box${name}`);
 };
 
 const spacing: Record<number, number> = {

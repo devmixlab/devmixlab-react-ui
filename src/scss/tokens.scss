@@ -31,6 +31,13 @@ $p: cfg.$prefix;
     --#{$p}-text-disabled: #{functions.intent-color('gray', 400)};
     --#{$p}-text-muted: #{functions.intent-color('gray', 500)};
 
+    --#{$p}-shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
+    0 0 0 4px color-mix(
+        in srgb,
+        var(--#{$p}-control-accent) 50%,
+        transparent
+    );
+
     // disabled surfaces
     --#{$p}-surface-disabled: #{functions.intent-color('gray', 300)};
     --#{$p}-surface-disabled-subtle: #{functions.intent-color('gray', 200)};
@@ -84,7 +91,6 @@ $p: cfg.$prefix;
 
     //--#{$p}-control-foreground: #{functions.intent-color('neutral', 50)};
     --#{$p}-control-foreground: #fff;
-
 
 }
 
