@@ -9,9 +9,11 @@ import { useCheckboxGroupContext } from './checkboxGroup.context';
 import { useStableId } from '../../utils/useStableId';
 
 export type Size = 'sm' | 'md' | 'lg';
+export type Intent = 'danger' | 'warning' | 'success' | 'info';
 
 type CheckboxProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: Size;
+    intent?: Intent;
     invalid?: boolean;
     rounded?: BoxProps['rounded'];
     children?: React.ReactNode;
@@ -31,6 +33,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         {
             className,
             size,
+            intent,
             disabled,
             invalid,
             children,
@@ -121,6 +124,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 data-disabled={isDisabled || undefined}
                 data-state={indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'}
                 data-invalid={invalid || undefined}
+                {...(intent ? { ['data-intent']: intent } : {})}
             >
                 {labelPosition === 'left' && labelNode}
 
@@ -140,10 +144,6 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                     checked={isChecked}
                 />
 
-                {/*{labelPosition === 'left' && children && (*/}
-                {/*    <span className={prefix('__label')}>{children}</span>*/}
-                {/*)}*/}
-
                 <span className={prefix('__control')}>
                     {indeterminate ? (
                         <IndeterminateIcon className={prefix('__checkmark')} />
@@ -153,16 +153,6 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 </span>
 
                 {labelPosition === 'right' && labelNode}
-
-                {/*{labelPosition === 'right' && children && (*/}
-                {/*    <span className={prefix('__label')}>{children}</span>*/}
-                {/*)}*/}
-
-                {/*{description && descriptionId && (*/}
-                {/*    <span id={descriptionId} className={prefix('__description')}>*/}
-                {/*        {description}*/}
-                {/*    </span>*/}
-                {/*)}*/}
             </label>
         );
     },

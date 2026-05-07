@@ -1,6 +1,5 @@
 @use '../../config' as cfg;
 @use 'sass:map';
-@use '../../functions/intent' as intent;
 
 $p: cfg.$prefix;
 $checkbox-prefix: #{$p}--checkbox;
@@ -53,19 +52,38 @@ $checkbox-sizes: (
         }
     }
 
+    // Text
     --text: var(--#{$p}-text);
     --text-disabled: var(--#{$p}-text-disabled);
     --text-muted: var(--#{$p}-text-muted);
 
+    // Control colors
     --checkmark-color: var(--#{$p}-control-foreground);
     --bg: var(--#{$p}-control-bg);
     --accent: var(--#{$p}-control-accent);
     --border: var(--#{$p}-control-border);
     --border-hover: var(--accent);
-    --border-focus: var(--#{$p}-control-border-focus);
+
+    // Shadows
     --shadow: var(--#{$p}-control-shadow);
-    --shadow-hover: var(--#{$p}-control-shadow-hover);
-    --shadow-focus: var(--#{$p}-control-shadow-focus);
+    --shadow-hover: 0 0 0 3px color-mix(
+        in srgb,
+        var(--accent) 20%,
+        transparent
+    );
+    --shadow-focus: 0 0 0 2px var(--bg),
+    0 0 0 4px color-mix(
+        in srgb,
+        var(--accent) 50%,
+        transparent
+    );
+
+    // Intent colors
+    --accent-danger: var(--#{$p}-control-accent-danger);
+    --accent-success: var(--#{$p}-control-accent-success);
+    --accent-warning: var(--#{$p}-control-accent-warning);
+    --accent-info: var(--#{$p}-control-accent-info);
+
     --opacity-disabled: var(--#{$p}-control-opacity-disabled);
     --opacity: 1;
 
@@ -199,6 +217,22 @@ $checkbox-sizes: (
     // focus
     .#{$checkbox-prefix}__input:focus-visible + .#{$checkbox-prefix}__control {
         box-shadow: var(--shadow-focus);
+    }
+
+    &[data-intent='danger'] {
+        --accent: var(--accent-danger);
+    }
+
+    &[data-intent='success'] {
+        --accent: var(--accent-success);
+    }
+
+    &[data-intent='warning'] {
+        --accent: var(--accent-warning);
+    }
+
+    &[data-intent='info'] {
+        --accent: var(--accent-info);
     }
 
     &[data-disabled] {
