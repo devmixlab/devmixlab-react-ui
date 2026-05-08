@@ -143,7 +143,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 onClick={handleClearClick}
                 onMouseDown={(e) => e.preventDefault()}
                 className={prefix(`--clear-button`)}
-                tabIndex={-1}
+                tabIndex={0}
             >
                 {finalClearIcon}
             </button>

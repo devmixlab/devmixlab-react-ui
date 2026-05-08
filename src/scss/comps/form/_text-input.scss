@@ -1,4 +1,5 @@
 @use '../../functions' as functions;
+@use '../../mixins' as mixins;
 
 @use '../../config' as cfg;
 @use 'sass:map';
@@ -13,6 +14,7 @@ $sizes: (
 );
 
 .#{$text-input-prefix} {
+
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
             --height: #{map.get($value, height)};
@@ -20,17 +22,16 @@ $sizes: (
             --fs: #{map.get($value, fontSize)};
         }
     }
+
     .#{$p}--clear-button {
-        appearance: none;
-        border: none;
-        background: transparent;
+        @include mixins.reset-button;
+
         position: relative;
+        //border-radius: 50%;
+        border-radius: 3px;
 
-        padding: 0;
-        margin: 0;
-
-        width: 1.1em;
-        height: 1.1em;
+        width: 1.2em;
+        height: 1.2em;
 
         flex-shrink: 0;
 
@@ -38,35 +39,23 @@ $sizes: (
         align-items: center;
         justify-content: center;
 
-        cursor: pointer;
-        //color: var(--text-muted);
+        transition:
+            color var(--transition),
+            box-shadow var(--transition);
 
         &::before {
             content: '';
             position: absolute;
-
-            inset: -0.4em; // 👈 expand clickable area
-            border-radius: 50%;
+            inset: -0.5em;
+            border-radius: inherit;
         }
 
         &:hover {
             color: var(--text);
         }
 
-        &-button {
-            //position: absolute;
-
-            //top: 50%;
-            //left: 50%;
-            //
-            //transform: translate(-50%, -50%) scale(1.2);
-            //transform: scale(1.2);
-
-            line-height: 1;
-
-            &:focus-visible {
-                box-shadow: 0 0 0 2px var(--focus-ring);
-            }
+        &:focus-visible {
+            box-shadow: 0 0 0 2px var(--focus-ring);
         }
     }
 }
