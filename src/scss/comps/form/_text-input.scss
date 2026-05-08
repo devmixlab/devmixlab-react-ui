@@ -29,8 +29,8 @@ $sizes: (
         padding: 0;
         margin: 0;
 
-        //width: 1em;
-        //height: 1em;
+        width: 1.1em;
+        height: 1.1em;
 
         flex-shrink: 0;
 
@@ -39,7 +39,7 @@ $sizes: (
         justify-content: center;
 
         cursor: pointer;
-        color: var(--text-muted);
+        //color: var(--text-muted);
 
         &::before {
             content: '';

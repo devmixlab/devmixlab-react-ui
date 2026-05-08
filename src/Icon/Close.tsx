@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 
 export const Close = (props: React.ComponentProps<typeof Icon>) => (
     <Icon {...props}>
-        <path d="M18 6L6 18" />
-        <path d="M6 6l12 12" />
+        <path d="M19 5L5 19" />
+        <path d="M5 5l14 14" />
     </Icon>
 );
