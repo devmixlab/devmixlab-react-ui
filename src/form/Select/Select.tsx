@@ -2,11 +2,12 @@ import React, { forwardRef, useRef } from 'react';
 import clsx from 'clsx';
 import { Box, type BoxProps } from '../../Box/Box';
 import { Size, Variant } from '../Input/input.tokens';
-import { prefix } from '../Input/input.helpers';
+// import { prefix } from '../Input/input.helpers';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { TriangleDown as TriangleDownIcon } from '../../Icon';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
+import { CLASS_PREFIX } from '../../constants';
 
 export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> & {
     variant?: Variant;
@@ -18,6 +19,10 @@ export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 's
     end?: React.ReactNode;
     actions?: React.ReactNode; // 👈 NEW
     controls?: React.ReactNode; // 👈 optional (for NumberInput later)
+};
+
+export const prefix = (name: string = '') => {
+    return `${CLASS_PREFIX}${name}`;
 };
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
@@ -54,7 +59,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 
         const combinedRef = mergeRefs(selectRef, ref);
 
-        const cl = clsx(className, prefix('--select-input'));
+        const cl = clsx(className, prefix('--select'));
 
         const finalControls = (
             <>
@@ -80,7 +85,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                 <Box
                     as="select"
                     ref={combinedRef}
-                    className={prefix(`__field`)}
+                    className={prefix(`--field`)}
                     disabled={disabled}
                     aria-disabled={disabled || undefined}
                     {...rest}

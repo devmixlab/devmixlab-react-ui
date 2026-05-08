@@ -1,0 +1,61 @@
+@use '../../functions' as functions;
+@use '../../mixins' as mixins;
+
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$text-input-prefix: #{$p}--select;
+
+$sizes: (
+    sm: (height: 32px, fontSize: 14px),
+    md: (height: 40px, fontSize: 16px),
+    lg: (height: 48px, fontSize: 18px),
+);
+
+.#{$text-input-prefix} {
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            --height: #{map.get($value, height)};
+            --min-height: auto;
+            --fs: #{map.get($value, fontSize)};
+        }
+    }
+
+    //.#{$p}--clear-button {
+    //    @include mixins.reset-button;
+    //
+    //    position: relative;
+    //    //border-radius: 50%;
+    //    border-radius: 3px;
+    //
+    //    width: 1.2em;
+    //    height: 1.2em;
+    //
+    //    flex-shrink: 0;
+    //
+    //    display: flex;
+    //    align-items: center;
+    //    justify-content: center;
+    //
+    //    transition:
+    //        color var(--transition),
+    //        box-shadow var(--transition);
+    //
+    //    &::before {
+    //        content: '';
+    //        position: absolute;
+    //        inset: -0.5em;
+    //        border-radius: inherit;
+    //    }
+    //
+    //    &:hover {
+    //        color: var(--text);
+    //    }
+    //
+    //    &:focus-visible {
+    //        box-shadow: 0 0 0 2px var(--focus-ring);
+    //    }
+    //}
+}
