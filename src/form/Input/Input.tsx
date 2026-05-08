@@ -142,7 +142,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 aria-label="Clear input"
                 onClick={handleClearClick}
                 onMouseDown={(e) => e.preventDefault()}
-                className={prefix(`__clear-button`)}
+                className={prefix(`--clear-button`)}
                 tabIndex={-1}
             >
                 {finalClearIcon}
