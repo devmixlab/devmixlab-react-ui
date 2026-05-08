@@ -101,8 +101,7 @@ $sizes: (
         )};
 
         // text
-        --text: var(--intent-gray-100);
-        --text-muted: var(--intent-gray-400);
+        --text: #{functions.intent-color('gray', 100)};
 
         // background
         --bg-hover: #{functions.intent-color('gray', 800)};
@@ -121,6 +120,8 @@ $sizes: (
         --filled-surface-3: #{functions.intent-color('gray',600)};
 
     }
+
+    --group-color: var(--text-muted);
 
     position: relative;
     box-sizing: border-box;
@@ -153,6 +154,7 @@ $sizes: (
     }
 
     &:focus-within {
+        --group-color: var(--text);
         border-color: var(--border-focus);
         box-shadow: 0 0 0 3px var(--focus-ring);
     }
@@ -204,7 +206,7 @@ $sizes: (
         align-items: center;
         justify-content: center;
         gap: var(--gap);
-        color: var(--text-muted);
+        color: var(--group-color);
 
         .#{$field-root-prefix}__group-item {
             height: 1em;
