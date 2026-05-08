@@ -273,14 +273,20 @@ $sizes: (
         --bg: var(--filled-surface-1);
         --bg-hover: var(--filled-surface-2);
 
-        --border: var(--filled-surface-2);
+        &:not([data-invalid]) {
+            --border: var(--filled-surface-2);
+            --border-hover: var(--filled-surface-3);
+            --border-focus: var(--filled-surface-3);
+        }
     }
 
-    &[data-variant='ghost']:not([data-invalid]) {
+    &[data-variant='ghost'] {
         --bg: transparent;
 
-        --border: transparent;
-        --border-hover: transparent;
-        --border-focus: transparent;
+        &:not([data-invalid]) {
+            --border: transparent;
+            --border-hover: transparent;
+            --border-focus: transparent;
+        }
     }
 }
