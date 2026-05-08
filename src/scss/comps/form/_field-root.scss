@@ -172,13 +172,13 @@ $sizes: (
         --text: var(--text-disabled);
         --text-muted: var(--text-disabled);
 
-        .#{$field-root-prefix}__slot {
+        .#{$p}__slot {
             pointer-events: none;
         }
     }
 
     /* SLOT */
-    .#{$field-root-prefix}__slot {
+    .#{$p}--slot {
         position: absolute;
         top: 0;
 
@@ -193,22 +193,22 @@ $sizes: (
         padding-bottom: var(--slot-pb, 0);
     }
 
-    .#{$field-root-prefix}__slot-start {
+    .#{$p}--slot-start {
         left: var(--spacing-x);
     }
 
-    .#{$field-root-prefix}__slot-end {
+    .#{$p}--slot-end {
         right: var(--spacing-x);
     }
 
-    .#{$field-root-prefix}__group {
+    .#{$p}--group {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: var(--gap);
         color: var(--group-color);
 
-        .#{$field-root-prefix}__group-item {
+        .#{$p}--group-item {
             height: 1em;
             display: inline-flex;
             align-items: center;
@@ -223,19 +223,22 @@ $sizes: (
         }
     }
 
-    .#{$field-root-prefix}__actions-group {
+    .#{$p}--actions-group {
         margin-left: var(--action-gap);
     }
 
-    .#{$field-root-prefix}__controls-group {
+    .#{$p}--controls-group {
         margin-left: var(--control-gap);
     }
 
     .#{$p}--field {
         appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
         border: none;
         background: transparent;
         user-select: text;
+        font: inherit;
         font-size: var(--field-fs, inherit);
 
         padding-left: var(--field-pl, 0);
@@ -245,13 +248,15 @@ $sizes: (
 
         margin: 0;
 
+        border-radius: 0;
+
         height: var(--field-h, 100%);
         width: 100%;
         min-width: 0;
 
         flex: 1;
 
-        line-height: 1;
+        line-height: normal;
         color: var(--text);
 
         outline: none; /* wrapper handles focus */

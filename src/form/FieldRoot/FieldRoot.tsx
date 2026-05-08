@@ -93,18 +93,10 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             return () => ro.disconnect();
         }, [start, end, actions, controls]);
 
-        const cl = clsx(
-            className,
-            prefix(),
-            classPrefix(`--${variant}`),
-            // classPrefix(`--size-${size}`),
-            {
-                [classPrefix(`--invalid`)]: invalid,
-                [classPrefix(`--disabled`)]: disabled,
-                [classPrefix(`--has-start-slot`)]: hasStart,
-                [classPrefix(`--has-end-slot`)]: hasEnd,
-            },
-        );
+        const cl = clsx(className, prefix(), {
+            [classPrefix(`--has-start-slot`)]: hasStart,
+            [classPrefix(`--has-end-slot`)]: hasEnd,
+        });
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (disabled) return;
@@ -155,32 +147,50 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 {...rest}
             >
                 {hasStart && (
-                    <div ref={startRef} className={clsx(prefix(`__slot`), prefix(`__slot-start`))}>
-                        <span className={prefix(`__group`)}>{start}</span>
+                    <div
+                        ref={startRef}
+                        className={clsx(classPrefix(`--slot`), classPrefix(`--slot-start`))}
+                    >
+                        <span className={classPrefix(`--group`)}>{start}</span>
                     </div>
                 )}
 
                 {children}
 
                 {hasEnd && (
-                    <div ref={endRef} className={clsx(prefix(`__slot`), prefix(`__slot-end`))}>
+                    <div
+                        ref={endRef}
+                        className={clsx(classPrefix(`--slot`), classPrefix(`--slot-end`))}
+                    >
                         {/* 1. VALUE / CONTEXT */}
                         {end && (
-                            <span className={clsx(prefix(`__group`), prefix(`__end-group`))}>
+                            <span
+                                className={clsx(classPrefix(`--group`), classPrefix(`--end-group`))}
+                            >
                                 {end}
                             </span>
                         )}
 
                         {/* 2. ACTIONS (clear + custom actions) */}
                         {actions && (
-                            <span className={clsx(prefix(`__group`), prefix(`__actions-group`))}>
+                            <span
+                                className={clsx(
+                                    classPrefix(`--group`),
+                                    classPrefix(`--actions-group`),
+                                )}
+                            >
                                 {actions}
                             </span>
                         )}
 
                         {/* 3. CONTROLS */}
                         {controls && (
-                            <span className={clsx(prefix(`__group`), prefix(`__controls-group`))}>
+                            <span
+                                className={clsx(
+                                    classPrefix(`--group`),
+                                    classPrefix(`--controls-group`),
+                                )}
+                            >
                                 {controls}
                             </span>
                         )}
