@@ -206,6 +206,7 @@ $sizes: (
         align-items: center;
         justify-content: center;
         gap: var(--gap);
+        //gap: 10px;
         color: var(--group-color);
 
         .#{$p}--group-item {

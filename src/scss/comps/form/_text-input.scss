@@ -8,9 +8,9 @@ $p: cfg.$prefix;
 $text-input-prefix: #{$p}--text-input;
 
 $sizes: (
-    sm: (height: 32px, fontSize: 14px),
-    md: (height: 40px, fontSize: 16px),
-    lg: (height: 48px, fontSize: 18px),
+    sm: (height: 32px, fontSize: 14px, actionHitAreaOffset: 4px),
+    md: (height: 40px, fontSize: 16px, actionHitAreaOffset: 6px),
+    lg: (height: 48px, fontSize: 18px, actionHitAreaOffset: 8px),
 );
 
 @mixin action-button {
@@ -49,7 +49,7 @@ $sizes: (
     &::before {
         content: '';
         position: absolute;
-        inset: -0.4em;
+        inset: calc(var(--action-hit-area-offset) * -1);
         border-radius: inherit;
     }
 
@@ -69,6 +69,7 @@ $sizes: (
             --height: #{map.get($value, height)};
             --min-height: auto;
             --fs: #{map.get($value, fontSize)};
+            --action-hit-area-offset: #{map.get($value, actionHitAreaOffset)};
         }
     }
 
