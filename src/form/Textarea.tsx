@@ -1,13 +1,13 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
-import { Size, Variant } from './input.tokens';
-import { prefix } from './input.helpers';
-import { mergeRefs } from '../../utils/mergeRefs';
-import { useFormFieldContext } from '../FormField/formField.context';
-import { Close } from '../../Icon/Close';
-import { IconWrapper } from '../../Icon';
-import { FieldRoot } from '../FieldRoot/FieldRoot';
+import { Box, type BoxProps } from '../Box/Box';
+import { Size, Variant } from './Input/input.tokens';
+import { prefix } from './Input/input.helpers';
+import { mergeRefs } from '../utils/mergeRefs';
+import { useFormFieldContext } from './FormField/formField.context';
+import { Close } from '../Icon/Close';
+import { IconWrapper } from '../Icon';
+import { FieldRoot } from './FieldRoot';
 
 export type TextareaProps = Omit<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,

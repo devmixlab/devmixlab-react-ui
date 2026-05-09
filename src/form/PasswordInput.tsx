@@ -1,11 +1,11 @@
 import React, { forwardRef, useState } from 'react';
-import { Input, type InputProps } from './Input';
+import { TextInput, type InputProps } from './TextInput';
 // import { prefix } from './input.helpers';
-import { useFormFieldContext } from '../FormField/formField.context';
-import { Eye } from '../../Icon/Eye';
-import { EyeOff } from '../../Icon/EyeOff';
-import { CLASS_PREFIX } from '../../constants';
-import { classPrefix } from '../../utils/classPrefix';
+import { useFormFieldContext } from './FormField/formField.context';
+import { Eye } from '../Icon/Eye';
+import { EyeOff } from '../Icon/EyeOff';
+import { CLASS_PREFIX } from '../constants';
+import { classPrefix } from '../utils/classPrefix';
 
 export type PasswordInputProps = Omit<InputProps, 'type'> & {
     showToggle?: boolean;
@@ -16,10 +16,6 @@ type ToggleButtonProps = {
     visible: boolean;
     id?: string;
 };
-
-// export const prefix = (name: string = '') => {
-//     return `${CLASS_PREFIX}${name}`;
-// };
 
 const ToggleButton = ({ toggle, visible, id }: ToggleButtonProps) => (
     <button
@@ -46,7 +42,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         const toggle = () => setVisible((v) => !v);
 
         return (
-            <Input
+            <TextInput
                 {...props}
                 id={inputId}
                 ref={ref}

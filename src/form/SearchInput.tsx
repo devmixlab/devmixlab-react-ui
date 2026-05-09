@@ -1,9 +1,9 @@
 import React, { forwardRef, useRef, useState, useEffect } from 'react';
-import { Input, type InputProps } from '../Input/Input';
-import { useFormFieldContext } from '../FormField/formField.context';
-import { Search as SearchIcon } from '../../Icon/Search';
-import { mergeRefs } from '../../utils/mergeRefs';
-import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
+import { TextInput, type InputProps } from './TextInput';
+import { useFormFieldContext } from './FormField/formField.context';
+import { Search as SearchIcon } from '../Icon/Search';
+import { mergeRefs } from '../utils/mergeRefs';
+import { DefaultSpinner } from '../Spinner/DefaultSpinner';
 
 export type SearchInputProps = Omit<InputProps, 'type'> & {
     searchIcon?: React.ReactNode;
@@ -102,7 +102,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         };
 
         return (
-            <Input
+            <TextInput
                 {...props}
                 clearable={clearable}
                 clearIcon={clearIcon}

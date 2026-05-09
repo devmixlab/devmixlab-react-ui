@@ -86,7 +86,7 @@ This component behaves like a **text editor for tokens**.
 | ----------- | ---------------------- |
 | `maxTags`   | Maximum number of tags |
 | `maxLength` | Max label length       |
-| `separator` | Input split regex      |
+| `separator` | TextInput split regex      |
 
 ---
 

@@ -1,5 +1,5 @@
 import React, { forwardRef, useRef, useState } from 'react';
-import { FieldRoot } from '../FieldRoot/FieldRoot';
+import { FieldRoot } from '../FieldRoot';
 import { Box } from '../../Box/Box';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { prefix } from '../Input/input.helpers';

@@ -1,9 +1,9 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
-import { Input, type InputProps } from '../Input/Input';
-import { prefix as inputPrefix, renderGroupItem } from '../Input/input.helpers';
-import { useFormFieldContext } from '../FormField/formField.context';
-import { ChevronUp } from '../../Icon/ChevronUp';
-import { ChevronDown } from '../../Icon/ChevronDown';
+import { TextInput, type InputProps } from './TextInput';
+import { prefix as inputPrefix, renderGroupItem } from './Input/input.helpers';
+import { useFormFieldContext } from './FormField/formField.context';
+import { ChevronUp } from '../Icon/ChevronUp';
+import { ChevronDown } from '../Icon/ChevronDown';
 import Decimal from 'decimal.js';
 
 const isAtBound = (value: Decimal, bound: number | undefined, cmp: 'lte' | 'gte') => {
@@ -420,7 +420,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         };
 
         return (
-            <Input
+            <TextInput
                 {...props}
                 inputMode={integerOnly ? 'numeric' : 'decimal'}
                 value={displayValue}

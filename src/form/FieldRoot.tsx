@@ -1,11 +1,11 @@
 import React, { forwardRef, useRef, useLayoutEffect } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
-import { Size, Variant } from '../Input/input.tokens';
-// import { prefix } from '../Input/input.helpers';
-import { mergeRefs } from '../../utils/mergeRefs';
-// import { CLASS_PREFIX } from '../../constants';
-import { classPrefix } from '../../utils/classPrefix';
+import { Box, type BoxProps } from '../Box/Box';
+import { Size } from './form.tokens';
+import { mergeRefs } from '../utils/mergeRefs';
+import { classPrefix } from '../utils/classPrefix';
+
+export type Variant = 'outlined' | 'filled' | 'ghost';
 
 export type FieldRootProps = BoxProps & {
     start?: React.ReactNode;
@@ -24,10 +24,6 @@ export type FieldRootProps = BoxProps & {
 
     focusTargetRef?: React.RefObject<HTMLElement | null>;
     onClick?: React.MouseEventHandler<HTMLDivElement>;
-};
-
-export const prefix = (name: string = '') => {
-    return classPrefix(`--field-root${name}`);
 };
 
 export const renderGroupItem = (content: React.ReactNode) => (
@@ -97,7 +93,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             return () => ro.disconnect();
         }, [start, end, actions, controls]);
 
-        const cl = clsx(className, prefix(), {
+        const cl = clsx(className, classPrefix(`--field-root`), {
             [classPrefix(`--has-start-slot`)]: hasStart,
             [classPrefix(`--has-end-slot`)]: hasEnd,
         });

@@ -1,13 +1,13 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
-import { Size } from '../tokens';
-import { mergeRefs } from '../../utils/mergeRefs';
-import { useFormFieldContext } from '../FormField/formField.context';
-import { Close } from '../../Icon/Close';
-import { IconWrapper } from '../../Icon/IconWrapper';
-import { FieldRoot } from '../FieldRoot/FieldRoot';
-import { classPrefix } from '../../utils/classPrefix';
+import { Box, type BoxProps } from '../Box/Box';
+import { Size } from './form.tokens';
+import { mergeRefs } from '../utils/mergeRefs';
+import { useFormFieldContext } from './FormField/formField.context';
+import { Close } from '../Icon/Close';
+import { IconWrapper } from '../Icon/IconWrapper';
+import { FieldRoot } from './FieldRoot';
+import { classPrefix } from '../utils/classPrefix';
 
 export type Variant = 'outlined' | 'filled' | 'ghost';
 
@@ -31,7 +31,7 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
+const TextInput = forwardRef<HTMLInputElement, InputProps>(
     (
         {
             className,
@@ -193,6 +193,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     },
 );
 
-Input.displayName = 'Input';
+TextInput.displayName = 'TextInput';
 
-export { Input };
+export { TextInput };
