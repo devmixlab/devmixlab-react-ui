@@ -1,0 +1,75 @@
+@use '../../functions' as functions;
+@use '../../mixins' as mixins;
+
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$number-input-prefix: #{$p}--number-input;
+
+.#{$number-input-prefix} {
+    --stepper-width: calc(var(--height) * 0.6);
+    --stepper-bg-active: rgba(0, 0, 0, 0.1);
+    --stepper-bg-hover: rgba(0, 0, 0, 0.05);
+
+    @include cfg.dark {
+        --stepper-bg-active: rgba(255, 255, 255, 0.1);
+        --stepper-bg-hover: rgba(255, 255, 255, 0.05);
+    }
+
+    .#{$p}--stepper {
+        display: flex;
+        flex-direction: column;
+        height: var(--height);
+        width: var(--stepper-width);
+    }
+    .#{$p}--stepper button {
+        @include mixins.reset-button;
+
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        user-select: none;
+
+        height: 50%;
+        width: 100%;
+
+        line-height: 0;
+
+        svg {
+            width: 1.2em;
+        }
+
+        &:hover {
+            background: var(--stepper-bg-hover);
+            color: var(--text);
+        }
+
+        &:active {
+            background: var(--stepper-bg-active);
+        }
+
+        &:first-child {
+            border-bottom: 1px solid var(--text-muted);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+            //opacity: 0.4;
+            color: var(--text-disabled);
+            background: transparent;
+            svg {
+                //opacity: 0.5;
+                color: var(--text-disabled);
+            }
+        }
+
+        &:disabled:hover,
+        &:disabled:active {
+            background: transparent; // no interaction feedback
+        }
+    }
+}

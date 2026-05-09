@@ -6,6 +6,7 @@ import { useFormFieldContext } from '../FormField/formField.context';
 import { ChevronUp } from '../../Icon/ChevronUp';
 import { ChevronDown } from '../../Icon/ChevronDown';
 import Decimal from 'decimal.js';
+import clsx from 'clsx';
 
 const isAtBound = (value: Decimal, bound: number | undefined, cmp: 'lte' | 'gte') => {
     if (bound === undefined) return false;
@@ -46,14 +47,6 @@ const snapToStep = (value: Decimal, step: number) => {
     const s = new Decimal(step);
 
     return value.div(s).round().mul(s);
-};
-
-const formatDecimal = (d: Decimal, fixed?: number) => {
-    if (fixed != null) {
-        return d.toFixed(fixed);
-    }
-
-    return d.toString();
 };
 
 const toNumber = (val: number | string | undefined) => {
@@ -120,6 +113,8 @@ const findCursorFromDigits = (formatted: string, digitIndex: number) => {
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     (
         {
+            className,
+
             showStepper = false,
             unit,
             prefix,
@@ -152,12 +147,6 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
         const isControlled = value !== undefined;
 
-        const clamp = (v: number) => {
-            if (min !== undefined) v = Math.max(min, v);
-            if (max !== undefined) v = Math.min(max, v);
-            return v;
-        };
-
         const clampDecimal = (v: Decimal) => {
             if (min !== undefined) v = Decimal.max(v, min);
             if (max !== undefined) v = Decimal.min(v, max);
@@ -166,6 +155,16 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
         useEffect(() => {
             return () => clearTimeRefs();
+        }, []);
+
+        useEffect(() => {
+            const stop = () => clearTimeRefs();
+
+            window.addEventListener('mouseup', stop);
+
+            return () => {
+                window.removeEventListener('mouseup', stop);
+            };
         }, []);
 
         useEffect(() => {
@@ -315,7 +314,6 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
             const inputType = native && 'inputType' in native ? native.inputType : undefined;
 
-            const isBackspace = inputType === 'deleteContentBackward';
             const isDeleteForward = inputType === 'deleteContentForward';
 
             let digitsBeforeCursor = countDigits(raw.slice(0, cursor));
@@ -423,6 +421,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         return (
             <TextInput
                 {...props}
+                className={clsx(className, classPrefix('--number-input'))}
                 inputMode={integerOnly ? 'numeric' : 'decimal'}
                 value={displayValue}
                 onBlur={onInputBlur}
@@ -434,10 +433,12 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 onChange={handleChange}
                 // onClear={handleClear}
                 end={
-                    <>
-                        {renderGroupItem(suffix)}
-                        {renderGroupItem(unit)}
-                    </>
+                    suffix || unit ? (
+                        <>
+                            {suffix && renderGroupItem(suffix)}
+                            {unit && renderGroupItem(unit)}
+                        </>
+                    ) : undefined
                 }
                 controls={
                     showStepper &&
@@ -446,7 +447,10 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                             <button
                                 type="button"
                                 disabled={isAtMax}
-                                onMouseDown={() => startPress((m) => handleIncrDecr(true, m))}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    startPress((m) => handleIncrDecr(true, m));
+                                }}
                                 onMouseUp={clearTimeRefs}
                                 onMouseLeave={clearTimeRefs}
                             >
@@ -455,7 +459,10 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                             <button
                                 type="button"
                                 disabled={isAtMin}
-                                onMouseDown={() => startPress((m) => handleIncrDecr(false, m))}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    startPress((m) => handleIncrDecr(false, m));
+                                }}
                                 onMouseUp={clearTimeRefs}
                                 onMouseLeave={clearTimeRefs}
                             >

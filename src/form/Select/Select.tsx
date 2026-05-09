@@ -45,13 +45,13 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         const selectRef = useRef<HTMLSelectElement>(null);
 
         const ctx = useFormFieldContext();
+        const isInvalid = ctx ? ctx.hasError || invalid : invalid;
         const selectProps = ctx
             ? {
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
-                  'aria-invalid': ctx.hasError || invalid || undefined,
               }
-            : { 'aria-invalid': invalid || undefined };
+            : {};
 
         const combinedRef = mergeRefs(selectRef, ref);
 
@@ -67,7 +67,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         return (
             <FieldRoot
                 className={cl}
-                invalid={invalid}
+                invalid={isInvalid}
                 disabled={disabled}
                 rounded={rounded}
                 focusTargetRef={selectRef}
@@ -83,7 +83,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                     ref={combinedRef}
                     className={classPrefix(`--field`)}
                     disabled={disabled}
-                    aria-disabled={disabled || undefined}
+                    aria-invalid={isInvalid || undefined}
                     {...rest}
                     {...selectProps}
                 >

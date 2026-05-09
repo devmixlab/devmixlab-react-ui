@@ -68,6 +68,13 @@ $sizes: (
     .#{$p}--icon {
         width: 100%;
         height: 100%;
+        > svg,
+        > .MuiSvgIcon-root {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            font-size: var(--icon-size);
+            display: block;
+        }
     }
 
     transition:
@@ -231,7 +238,7 @@ $sizes: (
         --text: var(--text-disabled);
         --text-muted: var(--text-disabled);
 
-        .#{$p}__slot {
+        .#{$p}--slot {
             pointer-events: none;
         }
     }
