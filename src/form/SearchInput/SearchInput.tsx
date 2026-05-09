@@ -1,11 +1,11 @@
 import React, { forwardRef, useRef, useState, useEffect } from 'react';
-import { TextInput, type InputProps } from './TextInput';
-import { useFormFieldContext } from './FormField/formField.context';
-import { Search as SearchIcon } from '../Icon/Search';
-import { mergeRefs } from '../utils/mergeRefs';
-import { DefaultSpinner } from '../Spinner/DefaultSpinner';
+import { TextInput, type TextInputProps } from '../TextInput/TextInput';
+import { useFormFieldContext } from '../FormField/formField.context';
+import { Search as SearchIcon } from '../../Icon/Search';
+import { mergeRefs } from '../../utils/mergeRefs';
+import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
 
-export type SearchInputProps = Omit<InputProps, 'type'> & {
+export type SearchInputProps = Omit<TextInputProps, 'type'> & {
     searchIcon?: React.ReactNode;
     clearIcon?: React.ReactNode;
 

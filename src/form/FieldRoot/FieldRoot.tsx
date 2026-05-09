@@ -1,9 +1,9 @@
 import React, { forwardRef, useRef, useLayoutEffect } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box/Box';
-import { Size } from './form.tokens';
-import { mergeRefs } from '../utils/mergeRefs';
-import { classPrefix } from '../utils/classPrefix';
+import { Box, type BoxProps } from '../../Box/Box';
+import { Size } from '../form.tokens';
+import { mergeRefs } from '../../utils/mergeRefs';
+import { classPrefix } from '../../utils/classPrefix';
 
 export type Variant = 'outlined' | 'filled' | 'ghost';
 

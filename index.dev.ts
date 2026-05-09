@@ -12,13 +12,13 @@ export { Group as ButtonGroup } from './src/Button/Group';
 export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 
 // Form
-export { TextInput } from './src/form/TextInput';
-export { PasswordInput } from './src/form/PasswordInput';
-export { SearchInput } from './src/form/SearchInput';
-export { NumberInput } from './src/form/NumberInput';
+export { TextInput } from './src/form/TextInput/TextInput';
+export { PasswordInput } from './src/form/PasswordInput/PasswordInput';
+export { SearchInput } from './src/form/SearchInput/SearchInput';
+export { NumberInput } from './src/form/NumberInput/NumberInput';
 export { TagsInput } from './src/form/TagsInput/TagsInput';
-export { Textarea } from './src/form/Textarea';
-export { Select } from './src/form/Select';
+export { Textarea } from './src/form/Textarea/Textarea';
+export { Select } from './src/form/Select/Select';
 export { Checkbox } from './src/form/Checkbox/Checkbox';
 export { CheckboxGroup } from './src/form/Checkbox/CheckboxGroup';
 export { Switch } from './src/form/Switch/Switch';

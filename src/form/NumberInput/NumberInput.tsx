@@ -1,9 +1,10 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
-import { TextInput, type InputProps } from './TextInput';
-import { prefix as inputPrefix, renderGroupItem } from './Input/input.helpers';
-import { useFormFieldContext } from './FormField/formField.context';
-import { ChevronUp } from '../Icon/ChevronUp';
-import { ChevronDown } from '../Icon/ChevronDown';
+import { TextInput, type TextInputProps } from '../TextInput/TextInput';
+import { renderGroupItem } from '../FieldRoot/FieldRoot';
+import { classPrefix } from '../../utils/classPrefix';
+import { useFormFieldContext } from '../FormField/formField.context';
+import { ChevronUp } from '../../Icon/ChevronUp';
+import { ChevronDown } from '../../Icon/ChevronDown';
 import Decimal from 'decimal.js';
 
 const isAtBound = (value: Decimal, bound: number | undefined, cmp: 'lte' | 'gte') => {
@@ -23,7 +24,7 @@ const toDecimal = (val: number | string | undefined) => {
     }
 };
 
-export type NumberInputProps = Omit<InputProps, 'type'> & {
+export type NumberInputProps = Omit<TextInputProps, 'type'> & {
     unit?: string;
     prefix?: React.ReactNode;
     suffix?: React.ReactNode;
@@ -441,7 +442,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 controls={
                     showStepper &&
                     renderGroupItem(
-                        <div className={inputPrefix('__stepper')}>
+                        <div className={classPrefix('--stepper')}>
                             <button
                                 type="button"
                                 disabled={isAtMax}

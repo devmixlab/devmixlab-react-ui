@@ -2,16 +2,19 @@
  * @see tagsInputDocumentation.md
  */
 import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect } from 'react';
-import { type InputProps } from '../TextInput';
-import { FieldRoot } from '../FieldRoot';
-import { prefix } from '../Input/input.helpers';
+import { type TextInputProps } from '../TextInput/TextInput';
+import { FieldRoot } from '../FieldRoot/FieldRoot';
+// import { prefix } from '../Input/input.helpers';
 import clsx from 'clsx';
 import { Chip } from '../../Chip/Chip';
 import { mergeRefs } from '../../utils/mergeRefs';
 import type { BoxProps } from '../../Box/Box';
-import { Size, Variant } from '../Input/input.tokens';
+// import { Size, Variant } from '../Input/input.tokens';
+import { Size } from '../form.tokens';
+import { Variant } from '../FieldRoot/FieldRoot';
 import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon';
+import { classPrefix } from '../../utils/classPrefix';
 
 type RenderTagParams = {
     tag: TagItem;
@@ -37,7 +40,7 @@ export const slugify = (str: string) =>
         .replace(/\s+/g, '-') // spaces → dash
         .replace(/-+/g, '-');
 
-export type TagsInputProps = Omit<InputProps, 'value' | 'defaultValue' | 'onChange'> & {
+export type TagsInputProps = Omit<TextInputProps, 'value' | 'defaultValue' | 'onChange'> & {
     value?: TagItem[];
     defaultValue?: TagItem[];
     onValueChange?: (tags: TagItem[]) => void;
@@ -323,7 +326,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     type="button"
                     onMouseDown={(e) => e.preventDefault()} // 👈 keep focus
                     onClick={handleClearAll}
-                    className={prefix('__clear')}
+                    className={classPrefix('--clear-button')}
                 >
                     {finalClearIcon}
                 </button>
@@ -720,7 +723,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             setInputValue('');
         };
 
-        const cl = clsx(className, prefix(), prefix('--tags-input'));
+        const cl = clsx(className, classPrefix('--tags-input'));
 
         return (
             <FieldRoot
@@ -749,7 +752,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             <React.Fragment key={tag.id ?? tag.value}>
                                 <span
                                     ref={editMirrorRef}
-                                    className={prefix('__mirror')}
+                                    className={classPrefix('--mirror')}
                                     aria-hidden
                                 />
                                 <input
@@ -770,7 +773,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                                             cancelEdit();
                                         }
                                     }}
-                                    className={prefix('__tag-edit')}
+                                    className={classPrefix('--tag-edit')}
                                 />
                             </React.Fragment>
                         );
@@ -803,10 +806,10 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                                 onKeyDown={(e) => handleTagKeyDown(e)}
                                 onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                                 style={{ display: 'inline-flex' }}
-                                className={clsx(prefix('__tag'), {
-                                    [prefix('__tag--active')]: activeId === id,
-                                    [prefix('__tag--selected')]: isSelected(i),
-                                    [prefix('__tag--disabled')]: tag.disabled,
+                                className={clsx(classPrefix('--tag'), {
+                                    [classPrefix('--tag--active')]: activeId === id,
+                                    [classPrefix('--tag--selected')]: isSelected(i),
+                                    [classPrefix('--tag--disabled')]: tag.disabled,
                                 })}
                             >
                                 {node}
@@ -835,10 +838,10 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             onKeyDown={(e) => handleTagKeyDown(e)}
                             onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                             style={{ display: 'inline-flex' }}
-                            className={clsx(prefix('__tag'), {
-                                [prefix('__tag--active')]: activeId === id,
-                                [prefix('__tag--selected')]: isSelected(i),
-                                [prefix('__tag--disabled')]: tag.disabled,
+                            className={clsx(classPrefix('--tag'), {
+                                [classPrefix('--tag--active')]: activeId === id,
+                                [classPrefix('--tag--selected')]: isSelected(i),
+                                [classPrefix('--tag--disabled')]: tag.disabled,
                             })}
                         >
                             <Chip
@@ -855,14 +858,14 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         </div>
                     );
                 })}
-                <span ref={mirrorRef} className={prefix(`__mirror`)} aria-hidden />
+                <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />
                 <input
                     ref={combinedRef}
                     value={inputValue}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
-                    className={prefix(`__field`)}
+                    className={classPrefix(`--field`)}
                 />
             </FieldRoot>
             // </div>

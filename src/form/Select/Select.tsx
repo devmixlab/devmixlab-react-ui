@@ -1,13 +1,13 @@
 import React, { forwardRef, useRef } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box/Box';
-import { Size } from './form.tokens';
-import { useFormFieldContext } from './FormField/formField.context';
-import { TriangleDown as TriangleDownIcon } from '../Icon';
-import { mergeRefs } from '../utils/mergeRefs';
-import { FieldRoot } from './FieldRoot';
-import { classPrefix } from '../utils/classPrefix';
-import { Variant } from './FieldRoot';
+import { Box, type BoxProps } from '../../Box/Box';
+import { Size } from '../form.tokens';
+import { useFormFieldContext } from '../FormField/formField.context';
+import { TriangleDown as TriangleDownIcon } from '../../Icon';
+import { mergeRefs } from '../../utils/mergeRefs';
+import { FieldRoot } from '../FieldRoot/FieldRoot';
+import { classPrefix } from '../../utils/classPrefix';
+import { Variant } from '../FieldRoot/FieldRoot';
 
 export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> & {
     variant?: Variant;

@@ -1,8 +1,8 @@
 import React, { forwardRef, useRef, useState } from 'react';
-import { FieldRoot } from '../FieldRoot';
+import { FieldRoot } from '../FieldRoot/FieldRoot';
 import { Box } from '../../Box/Box';
 import { mergeRefs } from '../../utils/mergeRefs';
-import { prefix } from '../Input/input.helpers';
+import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
 
 type FileUploadProps = {
@@ -77,8 +77,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             onChange?.([]);
         };
 
-        const cl = clsx(prefix('--file-upload'), {
-            [prefix('--has-value')]: hasFiles,
+        const cl = clsx(classPrefix('--file-upload'), {
+            [classPrefix('--has-value')]: hasFiles,
         });
 
         return (
@@ -111,7 +111,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 />
 
                 {/* Visible UI */}
-                <Box as="div" className={prefix('__value')}>
+                <Box as="div" className={classPrefix('--value')}>
                     {hasFiles ? files.map((f) => f.name).join(', ') : 'Choose file...'}
                 </Box>
             </FieldRoot>
