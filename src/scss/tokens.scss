@@ -17,19 +17,49 @@ $p: cfg.$prefix;
     --#{$p}-control-opacity-disabled: 0.5;
 
     // intent palette
+    @include mixins.intent-vars($gray, 'secondary');
     @include mixins.intent-vars($blue, 'primary');
     @include mixins.intent-vars($red, 'danger');
     @include mixins.intent-vars($amber, 'warning');
     @include mixins.intent-vars($green, 'success');
     @include mixins.intent-vars($cyan, 'info');
     @include mixins.intent-vars($gray, 'gray');
-    @include mixins.intent-vars($gray, 'neutral');
-    @include mixins.intent-vars($gray, 'zinc');
+    @include mixins.intent-vars($neutral, 'neutral');
+    @include mixins.intent-vars($zinc, 'zinc');
+
+    // accent secondary
+    --#{$p}-accent-secondary: #{functions.intent-color('secondary', 500)};
+    --#{$p}-accent-secondary-active: #{functions.intent-color('secondary', 600)};
+    --#{$p}-accent-secondary-strong: #{functions.intent-color('secondary', 700)};
+    // accent primary
+    --#{$p}-accent-primary: #{functions.intent-color('primary', 500)};
+    --#{$p}-accent-primary-active: #{functions.intent-color('primary', 600)};
+    --#{$p}-accent-primary-strong: #{functions.intent-color('primary', 700)};
+    // accent success
+    --#{$p}-accent-success: #{functions.intent-color('success', 500)};
+    --#{$p}-accent-success-active: #{functions.intent-color('success', 600)};
+    --#{$p}-accent-success-strong: #{functions.intent-color('success', 700)};
+    // accent danger
+    --#{$p}-accent-danger: #{functions.intent-color('danger', 500)};
+    --#{$p}-accent-danger-active: #{functions.intent-color('danger', 600)};
+    --#{$p}-accent-danger-strong: #{functions.intent-color('danger', 700)};
+    // accent warning
+    --#{$p}-accent-warning: #{functions.intent-color('warning', 500)};
+    --#{$p}-accent-warning-active: #{functions.intent-color('warning', 600)};
+    --#{$p}-accent-warning-strong: #{functions.intent-color('warning', 700)};
+    // accent info
+    --#{$p}-accent-info: #{functions.intent-color('info', 500)};
+    --#{$p}-accent-info-active: #{functions.intent-color('info', 600)};
+    --#{$p}-accent-info-strong: #{functions.intent-color('info', 700)};
+
 
     // general
     --#{$p}-text: inherit;
     --#{$p}-text-disabled: #{functions.intent-color('gray', 400)};
     --#{$p}-text-muted: #{functions.intent-color('gray', 500)};
+
+    --#{$p}-text-danger: #{functions.intent-color('danger', 600)};
+    --#{$p}-text-danger-strong: #{functions.intent-color('danger', 700)};
 
     --#{$p}-shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
     0 0 0 4px color-mix(
@@ -95,10 +125,40 @@ $p: cfg.$prefix;
 }
 
 @include cfg.dark-root {
+
+    // accent secondary
+    --#{$p}-accent-secondary: #{functions.intent-color('secondary', 400)};
+    --#{$p}-accent-secondary-active: #{functions.intent-color('secondary', 500)};
+    --#{$p}-accent-secondary-strong: #{functions.intent-color('secondary', 600)};
+    // accent primary
+    --#{$p}-accent-primary: #{functions.intent-color('primary', 400)};
+    --#{$p}-accent-primary-active: #{functions.intent-color('primary', 500)};
+    --#{$p}-accent-primary-strong: #{functions.intent-color('primary', 600)};
+    // accent success
+    --#{$p}-accent-success: #{functions.intent-color('success', 400)};
+    --#{$p}-accent-success-active: #{functions.intent-color('success', 500)};
+    --#{$p}-accent-success-strong: #{functions.intent-color('success', 600)};
+    // accent danger
+    --#{$p}-accent-danger: #{functions.intent-color('danger', 400)};
+    --#{$p}-accent-danger-active: #{functions.intent-color('danger', 500)};
+    --#{$p}-accent-danger-strong: #{functions.intent-color('danger', 600)};
+    // accent warning
+    --#{$p}-accent-warning: #{functions.intent-color('warning', 400)};
+    --#{$p}-accent-warning-active: #{functions.intent-color('warning', 500)};
+    --#{$p}-accent-warning-strong: #{functions.intent-color('warning', 600)};
+    // accent info
+    --#{$p}-accent-info: #{functions.intent-color('info', 400)};
+    --#{$p}-accent-info-active: #{functions.intent-color('info', 500)};
+    --#{$p}-accent-info-strong: #{functions.intent-color('info', 600)};
+
+
     // general
     --#{$p}-text: #{functions.intent-color('gray', 100)};
     --#{$p}-text-disabled: #{functions.intent-color('gray', 500)};
     --#{$p}-text-muted: #{functions.intent-color('gray', 400)};
+
+    --#{$p}-text-danger: #{functions.intent-color('danger', 400)};
+    --#{$p}-text-danger-strong: #{functions.intent-color('danger', 300)};
 
     // disabled surfaces
     --#{$p}-surface-disabled: #{functions.intent-color('gray', 700)};

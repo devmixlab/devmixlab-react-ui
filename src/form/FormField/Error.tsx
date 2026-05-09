@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useFormFieldContext } from './formField.context';
-import { prefix } from './formField.helpers';
+import { classPrefix } from '../../utils/classPrefix';
+import clsx from 'clsx';
 
 const Error = ({ children }: { children: React.ReactNode }) => {
     const ctx = useFormFieldContext();
@@ -16,7 +17,7 @@ const Error = ({ children }: { children: React.ReactNode }) => {
     return (
         <div
             id={id}
-            className={prefix('__error')}
+            className={clsx(classPrefix('--error'), classPrefix('--message'))}
             role="alert"
             aria-live="assertive"
             aria-atomic="true"

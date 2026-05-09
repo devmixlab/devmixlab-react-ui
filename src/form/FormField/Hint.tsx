@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useFormFieldContext } from './formField.context';
-import { prefix } from './formField.helpers';
+import { classPrefix } from '../../utils/classPrefix';
+import clsx from 'clsx';
 
 const Hint = ({ children }: { children: React.ReactNode }) => {
     const ctx = useFormFieldContext();
@@ -17,7 +18,7 @@ const Hint = ({ children }: { children: React.ReactNode }) => {
     if (ctx.hasError) return null;
 
     return (
-        <div id={id} className={prefix('__hint')}>
+        <div id={id} className={clsx(classPrefix('--hint'), classPrefix('--message'))}>
             {children}
         </div>
     );

@@ -2,8 +2,13 @@ import React, { forwardRef, useMemo } from 'react';
 import { FormFieldProvider, FormFieldContextValule } from './formField.context';
 import { prefix } from './formField.helpers';
 import clsx from 'clsx';
+// import { Variant } from '../FieldRoot/FieldRoot';
+import { Size } from '../form.tokens';
+import { classPrefix } from '../../utils/classPrefix';
 
 export type FormFieldProps = {
+    // variant?: Variant;
+    size?: Size;
     id?: string;
     required?: boolean;
     children: React.ReactNode;
@@ -20,7 +25,7 @@ export type FormFieldComponent = React.ForwardRefExoticComponent<
 
 const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     (
-        { className, required, children, id: idProp }: FormFieldProps,
+        { size = 'md', className, required, children, id: idProp }: FormFieldProps,
         ref: React.Ref<HTMLDivElement>,
     ) => {
         const reactId = React.useId();
@@ -58,9 +63,10 @@ const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
                 <div
                     ref={ref}
                     role="group"
-                    className={clsx(prefix(), className)}
+                    className={clsx(classPrefix('--form-field'), className)}
                     data-invalid={hasError || undefined}
                     data-required={required || undefined}
+                    data-size={size}
                 >
                     {children}
                 </div>

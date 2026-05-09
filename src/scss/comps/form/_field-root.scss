@@ -1,4 +1,5 @@
 @use '../../functions' as functions;
+@use '../../mixins' as mixins;
 
 @use '../../config' as cfg;
 @use 'sass:map';
@@ -12,18 +13,21 @@ $sizes: (
         actionsGap: 8px,
         controlGap: 12px,
         spacingX: 8px,
+        fontSize: 14px,
     ),
     md: (
         gap: 6px,
         actionsGap: 10px,
         controlGap: 14px,
         spacingX: 16px,
+        fontSize: 16px,
     ),
     lg: (
         gap: 8px,
         actionsGap: 12px,
         controlGap: 16px,
         spacingX: 24px,
+        fontSize: 18px,
     )
 );
 
@@ -34,6 +38,56 @@ $sizes: (
     --action-gap: #{map.get($conf, actionsGap)};
     --control-gap: #{map.get($conf, controlGap)};
     --spacing-x: #{map.get($conf, spacingX)};
+    --fs: #{map.get($conf, fontSize)};
+}
+
+@mixin action-button {
+    @include mixins.reset-button;
+
+    position: relative;
+    border-radius: 3px;
+
+    width: 1.2em;
+    height: 1.2em;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > span,
+    > .#{$p}--icon {
+        width: 100%;
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .#{$p}--icon {
+        width: 100%;
+        height: 100%;
+    }
+
+    transition:
+        color var(--transition),
+        box-shadow var(--transition);
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: calc(var(--action-hit-area-offset) * -1);
+        border-radius: inherit;
+    }
+
+    &:hover {
+        color: var(--text);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 2px var(--focus-ring);
+    }
 }
 
 .#{$field-root-prefix} {
@@ -75,10 +129,10 @@ $sizes: (
 
     // border
     --border: #{functions.intent-color('gray', 300)};
-    --border-danger: #{functions.intent-color('danger', 300)};
     --border-hover: #{functions.intent-color('primary', 400)};
-    --border-danger-hover: #{functions.intent-color('danger', 400)};
     --border-focus: #{functions.intent-color('primary', 500)};
+    --border-danger: #{functions.intent-color('danger', 400)};
+    --border-danger-hover: #{functions.intent-color('danger', 500)};
     --border-danger-focus: #{functions.intent-color('danger', 500)};
 
     //filled surface;
@@ -108,10 +162,10 @@ $sizes: (
 
         // border
         --border: #{functions.intent-color('gray', 700)};
-        --border-danger: #{functions.intent-color('danger', 700)};
         --border-hover: #{functions.intent-color('primary', 500)};
-        --border-danger-hover: #{functions.intent-color('danger', 500)};
         --border-focus: #{functions.intent-color('primary', 400)};
+        --border-danger: #{functions.intent-color('danger', 300)};
+        --border-danger-hover: #{functions.intent-color('danger', 400)};
         --border-danger-focus: #{functions.intent-color('danger', 400)};
 
         //filled surface
@@ -134,11 +188,16 @@ $sizes: (
     user-select: none;
     font-size: var(--fs);
 
+    padding-left: var(--pl, 0);
+    padding-right: var(--pr, 0);
+    padding-top: var(--pt, 0);
+    padding-bottom: var(--pb, 0);
+
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
 
-    padding: 0;
+    //padding: 0;
 
     min-height: var(--min-height, 40px);
     height: var(--height, auto);
@@ -209,6 +268,8 @@ $sizes: (
         //gap: 10px;
         color: var(--group-color);
 
+        transition: color var(--transition);
+
         .#{$p}--group-item {
             height: 1em;
             display: inline-flex;
@@ -252,6 +313,7 @@ $sizes: (
         border-radius: 0;
 
         height: var(--field-h, 100%);
+        min-height: var(--field-min-h, 100%);
         width: 100%;
         min-width: 0;
 
@@ -296,5 +358,13 @@ $sizes: (
             --border-hover: transparent;
             --border-focus: transparent;
         }
+    }
+
+    .#{$p}--clear-button {
+        @include action-button;
+    }
+
+    .#{$p}--toggle-button {
+        @include action-button;
     }
 }

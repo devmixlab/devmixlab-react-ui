@@ -70,13 +70,13 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
 
         const ctx = useFormFieldContext();
+        const isInvalid = ctx ? ctx.hasError || invalid : false;
         const textareaProps = ctx
             ? {
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
-                  'aria-invalid': ctx.hasError || invalid || undefined,
               }
-            : { 'aria-invalid': invalid || undefined };
+            : {};
 
         const [hasValueState, setHasValueState] = useState(
             () => defaultValue != null && String(defaultValue).length > 0,
@@ -139,7 +139,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 onClick={handleClearClick}
                 onMouseDown={(e) => e.preventDefault()}
                 className={classPrefix(`--clear-button`)}
-                tabIndex={-1}
+                tabIndex={0}
             >
                 {finalClearIcon}
             </button>
@@ -157,7 +157,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         return (
             <FieldRoot
                 className={cl}
-                invalid={invalid}
+                invalid={isInvalid}
                 disabled={disabled}
                 rounded={rounded}
                 focusTargetRef={textareaRef}
@@ -180,6 +180,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                     disabled={disabled}
                     readOnly={readOnly}
                     aria-disabled={disabled || undefined}
+                    aria-invalid={isInvalid || undefined}
                     {...rest}
                     {...textareaProps}
                 />

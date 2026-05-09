@@ -8,59 +8,10 @@ $p: cfg.$prefix;
 $text-input-prefix: #{$p}--text-input;
 
 $sizes: (
-    sm: (height: 32px, fontSize: 14px, actionHitAreaOffset: 4px),
-    md: (height: 40px, fontSize: 16px, actionHitAreaOffset: 6px),
-    lg: (height: 48px, fontSize: 18px, actionHitAreaOffset: 8px),
+    sm: (height: 32px, actionHitAreaOffset: 4px),
+    md: (height: 40px, actionHitAreaOffset: 6px),
+    lg: (height: 48px, actionHitAreaOffset: 8px),
 );
-
-@mixin action-button {
-    @include mixins.reset-button;
-
-    position: relative;
-    border-radius: 3px;
-
-    width: 1.2em;
-    height: 1.2em;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    > span,
-    > .#{$p}--icon {
-        width: 100%;
-        height: 100%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .#{$p}--icon {
-        width: 100%;
-        height: 100%;
-    }
-
-    transition:
-        color var(--transition),
-        box-shadow var(--transition);
-
-    &::before {
-        content: '';
-        position: absolute;
-        inset: calc(var(--action-hit-area-offset) * -1);
-        border-radius: inherit;
-    }
-
-    &:hover {
-        color: var(--text);
-    }
-
-    &:focus-visible {
-        box-shadow: 0 0 0 2px var(--focus-ring);
-    }
-}
 
 .#{$text-input-prefix} {
 
@@ -68,16 +19,8 @@ $sizes: (
         &[data-size='#{$size}'] {
             --height: #{map.get($value, height)};
             --min-height: auto;
-            --fs: #{map.get($value, fontSize)};
             --action-hit-area-offset: #{map.get($value, actionHitAreaOffset)};
         }
     }
 
-    .#{$p}--clear-button {
-        @include action-button;
-    }
-
-    .#{$p}--toggle-button {
-        @include action-button;
-    }
 }

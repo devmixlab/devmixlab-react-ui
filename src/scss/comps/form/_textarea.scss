@@ -1,0 +1,50 @@
+@use '../../functions' as functions;
+@use '../../mixins' as mixins;
+
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$textarea-prefix: #{$p}--textarea;
+
+//$sizes: (
+//    sm: (height: 32px, fontSize: 14px, actionHitAreaOffset: 4px),
+//    md: (height: 40px, fontSize: 16px, actionHitAreaOffset: 6px),
+//    lg: (height: 48px, fontSize: 18px, actionHitAreaOffset: 8px),
+//);
+
+$sizes: (
+    sm: (minHeight: 72px, spacing: 6px, wrapperSpacing: 2px),
+    md: (minHeight: 96px, spacing: 8px, wrapperSpacing: 4px),
+    lg: (minHeight: 128px, spacing: 10px, wrapperSpacing: 6px),
+);
+
+.#{$textarea-prefix} {
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            --spacing: #{map.get($value, spacing)};
+            --wrapper-spacing: #{map.get($value, wrapperSpacing)};
+            //--min-height: #{map.get($value, minHeight)};
+            --field-min-h: #{map.get($value, minHeight)};
+        }
+    }
+
+    --field-min-h: 100%;
+
+    --slot-h: auto;
+    --slot-pt: calc(var(--spacing) + var(--wrapper-spacing));
+    //--slot-pt: 100px;
+    --pt: var(--wrapper-spacing);
+    --pl: var(--wrapper-spacing);
+    --pr: var(--wrapper-spacing);
+    --pb: var(--wrapper-spacing);
+
+    --field-pt: var(--spacing);
+    --field-pb: var(--spacing);
+
+    align-items: start;
+
+    //padding-top: var(--spacing-top);
+
+    //.#{$p}--
+}
