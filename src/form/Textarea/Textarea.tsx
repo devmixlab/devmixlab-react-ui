@@ -50,7 +50,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             value,
             defaultValue,
             onChange,
-            onKeyDown,
             readOnly,
 
             clearable = false,
@@ -70,7 +69,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
 
         const ctx = useFormFieldContext();
-        const isInvalid = ctx ? ctx.hasError || invalid : false;
+        const isInvalid = ctx ? ctx.hasError || invalid : invalid;
         const textareaProps = ctx
             ? {
                   id: rest.id ?? ctx.id,
@@ -113,17 +112,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             clearValue();
         };
 
-        const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-            const isClearShortcut = e.key === 'Backspace' && (e.ctrlKey || e.metaKey);
-
-            if (isClearShortcut && clearable && hasValue && !disabled && !readOnly) {
-                e.preventDefault();
-                clearValue();
-            }
-
-            onKeyDown?.(e);
-        };
-
         const showClearable = clearable && hasValue && !disabled && !readOnly;
 
         const cl = clsx(className, classPrefix('--textarea'), {
@@ -139,13 +127,12 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 onClick={handleClearClick}
                 onMouseDown={(e) => e.preventDefault()}
                 className={classPrefix(`--clear-button`)}
-                tabIndex={0}
             >
                 {finalClearIcon}
             </button>
         );
 
-        const hasActions = actions || showClearable;
+        const hasActions = Boolean(actions || showClearable);
 
         const finalActions = hasActions ? (
             <>
@@ -176,10 +163,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                     value={isControlled ? value : undefined}
                     defaultValue={!isControlled ? defaultValue : undefined}
                     onChange={handleChange}
-                    onKeyDown={handleKeyDown}
                     disabled={disabled}
                     readOnly={readOnly}
-                    aria-disabled={disabled || undefined}
                     aria-invalid={isInvalid || undefined}
                     {...rest}
                     {...textareaProps}

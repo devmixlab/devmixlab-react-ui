@@ -48,7 +48,6 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             value,
             defaultValue,
             onChange,
-            onKeyDown,
             htmlSize,
             type = 'text',
             readOnly,
@@ -69,13 +68,13 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
 
         const ctx = useFormFieldContext();
+        const isInvalid = ctx ? ctx.hasError || invalid : invalid;
         const inputProps = ctx
             ? {
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
-                  'aria-invalid': ctx.hasError || invalid || undefined,
               }
-            : { 'aria-invalid': invalid || undefined };
+            : {};
 
         // minimal UI state (only for uncontrolled)
         const [hasValueState, setHasValueState] = useState(
@@ -93,22 +92,6 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             onValueChange?.(e.target.value);
         };
 
-        const handleClearClick = (e: React.MouseEvent<HTMLElement>) => {
-            e.stopPropagation();
-            clearValue();
-        };
-
-        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-            const isClearShortcut = e.key === 'Backspace' && (e.ctrlKey || e.metaKey);
-
-            if (isClearShortcut && clearable && isTextLike && hasValue && !disabled && !readOnly) {
-                e.preventDefault();
-                clearValue(); // no event needed
-            }
-
-            onKeyDown?.(e);
-        };
-
         const clearValue = () => {
             if (isControlled) {
                 onValueChange?.('');
@@ -122,6 +105,11 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             }
 
             onClear?.();
+        };
+
+        const handleClearClick = (e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation();
+            clearValue();
         };
 
         const showClearable = clearable && isTextLike && hasValue && !disabled && !readOnly;
@@ -139,13 +127,12 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                 onClick={handleClearClick}
                 onMouseDown={(e) => e.preventDefault()}
                 className={classPrefix(`--clear-button`)}
-                tabIndex={0}
             >
                 {finalClearIcon}
             </button>
         );
 
-        const hasActions = actions || showClearable;
+        const hasActions = Boolean(actions || showClearable);
 
         const finalActions = hasActions ? (
             <>
@@ -157,7 +144,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         return (
             <FieldRoot
                 className={cl}
-                invalid={invalid}
+                invalid={isInvalid}
                 disabled={disabled}
                 rounded={rounded}
                 focusTargetRef={inputRef}
@@ -167,8 +154,6 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                 controls={controls}
                 variant={variant}
                 size={size}
-                data-disabled={disabled || undefined}
-                data-size={size}
                 data-clearable={clearable || undefined}
             >
                 <Box
@@ -180,10 +165,9 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                     value={isControlled ? value : undefined}
                     defaultValue={!isControlled ? defaultValue : undefined}
                     onChange={handleChange}
-                    onKeyDown={handleKeyDown}
                     disabled={disabled}
                     readOnly={readOnly}
-                    aria-disabled={disabled || undefined}
+                    aria-invalid={isInvalid || undefined}
                     {...rest}
                     {...inputProps}
                 />
