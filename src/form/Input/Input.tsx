@@ -1,14 +1,15 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Box, type BoxProps } from '../../Box/Box';
-import { Size, Variant } from './input.tokens';
-// import { prefix } from './input.helpers';
+import { Size } from '../tokens';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon/IconWrapper';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
-import { CLASS_PREFIX } from '../../constants';
+import { classPrefix } from '../../utils/classPrefix';
+
+export type Variant = 'outlined' | 'filled' | 'ghost';
 
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
     variant?: Variant;
@@ -26,10 +27,6 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
     clearIcon?: React.ReactNode;
     onClear?: () => void;
     onValueChange?: (value: string) => void;
-};
-
-export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}${name}`;
 };
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);
@@ -130,8 +127,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         const showClearable = clearable && isTextLike && hasValue && !disabled && !readOnly;
 
-        const cl = clsx(className, prefix('--text-input'), {
-            [prefix(`--clearable`)]: clearable,
+        const cl = clsx(className, classPrefix('--text-input'), {
+            [classPrefix(`--clearable`)]: clearable,
         });
 
         const combinedRef = mergeRefs(inputRef, ref);
@@ -142,7 +139,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 aria-label="Clear input"
                 onClick={handleClearClick}
                 onMouseDown={(e) => e.preventDefault()}
-                className={prefix(`--clear-button`)}
+                className={classPrefix(`--clear-button`)}
                 tabIndex={0}
             >
                 {finalClearIcon}
@@ -180,7 +177,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     as="input"
                     type={type}
                     size={htmlSize}
-                    className={prefix(`--field`)}
+                    className={classPrefix(`--field`)}
                     value={isControlled ? value : undefined}
                     defaultValue={!isControlled ? defaultValue : undefined}
                     onChange={handleChange}

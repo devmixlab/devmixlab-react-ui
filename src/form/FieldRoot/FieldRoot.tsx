@@ -30,6 +30,10 @@ export const prefix = (name: string = '') => {
     return classPrefix(`--field-root${name}`);
 };
 
+export const renderGroupItem = (content: React.ReactNode) => (
+    <span className={classPrefix('--group-item')}>{content}</span>
+);
+
 const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
     (
         {
