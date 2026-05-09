@@ -23,7 +23,7 @@ $sizes: (
         }
     }
 
-    .#{$p}--clear-button {
+    .#{$p}--clear-button, .#{$p}--toggle-button {
         @include mixins.reset-button;
 
         position: relative;

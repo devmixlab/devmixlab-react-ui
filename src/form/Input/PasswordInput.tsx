@@ -1,9 +1,11 @@
 import React, { forwardRef, useState } from 'react';
 import { Input, type InputProps } from './Input';
-import { prefix } from './input.helpers';
+// import { prefix } from './input.helpers';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { Eye } from '../../Icon/Eye';
 import { EyeOff } from '../../Icon/EyeOff';
+import { CLASS_PREFIX } from '../../constants';
+import { classPrefix } from '../../utils/classPrefix';
 
 export type PasswordInputProps = Omit<InputProps, 'type'> & {
     showToggle?: boolean;
@@ -15,6 +17,10 @@ type ToggleButtonProps = {
     id?: string;
 };
 
+// export const prefix = (name: string = '') => {
+//     return `${CLASS_PREFIX}${name}`;
+// };
+
 const ToggleButton = ({ toggle, visible, id }: ToggleButtonProps) => (
     <button
         type="button"
@@ -24,7 +30,7 @@ const ToggleButton = ({ toggle, visible, id }: ToggleButtonProps) => (
         aria-pressed={visible}
         aria-controls={id ?? undefined}
         // tabIndex={-1} // prevent stealing focus
-        className={prefix('__toggle')}
+        className={classPrefix('--toggle-button')}
     >
         <span aria-hidden="true">{visible ? <EyeOff /> : <Eye />}</span>
     </button>
