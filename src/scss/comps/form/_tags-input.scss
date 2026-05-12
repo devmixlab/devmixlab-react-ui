@@ -8,44 +8,37 @@ $p: cfg.$prefix;
 $tags-input-prefix: #{$p}--tags-input;
 
 $sizes: (
-    sm: (height: 32px, fontSize: 14px, spacingX: 8px, spacingY: 3px, spacingTop: 6px, gap: 4px),
-    md: (height: 40px, fontSize: 16px, spacingX: 16px, spacingY: 6px, spacingTop: 10px, gap: 6px),
-    lg: (height: 48px, fontSize: 18px, spacingX: 24px, spacingY: 9px, spacingTop: 12px, gap: 8px),
+    sm: (height: 32px, spacingY: 6px, spacingTop: 8px),
+    md: (height: 40px, spacingY: 10px, spacingTop: 12px),
+    lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
 );
 
 .#{$tags-input-prefix} {
     display: flex;
     flex-wrap: wrap;
-    //--height: auto;
-    //min-height: var(--height);
-    //align-items: flex-start;
-    --icon-adjust: 2px; // adjust icon to look consistent, its just fix
-    --slot-align: center;
     --slot-h: auto;
+    --height: auto;
     gap: var(--gap);
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
-            --height: auto;
             --min-height: #{map.get($value, height)};
             --top-offset: #{map.get($value, spacingTop)};
-            --y-offset: #{map.get($value, spacingTop)};
-            //--action-hit-area-offset: #{map.get($value, actionHitAreaOffset)};
+            --y-offset: #{map.get($value, spacingY)};
         }
     }
 
-    --slot-pt: calc(var(--top-offset));
+    --slot-pt: var(--top-offset);
     --pl: calc(var(--start-width) + var(--spacing-x) + var(--gap));
     --pr: calc(var(--end-width) + var(--spacing-x) + var(--gap));
     --pt: var(--y-offset);
     --pb: var(--y-offset);
 
     .#{$p}--field {
-        flex: 0 0 auto;   // 👈 force override
-        width: auto;      // 👈 CRITICAL
+        flex: 0 0 auto;   // force override
+        width: auto;      // CRITICAL
         min-width: 20px;
 
-        //min-width: 60px;    // keep cursor visible
         max-width: 100%;
 
         height: auto;
@@ -76,42 +69,30 @@ $sizes: (
         height: auto;
         padding: 0;
 
-        // 🔥 remove default input styles
+        // remove default input styles
         border: none;
         outline: none;
         background: transparent;
 
-        // 🔥 inherit text styles
+        // inherit text styles
         font: inherit;
         color: inherit;
         line-height: inherit;
 
-        // 🔥 spacing to match chip
+        // spacing to match chip
         padding-inline: calc(var(--gap) * 0.75);
 
-        // 🔥 prevent layout shift
+        // prevent layout shift
         display: inline-flex;
         align-items: center;
 
-        // 🔥 optional subtle editing state
+        // optional subtle editing state
         border-radius: 6px;
 
         &:focus {
             outline: none;
-            background: rgba(0, 0, 0, 0.05); // or use your token
-        }
-
-        &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
     }
-
-    //&[data-disabled] {
-    //    .#{$p}--tag {
-    //        pointer-events: none;
-    //    }
-    //}
 
     .#{$p}--tag {
         &[data-disabled] {

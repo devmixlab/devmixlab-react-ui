@@ -770,6 +770,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     data-active={activeId === id || undefined}
                     data-selected={isSelected(i) || undefined}
                     data-disabled={tag.disabled || disabled || undefined}
+                    data-prevent-focus
                 >
                     {tagNode}
                 </div>

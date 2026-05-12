@@ -104,16 +104,12 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             // avoid stealing focus from interactive children (buttons, etc.)
             if (
                 (e.target as HTMLElement).closest(
-                    'button, a, input, textarea, select, [role="button"], [role="switch"]',
+                    'button, a, input, textarea, select, [role="button"], [role="switch"], [data-prevent-focus]',
                 )
             ) {
                 return;
             }
 
-            // prevent native blur when clicking empty wrapper area
-            // e.preventDefault();
-
-            // focusTargetRef?.current?.focus();
             if (focusTargetRef?.current && document.activeElement !== focusTargetRef.current) {
                 focusTargetRef.current.focus();
             }
@@ -125,11 +121,13 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
 
             if (
                 (e.target as HTMLElement).closest(
-                    'button, a, input, textarea, select, [role="button"], [role="switch"]',
+                    'button, a, input, textarea, select, [role="button"], [role="switch"], [data-prevent-focus]',
                 )
             ) {
                 return;
             }
+
+            e.preventDefault();
 
             if (focusTargetRef?.current) {
                 focusTargetRef.current.focus();
