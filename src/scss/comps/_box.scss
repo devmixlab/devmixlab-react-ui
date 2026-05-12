@@ -7,11 +7,11 @@
 $p: cfg.$prefix;
 
 $breakpoints: (
-    xs: 480px,   // extra small phones
-    sm: 640px,   // small devices
-    md: 768px,   // tablets
-    lg: 1024px,  // desktops
-    xl: 1280px,  // large desktops
+    xs: 480px, // extra small phones
+    sm: 640px, // small devices
+    md: 768px, // tablets
+    lg: 1024px, // desktops
+    xl: 1280px, // large desktops
     '2xl': 1536px // very large screens
 );
 
@@ -33,23 +33,6 @@ $spacing: (
     16: 64px,
     20: 80px
 );
-
-// Generate grid column utilities (12-column system)
-//@for $i from 1 through 12 {
-//    // default
-//    .#{$prefix}col-#{$i} {
-//        grid-column: span #{$i};
-//    }
-//
-//    // responsive
-//    @each $breakpoint, $min-width in $breakpoints {
-//        @media (min-width: $min-width) {
-//            .#{$prefix}#{$breakpoint}\:col-#{$i} {
-//                grid-column: span #{$i};
-//            }
-//        }
-//    }
-//}
 
 .#{$p}--col {
     grid-column: 1 / -1; // spans all columns
@@ -74,53 +57,55 @@ $spacing: (
 }
 
 // Generate base spacing utilities
-@each $key, $value in $spacing {
-    .#{$p}--p-#{$key} {
-        padding: $value;
-    }
-    .#{$p}--pt-#{$key} {
-        padding-top: $value;
-    }
-    .#{$p}--pb-#{$key} {
-        padding-bottom: $value;
-    }
-    .#{$p}--pl-#{$key} {
-        padding-left: $value;
-    }
-    .#{$p}--pr-#{$key} {
-        padding-right: $value;
-    }
-    .#{$p}--px-#{$key} {
-        padding-left: $value;
-        padding-right: $value;
-    }
-    .#{$p}--py-#{$key} {
-        padding-top: $value;
-        padding-bottom: $value;
-    }
+.#{$p} {
+    @each $key, $value in $spacing {
+        &--p-#{$key} {
+            padding: $value;
+        }
+        &--pt-#{$key} {
+            padding-top: $value;
+        }
+        &--pb-#{$key} {
+            padding-bottom: $value;
+        }
+        &--pl-#{$key} {
+            padding-left: $value;
+        }
+        &--pr-#{$key} {
+            padding-right: $value;
+        }
+        &--px-#{$key} {
+            padding-left: $value;
+            padding-right: $value;
+        }
+        &--py-#{$key} {
+            padding-top: $value;
+            padding-bottom: $value;
+        }
 
-    .#{$p}--m-#{$key} {
-        margin: $value;
-    }
-    .#{$p}--mt-#{$key} {
-        margin-top: $value;
-    }
-    .#{$p}--mb-#{$key} {
-        margin-bottom: $value;
-    }
-    .#{$p}--ml-#{$key} {
-        margin-left: $value;
-    }
-    .#{$p}--mr-#{$key} {
-        margin-right: $value;
-    }
-    .#{$p}--mx-#{$key} {
-        margin-left: $value;
-        margin-right: $value;
-    }
-    .#{$p}--my-#{$key} {
-        margin-top: $value;
-        margin-bottom: $value;
+        &--m-#{$key} {
+            margin: $value;
+        }
+        &--mt-#{$key} {
+            margin-top: $value;
+        }
+        &--mb-#{$key} {
+            margin-bottom: $value;
+        }
+        &--ml-#{$key} {
+            margin-left: $value;
+        }
+        &--mr-#{$key} {
+            margin-right: $value;
+        }
+        &--mx-#{$key} {
+            margin-left: $value;
+            margin-right: $value;
+        }
+        &--my-#{$key} {
+            margin-top: $value;
+            margin-bottom: $value;
+        }
     }
 }
 
@@ -569,29 +554,24 @@ $z-indexes: (
 
     $shadows-dark: (
         none: none,
-
         xs: (
             0 1px 2px rgba(0, 0, 0, 0.3)
         ),
-
         sm: (
             0 1px 3px rgba(0, 0, 0, 0.35),
             0 1px 2px rgba(0, 0, 0, 0.2),
             0 0 0 1px rgba(255, 255, 255, 0.03)
         ),
-
         md: (
             0 4px 6px rgba(0, 0, 0, 0.4),
             0 2px 4px rgba(0, 0, 0, 0.25),
             0 0 0 1px rgba(255, 255, 255, 0.04)
         ),
-
         lg: (
             0 10px 15px rgba(0, 0, 0, 0.45),
             0 4px 6px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.05)
         ),
-
         xl: (
             0 20px 25px rgba(0, 0, 0, 0.5),
             0 8px 10px rgba(0, 0, 0, 0.35),
@@ -686,6 +666,7 @@ $z-indexes: (
     &--fw-thin {
         font-weight: 100;
     }
+
     &--fw-light {
         font-weight: 300;
     }

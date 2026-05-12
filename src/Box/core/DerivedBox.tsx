@@ -29,6 +29,7 @@ export type DerivedProps = {
     transP?: string; // property
 
     // grid
+    grid?: boolean | Size;
     col?: Size;
     size?: Size;
 
@@ -81,6 +82,7 @@ const DerivedBoxImpl = (
         transD,
         transE,
         transP,
+        grid,
         col,
         size,
         origin,
@@ -116,10 +118,20 @@ const DerivedBoxImpl = (
         derivedProps.push(['roundedTopRight', roundedRight], ['roundedBottomRight', roundedRight]);
     }
 
-    // if (roundedBottom) {
-    //     style.borderBottomLeftRadius = roundedBottom;
-    //     style.borderBottomRightRadius = roundedBottom;
-    // }
+    if (grid) {
+        const finalGrid = grid === true ? 12 : grid;
+
+        if (rest.display == null && rest.d == null) {
+            derivedProps.push(['display', 'grid']);
+        }
+
+        if (rest.gridTemplateColumns == null) {
+            const value =
+                typeof finalGrid === 'number' ? `repeat(${finalGrid}, minmax(0, 1fr))` : finalGrid;
+
+            derivedProps.push(['gridTemplateColumns', value]);
+        }
+    }
 
     if (col != null && rest.gridCol == null && rest.gridColumn == null) {
         derivedProps.push(['gridCol', `span ${col}`]);
