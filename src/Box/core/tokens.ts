@@ -133,3 +133,12 @@ export const displays = ['block', 'inline', 'inline-block', 'flex', 'grid', 'non
 export const overflows = ['auto', 'hidden', 'scroll', 'visible'] as const;
 
 export const gaps = spacing; // reuse existing spacing tokens
+
+// grid
+export const grids = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] as const;
+
+export type Grid = (typeof grids)[number];
+
+export const cols = grids;
+
+export type Col = (typeof cols)[number];

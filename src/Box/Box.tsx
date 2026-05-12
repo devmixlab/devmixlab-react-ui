@@ -24,13 +24,20 @@ type ImplProps = {
 
 const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     const widthFromContext = useWindowWidthContext();
-    const windowWidth = widthFromContext ?? useWindowWidth();
+    const windowWidth =
+        widthFromContext && widthFromContext > 0 ? widthFromContext : useWindowWidth();
     const bp = getActiveBreakpoint(windowWidth);
+
+    // console.log(useWindowWidth());
+    // console.log(windowWidth);
+    // console.log(bp);
 
     const restProps = rest;
 
     // const restEntries = Object.entries(rest);
     const restEntries = typedEntries(rest);
+
+    // console.log(restEntries);
 
     const classes: string[] = [];
     const locked = new Set<string>();
@@ -54,6 +61,10 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         }
 
         const config = configLookup[key];
+
+        // console.log(config);
+        // console.log(value);
+        // console.log(config.isToken(value));
 
         locked.add(config.key);
         if (config.alias) locked.add(config.alias);

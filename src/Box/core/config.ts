@@ -28,6 +28,8 @@ import {
     translates as translatesTokens,
     scales as scalesTokens,
     rotates as rotatesTokens,
+    grids as gridsTokens,
+    cols as colsTokens,
 } from './tokens';
 import { Props, BoxProps } from '../Box';
 import { StyleAliasKey, StyleAliasValue, stylePropToAliasMap } from '../../tokens/styleAliasMap';
@@ -425,6 +427,26 @@ export const config: OriginPropConfig[] = [
         prefix,
         tokens: sizesTokens,
     })),
+
+    // Grid
+    {
+        key: 'grid',
+        prefix: 'grid',
+        tokens: gridsTokens,
+        isToken: (isT: () => boolean, value: PropValue): value is string => {
+            return typeof value === 'number' || isT();
+        },
+    },
+
+    // Grid column
+    {
+        key: 'col',
+        prefix: 'col',
+        tokens: colsTokens,
+        isToken: (isT: () => boolean, value: PropValue): value is string => {
+            return typeof value === 'number' || isT();
+        },
+    },
 ];
 
 const isNonEmptyString = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0;
