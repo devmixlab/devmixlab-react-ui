@@ -22,8 +22,17 @@ $p: cfg.$prefix;
     }
 }
 
-// Generate base spacing utilities
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+    @return $string;
+}
+
 .#{$p} {
+
+    // spacing
     @each $key, $value in $spacing {
         &--p-#{$key} {
             padding: $value;
@@ -73,19 +82,8 @@ $p: cfg.$prefix;
             margin-bottom: $value;
         }
     }
-}
 
-@function str-replace($string, $search, $replace: '') {
-    $index: str-index($string, $search);
-    @if $index {
-        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
-    }
-    @return $string;
-}
-
-.#{$p} {
-
-    // gap
+    // gap semantic
     @each $size, $value in $semantic-spacing {
         &--gap-#{$size} {
             gap: $value;
@@ -94,6 +92,19 @@ $p: cfg.$prefix;
             row-gap: $value;
         }
         &--col-gap-#{$size} {
+            column-gap: $value;
+        }
+    }
+
+    // gap
+    @each $key, $value in $spacing {
+        &--gap-#{$key} {
+            gap: $value;
+        }
+        &--row-gap-#{$key} {
+            row-gap: $value;
+        }
+        &--col-gap-#{$key} {
             column-gap: $value;
         }
     }
@@ -112,7 +123,7 @@ $p: cfg.$prefix;
     }
 
     // display
-    @each $d in (block, inline, inline-block, flex, grid, none) {
+    @each $d in ('block', 'inline', 'inline-block', 'flex', 'grid', 'none') {
         &--d-#{$d} {
             display: #{$d};
         }
@@ -138,35 +149,21 @@ $p: cfg.$prefix;
         }
     }
 
-    // optional base
-    &--transition {
-        transition-property: all;
+    @each $name, $value in $transition-properties {
+        &--trans-p-#{$name} {
+            transition-property: $value;
+        }
     }
 
-    // Position
-    // position
-    &--pos-static {
-        position: static;
-    }
-
-    &--pos-relative {
-        position: relative;
-    }
-
-    &--pos-absolute {
-        position: absolute;
-    }
-
-    &--pos-fixed {
-        position: fixed;
-    }
-
-    &--pos-sticky {
-        position: sticky;
+    @each $value in $positions {
+        &--pos-#{$value} {
+            position: $value;
+        }
     }
 
     @each $name, $value in $inset-values {
-        $safe: str-replace($name, '/', '-');
+        $name-negative: str-replace($name, '-', 'neg-');
+        $safe: str-replace($name-negative, '/', '-');
 
         &--top-#{$safe} {
             top: $value;
@@ -185,6 +182,7 @@ $p: cfg.$prefix;
     // Sizes
     @each $name, $value in $size-tokens {
         $safe-name: str-replace($name, '/', '-');
+
         &--w-#{$safe-name} {
             width: $value;
         }
@@ -207,119 +205,51 @@ $p: cfg.$prefix;
 
     @each $name, $ratio in $aspect-tokens {
         $safe-name: str-replace($name, '/', '-'); // convert "16/9" → "16-9"
+
         &--aspect-#{$safe-name} {
             aspect-ratio: $ratio;
         }
     }
 
     // Cursor & Pointer Events
+    @each $value in (auto, pointer, move, text, not-allowed, grab, grabbing) {
+        &--cursor-#{$value} {
+            cursor: #{$value};
+        }
+    }
     &--cursor-default {
-        cursor: default;
+        cursor: auto;
     }
 
-    &--cursor-pointer {
-        cursor: pointer;
-    }
-
-    &--cursor-move {
-        cursor: move;
-    }
-
-    &--cursor-text {
-        cursor: text;
-    }
-
-    &--cursor-not-allowed {
-        cursor: not-allowed;
-    }
-
-    &--cursor-grab {
-        cursor: grab;
-    }
-
-    &--cursor-grabbing {
-        cursor: grabbing;
-    }
-
-    &--ptr-auto {
-        pointer-events: auto;
-    }
-
-    &--ptr-none {
-        pointer-events: none;
+    @each $value in (auto, none) {
+        &--ptr-#{$value} {
+            pointer-events: #{$value};
+        }
     }
 
     // Flex
-    &--dir-row {
-        flex-direction: row;
+    @each $value in (row, row-reverse, column, column-reverse) {
+        &--dir-#{$value} {
+            flex-direction: #{$value};
+        }
     }
 
-    &--dir-row-reverse {
-        flex-direction: row-reverse;
+    @each $name, $value in $justify-values {
+        &--justify-#{$name} {
+            justify-content: #{$value};
+        }
     }
 
-    &--dir-column {
-        flex-direction: column;
+    @each $name, $value in $align-values {
+        &--align-#{$name} {
+            align-items: #{$value};
+        }
     }
 
-    &--dir-column-reverse {
-        flex-direction: column-reverse;
-    }
-
-    &--justify-start {
-        justify-content: flex-start;
-    }
-
-    &--justify-center {
-        justify-content: center;
-    }
-
-    &--justify-end {
-        justify-content: flex-end;
-    }
-
-    &--justify-between {
-        justify-content: space-between;
-    }
-
-    &--justify-around {
-        justify-content: space-around;
-    }
-
-    &--justify-evenly {
-        justify-content: space-evenly;
-    }
-
-    &--align-start {
-        align-items: flex-start;
-    }
-
-    &--align-center {
-        align-items: center;
-    }
-
-    &--align-end {
-        align-items: flex-end;
-    }
-
-    &--align-stretch {
-        align-items: stretch;
-    }
-
-    &--align-baseline {
-        align-items: baseline;
-    }
-
-    &--wrap-nowrap {
-        flex-wrap: nowrap;
-    }
-
-    &--wrap-wrap {
-        flex-wrap: wrap;
-    }
-
-    &--wrap-wrap-reverse {
-        flex-wrap: wrap-reverse;
+    @each $value in (nowrap, wrap, wrap-reverse) {
+        &--wrap-#{$value} {
+            flex-wrap: #{$value};
+        }
     }
 
     // Spacing
@@ -372,78 +302,15 @@ $p: cfg.$prefix;
         }
     }
 
-    .dru--pt-sm {
-        padding-top: 8px;
-    }
-
-    .dru--px-md {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
-    $shadows: (
-        none: none,
-        xs: 0 1px 2px rgba(0, 0, 0, 0.05),
-        sm:
-            (0 1px 3px rgba(0, 0, 0, 0.08),
-            0 1px 2px rgba(0, 0, 0, 0.04)),
-        md:
-            (0 4px 6px rgba(0, 0, 0, 0.12),
-            0 2px 4px rgba(0, 0, 0, 0.06)),
-        lg:
-            (0 10px 15px rgba(0, 0, 0, 0.16),
-            0 4px 6px rgba(0, 0, 0, 0.08)),
-        xl:
-            (0 20px 25px rgba(0, 0, 0, 0.2),
-            0 8px 10px rgba(0, 0, 0, 0.1)),
-    );
-
-    $shadows-dark: (
-        none: none,
-        xs: (
-            0 1px 2px rgba(0, 0, 0, 0.3)
-        ),
-        sm: (
-            0 1px 3px rgba(0, 0, 0, 0.35),
-            0 1px 2px rgba(0, 0, 0, 0.2),
-            0 0 0 1px rgba(255, 255, 255, 0.03)
-        ),
-        md: (
-            0 4px 6px rgba(0, 0, 0, 0.4),
-            0 2px 4px rgba(0, 0, 0, 0.25),
-            0 0 0 1px rgba(255, 255, 255, 0.04)
-        ),
-        lg: (
-            0 10px 15px rgba(0, 0, 0, 0.45),
-            0 4px 6px rgba(0, 0, 0, 0.3),
-            0 0 0 1px rgba(255, 255, 255, 0.05)
-        ),
-        xl: (
-            0 20px 25px rgba(0, 0, 0, 0.5),
-            0 8px 10px rgba(0, 0, 0, 0.35),
-            0 0 0 1px rgba(255, 255, 255, 0.06)
-        ),
-    );
-
     @each $name, $value in $shadows {
         &--shadow-#{$name} {
-            box-shadow: #{$value};
+            box-shadow: $value;
+
             @include cfg.dark {
-                box-shadow: #{map-get($shadows-dark, $name)};
-                //background-color: red!important;
+                box-shadow: map.get($shadows-dark, $name);
             }
         }
     }
-
-    $radii: (
-        none: 0px,
-        xs: 2px,
-        sm: 4px,
-        md: 8px,
-        lg: 12px,
-        xl: 16px,
-        full: 9999px,
-    );
 
     @each $name, $value in $radii {
         &--rounded-#{$name} {
@@ -480,99 +347,181 @@ $p: cfg.$prefix;
     }
 
     /* font size */
-    &--fs-xs {
-        font-size: 12px;
-    }
-
-    &--fs-sm {
-        font-size: 14px;
-    }
-
-    &--fs-md {
-        font-size: 16px;
-    }
-
-    &--fs-lg {
-        font-size: 18px;
-    }
-
-    &--fs-xl {
-        font-size: 20px;
-    }
-
-    &--fs-2xl {
-        font-size: 24px;
-    }
-
-    &--fs-3xl {
-        font-size: 30px;
+    @each $name, $value in $font-sizes {
+        &--fs-#{$name} {
+            font-size: $value;
+        }
     }
 
     /* font weight */
-    &--fw-thin {
-        font-weight: 100;
-    }
-
-    &--fw-light {
-        font-weight: 300;
-    }
-
-    &--fw-normal {
-        font-weight: 400;
-    }
-
-    &--fw-medium {
-        font-weight: 500;
-    }
-
-    &--fw-semibold {
-        font-weight: 600;
-    }
-
-    &--fw-bold {
-        font-weight: 700;
+    @each $name, $value in $font-weights {
+        &--fw-#{$name} {
+            font-weight: $value;
+        }
     }
 
     /* line height */
-    &--lh-tight {
-        line-height: 1.2;
-    }
-
-    &--lh-normal {
-        line-height: 1.5;
-    }
-
-    &--lh-relaxed {
-        line-height: 1.75;
+    @each $name, $value in $line-heights {
+        &--lh-#{$name} {
+            line-height: $value;
+        }
     }
 
     /* letter spacing */
-    &--ls-tight {
-        letter-spacing: -0.01em;
-    }
-
-    &--ls-normal {
-        letter-spacing: 0;
-    }
-
-    &--ls-wide {
-        letter-spacing: 0.05em;
+    @each $name, $value in $letter-spacings {
+        &--ls-#{$name} {
+            letter-spacing: $value;
+        }
     }
 
     /* border width */
-    &--bw-none {
-        border-width: 0;
+    @each $name, $value in $border-widths {
+        &--bw-#{$name} {
+            border-width: $value;
+        }
     }
 
-    &--bw-thin {
-        border-width: 1px;
+
+    // NEW
+    /////////////////////////////////////////
+
+    // text align
+    @each $name, $value in $text-alignments {
+        &--text-#{$name} {
+            text-align: $value;
+        }
     }
 
-    &--bw-normal {
-        border-width: 2px;
+    // text transform
+    @each $name, $value in $text-transforms {
+        &--text-#{$name} {
+            text-transform: $value;
+        }
     }
 
-    &--bw-thick {
-        border-width: 3px;
+    // text decoration
+    @each $name, $value in $text-decorations {
+        &--text-decoration-#{$name} {
+            text-decoration: $value;
+        }
+    }
+
+    // white space
+    @each $name, $value in $white-spaces {
+        &--ws-#{$name} {
+            white-space: $value;
+        }
+    }
+
+    // text overflow
+    @each $name, $value in $text-overflows {
+        &--text-overflow-#{$name} {
+            text-overflow: $value;
+        }
+    }
+
+    // word break
+    @each $name, $value in $word-breaks {
+        &--break-#{$name} {
+            word-break: $value;
+        }
+    }
+
+    // overflow wrap
+    @each $name, $value in $overflow-wraps {
+        &--wrap-#{$name} {
+            overflow-wrap: $value;
+        }
+    }
+
+    // font style
+    @each $name, $value in $font-styles {
+        &--font-#{$name} {
+            font-style: $value;
+        }
+    }
+
+    // opacity
+    @each $name, $value in $opacities {
+        &--opacity-#{$name} {
+            opacity: $value;
+        }
+    }
+
+    // visibility
+    @each $name, $value in $visibilities {
+        &--visibility-#{$name} {
+            visibility: $value;
+        }
+    }
+
+    // user select
+    @each $name, $value in $user-selects {
+        &--select-#{$name} {
+            user-select: $value;
+        }
+    }
+
+    // disable appearance
+    &--appearance-none {
+        appearance: none;
+    }
+
+    // textarea resize
+    @each $name, $value in $resizes {
+        &--resize-#{$name} {
+            resize: $value;
+        }
+    }
+
+    // media
+    @each $name, $value in $object-fits {
+        &--object-#{$name} {
+            object-fit: $value;
+        }
+    }
+
+    // border style
+    @each $name, $value in $border-styles {
+        &--border-#{$name} {
+            border-style: $value;
+        }
+    }
+
+    &--truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &--grow {
+        flex-grow: 1;
+    }
+
+    &--grow-0 {
+        flex-grow: 0;
+    }
+
+    &--shrink {
+        flex-shrink: 1;
+    }
+
+    &--shrink-0 {
+        flex-shrink: 0;
+    }
+
+    // Align self
+    @each $name, $value in $self-alignments {
+        &--self-#{$name} {
+            align-self: $value;
+        }
+    }
+
+    &--isolate {
+        isolation: isolate;
+    }
+
+    &--scroll-smooth {
+        scroll-behavior: smooth;
     }
 }

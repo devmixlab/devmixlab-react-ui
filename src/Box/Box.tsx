@@ -34,6 +34,24 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
 
     const restProps = rest;
 
+    // Transition composition
+    const hasTransitionHelpers =
+        restProps.transD != null || restProps.transE != null || restProps.transP != null;
+
+    if (hasTransitionHelpers && restProps.transition == null) {
+        if (restProps.transD == null) {
+            restProps.transD = 'normal';
+        }
+
+        if (restProps.transE == null) {
+            restProps.transE = 'standard';
+        }
+
+        if (restProps.transP == null) {
+            restProps.transP = 'all';
+        }
+    }
+
     // const restEntries = Object.entries(rest);
     const restEntries = typedEntries(rest);
 
@@ -70,9 +88,11 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         if (config.alias) locked.add(config.alias);
 
         const finalResolved =
-            config.map != null ? config.map[resolved as string | number] : resolved;
+            config.map != null ? (config.map[resolved as string | number] ?? resolved) : resolved;
 
-        const finalValue = finalResolved as PropValue;
+        const finalValue = config.modifyValue
+            ? config.modifyValue(finalResolved as PropValue)
+            : (finalResolved as PropValue);
 
         const configCheck = config.check
             ? config.check({ props: restProps as Props, key, value: finalValue })
@@ -96,7 +116,9 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
 
         if (config.isToken && config.isToken(finalValue) && configCheck) {
             const safeValue =
-                typeof finalValue === 'string' ? finalValue.replace(/\//g, '-') : finalValue;
+                typeof finalValue === 'string'
+                    ? finalValue.replace(/^-/, 'neg-').replace(/\//g, '-')
+                    : finalValue;
             classes.push(classPrefix(`--${config.prefix}-${safeValue}`));
         } else {
             passNext(key, finalValue);

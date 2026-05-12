@@ -11,8 +11,16 @@ $p: cfg.$prefix;
     --#{$p}-duration-normal: 180ms;
     --#{$p}-duration-slow: 240ms;
 
+    //--#{$p}-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    //--#{$p}-ease-press: cubic-bezier(0.3, 0, 0.2, 1);
+    --#{$p}-ease-linear: linear;
+
     --#{$p}-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --#{$p}-ease-enter: cubic-bezier(0, 0, 0.2, 1);
+    --#{$p}-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
     --#{$p}-ease-press: cubic-bezier(0.3, 0, 0.2, 1);
+    --#{$p}-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
 
     --#{$p}-control-opacity-disabled: 0.5;
 

@@ -24,12 +24,16 @@ import {
     transitionDurations as transitionDurationsTokens,
     transitionEasings as transitionEasingsTokens,
     transitionEasingsMap,
+    transitionProperties as transitionPropertiesTokens,
+    // transitionPropertiesMap,
+    zNumberIndexes,
     zIndexes as zIndexesTokens,
     translates as translatesTokens,
     scales as scalesTokens,
     rotates as rotatesTokens,
     grids as gridsTokens,
     cols as colsTokens,
+    insetsMap,
 } from './tokens';
 import { Props, BoxProps } from '../Box';
 import { StyleAliasKey, StyleAliasValue, stylePropToAliasMap } from '../../tokens/styleAliasMap';
@@ -62,6 +66,7 @@ export type OriginPropConfig = {
     // check?: ({ props: ResponsiveBoxProps, key: Key, value: PropValue }) => boolean;
     resolveInStyle?: (props: ResolveInStyleProps) => string | number;
     isToken?: (isT: () => boolean, value: PropValue) => value is string;
+    modifyValue?: (value: PropValue) => PropValue;
 };
 
 // export type OriginPropConfig = {
@@ -230,6 +235,8 @@ export const resolveTransformTranslate = (v: string) => {
 //     return String(value);
 // };
 
+const widthsPrefixes = new Set(['w', 'min-w', 'max-w']);
+
 export const config: OriginPropConfig[] = [
     { key: 'boxShadow', prefix: 'shadow', tokens: shadowsTokens },
 
@@ -253,7 +260,7 @@ export const config: OriginPropConfig[] = [
         tokens: gapsTokens,
     })),
 
-    // { key: 'borderRadius', prefix: 'rounded', tokens: radiiTokens },
+    { key: 'borderRadius', prefix: 'rounded', tokens: radiiTokens },
 
     // Typography
     { key: 'fontSize', prefix: 'fs', tokens: fontSizesTokens },
@@ -267,7 +274,14 @@ export const config: OriginPropConfig[] = [
     { key: 'flexDirection', prefix: 'dir', tokens: flexDirectionsTokens },
     { key: 'justifyContent', prefix: 'justify', tokens: justifyContentsTokens },
     { key: 'alignItems', prefix: 'align', tokens: alignItemsTokens },
-    { key: 'flexWrap', prefix: 'wrap', tokens: flexWrapsTokens },
+    {
+        key: 'flexWrap',
+        prefix: 'wrap',
+        tokens: flexWrapsTokens,
+        modifyValue: (value: PropValue) => {
+            return value === true ? 'wrap' : value;
+        },
+    },
 
     { key: 'aspectRatio', prefix: 'aspect', tokens: aspectsTokens },
 
@@ -293,9 +307,29 @@ export const config: OriginPropConfig[] = [
             return !props || props['transition'] === undefined;
         },
     },
+    {
+        key: 'transP',
+        prefix: 'trans-p',
+        tokens: transitionPropertiesTokens,
+        check: ({ props }) => {
+            return !props || props['transition'] === undefined;
+        },
+
+        // transitionPropertiesTokens,
+    },
 
     // Others
-    { key: 'zIndex', prefix: 'z', tokens: zIndexesTokens },
+    {
+        key: 'zIndex',
+        prefix: 'z',
+        tokens: zIndexesTokens,
+        modifyValue: (value: PropValue) => {
+            return typeof value === 'number' &&
+                (zNumberIndexes as readonly number[]).includes(value)
+                ? String(value)
+                : value;
+        },
+    },
     { key: 'display', prefix: 'd', tokens: displaysTokens },
 
     // Transform
@@ -358,6 +392,9 @@ export const config: OriginPropConfig[] = [
             key: key,
             prefix: prefix ?? key,
             tokens: gapsTokens,
+            isToken: (isT: () => boolean, value: PropValue): value is string => {
+                return typeof value === 'number' || isT();
+            },
         }),
     ),
 
@@ -376,17 +413,13 @@ export const config: OriginPropConfig[] = [
 
     // Positioning
     { key: 'position', prefix: 'pos', tokens: positionsTokens },
-    ...(
-        [
-            ['top', 't'],
-            ['left', 'l'],
-            ['right', 'r'],
-            ['bottom', 'b'],
-        ] as const
-    ).map(([key, prefix]) => ({
+    ...([['top'], ['left'], ['right'], ['bottom']] as const).map(([key]) => ({
         key: key,
-        prefix,
         tokens: insetsTokens,
+        map: insetsMap,
+        modifyValue: (value: PropValue) => {
+            return value === 0 ? '0' : value;
+        },
     })),
 
     // Overflow
@@ -426,6 +459,13 @@ export const config: OriginPropConfig[] = [
         key: key,
         prefix,
         tokens: sizesTokens,
+        modifyValue: (value: PropValue) => {
+            if (value !== 'screen') return value;
+            return widthsPrefixes.has(prefix) ? 'screen-w' : 'screen-h';
+        },
+        isToken: (isT: () => boolean, value: PropValue): value is string => {
+            return value === 'screen-w' || value === 'screen-h' || isT();
+        },
     })),
 
     // Grid
@@ -435,6 +475,9 @@ export const config: OriginPropConfig[] = [
         tokens: gridsTokens,
         isToken: (isT: () => boolean, value: PropValue): value is string => {
             return typeof value === 'number' || isT();
+        },
+        modifyValue: (value: PropValue) => {
+            return value === true ? 12 : value;
         },
     },
 
@@ -467,7 +510,16 @@ export type LookupKey = Key | StyleAliasKey;
 
 export const configLookup: Record<LookupKey, MapedPropConfig> = Object.fromEntries(
     config.flatMap(
-        ({ key, prefix, map, tokens, check, resolveInStyle, isToken: configIsToken }) => {
+        ({
+            key,
+            prefix,
+            map,
+            tokens,
+            check,
+            resolveInStyle,
+            isToken: configIsToken,
+            modifyValue,
+        }) => {
             const alias = stylePropToAliasMap[key as keyof typeof stylePropToAliasMap];
             // const alias = hasKey(stylePropToAliasMap, key) ? stylePropToAliasMap[key] : undefined;
             const mappedProp: MapedPropConfig = Object.freeze({
@@ -480,6 +532,7 @@ export const configLookup: Record<LookupKey, MapedPropConfig> = Object.fromEntri
                     const isT = () => isToken(value, tokens);
                     return configIsToken ? configIsToken(isT, value) : isT();
                 },
+                modifyValue,
                 ...(alias !== undefined && { alias }),
             });
 
