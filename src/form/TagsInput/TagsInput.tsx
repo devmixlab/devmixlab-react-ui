@@ -379,8 +379,9 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             setInputValue('');
         };
         const removeTag = (index: number) => {
-            const removed = tags[index];
+            if (disabled) return;
 
+            const removed = tags[index];
             if (removed.disabled) return;
 
             const next = tags.filter((_, i) => i !== index);
@@ -861,6 +862,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />
                 <input
                     ref={combinedRef}
+                    disabled={disabled}
                     value={inputValue}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}

@@ -1,0 +1,174 @@
+@use '../../functions' as functions;
+@use '../../mixins' as mixins;
+
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$tags-input-prefix: #{$p}--tags-input;
+
+$sizes: (
+    sm: (height: 32px, fontSize: 14px, spacingX: 8px, spacingY: 3px, spacingTop: 6px, gap: 4px),
+    md: (height: 40px, fontSize: 16px, spacingX: 16px, spacingY: 6px, spacingTop: 10px, gap: 6px),
+    lg: (height: 48px, fontSize: 18px, spacingX: 24px, spacingY: 9px, spacingTop: 12px, gap: 8px),
+);
+
+.#{$tags-input-prefix} {
+    display: flex;
+    flex-wrap: wrap;
+    //--height: auto;
+    //min-height: var(--height);
+    //align-items: flex-start;
+    --icon-adjust: 2px; // adjust icon to look consistent, its just fix
+    --slot-align: center;
+    --slot-h: auto;
+    gap: var(--gap);
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            --height: auto;
+            --min-height: #{map.get($value, height)};
+            --top-offset: #{map.get($value, spacingTop)};
+            --y-offset: #{map.get($value, spacingTop)};
+            //--action-hit-area-offset: #{map.get($value, actionHitAreaOffset)};
+        }
+    }
+
+    --slot-pt: calc(var(--top-offset));
+    --pl: calc(var(--start-width) + var(--spacing-x) + var(--gap));
+    --pr: calc(var(--end-width) + var(--spacing-x) + var(--gap));
+    --pt: var(--y-offset);
+    --pb: var(--y-offset);
+
+    //@each $size, $value in $sizes {
+    //    //$gaps: map.get($input-gaps, $size);
+    //    &.#{$p}--size-#{$size} {
+    //
+    //        // Slot vars
+    //        //--top-offset: 0px;
+    //        --top-offset: #{map.get($value, spacingTop)};
+    //        --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
+    //        --y-offset: #{map.get($value, spacingY)};
+    //        --gap: #{map.get($gaps, gap)};
+    //        --actions-gap: #{map.get($gaps, actionsGap)};
+    //        --checkbox-gap: #{map.get($gaps, controlGap)};
+    //
+    //        --pt: var(--y-offset);
+    //        --pb: var(--y-offset);
+    //
+    //        // Field vars
+    //        //--pl: 100px;
+    //        //--pl: var(--x-offset); // default field padding left
+    //        --pr: var(--x-offset); // default field padding right
+    //        --field-pl: var(--x-offset); // default field padding left
+    //        --field-pr: var(--x-offset); // default field padding right
+    //        //--field-pl: 20px;
+    //        --min-height: #{map.get($value, height)};
+    //        //--min-height: 100px;
+    //        //--height: 100%;
+    //        --fs: #{map.get($value, fontSize)};
+    //        //--stepper-width: calc(var(--height) * 0.6);
+    //
+    //        &.#{$compPrefix}--has-start-slot {
+    //            --pl: calc(var(--start-width) + var(--gap));
+    //        }
+    //
+    //        &.#{$compPrefix}--has-end-slot {
+    //            --pr: calc(var(--end-width) + var(--gap));
+    //        }
+    //    }
+    //}
+
+    .#{$p}--field {
+        flex: 0 0 auto;   // 👈 force override
+        width: auto;      // 👈 CRITICAL
+        min-width: 20px;
+
+        //min-width: 60px;    // keep cursor visible
+        max-width: 100%;
+
+        height: auto;
+        padding: 0;
+    }
+
+    .#{$p}--mirror {
+        position: absolute;
+        visibility: hidden;
+        white-space: pre;
+
+        font: inherit;         // 👈 VERY important
+        letter-spacing: inherit;
+
+        padding: 0;
+        margin: 0;
+    }
+
+    .#{$p}--tag{
+        &--selected {
+            //background: var(--color-primary-soft);
+            //outline: 2px solid red;
+        }
+        &--active {
+            outline: none;
+            //outline: 2px solid var(--border-hover);
+            //outline-offset: 2px;
+        }
+        //&:focus {
+        //    outline: 2px solid var(currentColor);
+        //}
+    }
+
+    //.#{$compPrefix}__tag--active {
+    //    outline: 2px solid var(currentColor);
+    //    outline-offset: 2px;
+    //}
+
+    //.#{$compPrefix}__tag--select {
+    //    outline: 2px solid red;
+    //    outline-offset: 2px;
+    //    display: none;
+    //}
+
+    .#{$p}--tag-edit {
+        flex: 0 0 auto;
+        min-width: 20px;
+        max-width: 100%;
+        width: auto;
+
+        caret-color: currentColor;
+        transition: background 0.15s ease;
+
+        height: auto;
+        padding: 0;
+
+        // 🔥 remove default input styles
+        border: none;
+        outline: none;
+        background: transparent;
+
+        // 🔥 inherit text styles
+        font: inherit;
+        color: inherit;
+        line-height: inherit;
+
+        // 🔥 spacing to match chip
+        padding-inline: calc(var(--gap) * 0.75);
+
+        // 🔥 prevent layout shift
+        display: inline-flex;
+        align-items: center;
+
+        // 🔥 optional subtle editing state
+        border-radius: 6px;
+
+        &:focus {
+            outline: none;
+            background: rgba(0, 0, 0, 0.05); // or use your token
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}

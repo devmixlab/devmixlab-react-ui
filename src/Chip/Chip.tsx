@@ -2,7 +2,13 @@ import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { Box, type BoxProps } from '../Box/Box';
 import { Size, Intent, Variant } from './chip.tokens';
-import { prefix } from './chip.helpers';
+// import { prefix } from './chip.helpers';
+import { CLASS_PREFIX } from '../constants';
+import { classPrefix } from '../utils/classPrefix';
+
+export const prefix = (name: string = '') => {
+    return classPrefix(`--chip${name}`);
+};
 
 // export type ButtonProps = React.ButtonHTMLAttributes<HTMLElement> & {
 export type ChipProps = {
@@ -71,20 +77,20 @@ const Chip = forwardRef(
 
         const Component = as ?? (isLinkOnly ? 'a' : isButton ? 'button' : 'span');
 
-        const cl = clsx(
-            className,
-            prefix(),
-            prefix(`--${variant}`),
-            prefix(`--${intent}`),
-            prefix(`--size-${size}`),
-            {
-                [prefix(`--removable`)]: removable,
-                [prefix(`--disabled`)]: disabled,
-                [prefix(`--selected`)]: selected,
-                [prefix(`--interactive`)]: isInteractive,
-                [prefix(`--focused`)]: focused,
-            },
-        );
+        // const cl = clsx(
+        //     className,
+        //     classPrefix('--chip'),
+        //     // prefix(`--${variant}`),
+        //     // prefix(`--${intent}`),
+        //     // prefix(`--size-${size}`),
+        //     // {
+        //     //     [prefix(`--removable`)]: removable,
+        //     //     [prefix(`--disabled`)]: disabled,
+        //     //     [prefix(`--selected`)]: selected,
+        //     //     [prefix(`--interactive`)]: isInteractive,
+        //     //     [prefix(`--focused`)]: focused,
+        //     // },
+        // );
 
         const handleClick = (e: React.MouseEvent<any>) => {
             if (disabled) {
@@ -131,12 +137,21 @@ const Chip = forwardRef(
                 as={Component}
                 type={Component === 'button' ? 'button' : undefined}
                 ref={ref}
-                className={cl}
+                className={clsx(className, prefix())}
                 disabled={Component === 'button' ? disabled : undefined}
                 rounded={rounded}
+                // rounded="lg"
                 {...restProps}
                 onClick={isInteractive ? handleClick : undefined}
                 onKeyDown={!isButton && !isLink && isInteractive ? handleKeyDown : undefined}
+                data-variant={variant}
+                data-intent={intent}
+                data-size={size}
+                data-removable={removable || undefined}
+                data-disabled={disabled || undefined}
+                data-selected={selected || undefined}
+                data-interactive={isInteractive || undefined}
+                data-focused={focused || undefined}
             >
                 {/* START ICON */}
                 {startIcon != null && <span className={prefix(`__icon`)}>{startIcon}</span>}
