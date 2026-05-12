@@ -724,11 +724,44 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             setInputValue('');
         };
 
-        const cl = clsx(className, classPrefix('--tags-input'));
+        const tagNodeWrapper = (
+            tag: TagItem,
+            i: number,
+            id: string | number,
+            tagNode: React.ReactNode,
+        ) => {
+            return (
+                <div
+                    ref={(el) => {
+                        if (tag.id != null) {
+                            tagRefs.current[tag.id] = el;
+                        }
+                    }}
+                    key={id}
+                    tabIndex={!tag.disabled && activeId === id ? 0 : -1}
+                    onFocus={() => {
+                        if (tag.disabled) return;
+                        setActiveId(id);
+                        setSelectionStart(null);
+                        setSelectionEnd(null);
+                    }}
+                    onKeyDown={(e) => handleTagKeyDown(e)}
+                    onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
+                    style={{ display: 'inline-flex' }}
+                    className={clsx(classPrefix('--tag'), {
+                        [classPrefix('--tag--active')]: activeId === id,
+                        [classPrefix('--tag--selected')]: isSelected(i),
+                        [classPrefix('--tag--disabled')]: tag.disabled,
+                    })}
+                >
+                    {tagNode}
+                </div>
+            );
+        };
 
         return (
             <FieldRoot
-                className={cl}
+                className={clsx(className, classPrefix('--tags-input'))}
                 invalid={invalid}
                 disabled={disabled}
                 rounded={rounded}
@@ -789,74 +822,55 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             disabled: disabled || tag.disabled,
                         });
 
-                        return React.isValidElement(node) ? (
-                            <div
-                                ref={(el) => {
-                                    if (tag.id != null) {
-                                        tagRefs.current[tag.id] = el;
-                                    }
-                                }}
-                                key={id}
-                                tabIndex={!tag.disabled && activeId === id ? 0 : -1}
-                                onFocus={() => {
-                                    if (tag.disabled) return;
-                                    setActiveId(id);
-                                    setSelectionStart(null);
-                                    setSelectionEnd(null);
-                                }}
-                                onKeyDown={(e) => handleTagKeyDown(e)}
-                                onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
-                                style={{ display: 'inline-flex' }}
-                                className={clsx(classPrefix('--tag'), {
-                                    [classPrefix('--tag--active')]: activeId === id,
-                                    [classPrefix('--tag--selected')]: isSelected(i),
-                                    [classPrefix('--tag--disabled')]: tag.disabled,
-                                })}
-                            >
-                                {node}
-                            </div>
-                        ) : (
-                            node
-                        );
+                        return React.isValidElement(node) ? tagNodeWrapper(tag, i, id, node) : node;
+
+                        // return React.isValidElement(node) ? (
+                        //     <div
+                        //         ref={(el) => {
+                        //             if (tag.id != null) {
+                        //                 tagRefs.current[tag.id] = el;
+                        //             }
+                        //         }}
+                        //         key={id}
+                        //         tabIndex={!tag.disabled && activeId === id ? 0 : -1}
+                        //         onFocus={() => {
+                        //             if (tag.disabled) return;
+                        //             setActiveId(id);
+                        //             setSelectionStart(null);
+                        //             setSelectionEnd(null);
+                        //         }}
+                        //         onKeyDown={(e) => handleTagKeyDown(e)}
+                        //         onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
+                        //         style={{ display: 'inline-flex' }}
+                        //         className={clsx(classPrefix('--tag'), {
+                        //             [classPrefix('--tag--active')]: activeId === id,
+                        //             [classPrefix('--tag--selected')]: isSelected(i),
+                        //             [classPrefix('--tag--disabled')]: tag.disabled,
+                        //         })}
+                        //     >
+                        //         {node}
+                        //     </div>
+                        // ) : (
+                        //     node
+                        // );
                     }
 
-                    // 🔥 DEFAULT CHIP
-                    return (
-                        <div
-                            ref={(el) => {
-                                if (tag.id != null) {
-                                    tagRefs.current[tag.id] = el;
-                                }
-                            }}
-                            key={tag.id ?? tag.value}
-                            tabIndex={!tag.disabled && activeId === id ? 0 : -1}
-                            onFocus={() => {
-                                if (tag.disabled) return;
-                                setActiveId(id);
-                                setSelectionStart(null);
-                                setSelectionEnd(null);
-                            }}
-                            onKeyDown={(e) => handleTagKeyDown(e)}
-                            onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
-                            style={{ display: 'inline-flex' }}
-                            className={clsx(classPrefix('--tag'), {
-                                [classPrefix('--tag--active')]: activeId === id,
-                                [classPrefix('--tag--selected')]: isSelected(i),
-                                [classPrefix('--tag--disabled')]: tag.disabled,
-                            })}
+                    // DEFAULT CHIP
+                    return tagNodeWrapper(
+                        tag,
+                        i,
+                        id,
+                        <Chip
+                            size={size}
+                            removable={!tag.disabled}
+                            disabled={tag.disabled}
+                            onRemove={remove}
+                            intent="primary"
+                            selected={isSelected(i)}
+                            focused={!tag.disabled && activeId === id}
                         >
-                            <Chip
-                                size={size}
-                                removable={!tag.disabled}
-                                disabled={tag.disabled}
-                                onRemove={remove}
-                                intent="primary"
-                                selected={isSelected(i)}
-                                focused={!tag.disabled && activeId === id}
-                            >
-                                {tag.label}
-                            </Chip>
-                        </div>
+                            {tag.label}
+                        </Chip>,
                     );
                 })}
                 <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />

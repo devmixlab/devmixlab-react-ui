@@ -40,45 +40,6 @@ $sizes: (
     --pt: var(--y-offset);
     --pb: var(--y-offset);
 
-    //@each $size, $value in $sizes {
-    //    //$gaps: map.get($input-gaps, $size);
-    //    &.#{$p}--size-#{$size} {
-    //
-    //        // Slot vars
-    //        //--top-offset: 0px;
-    //        --top-offset: #{map.get($value, spacingTop)};
-    //        --x-offset: #{map.get($value, spacingX)}; // slot x axis offset
-    //        --y-offset: #{map.get($value, spacingY)};
-    //        --gap: #{map.get($gaps, gap)};
-    //        --actions-gap: #{map.get($gaps, actionsGap)};
-    //        --checkbox-gap: #{map.get($gaps, controlGap)};
-    //
-    //        --pt: var(--y-offset);
-    //        --pb: var(--y-offset);
-    //
-    //        // Field vars
-    //        //--pl: 100px;
-    //        //--pl: var(--x-offset); // default field padding left
-    //        --pr: var(--x-offset); // default field padding right
-    //        --field-pl: var(--x-offset); // default field padding left
-    //        --field-pr: var(--x-offset); // default field padding right
-    //        //--field-pl: 20px;
-    //        --min-height: #{map.get($value, height)};
-    //        //--min-height: 100px;
-    //        //--height: 100%;
-    //        --fs: #{map.get($value, fontSize)};
-    //        //--stepper-width: calc(var(--height) * 0.6);
-    //
-    //        &.#{$compPrefix}--has-start-slot {
-    //            --pl: calc(var(--start-width) + var(--gap));
-    //        }
-    //
-    //        &.#{$compPrefix}--has-end-slot {
-    //            --pr: calc(var(--end-width) + var(--gap));
-    //        }
-    //    }
-    //}
-
     .#{$p}--field {
         flex: 0 0 auto;   // 👈 force override
         width: auto;      // 👈 CRITICAL
