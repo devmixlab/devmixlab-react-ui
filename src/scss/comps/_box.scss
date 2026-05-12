@@ -1,0 +1,751 @@
+@use '../functions' as functions;
+@use '../mixins' as mixins;
+
+@use '../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+
+$breakpoints: (
+    xs: 480px,   // extra small phones
+    sm: 640px,   // small devices
+    md: 768px,   // tablets
+    lg: 1024px,  // desktops
+    xl: 1280px,  // large desktops
+    '2xl': 1536px // very large screens
+);
+
+$spacing: (
+    0: 0px,
+    //'0.5': 2px,
+    1: 4px,
+    //'1.5': 6px,
+    2: 8px,
+    3: 12px,
+    4: 16px,
+    5: 20px,
+    6: 24px,
+    7: 28px,
+    8: 32px,
+    9: 36px,
+    10: 40px,
+    12: 48px,
+    16: 64px,
+    20: 80px
+);
+
+// Generate grid column utilities (12-column system)
+//@for $i from 1 through 12 {
+//    // default
+//    .#{$prefix}col-#{$i} {
+//        grid-column: span #{$i};
+//    }
+//
+//    // responsive
+//    @each $breakpoint, $min-width in $breakpoints {
+//        @media (min-width: $min-width) {
+//            .#{$prefix}#{$breakpoint}\:col-#{$i} {
+//                grid-column: span #{$i};
+//            }
+//        }
+//    }
+//}
+
+.#{$p}--col {
+    grid-column: 1 / -1; // spans all columns
+}
+
+// Generate default column classes
+@for $i from 1 through 12 {
+    .#{$p}--col-#{$i} {
+        grid-column: span #{$i};
+    }
+}
+
+// Generate responsive column classes in **mobile-first order**
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        @for $i from 1 through 12 {
+            .#{$p}--#{$breakpoint}\:col-#{$i} {
+                grid-column: span #{$i};
+            }
+        }
+    }
+}
+
+// Generate base spacing utilities
+@each $key, $value in $spacing {
+    .#{$p}--p-#{$key} {
+        padding: $value;
+    }
+    .#{$p}--pt-#{$key} {
+        padding-top: $value;
+    }
+    .#{$p}--pb-#{$key} {
+        padding-bottom: $value;
+    }
+    .#{$p}--pl-#{$key} {
+        padding-left: $value;
+    }
+    .#{$p}--pr-#{$key} {
+        padding-right: $value;
+    }
+    .#{$p}--px-#{$key} {
+        padding-left: $value;
+        padding-right: $value;
+    }
+    .#{$p}--py-#{$key} {
+        padding-top: $value;
+        padding-bottom: $value;
+    }
+
+    .#{$p}--m-#{$key} {
+        margin: $value;
+    }
+    .#{$p}--mt-#{$key} {
+        margin-top: $value;
+    }
+    .#{$p}--mb-#{$key} {
+        margin-bottom: $value;
+    }
+    .#{$p}--ml-#{$key} {
+        margin-left: $value;
+    }
+    .#{$p}--mr-#{$key} {
+        margin-right: $value;
+    }
+    .#{$p}--mx-#{$key} {
+        margin-left: $value;
+        margin-right: $value;
+    }
+    .#{$p}--my-#{$key} {
+        margin-top: $value;
+        margin-bottom: $value;
+    }
+}
+
+// Generate responsive spacing utilities
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        @each $key, $value in $spacing {
+            .#{$p}--#{$breakpoint}\:p-#{$key} {
+                padding: $value;
+            }
+            .#{$p}--#{$breakpoint}\:pt-#{$key} {
+                padding-top: $value;
+            }
+            .#{$p}--#{$breakpoint}\:pb-#{$key} {
+                padding-bottom: $value;
+            }
+            .#{$p}--#{$breakpoint}\:pl-#{$key} {
+                padding-left: $value;
+            }
+            .#{$p}--#{$breakpoint}\:pr-#{$key} {
+                padding-right: $value;
+            }
+            .#{$p}--#{$breakpoint}\:px-#{$key} {
+                padding-left: $value;
+                padding-right: $value;
+            }
+            .#{$p}--#{$breakpoint}\:py-#{$key} {
+                padding-top: $value;
+                padding-bottom: $value;
+            }
+
+            .#{$p}--#{$breakpoint}\:m-#{$key} {
+                margin: $value;
+            }
+            .#{$p}--#{$breakpoint}\:mt-#{$key} {
+                margin-top: $value;
+            }
+            .#{$p}--#{$breakpoint}\:mb-#{$key} {
+                margin-bottom: $value;
+            }
+            .#{$p}--#{$breakpoint}\:ml-#{$key} {
+                margin-left: $value;
+            }
+            .#{$p}--#{$breakpoint}\:mr-#{$key} {
+                margin-right: $value;
+            }
+            .#{$p}--#{$breakpoint}\:mx-#{$key} {
+                margin-left: $value;
+                margin-right: $value;
+            }
+            .#{$p}--#{$breakpoint}\:my-#{$key} {
+                margin-top: $value;
+                margin-bottom: $value;
+            }
+        }
+    }
+}
+
+$spacing: (
+    0: 0px,
+    xs: 4px,
+    sm: 8px,
+    md: 16px,
+    lg: 24px,
+    xl: 32px,
+    2xl: 48px,
+);
+
+$size-tokens: (
+    full: 100%,
+    screen: 100vh,
+    '1/2': 50%,
+    '1/3': 33.3333%,
+    '2/3': 66.6667%,
+    '1/4': 25%,
+    '3/4': 75%,
+    '1/5': 20%,
+    '2/5': 40%,
+    '3/5': 60%,
+    '4/5': 80%,
+    '1/10': 10%
+);
+
+$aspect-tokens: (
+    '1': 1,
+    '1/1': 1 / 1,
+    '16/9': 16 / 9,
+    '4/3': 4 / 3,
+    '3/2': 3 / 2,
+    '21/9': 21 / 9
+);
+
+// inset tokens
+$inset-values: (
+    '0': 0,
+    auto: auto,
+    '1/2': 50%,
+    full: 100%
+);
+
+$transition-durations: (
+    fast: 150ms,
+    normal: 300ms,
+    slow: 500ms
+);
+
+$transition-easings: (
+    linear: linear,
+    ease: ease,
+    'ease-in': ease-in,
+    'ease-out': ease-out,
+    'ease-in-out': ease-in-out
+);
+
+$z-indexes: (
+    base: 0,
+    dropdown: 1000,
+    sticky: 1100,
+    overlay: 1200,
+    modal: 1300,
+    tooltip: 1400
+);
+
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+    @return $string;
+}
+
+.#{$p} {
+
+    // gap
+    @each $size, $value in $spacing {
+        &--gap-#{$size} {
+            gap: $value;
+        }
+        &--row-gap-#{$size} {
+            row-gap: $value;
+        }
+        &--col-gap-#{$size} {
+            column-gap: $value;
+        }
+    }
+
+    // overflow
+    @each $token in ('auto', 'hidden', 'scroll', 'visible') {
+        &--ov-#{$token} {
+            overflow: #{$token};
+        }
+        &--ov-x-#{$token} {
+            overflow-x: #{$token};
+        }
+        &--ov-y-#{$token} {
+            overflow-y: #{$token};
+        }
+    }
+
+    // display
+    @each $d in (block, inline, inline-block, flex, grid, none) {
+        &--d-#{$d} {
+            display: #{$d};
+        }
+    }
+
+    // Z-index
+    @each $name, $value in $z-indexes {
+        &--z-#{$name} {
+            z-index: $value;
+        }
+    }
+
+    // Transition
+    @each $name, $value in $transition-durations {
+        &--trans-d-#{$name} {
+            transition-duration: $value;
+        }
+    }
+
+    @each $name, $value in $transition-easings {
+        &--trans-e-#{$name} {
+            transition-timing-function: $value;
+        }
+    }
+
+    // optional base
+    &--transition {
+        transition-property: all;
+    }
+
+    // Position
+    // position
+    &--pos-static {
+        position: static;
+    }
+
+    &--pos-relative {
+        position: relative;
+    }
+
+    &--pos-absolute {
+        position: absolute;
+    }
+
+    &--pos-fixed {
+        position: fixed;
+    }
+
+    &--pos-sticky {
+        position: sticky;
+    }
+
+    @each $name, $value in $inset-values {
+        $safe: str-replace($name, '/', '-');
+
+        &--top-#{$safe} {
+            top: $value;
+        }
+        &--left-#{$safe} {
+            left: $value;
+        }
+        &--right-#{$safe} {
+            right: $value;
+        }
+        &--bottom-#{$safe} {
+            bottom: $value;
+        }
+    }
+
+    // Sizes
+    @each $name, $value in $size-tokens {
+        $safe-name: str-replace($name, '/', '-');
+        &--w-#{$safe-name} {
+            width: $value;
+        }
+        &--h-#{$safe-name} {
+            height: $value;
+        }
+        &--min-w-#{$safe-name} {
+            min-width: $value;
+        }
+        &--max-w-#{$safe-name} {
+            max-width: $value;
+        }
+        &--min-h-#{$safe-name} {
+            min-height: $value;
+        }
+        &--max-h-#{$safe-name} {
+            max-height: $value;
+        }
+    }
+
+    @each $name, $ratio in $aspect-tokens {
+        $safe-name: str-replace($name, '/', '-'); // convert "16/9" → "16-9"
+        &--aspect-#{$safe-name} {
+            aspect-ratio: $ratio;
+        }
+    }
+
+    // Cursor & Pointer Events
+    &--cursor-default {
+        cursor: default;
+    }
+
+    &--cursor-pointer {
+        cursor: pointer;
+    }
+
+    &--cursor-move {
+        cursor: move;
+    }
+
+    &--cursor-text {
+        cursor: text;
+    }
+
+    &--cursor-not-allowed {
+        cursor: not-allowed;
+    }
+
+    &--cursor-grab {
+        cursor: grab;
+    }
+
+    &--cursor-grabbing {
+        cursor: grabbing;
+    }
+
+    &--ptr-auto {
+        pointer-events: auto;
+    }
+
+    &--ptr-none {
+        pointer-events: none;
+    }
+
+    // Flex
+    &--dir-row {
+        flex-direction: row;
+    }
+
+    &--dir-row-reverse {
+        flex-direction: row-reverse;
+    }
+
+    &--dir-column {
+        flex-direction: column;
+    }
+
+    &--dir-column-reverse {
+        flex-direction: column-reverse;
+    }
+
+    &--justify-start {
+        justify-content: flex-start;
+    }
+
+    &--justify-center {
+        justify-content: center;
+    }
+
+    &--justify-end {
+        justify-content: flex-end;
+    }
+
+    &--justify-between {
+        justify-content: space-between;
+    }
+
+    &--justify-around {
+        justify-content: space-around;
+    }
+
+    &--justify-evenly {
+        justify-content: space-evenly;
+    }
+
+    &--align-start {
+        align-items: flex-start;
+    }
+
+    &--align-center {
+        align-items: center;
+    }
+
+    &--align-end {
+        align-items: flex-end;
+    }
+
+    &--align-stretch {
+        align-items: stretch;
+    }
+
+    &--align-baseline {
+        align-items: baseline;
+    }
+
+    &--wrap-nowrap {
+        flex-wrap: nowrap;
+    }
+
+    &--wrap-wrap {
+        flex-wrap: wrap;
+    }
+
+    &--wrap-wrap-reverse {
+        flex-wrap: wrap-reverse;
+    }
+
+    // Spacing
+    @each $size, $value in $spacing {
+        &--p-#{$size} {
+            padding: $value;
+        }
+        &--pt-#{$size} {
+            padding-top: $value;
+        }
+        &--pb-#{$size} {
+            padding-bottom: $value;
+        }
+        &--pl-#{$size} {
+            padding-left: $value;
+        }
+        &--pr-#{$size} {
+            padding-right: $value;
+        }
+        &--px-#{$size} {
+            padding-left: $value;
+            padding-right: $value;
+        }
+        &--py-#{$size} {
+            padding-top: $value;
+            padding-bottom: $value;
+        }
+        &--m-#{$size} {
+            margin: $value;
+        }
+        &--mt-#{$size} {
+            margin-top: $value;
+        }
+        &--mb-#{$size} {
+            margin-bottom: $value;
+        }
+        &--ml-#{$size} {
+            margin-left: $value;
+        }
+        &--mr-#{$size} {
+            margin-right: $value;
+        }
+        &--mx-#{$size} {
+            margin-left: $value;
+            margin-right: $value;
+        }
+        &--my-#{$size} {
+            margin-top: $value;
+            margin-bottom: $value;
+        }
+    }
+
+    .dru--pt-sm {
+        padding-top: 8px;
+    }
+
+    .dru--px-md {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    $shadows: (
+        none: none,
+        xs: 0 1px 2px rgba(0, 0, 0, 0.05),
+        sm:
+            (0 1px 3px rgba(0, 0, 0, 0.08),
+            0 1px 2px rgba(0, 0, 0, 0.04)),
+        md:
+            (0 4px 6px rgba(0, 0, 0, 0.12),
+            0 2px 4px rgba(0, 0, 0, 0.06)),
+        lg:
+            (0 10px 15px rgba(0, 0, 0, 0.16),
+            0 4px 6px rgba(0, 0, 0, 0.08)),
+        xl:
+            (0 20px 25px rgba(0, 0, 0, 0.2),
+            0 8px 10px rgba(0, 0, 0, 0.1)),
+    );
+
+    $shadows-dark: (
+        none: none,
+
+        xs: (
+            0 1px 2px rgba(0, 0, 0, 0.3)
+        ),
+
+        sm: (
+            0 1px 3px rgba(0, 0, 0, 0.35),
+            0 1px 2px rgba(0, 0, 0, 0.2),
+            0 0 0 1px rgba(255, 255, 255, 0.03)
+        ),
+
+        md: (
+            0 4px 6px rgba(0, 0, 0, 0.4),
+            0 2px 4px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.04)
+        ),
+
+        lg: (
+            0 10px 15px rgba(0, 0, 0, 0.45),
+            0 4px 6px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.05)
+        ),
+
+        xl: (
+            0 20px 25px rgba(0, 0, 0, 0.5),
+            0 8px 10px rgba(0, 0, 0, 0.35),
+            0 0 0 1px rgba(255, 255, 255, 0.06)
+        ),
+    );
+
+    @each $name, $value in $shadows {
+        &--shadow-#{$name} {
+            box-shadow: #{$value};
+            @include cfg.dark {
+                box-shadow: #{map-get($shadows-dark, $name)};
+                //background-color: red!important;
+            }
+        }
+    }
+
+    $radii: (
+        none: 0px,
+        xs: 2px,
+        sm: 4px,
+        md: 8px,
+        lg: 12px,
+        xl: 16px,
+        full: 9999px,
+    );
+
+    @each $name, $value in $radii {
+        &--rounded-#{$name} {
+            border-radius: $value;
+        }
+        &--rounded-top-left-#{$name} {
+            border-top-left-radius: $value;
+        }
+        &--rounded-top-right-#{$name} {
+            border-top-right-radius: $value;
+        }
+        &--rounded-bottom-left-#{$name} {
+            border-bottom-left-radius: $value;
+        }
+        &--rounded-bottom-right-#{$name} {
+            border-bottom-right-radius: $value;
+        }
+        &--rounded-left-#{$name} {
+            border-top-left-radius: $value;
+            border-bottom-left-radius: $value;
+        }
+        &--rounded-top-#{$name} {
+            border-top-left-radius: $value;
+            border-top-right-radius: $value;
+        }
+        &--rounded-right-#{$name} {
+            border-top-right-radius: $value;
+            border-bottom-right-radius: $value;
+        }
+        &--rounded-bottom-#{$name} {
+            border-bottom-left-radius: $value;
+            border-bottom-right-radius: $value;
+        }
+    }
+
+    /* font size */
+    &--fs-xs {
+        font-size: 12px;
+    }
+
+    &--fs-sm {
+        font-size: 14px;
+    }
+
+    &--fs-md {
+        font-size: 16px;
+    }
+
+    &--fs-lg {
+        font-size: 18px;
+    }
+
+    &--fs-xl {
+        font-size: 20px;
+    }
+
+    &--fs-2xl {
+        font-size: 24px;
+    }
+
+    &--fs-3xl {
+        font-size: 30px;
+    }
+
+    /* font weight */
+    &--fw-thin {
+        font-weight: 100;
+    }
+    &--fw-light {
+        font-weight: 300;
+    }
+
+    &--fw-normal {
+        font-weight: 400;
+    }
+
+    &--fw-medium {
+        font-weight: 500;
+    }
+
+    &--fw-semibold {
+        font-weight: 600;
+    }
+
+    &--fw-bold {
+        font-weight: 700;
+    }
+
+    /* line height */
+    &--lh-tight {
+        line-height: 1.2;
+    }
+
+    &--lh-normal {
+        line-height: 1.5;
+    }
+
+    &--lh-relaxed {
+        line-height: 1.75;
+    }
+
+    /* letter spacing */
+    &--ls-tight {
+        letter-spacing: -0.01em;
+    }
+
+    &--ls-normal {
+        letter-spacing: 0;
+    }
+
+    &--ls-wide {
+        letter-spacing: 0.05em;
+    }
+
+    /* border width */
+    &--bw-none {
+        border-width: 0;
+    }
+
+    &--bw-thin {
+        border-width: 1px;
+    }
+
+    &--bw-normal {
+        border-width: 2px;
+    }
+
+    &--bw-thick {
+        border-width: 3px;
+    }
+}
