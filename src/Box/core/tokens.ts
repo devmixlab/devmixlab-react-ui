@@ -195,6 +195,30 @@ export const transitionProperties = [
 //     position: 'top, left, right, bottom',
 // } as const;
 
+export const opacities = [
+    '0',
+    '5',
+    '10',
+    '15',
+    '20',
+    '25',
+    '30',
+    '35',
+    '40',
+    '45',
+    '50',
+    '55',
+    '60',
+    '65',
+    '70',
+    '75',
+    '80',
+    '85',
+    '90',
+    '95',
+    '100',
+] as const;
+
 export const zNumberIndexes = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] as const;
 
 export const zTokenIndexes = ['base', 'dropdown', 'sticky', 'overlay', 'modal', 'tooltip'] as const;
@@ -248,3 +272,13 @@ export const overflowWrapsMap: Record<string, (typeof overflowWraps)[number]> = 
 };
 
 export const fontStyles = ['normal', 'italic', 'oblique'] as const;
+
+export const visibilities = ['visible', 'hidden'] as const;
+
+export const userSelects = ['none', 'text', 'all', 'auto'] as const;
+
+export const objectFits = ['contain', 'cover', 'fill', 'none', 'scale-down'] as const;
+
+export const borderStyles = ['none', 'solid', 'dashed', 'dotted'] as const;
+
+export const selfAlignments = ['auto', 'start', 'center', 'end', 'stretch'] as const;

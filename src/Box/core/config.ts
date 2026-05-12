@@ -13,6 +13,16 @@ import {
     insets as insetsTokens,
     justifyContents as justifyContentsTokens,
     letterSpacings as letterSpacingsTokens,
+    textAlignments as textAlignmentsTokens,
+    textTransforms as textTransformsTokens,
+    textDecorations as textDecorationsTokens,
+    whiteSpaces as whiteSpacesTokens,
+    textOverflows as textOverflowsTokens,
+    wordBreaks as wordBreaksTokens,
+    overflowWraps as overflowWrapsTokens,
+    overflowWrapsMap,
+    opacities as opacitiesTokens,
+    fontStyles as fontStylesTokens,
     lineHeights as lineHeightsTokens,
     overflows as overflowsTokens,
     pointerEvents as pointerEventsTokens,
@@ -34,6 +44,17 @@ import {
     grids as gridsTokens,
     cols as colsTokens,
     insetsMap,
+    whiteSpacesMap,
+    wordBreaksMap,
+    textDecorationsMap,
+    // opacities,
+    visibilities as visibilitiesTokens,
+    userSelects as userSelectsTokens,
+    objectFits as objectFitsTokens,
+    borderStyles as borderStylesTokens,
+    selfAlignments as selfAlignmentsTokens,
+    borderStyles,
+    selfAlignments,
 } from './tokens';
 import { Props, BoxProps } from '../Box';
 import { StyleAliasKey, StyleAliasValue, stylePropToAliasMap } from '../../tokens/styleAliasMap';
@@ -267,6 +288,42 @@ export const config: OriginPropConfig[] = [
     { key: 'fontWeight', prefix: 'fw', tokens: fontWeightsTokens },
     { key: 'lineHeight', prefix: 'lh', tokens: lineHeightsTokens },
     { key: 'letterSpacing', prefix: 'ls', tokens: letterSpacingsTokens },
+
+    { key: 'textAlign', prefix: 'text', tokens: textAlignmentsTokens },
+    { key: 'textTransform', prefix: 'text', tokens: textTransformsTokens },
+    {
+        key: 'textDecoration',
+        prefix: 'text-decoration',
+        map: textDecorationsMap,
+        tokens: textDecorationsTokens,
+    },
+    { key: 'whiteSpace', prefix: 'ws', map: whiteSpacesMap, tokens: whiteSpacesTokens },
+    { key: 'textOverflow', prefix: 'text-overflow', tokens: textOverflowsTokens },
+    { key: 'wordBreak', prefix: 'break', map: wordBreaksMap, tokens: wordBreaksTokens },
+    {
+        key: 'overflowWrap',
+        prefix: 'overflow-wrap',
+        map: overflowWrapsMap,
+        tokens: overflowWrapsTokens,
+    },
+    { key: 'fontStyle', prefix: 'font', tokens: fontStylesTokens },
+    {
+        key: 'opacity',
+        tokens: opacitiesTokens,
+        isToken: (isT: () => boolean, value: PropValue): value is string => {
+            return (
+                (typeof value === 'number' &&
+                    (opacitiesTokens as readonly string[]).includes(String(value))) ||
+                isT()
+            );
+        },
+    },
+
+    { key: 'visibility', tokens: visibilitiesTokens },
+    { key: 'userSelect', prefix: 'select', tokens: userSelectsTokens },
+    { key: 'objectFit', prefix: 'object', tokens: objectFitsTokens },
+    { key: 'borderStyle', prefix: 'border', tokens: borderStylesTokens },
+    { key: 'alignSelf', prefix: 'self', tokens: selfAlignmentsTokens },
 
     { key: 'borderWidth', prefix: 'bw', tokens: borderWidthsTokens },
 

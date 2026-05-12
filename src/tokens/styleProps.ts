@@ -197,6 +197,8 @@ export const styleProps = defineStyleProps([
     'cursor',
     'pointerEvents',
     'visibility',
+    'userSelect',
+    'resize',
 
     // 12. Media
     'objectFit',

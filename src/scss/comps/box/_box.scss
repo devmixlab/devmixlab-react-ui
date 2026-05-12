@@ -381,10 +381,6 @@ $p: cfg.$prefix;
         }
     }
 
-
-    // NEW
-    /////////////////////////////////////////
-
     // text align
     @each $name, $value in $text-alignments {
         &--text-#{$name} {
@@ -448,6 +444,9 @@ $p: cfg.$prefix;
         }
     }
 
+    // NEW
+    /////////////////////////////////////////
+
     // visibility
     @each $name, $value in $visibilities {
         &--visibility-#{$name} {
@@ -468,10 +467,8 @@ $p: cfg.$prefix;
     }
 
     // textarea resize
-    @each $name, $value in $resizes {
-        &--resize-#{$name} {
-            resize: $value;
-        }
+    &--resize-none {
+        resize: none;
     }
 
     // media
