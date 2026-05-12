@@ -110,6 +110,9 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 return;
             }
 
+            // prevent native blur when clicking empty wrapper area
+            // e.preventDefault();
+
             // focusTargetRef?.current?.focus();
             if (focusTargetRef?.current && document.activeElement !== focusTargetRef.current) {
                 focusTargetRef.current.focus();

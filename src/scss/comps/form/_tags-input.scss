@@ -64,32 +64,6 @@ $sizes: (
         margin: 0;
     }
 
-    .#{$p}--tag{
-        &--selected {
-            //background: var(--color-primary-soft);
-            //outline: 2px solid red;
-        }
-        &--active {
-            outline: none;
-            //outline: 2px solid var(--border-hover);
-            //outline-offset: 2px;
-        }
-        //&:focus {
-        //    outline: 2px solid var(currentColor);
-        //}
-    }
-
-    //.#{$compPrefix}__tag--active {
-    //    outline: 2px solid var(currentColor);
-    //    outline-offset: 2px;
-    //}
-
-    //.#{$compPrefix}__tag--select {
-    //    outline: 2px solid red;
-    //    outline-offset: 2px;
-    //    display: none;
-    //}
-
     .#{$p}--tag-edit {
         flex: 0 0 auto;
         min-width: 20px;
@@ -130,6 +104,21 @@ $sizes: (
         &:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+    }
+
+    //&[data-disabled] {
+    //    .#{$p}--tag {
+    //        pointer-events: none;
+    //    }
+    //}
+
+    .#{$p}--tag {
+        &[data-disabled] {
+            pointer-events: none;
+        }
+        &[data-active] {
+            outline: none;
         }
     }
 }

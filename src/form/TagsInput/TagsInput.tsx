@@ -745,14 +745,31 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         setSelectionStart(null);
                         setSelectionEnd(null);
                     }}
+                    onBlur={(e) => {
+                        const next = e.relatedTarget as Node | null;
+
+                        // still inside current tag wrapper
+                        if (e.currentTarget.contains(next)) return;
+
+                        setActiveId(null);
+                    }}
                     onKeyDown={(e) => handleTagKeyDown(e)}
                     onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (tag.disabled) return;
+
+                        setActiveId(id);
+
+                        requestAnimationFrame(() => {
+                            tagRefs.current[id]?.focus();
+                        });
+                    }}
                     style={{ display: 'inline-flex' }}
-                    className={clsx(classPrefix('--tag'), {
-                        [classPrefix('--tag--active')]: activeId === id,
-                        [classPrefix('--tag--selected')]: isSelected(i),
-                        [classPrefix('--tag--disabled')]: tag.disabled,
-                    })}
+                    className={classPrefix('--tag')}
+                    data-active={activeId === id || undefined}
+                    data-selected={isSelected(i) || undefined}
+                    data-disabled={tag.disabled || disabled || undefined}
                 >
                     {tagNode}
                 </div>
@@ -821,38 +838,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             remove,
                             disabled: disabled || tag.disabled,
                         });
-
                         return React.isValidElement(node) ? tagNodeWrapper(tag, i, id, node) : node;
-
-                        // return React.isValidElement(node) ? (
-                        //     <div
-                        //         ref={(el) => {
-                        //             if (tag.id != null) {
-                        //                 tagRefs.current[tag.id] = el;
-                        //             }
-                        //         }}
-                        //         key={id}
-                        //         tabIndex={!tag.disabled && activeId === id ? 0 : -1}
-                        //         onFocus={() => {
-                        //             if (tag.disabled) return;
-                        //             setActiveId(id);
-                        //             setSelectionStart(null);
-                        //             setSelectionEnd(null);
-                        //         }}
-                        //         onKeyDown={(e) => handleTagKeyDown(e)}
-                        //         onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
-                        //         style={{ display: 'inline-flex' }}
-                        //         className={clsx(classPrefix('--tag'), {
-                        //             [classPrefix('--tag--active')]: activeId === id,
-                        //             [classPrefix('--tag--selected')]: isSelected(i),
-                        //             [classPrefix('--tag--disabled')]: tag.disabled,
-                        //         })}
-                        //     >
-                        //         {node}
-                        //     </div>
-                        // ) : (
-                        //     node
-                        // );
                     }
 
                     // DEFAULT CHIP
@@ -863,11 +849,11 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         <Chip
                             size={size}
                             removable={!tag.disabled}
-                            disabled={tag.disabled}
+                            disabled={tag.disabled || disabled}
                             onRemove={remove}
                             intent="primary"
                             selected={isSelected(i)}
-                            focused={!tag.disabled && activeId === id}
+                            focused={!tag.disabled && !disabled && activeId === id}
                         >
                             {tag.label}
                         </Chip>,
