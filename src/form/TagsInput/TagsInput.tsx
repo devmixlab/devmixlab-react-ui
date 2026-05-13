@@ -56,6 +56,7 @@ export type TagsInputProps = Omit<TextInputProps, 'value' | 'defaultValue' | 'on
     renderTag?: (params: RenderTagParams) => React.ReactNode;
 
     invalid?: boolean;
+    readOnly?: boolean;
     rounded?: BoxProps['rounded'];
     variant?: Variant;
     size?: Size;
@@ -106,6 +107,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             renderTag,
 
             invalid,
+            readOnly = false,
             disabled,
             rounded = 'md',
             variant = 'outlined',
@@ -161,7 +163,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
 
         const isEditable = (tag: TagItem, index: number) => {
-            if (disabled || tag.disabled) return false;
+            // if (disabled || tag.disabled) return false;
+            if (disabled || readOnly || tag.disabled) return false;
 
             if (typeof editable === 'function') {
                 return editable(tag, index);
@@ -171,7 +174,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
 
         const isRemovable = (tag: TagItem, index: number) => {
-            if (disabled || tag.disabled) return false;
+            // if (disabled || tag.disabled) return false;
+            if (disabled || readOnly || tag.disabled) return false;
 
             if (typeof removable === 'function') {
                 return removable(tag, index);
@@ -325,7 +329,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         }, [editingValue, editingIndex]);
 
         const handleClearAll = async () => {
-            if (disabled) return;
+            if (disabled || readOnly) return;
 
             const shouldClear = await onClearAll?.(tags);
 
@@ -347,6 +351,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     onMouseDown={(e) => e.preventDefault()} // 👈 keep focus
                     onClick={handleClearAll}
                     className={classPrefix('--clear-button')}
+                    disabled={disabled || readOnly}
                 >
                     {finalClearIcon}
                 </button>
@@ -399,7 +404,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             setInputValue('');
         };
         const removeTag = (index: number) => {
-            if (disabled) return;
+            if (disabled || readOnly) return;
 
             const removed = tags[index];
             if (!isRemovable(removed, index)) return;
@@ -810,9 +815,10 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         }
                     }}
                     key={id}
-                    tabIndex={!tag.disabled && activeId === id ? 0 : -1}
+                    // tabIndex={!tag.disabled && activeId === id ? 0 : -1}
+                    tabIndex={!readOnly && !tag.disabled && activeId === id ? 0 : -1}
                     onFocus={() => {
-                        if (tag.disabled) return;
+                        if (readOnly || tag.disabled) return;
                         setActiveId(id);
                         setSelectionStart(null);
                         setSelectionEnd(null);
@@ -829,7 +835,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                     onClick={(e) => {
                         e.stopPropagation();
-                        if (tag.disabled) return;
+
+                        if (readOnly || tag.disabled) return;
 
                         setActiveId(id);
 
@@ -855,8 +862,9 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 className={clsx(className, classPrefix('--tags-input'))}
                 invalid={invalid}
                 disabled={disabled}
+                readOnly={readOnly}
                 rounded={rounded}
-                focusTargetRef={inputRef}
+                focusTargetRef={!readOnly ? inputRef : undefined}
                 variant={variant}
                 size={size}
                 start={start} // optional
@@ -947,7 +955,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />
                         <input
                             ref={combinedRef}
-                            disabled={disabled}
+                            disabled={disabled || readOnly}
                             value={inputValue}
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}

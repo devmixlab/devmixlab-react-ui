@@ -123,10 +123,13 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 disabled={disabled || loading}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={(e) => {
+                    if (disabled || loading) return;
+
                     e.stopPropagation();
                     openFileDialog();
                 }}
                 className={classPrefix('--upload-button')}
+                data-disabled={disabled || loading}
             >
                 {uploadIcon ?? <Upload />}
             </button>
@@ -139,10 +142,14 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     aria-label="Clear files"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={(e) => {
+                        if (disabled || loading) return;
+
                         e.stopPropagation();
                         clearFiles();
                     }}
                     className={classPrefix('--clear-button')}
+                    disabled={disabled || loading}
+                    data-disabled={disabled || loading}
                 >
                     {finalClearIcon}
                 </button>
@@ -166,7 +173,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     value={tags}
                     inputEnabled={false}
                     // editable={false}
-                    disabled={disabled || loading}
+                    disabled={disabled}
+                    readOnly={loading}
                     start={start}
                     size={size}
                     inputMode="none"

@@ -88,12 +88,16 @@ $sizes: (
         border-radius: inherit;
     }
 
-    &:hover {
+    &:not([data-disabled]):hover {
         color: var(--text);
     }
 
     &:focus-visible {
         box-shadow: 0 0 0 2px var(--focus-ring);
+    }
+
+    &[data-disabled]{
+        cursor: default;
     }
 }
 
@@ -214,7 +218,7 @@ $sizes: (
     background var(--transition),
     color var(--transition);
 
-    &:hover:not([data-disabled]) {
+    &:hover:not([data-disabled]):not([data-readonly]) {
         border-color: var(--border-hover);
         background: var(--bg-hover);
     }

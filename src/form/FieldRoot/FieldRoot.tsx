@@ -17,6 +17,7 @@ export type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
         variant?: Variant;
         size?: Size;
         disabled?: boolean;
+        readOnly?: boolean;
         invalid?: boolean;
         rounded?: BoxProps['rounded'];
 
@@ -42,6 +43,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             variant = 'outlined',
             size = 'md',
             disabled = false,
+            readOnly = false,
             invalid = false,
             rounded = 'md',
 
@@ -99,24 +101,6 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             [classPrefix(`--has-end-slot`)]: hasEnd,
         });
 
-        // const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        //     if (disabled) return;
-        //
-        //     // avoid stealing focus from interactive children (buttons, etc.)
-        //     if (
-        //         (e.target as HTMLElement).closest(
-        //             'button, a, input, textarea, select, [role="button"], [role="switch"], [data-prevent-focus]',
-        //         )
-        //     ) {
-        //         return;
-        //     }
-        //
-        //     if (focusTargetRef?.current && document.activeElement !== focusTargetRef.current) {
-        //         focusTargetRef.current.focus();
-        //     }
-        //     onClick?.(e);
-        // };
-
         const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (disabled) return;
 
@@ -159,6 +143,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 className={cl}
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
+                data-readonly={readOnly || undefined}
                 data-size={size}
                 {...(variant ? { ['data-variant']: variant } : {})}
                 rounded={rounded}
