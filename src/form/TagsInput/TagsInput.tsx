@@ -610,14 +610,6 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     nextIndexTemp = findNextEnabled(next, index, 1);
                 }
 
-                ////
-                // if (nextIndexTemp == null) {
-                //     requestAnimationFrame(() => {
-                //         inputRef.current?.focus();
-                //     });
-                //     return;
-                // }
-
                 if (nextIndexTemp == null) {
                     // token-only mode (e.g. FileUpload)
                     if (!inputEnabled) {
@@ -637,26 +629,6 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         return;
                     }
                 }
-
-                // if (nextIndexTemp == null) {
-                //     // no input mode (e.g. FileUpload)
-                //     // keep focus inside remaining tags
-                //     const fallbackIndex = findNextEnabled(next, next.length - 1, -1);
-                //
-                //     if (fallbackIndex == null) {
-                //         setActiveId(null);
-                //
-                //         if (inputEnabled) {
-                //             requestAnimationFrame(() => {
-                //                 inputRef.current?.focus();
-                //             });
-                //         }
-                //
-                //         return;
-                //     }
-                //
-                //     nextIndexTemp = fallbackIndex;
-                // }
 
                 const nextIndex = nextIndexTemp;
 
