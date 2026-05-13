@@ -22,6 +22,7 @@ type FileUploadProps = {
     actions?: React.ReactNode;
 
     size?: Size;
+    loading?: boolean;
 };
 
 const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
@@ -45,6 +46,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             actions,
 
             size = 'md',
+            loading = false,
         },
         ref,
     ) => {
@@ -66,7 +68,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         };
 
         const openFileDialog = () => {
-            if (!disabled) {
+            if (!disabled && !loading) {
                 inputRef.current?.click();
             }
         };
@@ -118,7 +120,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const uploadButton = (
             <button
                 type="button"
-                disabled={disabled}
+                disabled={disabled || loading}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={(e) => {
                     e.stopPropagation();
@@ -154,17 +156,17 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     type="file"
                     multiple={multiple}
                     accept={accept}
-                    disabled={disabled}
+                    disabled={disabled || loading}
                     onChange={handleChange}
                 />
 
                 <TagsInput
-                    // className={classPrefix('--file-upload')}
+                    className={classPrefix('--file-upload')}
                     // fullWidth
                     value={tags}
                     inputEnabled={false}
                     // editable={false}
-                    disabled={disabled}
+                    disabled={disabled || loading}
                     start={start}
                     size={size}
                     inputMode="none"
@@ -181,6 +183,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     }
                     onClick={!files.length ? openFileDialog : undefined}
                     data-not-empty={!!files.length || undefined}
+                    data-loading={loading || undefined}
                 />
             </>
         );

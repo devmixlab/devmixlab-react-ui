@@ -22,28 +22,68 @@ $sizes: (
 }
 
 .#{$file-upload-prefix} {
-    display: inline-flex;
-    flex-wrap: wrap;
-    --slot-h: auto;
-    --height: auto;
-    gap: var(--gap);
+    //display: inline-flex;
+    //flex-wrap: wrap;
+    //--slot-h: auto;
+    //--height: auto;
+    //gap: var(--gap);
+    cursor: pointer;
+    //
+    //@each $size, $value in $sizes {
+    //    &[data-size='#{$size}'] {
+    //        @include applySize ($size);
+    //        //--min-height: #{map.get($value, height)};
+    //        //--top-offset: #{map.get($value, spacingTop)};
+    //        //--y-offset: #{map.get($value, spacingY)};
+    //    }
+    //}
+    //
+    //--slot-pt: var(--top-offset);
+    //--pl: calc(var(--start-width) + var(--spacing-x) + var(--gap));
+    //--pr: calc(var(--end-width) + var(--spacing-x) + var(--gap));
+    //--pt: var(--y-offset);
+    //--pb: var(--y-offset);
+    //
+    //.#{$p}--input-file {
+    //    @include mixins.visually-hidden;
+    //}
 
-    @each $size, $value in $sizes {
-        &[data-size='#{$size}'] {
-            @include applySize ($size);
-            //--min-height: #{map.get($value, height)};
-            //--top-offset: #{map.get($value, spacingTop)};
-            //--y-offset: #{map.get($value, spacingY)};
-        }
+    &[data-not-empty] {
+        cursor: default;
     }
 
-    --slot-pt: var(--top-offset);
-    --pl: calc(var(--start-width) + var(--spacing-x) + var(--gap));
-    --pr: calc(var(--end-width) + var(--spacing-x) + var(--gap));
-    --pt: var(--y-offset);
-    --pb: var(--y-offset);
+    &[data-loading] {
+        position: relative;
+        overflow: hidden;
 
-    .#{$p}--input-file {
-        @include mixins.visually-hidden;
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -30%;
+            width: 30%;
+            height: 2px;
+
+            border-radius: 999px;
+
+            //background: #{functions.intent-color(primary, 500)};
+            background: var(--#{$p}-accent-primary);
+
+            opacity: 0.7;
+
+            animation: file-upload-loading 1.2s linear infinite;
+
+            pointer-events: none;
+        }
+    }
+}
+
+@keyframes file-upload-loading {
+    0% {
+        left: -30%;
+    }
+
+    100% {
+        left: 100%;
     }
 }
