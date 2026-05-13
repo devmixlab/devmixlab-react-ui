@@ -5,14 +5,23 @@ import { Size } from '../form.tokens';
 import { Close, IconWrapper, Upload } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 
+type FileUploadItem = {
+    id: string;
+    file: File;
+
+    progress?: number;
+
+    status?: 'idle' | 'uploading' | 'success' | 'error';
+};
+
 type FileUploadProps = {
     multiple?: boolean;
     accept?: string;
     disabled?: boolean;
 
-    value?: File[];
-    defaultValue?: File[];
-    onChange?: (files: File[]) => void;
+    value?: FileUploadItem[];
+    defaultValue?: FileUploadItem[];
+    onChange?: (files: FileUploadItem[]) => void;
 
     clearable?: boolean;
     clearIcon?: React.ReactNode;
@@ -55,11 +64,11 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
         const isControlled = value !== undefined;
 
-        const [filesState, setFilesState] = useState<File[]>(defaultValue);
+        const [filesState, setFilesState] = useState<FileUploadItem[]>(defaultValue);
 
         const files = isControlled ? value! : filesState;
 
-        const setFiles = (next: File[]) => {
+        const setFiles = (next: FileUploadItem[]) => {
             if (!isControlled) {
                 setFilesState(next);
             }
@@ -76,15 +85,24 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const selected = Array.from(e.target.files ?? []);
 
+            const selectedItems: FileUploadItem[] = selected.map((file) => ({
+                id: crypto.randomUUID(),
+                file,
+                progress: 0,
+                status: 'idle',
+            }));
+
             const next = multiple
                 ? [
                       ...files,
-                      ...selected.filter(
-                          (file) =>
-                              !files.some((existing) => getFileKey(existing) === getFileKey(file)),
+                      ...selectedItems.filter(
+                          (item) =>
+                              !files.some(
+                                  (existing) => getFileKey(existing.file) === getFileKey(item.file),
+                              ),
                       ),
                   ]
-                : selected;
+                : selectedItems;
 
             setFiles(next);
 
@@ -105,12 +123,25 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             }
         };
 
+        // const tags = useMemo(
+        //     () =>
+        //         files.map((file) => ({
+        //             id: getFileKey(file),
+        //             label: file.name,
+        //             value: file.name,
+        //         })),
+        //     [files],
+        // );
+
         const tags = useMemo(
             () =>
-                files.map((file) => ({
-                    id: getFileKey(file),
-                    label: file.name,
-                    value: file.name,
+                files.map((item) => ({
+                    id: item.id,
+                    label:
+                        item.status === 'uploading'
+                            ? `${item.file.name} ${item.progress ?? 0}%`
+                            : item.file.name,
+                    value: item.file.name,
                 })),
             [files],
         );
@@ -129,7 +160,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     openFileDialog();
                 }}
                 className={classPrefix('--upload-button')}
-                data-disabled={disabled || loading}
+                data-disabled={disabled || loading || undefined}
             >
                 {uploadIcon ?? <Upload />}
             </button>
@@ -149,7 +180,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     }}
                     className={classPrefix('--clear-button')}
                     disabled={disabled || loading}
-                    data-disabled={disabled || loading}
+                    data-disabled={disabled || loading || undefined}
                 >
                     {finalClearIcon}
                 </button>
