@@ -45,6 +45,8 @@ export type TagsInputProps = Omit<TextInputProps, 'value' | 'defaultValue' | 'on
     defaultValue?: TagItem[];
     onValueChange?: (tags: TagItem[]) => void;
 
+    inputEnabled?: boolean;
+
     editable?: boolean | ((tag: TagItem, index: number) => boolean);
 
     normalizeTag?: (label: string) => string;
@@ -86,6 +88,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
     (
         {
             className,
+
+            inputEnabled = true,
 
             value,
             defaultValue = [],
@@ -390,6 +394,11 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             onTagRemove?.(removed, index);
         };
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (!inputEnabled) {
+                props.onKeyDown?.(e);
+                return;
+            }
+
             // ⬅️ move to last tag
             if (e.key === 'ArrowLeft' && !inputValue && tags.length) {
                 e.preventDefault();
@@ -644,6 +653,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             }
         };
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (!inputEnabled) return;
+
             let raw = e.target.value;
 
             if (maxLength && raw.length > maxLength) {
@@ -665,6 +676,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
         };
 
         const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+            if (!inputEnabled) return;
+
             const text = e.clipboardData.getData('text');
 
             if (!separator.test(text)) return;
@@ -860,16 +873,20 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         </Chip>,
                     );
                 })}
-                <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />
-                <input
-                    ref={combinedRef}
-                    disabled={disabled}
-                    value={inputValue}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    onPaste={handlePaste}
-                    className={classPrefix(`--field`)}
-                />
+                {inputEnabled && (
+                    <>
+                        <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />
+                        <input
+                            ref={combinedRef}
+                            disabled={disabled}
+                            value={inputValue}
+                            onChange={handleChange}
+                            onKeyDown={handleKeyDown}
+                            onPaste={handlePaste}
+                            className={classPrefix(`--field`)}
+                        />
+                    </>
+                )}
             </FieldRoot>
             // </div>
         );

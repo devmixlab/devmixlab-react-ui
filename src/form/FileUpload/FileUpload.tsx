@@ -149,8 +149,9 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 />
 
                 <TagsInput
-                    className={classPrefix('--file-upload')}
+                    // className={classPrefix('--file-upload')}
                     value={tags}
+                    inputEnabled={false}
                     editable={false}
                     disabled={disabled}
                     start={start}
