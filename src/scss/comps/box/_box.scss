@@ -461,16 +461,6 @@ $p: cfg.$prefix;
         }
     }
 
-    // disable appearance
-    &--appearance-none {
-        appearance: none;
-    }
-
-    // textarea resize
-    &--resize-none {
-        resize: none;
-    }
-
     // media
     @each $name, $value in $object-fits {
         &--object-#{$name} {
@@ -483,6 +473,16 @@ $p: cfg.$prefix;
         &--border-#{$name} {
             border-style: $value;
         }
+    }
+
+    // disable appearance
+    &--appearance-none {
+        appearance: none;
+    }
+
+    // textarea resize
+    &--resize-none {
+        resize: none;
     }
 
     &--truncate {

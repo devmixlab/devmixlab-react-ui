@@ -13,7 +13,9 @@ type Responsiveify<T> = {
     [K in keyof T]?: Responsive<T[K]>;
 };
 
-export type Props = {} & DerivedProps;
+export type Props = {
+    appearanceNone?: boolean;
+} & DerivedProps;
 
 export type BoxProps = Responsiveify<Props>;
 
@@ -32,7 +34,9 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     // console.log(windowWidth);
     // console.log(bp);
 
-    const restProps = rest;
+    const { appearanceNone, resizeNone, ...restWithoutBooleans } = rest;
+
+    const restProps = restWithoutBooleans;
 
     // Transition composition
     const hasTransitionHelpers =
@@ -64,6 +68,9 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     const passNext = (key: string, val: unknown) => {
         propsToPassNext[key as keyof BoxProps] = val;
     };
+
+    if (appearanceNone === true) classes.push(classPrefix(`--appearance-none`));
+    if (resizeNone === true) classes.push(classPrefix(`--resize-none`));
 
     restEntries.forEach(([rawKey, value]) => {
         const key = rawKey as string;
