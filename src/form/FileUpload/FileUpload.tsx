@@ -72,7 +72,19 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const selected = Array.from(e.target.files ?? []);
 
-            const next = multiple ? [...files, ...selected] : selected;
+            // const next = multiple ? [...files, ...selected] : selected;
+
+            const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
+
+            const next = multiple
+                ? [
+                      ...files,
+                      ...selected.filter(
+                          (file) =>
+                              !files.some((existing) => getFileKey(existing) === getFileKey(file)),
+                      ),
+                  ]
+                : selected;
 
             setFiles(next);
 
@@ -96,7 +108,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const tags = useMemo(
             () =>
                 files.map((file) => ({
-                    id: `${file.name}-${file.lastModified}`,
+                    id: `${file.name}-${file.size}-${file.lastModified}`,
                     label: file.name,
                     value: file.name,
                 })),
@@ -170,7 +182,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             {clearButton}
                         </>
                     }
-                    onClick={openFileDialog}
+                    onClick={!files.length ? openFileDialog : undefined}
                 />
             </>
         );

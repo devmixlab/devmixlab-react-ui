@@ -851,6 +851,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
         return (
             <FieldRoot
+                {...props}
                 className={clsx(className, classPrefix('--tags-input'))}
                 invalid={invalid}
                 disabled={disabled}
