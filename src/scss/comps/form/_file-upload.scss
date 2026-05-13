@@ -1,0 +1,49 @@
+@use '../../functions' as functions;
+@use '../../mixins' as mixins;
+
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$file-upload-prefix: #{$p}--file-upload;
+
+$sizes: (
+    sm: (height: 32px, spacingY: 6px, spacingTop: 8px),
+    md: (height: 40px, spacingY: 10px, spacingTop: 12px),
+    lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
+);
+
+@mixin applySize ($size) {
+    $conf: map.get($sizes, $size);
+
+    --min-height: #{map.get($conf, height)};
+    --top-offset: #{map.get($conf, spacingTop)};
+    --y-offset: #{map.get($conf, spacingY)};
+}
+
+.#{$file-upload-prefix} {
+    display: inline-flex;
+    flex-wrap: wrap;
+    --slot-h: auto;
+    --height: auto;
+    gap: var(--gap);
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            @include applySize ($size);
+            //--min-height: #{map.get($value, height)};
+            //--top-offset: #{map.get($value, spacingTop)};
+            //--y-offset: #{map.get($value, spacingY)};
+        }
+    }
+
+    --slot-pt: var(--top-offset);
+    --pl: calc(var(--start-width) + var(--spacing-x) + var(--gap));
+    --pr: calc(var(--end-width) + var(--spacing-x) + var(--gap));
+    --pt: var(--y-offset);
+    --pb: var(--y-offset);
+
+    .#{$p}--input-file {
+        @include mixins.visually-hidden;
+    }
+}
