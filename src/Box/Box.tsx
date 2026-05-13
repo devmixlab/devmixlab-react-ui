@@ -8,6 +8,7 @@ import { useWindowWidthContext } from './WindowWidthProvider';
 import { useWindowWidth } from '../hooks/useWindowWidth';
 import { configLookup, type PropValue } from './core/config';
 import { createPolymorphic } from '../types/polymorphic';
+import { booleanClassMap } from './core/tokens';
 
 type Responsiveify<T> = {
     [K in keyof T]?: Responsive<T[K]>;
@@ -30,13 +31,7 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         widthFromContext && widthFromContext > 0 ? widthFromContext : useWindowWidth();
     const bp = getActiveBreakpoint(windowWidth);
 
-    // console.log(useWindowWidth());
-    // console.log(windowWidth);
-    // console.log(bp);
-
-    const { appearanceNone, resizeNone, ...restWithoutBooleans } = rest;
-
-    const restProps = restWithoutBooleans;
+    const restProps = rest;
 
     // Transition composition
     const hasTransitionHelpers =
@@ -56,10 +51,8 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         }
     }
 
-    // const restEntries = Object.entries(rest);
-    const restEntries = typedEntries(rest);
-
-    // console.log(restEntries);
+    // const restEntries = typedEntries(rest);
+    const restEntries = typedEntries(restProps);
 
     const classes: string[] = [];
     const locked = new Set<string>();
@@ -69,8 +62,14 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         propsToPassNext[key as keyof BoxProps] = val;
     };
 
-    if (appearanceNone === true) classes.push(classPrefix(`--appearance-none`));
-    if (resizeNone === true) classes.push(classPrefix(`--resize-none`));
+    Object.entries(booleanClassMap).forEach(([key, className]) => {
+        if (rest[key] === true) {
+            classes.push(classPrefix(className));
+        }
+    });
+
+    if (rest.grow === 0) classes.push(classPrefix(`--grow-0`));
+    if (rest.shrink === 0) classes.push(classPrefix(`--shrink-0`));
 
     restEntries.forEach(([rawKey, value]) => {
         const key = rawKey as string;

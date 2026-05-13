@@ -475,6 +475,13 @@ $p: cfg.$prefix;
         }
     }
 
+    // Align self
+    @each $name, $value in $self-alignments {
+        &--self-#{$name} {
+            align-self: $value;
+        }
+    }
+
     // disable appearance
     &--appearance-none {
         appearance: none;
@@ -505,13 +512,6 @@ $p: cfg.$prefix;
 
     &--shrink-0 {
         flex-shrink: 0;
-    }
-
-    // Align self
-    @each $name, $value in $self-alignments {
-        &--self-#{$name} {
-            align-self: $value;
-        }
     }
 
     &--isolate {
