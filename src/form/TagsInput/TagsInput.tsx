@@ -488,7 +488,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 setSelectionEnd(tags.length - 1);
             }
 
-            if (e.key === 'ArrowLeft') {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
                 e.preventDefault();
 
                 if (e.shiftKey) {
@@ -510,8 +510,22 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             tagRefs.current[nextId]?.focus();
                         });
                     } else {
-                        setActiveId(null);
-                        inputRef.current?.focus();
+                        if (!inputEnabled) {
+                            const wrapIndex = findNextEnabled(tags, tags.length - 1, -1);
+
+                            if (wrapIndex !== null) {
+                                const wrapId = getId(wrapIndex);
+
+                                setActiveId(wrapId);
+
+                                requestAnimationFrame(() => {
+                                    tagRefs.current[wrapId]?.focus();
+                                });
+                            }
+                        } else {
+                            setActiveId(null);
+                            inputRef.current?.focus();
+                        }
                     }
 
                     setSelectionStart(null);
@@ -519,7 +533,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                 }
             }
 
-            if (e.key === 'ArrowRight') {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                 e.preventDefault();
 
                 if (e.shiftKey) {
@@ -546,8 +560,22 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             inputRef.current?.focus();
                         }
                     } else {
-                        setActiveId(null);
-                        inputRef.current?.focus();
+                        if (!inputEnabled) {
+                            const wrapIndex = findNextEnabled(tags, 0, 1);
+
+                            if (wrapIndex !== null) {
+                                const wrapId = getId(wrapIndex);
+
+                                setActiveId(wrapId);
+
+                                requestAnimationFrame(() => {
+                                    tagRefs.current[wrapId]?.focus();
+                                });
+                            }
+                        } else {
+                            setActiveId(null);
+                            inputRef.current?.focus();
+                        }
                     }
 
                     setSelectionStart(null);

@@ -24,6 +24,8 @@ type FileUploadProps = {
     size?: Size;
 };
 
+const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
+
 export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
     (
         {
@@ -72,10 +74,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const selected = Array.from(e.target.files ?? []);
 
-            // const next = multiple ? [...files, ...selected] : selected;
-
-            const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
-
             const next = multiple
                 ? [
                       ...files,
@@ -108,7 +106,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const tags = useMemo(
             () =>
                 files.map((file) => ({
-                    id: `${file.name}-${file.size}-${file.lastModified}`,
+                    id: getFileKey(file),
                     label: file.name,
                     value: file.name,
                 })),
@@ -172,7 +170,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
                     onTagRemove={(_, index) => {
-                        console.log('onTagRemove');
                         removeFile(index);
                     }}
                     actions={
@@ -183,6 +180,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                         </>
                     }
                     onClick={!files.length ? openFileDialog : undefined}
+                    data-not-empty={!!files.length || undefined}
                 />
             </>
         );

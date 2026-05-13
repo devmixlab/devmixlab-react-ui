@@ -19,6 +19,7 @@ $sizes: (
     --slot-h: auto;
     --height: auto;
     gap: var(--gap);
+    cursor: pointer;
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
@@ -33,6 +34,10 @@ $sizes: (
     --pr: calc(var(--end-width) + var(--spacing-x) + var(--gap));
     --pt: var(--y-offset);
     --pb: var(--y-offset);
+
+    &[data-not-empty] {
+        cursor: default;
+    }
 
     &[data-full-width]{
         display: flex;
