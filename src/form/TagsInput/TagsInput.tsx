@@ -50,6 +50,7 @@ export type TagsInputProps = Omit<TextInputProps, 'value' | 'defaultValue' | 'on
     fullWidth?: boolean;
 
     editable?: boolean | ((tag: TagItem, index: number) => boolean);
+    removable?: boolean | ((tag: TagItem, index: number) => boolean);
 
     normalizeTag?: (label: string) => string;
     renderTag?: (params: RenderTagParams) => React.ReactNode;
@@ -114,6 +115,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             unique = false, // 👈 default
             onDuplicate,
 
+            removable = true,
             onTagAdd,
             onTagRemove,
 
@@ -166,6 +168,16 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             }
 
             return editable !== false;
+        };
+
+        const isRemovable = (tag: TagItem, index: number) => {
+            if (disabled || tag.disabled) return false;
+
+            if (typeof removable === 'function') {
+                return removable(tag, index);
+            }
+
+            return removable !== false;
         };
 
         // Edit refs
@@ -390,7 +402,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             if (disabled) return;
 
             const removed = tags[index];
-            if (removed.disabled) return;
+            if (!isRemovable(removed, index)) return;
 
             const next = tags.filter((_, i) => i !== index);
 
@@ -581,6 +593,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
                 const next = tags.filter((_, i) => i !== targetIndex);
 
+                const removed = tags[targetIndex];
+                onTagRemove?.(removed, targetIndex);
                 setTags(next);
 
                 if (next.length === 0) {
@@ -596,12 +610,53 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     nextIndexTemp = findNextEnabled(next, index, 1);
                 }
 
+                ////
+                // if (nextIndexTemp == null) {
+                //     requestAnimationFrame(() => {
+                //         inputRef.current?.focus();
+                //     });
+                //     return;
+                // }
+
                 if (nextIndexTemp == null) {
-                    requestAnimationFrame(() => {
-                        inputRef.current?.focus();
-                    });
-                    return;
+                    // token-only mode (e.g. FileUpload)
+                    if (!inputEnabled) {
+                        const fallbackIndex = findNextEnabled(next, next.length - 1, -1);
+
+                        if (fallbackIndex != null) {
+                            nextIndexTemp = fallbackIndex;
+                        } else {
+                            setActiveId(null);
+                            return;
+                        }
+                    } else {
+                        requestAnimationFrame(() => {
+                            inputRef.current?.focus();
+                        });
+
+                        return;
+                    }
                 }
+
+                // if (nextIndexTemp == null) {
+                //     // no input mode (e.g. FileUpload)
+                //     // keep focus inside remaining tags
+                //     const fallbackIndex = findNextEnabled(next, next.length - 1, -1);
+                //
+                //     if (fallbackIndex == null) {
+                //         setActiveId(null);
+                //
+                //         if (inputEnabled) {
+                //             requestAnimationFrame(() => {
+                //                 inputRef.current?.focus();
+                //             });
+                //         }
+                //
+                //         return;
+                //     }
+                //
+                //     nextIndexTemp = fallbackIndex;
+                // }
 
                 const nextIndex = nextIndexTemp;
 

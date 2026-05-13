@@ -153,13 +153,16 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     // fullWidth
                     value={tags}
                     inputEnabled={false}
-                    editable={false}
+                    // editable={false}
                     disabled={disabled}
                     start={start}
                     size={size}
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
-                    onTagRemove={(_, index) => removeFile(index)}
+                    onTagRemove={(_, index) => {
+                        console.log('onTagRemove');
+                        removeFile(index);
+                    }}
                     actions={
                         <>
                             {actions}

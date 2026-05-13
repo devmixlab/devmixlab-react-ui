@@ -99,21 +99,39 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             [classPrefix(`--has-end-slot`)]: hasEnd,
         });
 
+        // const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        //     if (disabled) return;
+        //
+        //     // avoid stealing focus from interactive children (buttons, etc.)
+        //     if (
+        //         (e.target as HTMLElement).closest(
+        //             'button, a, input, textarea, select, [role="button"], [role="switch"], [data-prevent-focus]',
+        //         )
+        //     ) {
+        //         return;
+        //     }
+        //
+        //     if (focusTargetRef?.current && document.activeElement !== focusTargetRef.current) {
+        //         focusTargetRef.current.focus();
+        //     }
+        //     onClick?.(e);
+        // };
+
         const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (disabled) return;
 
-            // avoid stealing focus from interactive children (buttons, etc.)
-            if (
-                (e.target as HTMLElement).closest(
-                    'button, a, input, textarea, select, [role="button"], [role="switch"], [data-prevent-focus]',
-                )
-            ) {
-                return;
+            const isInteractive = (e.target as HTMLElement).closest(
+                'button, a, input, textarea, select, [role="button"], [role="switch"], [data-prevent-focus]',
+            );
+
+            // only skip focus stealing
+            if (!isInteractive) {
+                if (focusTargetRef?.current && document.activeElement !== focusTargetRef.current) {
+                    focusTargetRef.current.focus();
+                }
             }
 
-            if (focusTargetRef?.current && document.activeElement !== focusTargetRef.current) {
-                focusTargetRef.current.focus();
-            }
+            // ALWAYS forward click
             onClick?.(e);
         };
 
