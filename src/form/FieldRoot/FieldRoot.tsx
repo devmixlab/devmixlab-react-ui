@@ -7,24 +7,25 @@ import { classPrefix } from '../../utils/classPrefix';
 
 export type Variant = 'outlined' | 'filled' | 'ghost';
 
-export type FieldRootProps = BoxProps & {
-    start?: React.ReactNode;
-    end?: React.ReactNode;
-    actions?: React.ReactNode;
-    controls?: React.ReactNode;
+export type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
+    BoxProps & {
+        start?: React.ReactNode;
+        end?: React.ReactNode;
+        actions?: React.ReactNode;
+        controls?: React.ReactNode;
 
-    variant?: Variant;
-    size?: Size;
-    disabled?: boolean;
-    invalid?: boolean;
-    rounded?: BoxProps['rounded'];
+        variant?: Variant;
+        size?: Size;
+        disabled?: boolean;
+        invalid?: boolean;
+        rounded?: BoxProps['rounded'];
 
-    children: React.ReactNode;
-    className?: string;
+        children: React.ReactNode;
+        className?: string;
 
-    focusTargetRef?: React.RefObject<HTMLElement | null>;
-    onClick?: React.MouseEventHandler<HTMLDivElement>;
-};
+        focusTargetRef?: React.RefObject<HTMLElement | null>;
+        onClick?: React.MouseEventHandler<HTMLDivElement>;
+    };
 
 export const renderGroupItem = (content: React.ReactNode) => (
     <span className={classPrefix('--group-item')}>{content}</span>
