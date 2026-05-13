@@ -1,11 +1,9 @@
-import React, { forwardRef, useRef, useState } from 'react';
-import { FieldRoot } from '../FieldRoot/FieldRoot';
-import { Box } from '../../Box/Box';
+import React, { forwardRef, useMemo, useRef, useState } from 'react';
+import { TagsInput } from '../TagsInput/TagsInput';
 import { mergeRefs } from '../../utils/mergeRefs';
-import { classPrefix } from '../../utils/classPrefix';
-import clsx from 'clsx';
 import { Size } from '../form.tokens';
-import { Close, IconWrapper } from '../../Icon';
+import { Close, IconWrapper, Upload } from '../../Icon';
+import { classPrefix } from '../../utils/classPrefix';
 
 type FileUploadProps = {
     multiple?: boolean;
@@ -18,9 +16,9 @@ type FileUploadProps = {
 
     clearable?: boolean;
     clearIcon?: React.ReactNode;
+    uploadIcon?: React.ReactNode;
 
     start?: React.ReactNode;
-    end?: React.ReactNode;
     actions?: React.ReactNode;
 
     size?: Size;
@@ -39,25 +37,31 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
             clearable = true,
             clearIcon,
+            uploadIcon,
 
             start,
-            end,
             actions,
 
             size = 'md',
         },
         ref,
     ) => {
-        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
-
         const inputRef = useRef<HTMLInputElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
         const isControlled = value !== undefined;
+
         const [filesState, setFilesState] = useState<File[]>(defaultValue);
 
         const files = isControlled ? value! : filesState;
-        const hasFiles = files.length > 0;
+
+        const setFiles = (next: File[]) => {
+            if (!isControlled) {
+                setFilesState(next);
+            }
+
+            onChange?.(next);
+        };
 
         const openFileDialog = () => {
             if (!disabled) {
@@ -68,75 +72,74 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const selected = Array.from(e.target.files ?? []);
 
-            if (!isControlled) {
-                setFilesState(selected);
-            }
+            const next = multiple ? [...files, ...selected] : selected;
 
-            onChange?.(selected);
+            setFiles(next);
+
+            // allow re-select same file
+            e.target.value = '';
+        };
+
+        const removeFile = (index: number) => {
+            const next = files.filter((_, i) => i !== index);
+            setFiles(next);
         };
 
         const clearFiles = () => {
-            if (!isControlled) {
-                setFilesState([]);
-            }
+            setFiles([]);
 
             if (inputRef.current) {
                 inputRef.current.value = '';
             }
-
-            onChange?.([]);
         };
 
-        // const cl = clsx(classPrefix('--file-upload'), {
-        //     [classPrefix('--has-value')]: hasFiles,
-        // });
+        const tags = useMemo(
+            () =>
+                files.map((file) => ({
+                    id: `${file.name}-${file.lastModified}`,
+                    label: file.name,
+                    value: file.name,
+                })),
+            [files],
+        );
 
-        const clearButton = (
+        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
+
+        const uploadButton = (
             <button
                 type="button"
-                aria-label="Clear input"
+                disabled={disabled}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={(e) => {
                     e.stopPropagation();
-                    clearFiles();
+                    openFileDialog();
                 }}
-                onMouseDown={(e) => e.preventDefault()}
-                className={classPrefix(`--clear-button`)}
+                className={classPrefix('--upload-button')}
             >
-                {finalClearIcon}
+                {uploadIcon ?? <Upload />}
             </button>
         );
 
-        const hasActions = Boolean(actions || (clearable && hasFiles));
-
-        const finalActions = hasActions ? (
-            <>
-                {actions}
-                {clearable && hasFiles && clearButton}
-            </>
-        ) : undefined;
+        const clearButton =
+            clearable && files.length > 0 ? (
+                <button
+                    type="button"
+                    aria-label="Clear files"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        clearFiles();
+                    }}
+                    className={classPrefix('--clear-button')}
+                >
+                    {finalClearIcon}
+                </button>
+            ) : null;
 
         return (
-            <FieldRoot
-                className={classPrefix('--file-upload')}
-                disabled={disabled}
-                start={start}
-                end={end}
-                size={size}
-                actions={finalActions}
-                onClick={openFileDialog}
-                role="button"
-                tabIndex={disabled ? -1 : 0}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        openFileDialog();
-                    }
-                }}
-                data-has-value={hasFiles || undefined}
-            >
-                {/* Hidden native input */}
+            <>
                 <input
-                    className={classPrefix('--input-file')}
+                    hidden
                     ref={combinedRef}
                     type="file"
                     multiple={multiple}
@@ -145,11 +148,26 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     onChange={handleChange}
                 />
 
-                {/* Visible UI */}
-                <Box as="div" className={classPrefix('--value')}>
-                    {hasFiles ? files.map((f) => f.name).join(', ') : 'Choose file...'}
-                </Box>
-            </FieldRoot>
+                <TagsInput
+                    className={classPrefix('--file-upload')}
+                    value={tags}
+                    editable={false}
+                    disabled={disabled}
+                    start={start}
+                    size={size}
+                    inputMode="none"
+                    placeholder={files.length ? '' : 'Choose files...'}
+                    onTagRemove={(_, index) => removeFile(index)}
+                    actions={
+                        <>
+                            {actions}
+                            {uploadButton}
+                            {clearButton}
+                        </>
+                    }
+                    onClick={openFileDialog}
+                />
+            </>
         );
     },
 );
