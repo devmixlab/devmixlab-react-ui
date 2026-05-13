@@ -14,7 +14,7 @@ $sizes: (
 );
 
 .#{$tags-input-prefix} {
-    display: flex;
+    display: inline-flex;
     flex-wrap: wrap;
     --slot-h: auto;
     --height: auto;
@@ -33,6 +33,10 @@ $sizes: (
     --pr: calc(var(--end-width) + var(--spacing-x) + var(--gap));
     --pt: var(--y-offset);
     --pb: var(--y-offset);
+
+    &[data-full-width]{
+        display: flex;
+    }
 
     .#{$p}--field {
         flex: 0 0 auto;   // force override

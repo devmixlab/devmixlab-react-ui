@@ -46,6 +46,8 @@ export type TagsInputProps = Omit<TextInputProps, 'value' | 'defaultValue' | 'on
     onValueChange?: (tags: TagItem[]) => void;
 
     inputEnabled?: boolean;
+    placeholder?: string;
+    fullWidth?: boolean;
 
     editable?: boolean | ((tag: TagItem, index: number) => boolean);
 
@@ -90,6 +92,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
             className,
 
             inputEnabled = true,
+            placeholder,
+            fullWidth = false,
 
             value,
             defaultValue = [],
@@ -806,6 +810,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         {clearButton}
                     </>
                 }
+                data-full-width={fullWidth || undefined}
             >
                 {tags.map((tag, i) => {
                     const remove = () => removeTag(i);
@@ -873,6 +878,14 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                         </Chip>,
                     );
                 })}
+                {!tags.length && placeholder && (
+                    <span
+                        className={classPrefix('--placeholder')}
+                        data-disabled={disabled || undefined}
+                    >
+                        {placeholder}
+                    </span>
+                )}
                 {inputEnabled && (
                     <>
                         <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />

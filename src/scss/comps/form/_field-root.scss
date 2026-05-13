@@ -367,6 +367,10 @@ $sizes: (
         }
     }
 
+    .#{$p}--upload-button {
+        @include action-button;
+    }
+
     .#{$p}--clear-button {
         @include action-button;
     }
