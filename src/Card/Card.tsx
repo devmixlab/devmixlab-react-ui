@@ -1,18 +1,10 @@
 import React, { forwardRef } from 'react';
 import { CLASS_PREFIX } from '../constants';
 import { CardProvider } from './card.context';
-
 import { Density } from './card.tokens';
-
 import { Box, type BoxProps } from '../Box/Box';
 import clsx from 'clsx';
-
-import { defaultCardTheme } from './card.themes';
-// import { toCardVars } from './card.helpers';
-
 import { createPolymorphic, type PolymorphicComponent } from '../types/polymorphic';
-import { HeadingsProps, HProps } from '../Heading/Heading';
-
 import { type HeaderOwnProps } from './Header';
 import { type BodyOwnProps } from './Body';
 import { type MediaComponent } from './media/Media';
@@ -20,6 +12,7 @@ import { type FooterOwnProps } from './Footer';
 import { type ContentProps } from './Content';
 import { type SectionOwnProps } from './Section';
 
+// it used in Body, Header, Footer
 export const prefix = (name: string = '') => {
     return `${CLASS_PREFIX}--card${name}`;
 };
@@ -42,18 +35,8 @@ export type CardProps = {
     interactive?: boolean;
     disabled?: boolean;
     appearance?: 'neutral' | 'semantic';
-    theme?: typeof defaultCardTheme;
 } & BoxProps &
     SpreadProps;
-
-// export type CardComponent = React.FC<CardProps> & {
-//     Header: React.FC<any>;
-//     Body: React.FC<any>;
-//     Footer: React.FC<any>;
-//     Media: React.FC<any>;
-//     Content: React.FC<any>;
-//     Section: React.FC<any>;
-// };
 
 export type CardComponent = PolymorphicComponent<CardProps, 'div'> & {
     Header: PolymorphicComponent<HeaderOwnProps>;
@@ -87,20 +70,12 @@ export const CardImpl = (
     const finalInteractive = !isDisabled && (isNaturallyInteractive || interactive);
     const isButtonLike = finalInteractive && !isNaturallyInteractive;
 
-    const cl = clsx(prefix(), prefix(`--appearance-${appearance}`), className, {
-        // [prefix(`--outlined`)]: outlined,
-        [prefix(`--interactive`)]: finalInteractive,
-        [prefix(`--disabled`)]: isDisabled,
-        [prefix(`--accent`)]: accent,
-        [prefix(`--accent-${accentSide}`)]: accent,
-    });
-
     return (
         <CardProvider value={{ density, interactive: finalInteractive, disabled: isDisabled }}>
             <Box
                 ref={ref}
-                // style={toCardVars(theme ?? defaultCardTheme)}
                 as={as}
+                className={clsx(prefix(), className)}
                 href={as === 'a' && isDisabled ? undefined : href}
                 aria-disabled={isDisabled || undefined}
                 tabIndex={isDisabled ? -1 : isButtonLike ? 0 : tabIndex}
@@ -136,10 +111,9 @@ export const CardImpl = (
                 disabled={as === 'button' ? isDisabled : undefined}
                 data-interactive={finalInteractive || undefined}
                 data-disabled={isDisabled || undefined}
-                data-accent={accent || undefined}
+                data-accent={accent ? accentSide : undefined}
                 data-appearance={appearance}
                 data-density={density}
-                className={cl}
                 {...restProps}
                 d={d}
                 direction={direction}
