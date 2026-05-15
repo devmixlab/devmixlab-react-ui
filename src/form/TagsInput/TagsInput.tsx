@@ -152,22 +152,36 @@ const TagsInputInner = <TTag extends BaseTagItem>(
     const [activeId, setActiveId] = useState<string | number | null>(null);
 
     // Selection
-    const [selectionStart, setSelectionStart] = useState<number | null>(null);
-    const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
+    // const [selectionStart, setSelectionStart] = useState<number | null>(null);
+    // const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
 
-    const getSelectedRange = () => {
-        if (selectionStart === null || selectionEnd === null) return null;
+    const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
+    const [selectionAnchor, setSelectionAnchor] = useState<string | number | null>(null);
 
-        const start = Math.min(selectionStart, selectionEnd);
-        const end = Math.max(selectionStart, selectionEnd);
-
-        return { start, end };
+    const isSelected = (id: string | number) => {
+        return selectedIds.has(id);
     };
 
-    const isSelected = (index: number) => {
-        const range = getSelectedRange();
-        if (!range) return false;
-        return index >= range.start && index <= range.end;
+    const selectRange = (fromId: string | number, toId: string | number) => {
+        const from = getIndexById(fromId);
+        const to = getIndexById(toId);
+
+        if (from === -1 || to === -1) return;
+
+        const start = Math.min(from, to);
+        const end = Math.max(from, to);
+
+        const next = new Set<string | number>();
+
+        for (let i = start; i <= end; i++) {
+            const id = getId(i);
+
+            if (id != null) {
+                next.add(id);
+            }
+        }
+
+        setSelectedIds(next);
     };
 
     const isEditable = (tag: TTag, index: number) => {
@@ -232,8 +246,8 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         originalValueRef.current = tag.label; // 👈 SAVE ORIGINAL
 
         setEditingIndex(index);
-        setSelectionStart(null);
-        setSelectionEnd(null);
+        setSelectedIds(new Set());
+        setSelectionAnchor(null);
         setEditingValue(tag.label);
     };
 
@@ -487,9 +501,9 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         props.onKeyDown?.(e);
     };
 
-    const clamp = (value: number) => Math.max(0, Math.min(tags.length - 1, value));
     const handleTagKeyDown = (e: React.KeyboardEvent) => {
         const index = getIndexById(activeId);
+        const anchor = selectionAnchor ?? activeId ?? getId(index);
 
         if (index === -1) return;
 
@@ -497,109 +511,83 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
         if (e.key === 'a' && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
-            setSelectionStart(0);
-            setSelectionEnd(tags.length - 1);
+            setSelectedIds(new Set(tags.map((t) => t.id ?? t.value)));
         }
+
+        // const moveSelection = (direction: -1 | 1, withSelection: boolean) => {
+        //     const nextIndex = findNextEnabled(tags, index + direction, direction);
+        //
+        //     if (nextIndex == null) return;
+        //
+        //     const nextId = getId(nextIndex);
+        //
+        //     if (withSelection) {
+        //         setSelectionAnchor(anchor);
+        //         selectRange(anchor, nextId);
+        //     } else {
+        //         setSelectedIds(new Set());
+        //         setSelectionAnchor(null);
+        //     }
+        //
+        //     setActiveId(nextId);
+        //
+        //     requestAnimationFrame(() => {
+        //         tagRefs.current[nextId]?.focus();
+        //     });
+        // };
+
+        const moveSelection = (direction: -1 | 1, withSelection: boolean) => {
+            const nextIndex = findNextEnabled(tags, index + direction, direction);
+
+            // no more tags -> move focus to input
+            if (nextIndex == null) {
+                if (inputEnabled) {
+                    setActiveId(null);
+
+                    if (!withSelection) {
+                        setSelectedIds(new Set());
+                        setSelectionAnchor(null);
+                    }
+
+                    requestAnimationFrame(() => {
+                        inputRef.current?.focus();
+                    });
+                }
+
+                return;
+            }
+
+            const nextId = getId(nextIndex);
+
+            if (withSelection) {
+                setSelectionAnchor(anchor);
+                selectRange(anchor, nextId);
+            } else {
+                setSelectedIds(new Set());
+                setSelectionAnchor(null);
+            }
+
+            setActiveId(nextId);
+
+            requestAnimationFrame(() => {
+                tagRefs.current[nextId]?.focus();
+            });
+        };
 
         if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
             e.preventDefault();
-
-            if (e.shiftKey) {
-                if (selectionStart === null) {
-                    setSelectionStart(index);
-                    setSelectionEnd(index - 1);
-                } else {
-                    setSelectionEnd((prev) => clamp(prev !== null ? prev - 1 : index - 1));
-                }
-            } else {
-                const nextIndex = findNextEnabled(tags, index - 1, -1);
-
-                if (nextIndex !== null) {
-                    const nextId = getId(nextIndex);
-
-                    setActiveId(nextId);
-
-                    requestAnimationFrame(() => {
-                        tagRefs.current[nextId]?.focus();
-                    });
-                } else {
-                    if (!inputEnabled) {
-                        const wrapIndex = findNextEnabled(tags, tags.length - 1, -1);
-
-                        if (wrapIndex !== null) {
-                            const wrapId = getId(wrapIndex);
-
-                            setActiveId(wrapId);
-
-                            requestAnimationFrame(() => {
-                                tagRefs.current[wrapId]?.focus();
-                            });
-                        }
-                    } else {
-                        setActiveId(null);
-                        inputRef.current?.focus();
-                    }
-                }
-
-                setSelectionStart(null);
-                setSelectionEnd(null);
-            }
+            moveSelection(-1, e.shiftKey);
+            return;
         }
 
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
             e.preventDefault();
-
-            if (e.shiftKey) {
-                if (selectionStart === null) {
-                    setSelectionStart(index);
-                    setSelectionEnd(index + 1);
-                } else {
-                    setSelectionEnd((prev) => clamp(prev !== null ? prev + 1 : index + 1));
-                }
-            } else {
-                if (index < tags.length - 1) {
-                    const nextIndex = findNextEnabled(tags, index + 1, 1);
-
-                    if (nextIndex !== null) {
-                        const nextId = getId(nextIndex);
-
-                        setActiveId(nextId);
-
-                        requestAnimationFrame(() => {
-                            tagRefs.current[nextId]?.focus();
-                        });
-                    } else {
-                        setActiveId(null);
-                        inputRef.current?.focus();
-                    }
-                } else {
-                    if (!inputEnabled) {
-                        const wrapIndex = findNextEnabled(tags, 0, 1);
-
-                        if (wrapIndex !== null) {
-                            const wrapId = getId(wrapIndex);
-
-                            setActiveId(wrapId);
-
-                            requestAnimationFrame(() => {
-                                tagRefs.current[wrapId]?.focus();
-                            });
-                        }
-                    } else {
-                        setActiveId(null);
-                        inputRef.current?.focus();
-                    }
-                }
-
-                setSelectionStart(null);
-                setSelectionEnd(null);
-            }
+            moveSelection(1, e.shiftKey);
+            return;
         }
 
         if (e.key === 'Backspace' || e.key === 'Delete') {
-            const range = getSelectedRange();
-
-            if (range) {
+            if (selectedIds.size > 0) {
                 e.preventDefault();
                 removeSelected();
                 return;
@@ -690,99 +678,56 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         }
     };
     const removeSelected = () => {
-        const range = getSelectedRange();
-        if (!range) return;
+        if (!selectedIds.size) return;
 
         const next = tags.filter((tag, i) => {
-            const inRange = i >= range.start && i <= range.end;
-            return !inRange || tag.disabled;
-        });
+            const id = getId(i);
 
-        tags.forEach((tag, i) => {
-            const inRange = i >= range.start && i <= range.end;
-
-            if (inRange && !tag.disabled) {
-                // console.log(4343);
+            if (selectedIds.has(id)) {
                 onTagRemove?.(tag, i);
+                return false;
             }
+
+            return true;
         });
+
+        const activeIndex = getIndexById(activeId);
+
+        const removedBefore = tags.slice(0, activeIndex).filter((_, i) => {
+            const id = getId(i);
+            return selectedIds.has(id);
+        }).length;
 
         setTags(next);
 
-        // 👇 NEW: compute next focus
-        const nextIndex =
-            range.start < next.length
-                ? range.start // next item shifts into this position
-                : next.length - 1; // fallback to last item
-
-        setSelectionStart(null);
-        setSelectionEnd(null);
+        setSelectedIds(new Set());
+        setSelectionAnchor(null);
 
         if (next.length === 0) {
             setActiveId(null);
-            requestAnimationFrame(() => inputRef.current?.focus());
-        } else {
-            const nextTag = next[nextIndex];
-
-            const nextId = nextTag.id ?? nextTag.value;
-
-            setActiveId(nextId);
 
             requestAnimationFrame(() => {
-                tagRefs.current[nextId]?.focus();
+                inputRef.current?.focus();
             });
+
+            return;
         }
+
+        let focusIndex = activeIndex - removedBefore;
+
+        focusIndex = Math.max(0, Math.min(focusIndex, next.length - 1));
+
+        const nextTag = next[focusIndex];
+        const nextId = nextTag.id ?? nextTag.value;
+
+        setActiveId(nextId);
+        setSelectionAnchor(nextId);
+
+        requestAnimationFrame(() => {
+            tagRefs.current[nextId]?.focus();
+        });
     };
-    // const removeSelected = () => {
-    //     const range = getSelectedRange();
-    //     if (!range) return;
-    //
-    //     const removed: Array<{ tag: TTag; index: number }> = [];
-    //
-    //     const next = tags.filter((tag, i) => {
-    //         const inRange = i >= range.start && i <= range.end;
-    //
-    //         if (!inRange) return true;
-    //
-    //         const removable = isRemovable(tag, i);
-    //
-    //         if (!removable) return true;
-    //
-    //         removed.push({ tag, index: i });
-    //
-    //         return false;
-    //     });
-    //
-    //     removed.forEach(({ tag, index }) => {
-    //         onTagRemove?.(tag, index);
-    //     });
-    //
-    //     setTags(next);
-    //
-    //     setSelectionStart(null);
-    //     setSelectionEnd(null);
-    //
-    //     if (next.length === 0) {
-    //         setActiveId(null);
-    //
-    //         requestAnimationFrame(() => {
-    //             inputRef.current?.focus();
-    //         });
-    //
-    //         return;
-    //     }
-    //
-    //     const nextIndex = range.start < next.length ? range.start : next.length - 1;
-    //
-    //     const nextTag = next[nextIndex];
-    //     const nextId = nextTag.id ?? nextTag.value;
-    //
-    //     setActiveId(nextId);
-    //
-    //     requestAnimationFrame(() => {
-    //         tagRefs.current[nextId]?.focus();
-    //     });
-    // };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!inputEnabled) return;
 
@@ -886,9 +831,15 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                 onFocus={() => {
                     if (readOnly || tag.disabled) return;
                     setActiveId(id);
-                    setSelectionStart(null);
-                    setSelectionEnd(null);
                 }}
+                // onBlur={(e) => {
+                //     const next = e.relatedTarget as Node | null;
+                //
+                //     // still inside current tag wrapper
+                //     if (e.currentTarget.contains(next)) return;
+                //
+                //     setActiveId(null);
+                // }}
                 onBlur={(e) => {
                     const next = e.relatedTarget as Node | null;
 
@@ -896,13 +847,65 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     if (e.currentTarget.contains(next)) return;
 
                     setActiveId(null);
+
+                    // optional:
+                    if (
+                        !next ||
+                        !(next instanceof HTMLElement) ||
+                        !next.closest(`.${classPrefix('--tags-input')}`)
+                    ) {
+                        setSelectedIds(new Set());
+                        setSelectionAnchor(null);
+                    }
                 }}
                 onKeyDown={(e) => handleTagKeyDown(e)}
                 onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
+                // onClick={(e) => {
+                //     e.stopPropagation();
+                //
+                //     if (readOnly || tag.disabled) return;
+                //
+                //     setActiveId(id);
+                //
+                //     requestAnimationFrame(() => {
+                //         tagRefs.current[id]?.focus();
+                //     });
+                // }}
                 onClick={(e) => {
                     e.stopPropagation();
 
                     if (readOnly || tag.disabled) return;
+
+                    // CTRL / CMD toggle
+                    if (e.ctrlKey || e.metaKey) {
+                        setSelectedIds((prev) => {
+                            const next = new Set(prev);
+
+                            if (next.has(id)) {
+                                next.delete(id);
+                            } else {
+                                next.add(id);
+                            }
+
+                            return next;
+                        });
+
+                        // setSelectionAnchor(id);
+                        if (selectionAnchor == null) {
+                            setSelectionAnchor(id);
+                        }
+                    }
+
+                    // SHIFT range
+                    else if (e.shiftKey && selectionAnchor != null) {
+                        selectRange(selectionAnchor, id);
+                    }
+
+                    // NORMAL
+                    else {
+                        setSelectedIds(new Set([id]));
+                        setSelectionAnchor(id);
+                    }
 
                     setActiveId(id);
 
@@ -913,7 +916,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                 style={{ display: 'inline-flex' }}
                 className={classPrefix('--tag')}
                 data-active={activeId === id || undefined}
-                data-selected={isSelected(i) || undefined}
+                data-selected={isSelected(id) || undefined}
                 data-disabled={tag.disabled || disabled || undefined}
                 data-prevent-focus
             >
@@ -940,6 +943,16 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     {clearButton}
                 </>
             }
+            onBlur={(e) => {
+                const next = e.relatedTarget as Node | null;
+
+                // still inside TagsInput
+                if (e.currentTarget.contains(next)) return;
+
+                setActiveId(null);
+                setSelectedIds(new Set());
+                setSelectionAnchor(null);
+            }}
             data-full-width={fullWidth || undefined}
             data-layout={layout}
         >
@@ -987,7 +1000,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                         index: i,
                         remove,
                         disabled: disabled || tag.disabled,
-                        selected: isSelected(i),
+                        selected: isSelected(id),
                         focused: !tag.disabled && !disabled && activeId === id,
                     });
                     return React.isValidElement(node) ? tagNodeWrapper(tag, i, id, node) : node;
@@ -1004,7 +1017,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                         disabled={tag.disabled || disabled}
                         onRemove={remove}
                         intent="primary"
-                        selected={isSelected(i)}
+                        selected={isSelected(id)}
                         focused={!tag.disabled && !disabled && activeId === id}
                     >
                         {tag.label}
