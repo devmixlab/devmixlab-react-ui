@@ -170,10 +170,6 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         return new RegExp(separator.source, separator.flags.replace(/g/g, ''));
     }, [separator]);
 
-    // Selection
-    // const [selectionStart, setSelectionStart] = useState<number | null>(null);
-    // const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
-
     const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
     const [selectionAnchor, setSelectionAnchor] = useState<string | number | null>(null);
 
@@ -553,54 +549,6 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             setSelectedIds(new Set(tags.map((t) => t.id ?? t.value)));
         }
 
-        // const moveSelection = (direction: -1 | 1, withSelection: boolean) => {
-        //     const nextIndex = findNextEnabled(tags, index + direction, direction);
-        //
-        //     // no more tags -> move focus to input
-        //     if (nextIndex == null) {
-        //         if (withSelection) {
-        //             return;
-        //         }
-        //         if (inputEnabled) {
-        //             setActiveId(null);
-        //
-        //             if (!withSelection) {
-        //                 setSelectedIds(new Set());
-        //                 setSelectionAnchor(null);
-        //             }
-        //
-        //             focusInput();
-        //         } else {
-        //             const nextSideIndex = findNextEnabled(
-        //                 tags,
-        //                 direction < 0 ? tags.length - 1 : 0,
-        //                 direction,
-        //             );
-        //             if (nextSideIndex != null) {
-        //                 const sideTagId = getId(nextSideIndex);
-        //                 setSelectedIds(new Set());
-        //                 setSelectionAnchor(sideTagId);
-        //                 setActiveId(sideTagId);
-        //             }
-        //         }
-        //
-        //         return;
-        //     }
-        //
-        //     const nextId = getId(nextIndex);
-        //
-        //     if (withSelection) {
-        //         setSelectionAnchor(anchor);
-        //         selectRange(anchor, nextId);
-        //     } else {
-        //         setSelectedIds(new Set());
-        //         setSelectionAnchor(nextId);
-        //     }
-        //
-        //     setActiveId(nextId);
-        //     focusTag(nextId);
-        // };
-
         const moveSelection = (
             direction: -1 | 1,
             withSelection: boolean,
@@ -910,20 +858,11 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     }
                 }}
                 key={id}
-                // tabIndex={!tag.disabled && activeId === id ? 0 : -1}
                 tabIndex={!readOnly && !tag.disabled && activeId === id ? 0 : -1}
                 onFocus={() => {
                     if (readOnly || tag.disabled) return;
                     setActiveId(id);
                 }}
-                // onBlur={(e) => {
-                //     const next = e.relatedTarget as Node | null;
-                //
-                //     // still inside current tag wrapper
-                //     if (e.currentTarget.contains(next)) return;
-                //
-                //     setActiveId(null);
-                // }}
                 onBlur={(e) => {
                     const next = e.relatedTarget as Node | null;
 
