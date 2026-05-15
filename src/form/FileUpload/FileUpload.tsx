@@ -1,11 +1,21 @@
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
-import { TagsInput } from '../TagsInput/TagsInput';
+import { TagsInput, type BaseTagItem } from '../TagsInput/TagsInput';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { Size } from '../form.tokens';
 import { Close, IconWrapper, Upload } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { Card } from '../../Card';
 import { Close as CloseIcon } from '../../Icon';
+
+type FileUploadTag = BaseTagItem & {
+    previewUrl?: string;
+
+    file: File;
+
+    progress?: number;
+
+    status?: 'idle' | 'uploading' | 'success' | 'error';
+};
 
 type FileUploadItem = {
     id: string;
@@ -168,7 +178,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             }
         };
 
-        const tags = useMemo(
+        const tags = useMemo<FileUploadTag[]>(
             () =>
                 files.map((item) => ({
                     id: item.id,
@@ -238,7 +248,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     onChange={handleChange}
                 />
 
-                <TagsInput
+                <TagsInput<FileUploadTag>
                     className={classPrefix('--file-upload')}
                     // fullWidth
                     value={tags}
@@ -252,8 +262,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
                     renderTag={({ tag, focused, remove }) => {
-                        // const item = files.find((f) => f.id === tag.id);
-
                         return (
                             <Card
                                 focused={focused}
