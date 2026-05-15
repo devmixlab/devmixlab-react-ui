@@ -1,7 +1,7 @@
 /**
  * @see tagsInputDocumentation.md
  */
-import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect } from 'react';
+import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { type TextInputProps } from '../TextInput/TextInput';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
 // import { prefix } from '../Input/input.helpers';
@@ -159,6 +159,17 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         });
     };
 
+    const focusInput = (callback?: () => void) => {
+        requestAnimationFrame(() => {
+            inputRef.current?.focus();
+            callback?.();
+        });
+    };
+
+    const separatorRegex = useMemo(() => {
+        return new RegExp(separator.source, separator.flags.replace(/g/g, ''));
+    }, [separator]);
+
     // Selection
     // const [selectionStart, setSelectionStart] = useState<number | null>(null);
     // const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
@@ -296,10 +307,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         setTags(updated);
         setEditingIndex(null);
         setActiveId(null);
-
-        requestAnimationFrame(() => {
-            inputRef.current?.focus();
-        });
+        focusInput();
     };
 
     const cancelEdit = () => {
@@ -311,9 +319,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
         setEditingIndex(null);
         setActiveId(null);
-
-        requestAnimationFrame(() => {
-            inputRef.current?.focus();
+        focusInput(() => {
             isCancellingRef.current = false;
         });
     };
@@ -532,9 +538,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                         setSelectionAnchor(null);
                     }
 
-                    requestAnimationFrame(() => {
-                        inputRef.current?.focus();
-                    });
+                    focusInput();
                 } else {
                     const nextSideIndex = findNextEnabled(
                         tags,
@@ -559,7 +563,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                 selectRange(anchor, nextId);
             } else {
                 setSelectedIds(new Set());
-                setSelectionAnchor(null);
+                setSelectionAnchor(nextId);
             }
 
             setActiveId(nextId);
@@ -643,10 +647,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                         return;
                     }
                 } else {
-                    requestAnimationFrame(() => {
-                        inputRef.current?.focus();
-                    });
-
+                    focusInput();
                     return;
                 }
             }
@@ -694,11 +695,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
         if (next.length === 0) {
             setActiveId(null);
-
-            requestAnimationFrame(() => {
-                inputRef.current?.focus();
-            });
-
+            focusInput();
             return;
         }
 
@@ -725,8 +722,8 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         }
 
         // handle split typing (e.g. "a,b")
-        if (separator.test(raw)) {
-            const parts = raw.split(separator);
+        if (separatorRegex.test(raw)) {
+            const parts = raw.split(separatorRegex);
 
             parts.slice(0, -1).forEach(addTag);
             setInputValue(parts[parts.length - 1] ?? '');
@@ -742,12 +739,12 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
         const text = e.clipboardData.getData('text');
 
-        if (!separator.test(text)) return;
+        if (!separatorRegex.test(text)) return;
 
         e.preventDefault();
 
         const parts = text
-            .split(separator)
+            .split(separatorRegex)
             .map((t) => t.trim())
             .filter(Boolean);
 
