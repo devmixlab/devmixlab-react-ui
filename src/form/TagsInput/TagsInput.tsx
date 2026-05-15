@@ -939,7 +939,6 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     setActiveId(id);
                     focusTag(id);
                 }}
-                style={{ display: 'inline-flex' }}
                 className={classPrefix('--tag')}
                 data-active={activeId === id || undefined}
                 data-selected={isSelected(id) || undefined}

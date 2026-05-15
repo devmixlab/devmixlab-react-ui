@@ -82,6 +82,7 @@ $sizes: (
     }
 
     .#{$p}--tag {
+        display: inline-flex;
         &[data-disabled] {
             pointer-events: none;
         }

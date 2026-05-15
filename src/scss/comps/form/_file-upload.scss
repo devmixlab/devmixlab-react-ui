@@ -13,7 +13,7 @@ $sizes: (
     lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
 );
 
-@mixin applySize ($size) {
+@mixin applySize($size) {
     $conf: map.get($sizes, $size);
 
     --min-height: #{map.get($conf, height)};
@@ -22,12 +22,38 @@ $sizes: (
 }
 
 .#{$file-upload-prefix} {
-    .#{$p}--card{
+    .#{$p}--card {
         --border-section: none;
-        .#{$p}--card__section{
+
+        .#{$p}--card__section {
             border: none;
+            min-width: 0;
+            overflow: hidden;
         }
     }
+
+    &.#{$p}--tags-input .#{$p}--tag {
+        min-width: 0;
+        width: 100%;
+    }
+
+    &.#{$p}--field-root {
+        --slot-h: 100%;
+        --slot-pb: var(--slot-pt);
+        //.#{$p}--slot {
+        //    --slot-h: 100%;
+        //}
+    }
+
+    &[data-actions-vertical].#{$p}--field-root {
+        .#{$p}--group,
+        .#{$p}--slot {
+            flex-direction: column-reverse;
+            justify-content: start;
+        }
+        //.#{$p}--group
+    }
+
     //display: inline-flex;
     //flex-wrap: wrap;
     //--slot-h: auto;
@@ -40,6 +66,7 @@ $sizes: (
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
     //
     //@each $size, $value in $sizes {
     //    &[data-size='#{$size}'] {

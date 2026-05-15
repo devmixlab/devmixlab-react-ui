@@ -321,7 +321,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
                 <TagsInput<FileUploadTag>
                     className={classPrefix('--file-upload')}
-                    // fullWidth
+                    fullWidth
                     value={tags}
                     inputEnabled={false}
                     layout={layout === 'stacked' ? 'stacked' : undefined}
@@ -348,7 +348,13 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             >
                                 {layout === 'stacked' && (
                                     <Card.Section w="full" d="flex" align="center" gap="sm">
-                                        <Card.Section d="flex" align="center">
+                                        <Card.Section
+                                            shrink={0}
+                                            d="flex"
+                                            align="center"
+                                            justify="center"
+                                            w={50}
+                                        >
                                             {/*<Box size={30}>{fileKindIconMap[kind]}</Box>*/}
                                             {/*<Box size={30}>{fileKindLabelMap[kind]}</Box>*/}
                                             <Badge
@@ -375,12 +381,18 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                             {/*    <Box size={30}>{fileKindIconMap[kind]}</Box>*/}
                                             {/*)}*/}
                                         </Card.Section>
-                                        <Card.Section grow minW={0}>
+                                        <Card.Section grow>
                                             <div className={classPrefix('--file-name')}>
                                                 {tag.label}
                                             </div>
                                         </Card.Section>
-                                        <Card.Section>
+                                        <Card.Section
+                                            shrink={0}
+                                            d="flex"
+                                            align="center"
+                                            justify="center"
+                                            w={32}
+                                        >
                                             <button
                                                 onClick={remove}
                                                 className={classPrefix('--clear-button')}
@@ -406,6 +418,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     onClick={!files.length ? openFileDialog : undefined}
                     data-not-empty={!!files.length || undefined}
                     data-loading={loading || undefined}
+                    data-actions-vertical={files.length > 1 || undefined}
                 />
             </>
         );
