@@ -253,7 +253,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             <button
                 type="button"
                 disabled={disabled || loading}
-                onMouseDown={(e) => e.preventDefault()}
+                // onMouseDown={(e) => e.preventDefault()}
                 onClick={(e) => {
                     if (disabled || loading) return;
 
@@ -272,7 +272,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 <button
                     type="button"
                     aria-label="Clear files"
-                    onMouseDown={(e) => e.preventDefault()}
+                    // onMouseDown={(e) => e.preventDefault()}
                     onClick={(e) => {
                         if (disabled || loading) return;
 
@@ -312,11 +312,12 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     size={size}
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
-                    renderTag={({ tag, focused, remove }) => {
+                    renderTag={({ tag, focused, remove, selected }) => {
                         const kind = getFileKind(tag.file);
 
                         return (
                             <Card
+                                active={selected}
                                 focused={focused}
                                 // interactive
                                 focusable

@@ -18,7 +18,7 @@ $card-prefix: #{$p}--card;
 
     --border: var(--border-#{$mode});
     --border-section: var(--border-section-#{$mode});
-    --ring: var(--ring-#{$mode});
+    //--ring: var(--ring-#{$mode});
 
     --icon-surface: var(--icon-surface-#{$mode});
     --icon-color: var(--icon-color-#{$mode});
@@ -39,16 +39,22 @@ $card-prefix: #{$p}--card;
     /* ================== LIGHT ================== */
 
     --surface-light: var(--#{$p}-intent-gray-0);
+
     --surface-raised-light: var(--#{$p}-intent-gray-50);
+
     --surface-hover-light: var(--#{$p}-intent-gray-100);
-    --surface-raised-hover-light: var(--#{$p}-intent-gray-300);
+    --surface-active-light: var(--#{$p}-intent-gray-150);
+
+    --surface-raised-hover-light: var(--#{$p}-intent-gray-200);
+    --surface-raised-active-light: var(--#{$p}-intent-gray-250);
 
     --accent-light: var(--#{$p}-intent-gray-800);
     --accent-disabled-light: var(--#{$p}-intent-gray-400);
 
     --border-light: var(--#{$p}-intent-gray-200);
+    --border-active-light: var(--#{$p}-intent-gray-300);
+
     --border-section-light: var(--#{$p}-intent-gray-200);
-    --ring-light: var(--#{$p}-intent-gray-400);
 
     --icon-surface-light: var(--#{$p}-intent-gray-50);
     --icon-color-light: var(--#{$p}-intent-gray-800);
@@ -61,16 +67,22 @@ $card-prefix: #{$p}--card;
     /* ================== DARK ================== */
 
     --surface-dark: var(--#{$p}-intent-zinc-900);
+
     --surface-raised-dark: var(--#{$p}-intent-zinc-800);
+
     --surface-hover-dark: var(--#{$p}-intent-zinc-850);
+    --surface-active-dark: var(--#{$p}-intent-zinc-800);
+
     --surface-raised-hover-dark: var(--#{$p}-intent-zinc-700);
+    --surface-raised-active-dark: var(--#{$p}-intent-zinc-600);
 
     --accent-dark: var(--#{$p}-intent-zinc-300);
     --accent-disabled-dark: var(--#{$p}-intent-zinc-500);
 
     --border-dark: var(--#{$p}-intent-zinc-700);
+    --border-active-dark: var(--#{$p}-intent-zinc-600);
+
     --border-section-dark: var(--#{$p}-intent-zinc-700);
-    --ring-dark: var(--#{$p}-intent-zinc-500);
 
     --icon-surface-dark: var(--#{$p}-intent-gray-900);
     --icon-color-dark: var(--#{$p}-intent-gray-200);
@@ -78,6 +90,8 @@ $card-prefix: #{$p}--card;
     --text-dark: var(--#{$p}-intent-zinc-200);
     --text-muted-dark: var(--#{$p}-intent-zinc-400);
     --text-disabled-dark: var(--#{$p}-intent-zinc-600);
+
+    --ring: var(--#{$p}-accent-secondary);
 
 
     /* ================== CARD ================== */
@@ -254,6 +268,21 @@ $card-prefix: #{$p}--card;
         cursor: not-allowed;
         user-select: none;
     }
+
+    &[data-active] {
+        background-color: var(--surface-hover);
+        border-color: var(--accent);
+
+        .#{$card-prefix}__header,
+        .#{$card-prefix}__footer {
+            background-color: var(--surface-raised-hover);
+        }
+    }
+
+    //&[data-active][data-focusable]:focus-visible {
+    //    //outline-color: var(--accent);
+    //    outline: 2px solid var(--accent);
+    //}
 }
 
 //.#{$card-prefix}.#{$card-prefix}[data-disabled] {

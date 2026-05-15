@@ -44,6 +44,8 @@ $sizes: (
 @mixin action-button {
     @include mixins.reset-button;
 
+    will-change: transform;
+
     position: relative;
     border-radius: 3px;
 
@@ -79,7 +81,8 @@ $sizes: (
 
     transition:
         color var(--transition),
-        box-shadow var(--transition);
+        box-shadow var(--transition),
+        transform var(--transition-active);
 
     &::before {
         content: '';
@@ -90,6 +93,11 @@ $sizes: (
 
     &:not([data-disabled]):hover {
         color: var(--text);
+    }
+
+    &:not([data-disabled]):active {
+        transform: translateY(1px);
+        //transform: scale(0.94);
     }
 
     &:focus-visible {
@@ -111,6 +119,7 @@ $sizes: (
     }
 
     --transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+    --transition-active: var(--#{$p}-duration-fast) var(--#{$p}-ease-press);
     --icon-size: 1.1em;
 
     // field

@@ -38,6 +38,7 @@ export type CardProps = {
     pressable?: boolean;
     focusable?: boolean;
 
+    active?: boolean;
     disabled?: boolean;
     intent?: string;
     variant?: string;
@@ -66,6 +67,7 @@ export const CardImpl = (
         pressable = false,
         focusable = false,
 
+        active = false,
         disabled = false,
         accent = false,
         accentSide = 'left',
@@ -135,6 +137,7 @@ export const CardImpl = (
                 data-hoverable={finalHoverable || undefined}
                 data-pressable={finalPressable || undefined}
                 data-focusable={finalFocusable || undefined}
+                data-active={active || undefined}
                 data-disabled={isDisabled || undefined}
                 data-accent={accent ? accentSide : undefined}
                 data-intent={intent}

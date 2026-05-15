@@ -36,9 +36,9 @@ $p: cfg.$prefix;
     @include mixins.intent-vars($zinc, 'zinc');
 
     // accent secondary
-    --#{$p}-accent-secondary: #{functions.intent-color('secondary', 500)};
-    --#{$p}-accent-secondary-active: #{functions.intent-color('secondary', 600)};
-    --#{$p}-accent-secondary-strong: #{functions.intent-color('secondary', 700)};
+    --#{$p}-accent-secondary: #{functions.intent-color('secondary', 400)};
+    --#{$p}-accent-secondary-active: #{functions.intent-color('secondary', 500)};
+    --#{$p}-accent-secondary-strong: #{functions.intent-color('secondary', 600)};
     // accent primary
     --#{$p}-accent-primary: #{functions.intent-color('primary', 500)};
     --#{$p}-accent-primary-active: #{functions.intent-color('primary', 600)};
@@ -135,29 +135,29 @@ $p: cfg.$prefix;
 @include cfg.dark-root {
 
     // accent secondary
-    --#{$p}-accent-secondary: #{functions.intent-color('secondary', 400)};
-    --#{$p}-accent-secondary-active: #{functions.intent-color('secondary', 500)};
-    --#{$p}-accent-secondary-strong: #{functions.intent-color('secondary', 600)};
+    --#{$p}-accent-secondary: #{functions.intent-color('secondary', 300)};
+    --#{$p}-accent-secondary-active: #{functions.intent-color('secondary', 200)};
+    --#{$p}-accent-secondary-strong: #{functions.intent-color('secondary', 100)};
     // accent primary
     --#{$p}-accent-primary: #{functions.intent-color('primary', 400)};
-    --#{$p}-accent-primary-active: #{functions.intent-color('primary', 500)};
-    --#{$p}-accent-primary-strong: #{functions.intent-color('primary', 600)};
+    --#{$p}-accent-primary-active: #{functions.intent-color('primary', 300)};
+    --#{$p}-accent-primary-strong: #{functions.intent-color('primary', 200)};
     // accent success
     --#{$p}-accent-success: #{functions.intent-color('success', 400)};
-    --#{$p}-accent-success-active: #{functions.intent-color('success', 500)};
-    --#{$p}-accent-success-strong: #{functions.intent-color('success', 600)};
+    --#{$p}-accent-success-active: #{functions.intent-color('success', 300)};
+    --#{$p}-accent-success-strong: #{functions.intent-color('success', 200)};
     // accent danger
     --#{$p}-accent-danger: #{functions.intent-color('danger', 400)};
-    --#{$p}-accent-danger-active: #{functions.intent-color('danger', 500)};
-    --#{$p}-accent-danger-strong: #{functions.intent-color('danger', 600)};
+    --#{$p}-accent-danger-active: #{functions.intent-color('danger', 300)};
+    --#{$p}-accent-danger-strong: #{functions.intent-color('danger', 200)};
     // accent warning
     --#{$p}-accent-warning: #{functions.intent-color('warning', 400)};
-    --#{$p}-accent-warning-active: #{functions.intent-color('warning', 500)};
-    --#{$p}-accent-warning-strong: #{functions.intent-color('warning', 600)};
+    --#{$p}-accent-warning-active: #{functions.intent-color('warning', 300)};
+    --#{$p}-accent-warning-strong: #{functions.intent-color('warning', 200)};
     // accent info
     --#{$p}-accent-info: #{functions.intent-color('info', 400)};
-    --#{$p}-accent-info-active: #{functions.intent-color('info', 500)};
-    --#{$p}-accent-info-strong: #{functions.intent-color('info', 600)};
+    --#{$p}-accent-info-active: #{functions.intent-color('info', 300)};
+    --#{$p}-accent-info-strong: #{functions.intent-color('info', 200)};
 
 
     // general
