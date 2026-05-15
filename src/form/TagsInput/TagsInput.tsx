@@ -758,13 +758,6 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             return true;
         });
 
-        const activeIndex = getIndexById(activeId);
-
-        const removedBefore = tags.slice(0, activeIndex).filter((_, i) => {
-            const id = getId(i);
-            return selectedIds.has(id);
-        }).length;
-
         setTags(next);
 
         setSelectedIds(new Set());
@@ -776,11 +769,37 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             return;
         }
 
-        let focusIndex = activeIndex - removedBefore;
+        // active tag survived
+        const survivingActive = next.find((t) => (t.id ?? t.value) === activeId);
 
-        focusIndex = Math.max(0, Math.min(focusIndex, next.length - 1));
+        if (survivingActive && !survivingActive.disabled) {
+            const id = survivingActive.id ?? survivingActive.value;
 
-        const nextTag = next[focusIndex];
+            setActiveId(id);
+            setSelectionAnchor(id);
+            focusTag(id);
+
+            return;
+        }
+
+        // fallback: nearest enabled tag
+        const previousIndex = findNextEnabled(
+            next,
+            Math.min(getIndexById(activeId), next.length - 1),
+            -1,
+        );
+
+        const nextIndex =
+            previousIndex ??
+            findNextEnabled(next, Math.min(getIndexById(activeId), next.length - 1), 1);
+
+        if (nextIndex == null) {
+            setActiveId(null);
+            focusInput();
+            return;
+        }
+
+        const nextTag = next[nextIndex];
         const nextId = nextTag.id ?? nextTag.value;
 
         setActiveId(nextId);
