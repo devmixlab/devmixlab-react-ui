@@ -141,6 +141,12 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const inputRef = useRef<HTMLInputElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
+        const dragCounterRef = useRef(0);
+        const [isDragging, setIsDragging] = useState(false);
+
+        const [maxExceeded, setMaxExceeded] = useState(false);
+        const maxExceededTimeoutRef = useRef<number>();
+
         const isControlled = value !== undefined;
 
         const [filesState, setFilesState] = useState<FileUploadItem[]>(defaultValue);
@@ -188,9 +194,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             inputRef.current?.click();
         };
 
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const selected = Array.from(e.target.files ?? []);
-
+        const processFiles = (selected: File[]) => {
             const selectedItems: FileUploadItem[] = selected.map((file) => ({
                 id: crypto.randomUUID(),
                 file,
@@ -216,16 +220,76 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                   ]
                 : selectedItems;
 
-            if (maxFiles != null && merged.length > maxFiles) {
+            const exceeded = maxFiles != null && merged.length > maxFiles;
+
+            setMaxExceeded(exceeded);
+
+            if (exceeded) {
+                setMaxExceeded(true);
+
                 onMaxFilesExceeded?.(selected, files);
+
+                window.clearTimeout(maxExceededTimeoutRef.current);
+
+                maxExceededTimeoutRef.current = window.setTimeout(() => {
+                    setMaxExceeded(false);
+                }, 1200);
             }
 
             const next = maxFiles != null ? merged.slice(0, maxFiles) : merged;
 
             setFiles(next);
+        };
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            processFiles(Array.from(e.target.files ?? []));
 
             // allow re-select same file
             e.target.value = '';
+        };
+
+        const handleDragEnter = (e: React.DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (disabled || loading) return;
+
+            dragCounterRef.current += 1;
+            setIsDragging(true);
+        };
+
+        const handleDragLeave = (e: React.DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (disabled || loading) return;
+
+            dragCounterRef.current -= 1;
+
+            if (dragCounterRef.current <= 0) {
+                setIsDragging(false);
+            }
+        };
+
+        const handleDragOver = (e: React.DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const handleDrop = (e: React.DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (disabled || loading) return;
+
+            dragCounterRef.current = 0;
+            setIsDragging(false);
+
+            const dropped = Array.from(e.dataTransfer.files ?? []);
+
+            if (!dropped.length) return;
+
+            processFiles(dropped);
         };
 
         const removeFile = (tag: FileUploadTag) => {
@@ -408,9 +472,16 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                         </>
                     }
                     onClick={!files.length ? openFileDialog : undefined}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
                     data-not-empty={!!files.length || undefined}
                     data-loading={loading || undefined}
                     data-actions-vertical={files.length > 1 || undefined}
+                    data-dragging={isDragging || undefined}
+                    data-max-exceeded={maxExceeded || undefined}
+                    data-drag-rejected={isDragging && isMaxReached ? true : undefined}
                 />
             </>
         );

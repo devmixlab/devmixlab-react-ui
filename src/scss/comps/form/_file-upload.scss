@@ -115,6 +115,48 @@ $sizes: (
             pointer-events: none;
         }
     }
+
+    &[data-dragging] {
+        cursor: copy;
+        background: color-mix(
+            in srgb,
+            var(--#{$p}-accent-primary) 6%,
+            transparent
+        );
+
+        outline: 2px dashed var(--#{$p}-accent-primary);
+        outline-offset: -2px;
+
+        transition:
+            background 120ms ease,
+            outline-color 120ms ease;
+
+        .#{$p}--card {
+            opacity: 0.75;
+        }
+    }
+
+    &[data-drag-rejected] {
+        background: color-mix(
+            in srgb,
+            var(--#{$p}-accent-warning) 8%,
+            transparent
+        );
+
+        outline: 2px dashed var(--#{$p}-accent-warning);
+
+        cursor: not-allowed;
+    }
+
+    &[data-max-exceeded] {
+        outline: 2px solid var(--#{$p}-accent-danger);
+        outline-offset: 4px;
+
+        animation: file-upload-max-exceeded 1.2s ease;
+        //.#{$p}--card {
+        //    opacity: 0.85;
+        //}
+    }
 }
 
 @keyframes file-upload-loading {
@@ -124,5 +166,19 @@ $sizes: (
 
     100% {
         left: 100%;
+    }
+}
+
+@keyframes file-upload-max-exceeded {
+    0% {
+        outline-color: transparent;
+    }
+
+    15% {
+        outline-color: var(--#{$p}-accent-danger);
+    }
+
+    100% {
+        outline-color: transparent;
     }
 }
