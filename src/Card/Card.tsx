@@ -1,5 +1,4 @@
 import React, { forwardRef } from 'react';
-import { CLASS_PREFIX } from '../constants';
 import { CardProvider } from './card.context';
 import { Density } from './card.tokens';
 import { Box, type BoxProps } from '../Box/Box';
@@ -11,10 +10,11 @@ import { type MediaComponent } from './media/Media';
 import { type FooterOwnProps } from './Footer';
 import { type ContentProps } from './Content';
 import { type SectionOwnProps } from './Section';
+import { classPrefix } from '../utils/classPrefix';
 
 // it used in Body, Header, Footer
-export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--card${name}`;
+export const cardPrefix = (name: string = '') => {
+    return classPrefix(`--card${name}`);
 };
 
 type SpreadProps = {
@@ -34,7 +34,8 @@ export type CardProps = {
     accentSide?: 'left' | 'top';
     interactive?: boolean;
     disabled?: boolean;
-    appearance?: 'neutral' | 'semantic';
+    intent?: string;
+    variant?: string;
 } & BoxProps &
     SpreadProps;
 
@@ -56,7 +57,8 @@ export const CardImpl = (
         disabled = false,
         accent = false,
         accentSide = 'left',
-        appearance = 'neutral',
+        intent,
+        variant,
         d = 'flex',
         direction = 'column',
         ...rest
@@ -75,7 +77,7 @@ export const CardImpl = (
             <Box
                 ref={ref}
                 as={as}
-                className={clsx(prefix(), className)}
+                className={clsx(cardPrefix(), className)}
                 href={as === 'a' && isDisabled ? undefined : href}
                 aria-disabled={isDisabled || undefined}
                 tabIndex={isDisabled ? -1 : isButtonLike ? 0 : tabIndex}
@@ -112,7 +114,7 @@ export const CardImpl = (
                 data-interactive={finalInteractive || undefined}
                 data-disabled={isDisabled || undefined}
                 data-accent={accent ? accentSide : undefined}
-                data-appearance={appearance}
+                data-intent={intent}
                 data-density={density}
                 {...restProps}
                 d={d}

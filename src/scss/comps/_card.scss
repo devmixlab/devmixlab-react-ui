@@ -8,71 +8,76 @@ $p: cfg.$prefix;
 $card-prefix: #{$p}--card;
 
 @mixin card-theme($mode) {
-    --dru-card--surface: var(--dru-card--surface-#{$mode});
-    --dru-card--surface-raised: var(--dru-card--surface-raised-#{$mode});
-    --dru-card--surface-hover: var(--dru-card--surface-hover-#{$mode});
-    --dru-card--surface-raised-hover: var(--dru-card--surface-raised-hover-#{$mode});
+    --surface: var(--surface-#{$mode});
+    --surface-raised: var(--surface-raised-#{$mode});
+    --surface-hover: var(--surface-hover-#{$mode});
+    --surface-raised-hover: var(--surface-raised-hover-#{$mode});
 
-    --dru-card--accent: var(--dru-card--accent-#{$mode});
-    --dru-card--accent-disabled: var(--dru-card--accent-disabled-#{$mode});
+    --accent: var(--accent-#{$mode});
+    --accent-disabled: var(--accent-disabled-#{$mode});
 
-    --dru-card--border: var(--dru-card--border-#{$mode});
-    --dru-card--border-section: var(--dru-card--border-section-#{$mode});
-    --dru-card--ring: var(--dru-card--ring-#{$mode});
+    --border: var(--border-#{$mode});
+    --border-section: var(--border-section-#{$mode});
+    --ring: var(--ring-#{$mode});
 
-    --dru-card--icon-surface: var(--dru-card--icon-surface-#{$mode});
-    --dru-card--icon-color: var(--dru-card--icon-color-#{$mode});
+    --icon-surface: var(--icon-surface-#{$mode});
+    --icon-color: var(--icon-color-#{$mode});
 
-    --dru-card--text: var(--dru-card--text-#{$mode});
-    --dru-card--text-muted: var(--dru-card--text-muted-#{$mode});
-    --dru-card--text-disabled: var(--dru-card--text-disabled-#{$mode});
+    --text: var(--text-#{$mode});
+    --text-muted: var(--text-muted-#{$mode});
+    --text-disabled: var(--text-disabled-#{$mode});
+}
+
+@mixin card-root-colors {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
 }
 
 .#{$card-prefix} {
 
     /* ================== LIGHT ================== */
 
-    --dru-card--surface-light: #ffffff;
-    --dru-card--surface-raised-light: #f8fafc;        // slightly softer elevation
-    --dru-card--surface-hover-light: #e2e8f0;         // clearer hover
-    --dru-card--surface-raised-hover-light: #cbd5e1;  // stronger step
+    --surface-light: var(--#{$p}-intent-gray-0);
+    --surface-raised-light: var(--#{$p}-intent-gray-50);
+    --surface-hover-light: var(--#{$p}-intent-gray-100);
+    --surface-raised-hover-light: var(--#{$p}-intent-gray-300);
 
-    --dru-card--accent-light: #1f2937;                // slightly richer than #333
-    --dru-card--accent-disabled-light: #9ca3af;
+    --accent-light: var(--#{$p}-intent-gray-800);
+    --accent-disabled-light: var(--#{$p}-intent-gray-400);
 
-    --dru-card--border-light: #e5e7eb;
-    --dru-card--border-section-light: #e5e7eb;
-    --dru-card--ring-light: #9ca3af;
+    --border-light: var(--#{$p}-intent-gray-200);
+    --border-section-light: var(--#{$p}-intent-gray-200);
+    --ring-light: var(--#{$p}-intent-gray-400);
 
-    --dru-card--icon-surface-light: #f8fafc;
-    //--dru-card--icon-color-light: #1f2937;
-    --dru-card--icon-color-light: yellow;
+    --icon-surface-light: var(--#{$p}-intent-gray-50);
+    --icon-color-light: var(--#{$p}-intent-gray-800);
 
-    --dru-card--text-light: #111827;
-    --dru-card--text-muted-light: #6b7280;
-    --dru-card--text-disabled-light: #9ca3af;
+    --text-light: var(--#{$p}-intent-gray-900);
+    --text-muted-light: var(--#{$p}-intent-gray-500);
+    --text-disabled-light: var(--#{$p}-intent-gray-400);
 
 
     /* ================== DARK ================== */
 
-    --dru-card--surface-dark: #12141a;
-    --dru-card--surface-raised-dark: #181c27;         // more separation
-    --dru-card--surface-hover-dark: #22263a;          // clearer hover
-    --dru-card--surface-raised-hover-dark: #262b40;   // stronger step
+    --surface-dark: var(--#{$p}-intent-zinc-900);
+    --surface-raised-dark: var(--#{$p}-intent-zinc-800);
+    --surface-hover-dark: var(--#{$p}-intent-zinc-850);
+    --surface-raised-hover-dark: var(--#{$p}-intent-zinc-700);
 
-    --dru-card--accent-dark: #d1d5db;                 // softer than pure #ccc
-    --dru-card--accent-disabled-dark: #6b7280;
+    --accent-dark: var(--#{$p}-intent-zinc-300);
+    --accent-disabled-dark: var(--#{$p}-intent-zinc-500);
 
-    --dru-card--border-dark: #303645;                 // more visible border
-    --dru-card--border-section-dark: #303645;
-    --dru-card--ring-dark: #6b7280;
+    --border-dark: var(--#{$p}-intent-zinc-700);
+    --border-section-dark: var(--#{$p}-intent-zinc-700);
+    --ring-dark: var(--#{$p}-intent-zinc-500);
 
-    --dru-card--icon-surface-dark: #f8fafc;
-    --dru-card--icon-color-dark: #1f2937;
+    --icon-surface-dark: var(--#{$p}-intent-gray-900);
+    --icon-color-dark: var(--#{$p}-intent-gray-200);
 
-    --dru-card--text-dark: #e5e7eb;
-    --dru-card--text-muted-dark: #9ca3af;
-    --dru-card--text-disabled-dark: #5b6472;          // more muted than before
+    --text-dark: var(--#{$p}-intent-zinc-200);
+    --text-muted-dark: var(--#{$p}-intent-zinc-400);
+    --text-disabled-dark: var(--#{$p}-intent-zinc-600);
 
 
     /* ================== CARD ================== */
@@ -82,51 +87,43 @@ $card-prefix: #{$p}--card;
         @include card-theme ('dark');
     }
 
-    background-color: var(--dru-card--surface);
-    border: 1px solid var(--dru-card--border);
-
-    color: var(--dru-card--text);
+    @include card-root-colors;
 
     .#{$card-prefix}__header {
-        background-color: var(--dru-card--surface-raised);
-        border-bottom: 1px solid var(--dru-card--border);
+        background-color: var(--surface-raised);
+        border-bottom: 1px solid var(--border);
         border-top-right-radius: inherit;
         border-top-left-radius: inherit;
     }
 
     .#{$card-prefix}__footer {
-        background-color: var(--dru-card--surface-raised);
-        border-top: 1px solid var(--dru-card--border);
+        background-color: var(--surface-raised);
+        border-top: 1px solid var(--border);
         border-bottom-right-radius: inherit;
         border-bottom-left-radius: inherit;
     }
 
     .#{$card-prefix}__header,
     .#{$card-prefix}__footer {
-        flex-shrink: 0; // 🔥 prevents collapsing
+        flex-shrink: 0; // prevents collapsing
     }
 
     // normalize when rendered as __button
     &:where(button) {
-        appearance: none;
-        border: none;
-        background: none;
-        padding: 0;
-        margin: 0;
-        font: inherit;
-        color: inherit;
-        text-align: inherit;
+        @include mixins.reset-button();
+        @include card-root-colors;
 
-        display: block; // 🔥 important
-        width: 100%; // 🔥 prevents shrink
+        display: block; // important
+        width: 100%; // prevents shrink
     }
 
+    // normalize when rendered as __a
     &:where(a) {
-        text-decoration: none; // remove underline
-        color: inherit; // inherit text color
+        @include mixins.reset-link();
+        @include card-root-colors;
 
-        display: block; // 🔥 important
-        width: 100%; // 🔥 consistent layout
+        display: block; // important
+        width: 100%; // consistent layout
     }
 
     .#{$card-prefix}__media {
@@ -153,17 +150,16 @@ $card-prefix: #{$p}--card;
         justify-content: center;
 
         border-radius: 50%;
-        background-color: var(--dru-card--icon-surface);
-        //background-color: red;
-        color: var(--dru-card--icon-color);
+        background-color: var(--icon-surface);
+        color: var(--icon-color);
 
         flex-shrink: 0;
 
-        &--xs { width: 20px; height: 20px; font-size: 12px; }
-        &--sm { width: 28px; height: 28px; font-size: 14px; }
-        &--md { width: 36px; height: 36px; font-size: 18px; } // 👈 bumped
-        &--lg { width: 44px; height: 44px; font-size: 22px; }
-        &--xl { width: 52px; height: 52px; font-size: 26px; }
+        &[data-size='xs'] { width: 20px; height: 20px; font-size: 12px; }
+        &[data-size='sm'] { width: 28px; height: 28px; font-size: 14px; }
+        &[data-size='md'] { width: 36px; height: 36px; font-size: 18px; }
+        &[data-size='lg'] { width: 44px; height: 44px; font-size: 22px; }
+        &[data-size='xl'] { width: 52px; height: 52px; font-size: 26px; }
 
         svg,
         .MuiSvgIcon-root {
@@ -181,7 +177,7 @@ $card-prefix: #{$p}--card;
     }
 
     .#{$card-prefix}__section {
-        border-bottom: 1px solid var(--dru-card--border-section);
+        border-bottom: 1px solid var(--border-section);
 
         &:last-child {
             border-bottom: none;
@@ -193,49 +189,53 @@ $card-prefix: #{$p}--card;
         transition: transform 120ms ease, background-color 120ms ease;
         user-select: none;
 
-        //&:focus-visible {
-        //    outline: 2px solid var(--outline-color);
-        //    outline-offset: 2px;
-        //}
-
-        &:hover {
-            background-color: var(--dru-card--surface-hover);
+        &:not([data-disabled]):hover {
+            background-color: var(--surface-hover);
 
             //will-change: transform;
             transform: translateY(-1px);
         }
 
-        &:active {
+        &:not([data-disabled]):active {
             user-select: none;
             transform: translateY(0.5px);
         }
 
-        &:focus-visible {
-            outline: 2px solid var(--dru-card--ring);
+        &:not([data-disabled]):focus-visible {
+            outline: 2px solid var(--ring);
             outline-offset: 2px;
         }
     }
 
     &[data-accent='left'] {
-        border-left: 4px solid var(--dru-card--accent);
+        border-left: 4px solid var(--accent);
     }
 
     &[data-accent='top'] {
-        border-top: 4px solid var(--dru-card--accent);
+        border-top: 4px solid var(--accent);
         border-top-left-radius: 0;
         border-top-right-radius: 0;
     }
-}
 
-.#{$card-prefix}.#{$card-prefix}[data-disabled] {
-    --dru-card--accent: var(--dru-card--accent-disabled);
-    --dru-card--text: var(--dru-card--text-disabled);
+    &[data-disabled] {
+        --accent: var(--accent-disabled);
+        --text: var(--text-disabled);
+        --icon-color: var(--text-disabled);
 
-    cursor: not-allowed;
-    user-select: none;
-
-    &:hover {
-        transform: none;
-        background-color: var(--dru-card--surface); // prevent hover
+        cursor: not-allowed;
+        user-select: none;
     }
 }
+
+//.#{$card-prefix}.#{$card-prefix}[data-disabled] {
+//    --accent: var(--accent-disabled);
+//    --text: var(--text-disabled);
+//
+//    cursor: not-allowed;
+//    user-select: none;
+//
+//    &:hover {
+//        transform: none;
+//        background-color: var(--surface); // prevent hover
+//    }
+//}

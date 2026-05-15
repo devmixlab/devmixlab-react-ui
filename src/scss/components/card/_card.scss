@@ -4,15 +4,15 @@
 $card-prefix: '.dru--card';
 
 @mixin card-theme($mode) {
-    --dru-card--surface: var(--dru-card--surface-#{$mode});
-    --dru-card--surface-raised: var(--dru-card--surface-raised-#{$mode});
-    --dru-card--surface-hover: var(--dru-card--surface-hover-#{$mode});
-    --dru-card--surface-raised-hover: var(--dru-card--surface-raised-hover-#{$mode});
+    --surface: var(--dru-card--surface-#{$mode});
+    --surface-raised: var(--dru-card--surface-raised-#{$mode});
+    --surface-hover: var(--dru-card--surface-hover-#{$mode});
+    --surface-raised-hover: var(--dru-card--surface-raised-hover-#{$mode});
 
-    --dru-card--accent: var(--dru-card--accent-#{$mode});
-    --dru-card--accent-disabled: var(--dru-card--accent-disabled-#{$mode});
+    --accent: var(--dru-card--accent-#{$mode});
+    --accent-disabled: var(--dru-card--accent-disabled-#{$mode});
 
-    --dru-card--border: var(--dru-card--border-#{$mode});
+    --border: var(--dru-card--border-#{$mode});
     --dru-card--border-section: var(--dru-card--border-section-#{$mode});
     --dru-card--ring: var(--dru-card--ring-#{$mode});
 
@@ -27,25 +27,25 @@ $card-prefix: '.dru--card';
 #{$card-prefix} {
     /* ================== LIGHT ================== */
 
-    --dru-card--surface-light: #ffffff;
-    --dru-card--surface-raised-light: #f8fafc;        // slightly softer elevation
-    --dru-card--surface-hover-light: #e2e8f0;         // clearer hover
-    --dru-card--surface-raised-hover-light: #cbd5e1;  // stronger step
+    --surface-light: #ffffff;
+    --surface-raised-light: #f8fafc;        // slightly softer elevation
+    --surface-hover-light: #e2e8f0;         // clearer hover
+    --surface-raised-hover-light: #cbd5e1;  // stronger step
 
-    --dru-card--accent-light: #1f2937;                // slightly richer than #333
-    --dru-card--accent-disabled-light: #9ca3af;
+    --accent-light: #1f2937;                // slightly richer than #333
+    --accent-disabled-light: #9ca3af;
 
-    --dru-card--border-light: #e5e7eb;
-    --dru-card--border-section-light: #e5e7eb;
-    --dru-card--ring-light: #9ca3af;
+    --border-light: #e5e7eb;
+    --border-section-light: #e5e7eb;
+    --ring-light: #9ca3af;
 
-    --dru-card--icon-surface-light: #f8fafc;
+    --icon-surface-light: #f8fafc;
     //--dru-card--icon-color-light: #1f2937;
-    --dru-card--icon-color-light: yellow;
+    --icon-color-light: yellow;
 
-    --dru-card--text-light: #111827;
-    --dru-card--text-muted-light: #6b7280;
-    --dru-card--text-disabled-light: #9ca3af;
+    --text-light: #111827;
+    --text-muted-light: #6b7280;
+    --text-disabled-light: #9ca3af;
 
 
     /* ================== DARK ================== */
@@ -77,8 +77,8 @@ $card-prefix: '.dru--card';
         @include card-theme ('dark');
     }
 
-    background-color: var(--dru-card--surface);
-    border: 1px solid var(--dru-card--border);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     //display: flex;
     //flex-direction: column;
 
@@ -89,15 +89,15 @@ $card-prefix: '.dru--card';
     color: var(--dru-card--text);
 
     &__header {
-        background-color: var(--dru-card--surface-raised);
-        border-bottom: 1px solid var(--dru-card--border);
+        background-color: var(--surface-raised);
+        border-bottom: 1px solid var(--border);
         border-top-right-radius: inherit;
         border-top-left-radius: inherit;
     }
 
     &__footer {
-        background-color: var(--dru-card--surface-raised);
-        border-top: 1px solid var(--dru-card--border);
+        background-color: var(--surface-raised);
+        border-top: 1px solid var(--border);
         border-bottom-right-radius: inherit;
         border-bottom-left-radius: inherit;
     }
@@ -265,7 +265,7 @@ $card-prefix: '.dru--card';
         }
 
         &:hover {
-            background-color: var(--dru-card--surface-hover);
+            background-color: var(--surface-hover);
 
             //will-change: transform;
             transform: translateY(-1px);
@@ -283,18 +283,18 @@ $card-prefix: '.dru--card';
     }
 
     &--accent-left {
-        border-left: 4px solid var(--dru-card--accent);
+        border-left: 4px solid var(--accent);
     }
 
     &--accent-top {
-        border-top: 4px solid var(--dru-card--accent);
+        border-top: 4px solid var(--accent);
         border-top-left-radius: 0;
         border-top-right-radius: 0;
     }
 }
 
 #{$card-prefix}#{$card-prefix}--disabled {
-    --dru-card--accent: var(--dru-card--accent-disabled);
+    --accent: var(--accent-disabled);
     --dru-card--text: var(--dru-card--text-disabled);
 
     cursor: not-allowed;
@@ -302,6 +302,6 @@ $card-prefix: '.dru--card';
 
     &:hover {
         transform: none;
-        background-color: var(--dru-card--surface); // prevent hover
+        background-color: var(--surface); // prevent hover
     }
 }

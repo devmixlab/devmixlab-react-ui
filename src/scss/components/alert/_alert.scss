@@ -121,63 +121,63 @@ $compPrefix: 'dru--alert';
 
         &-base {
             // 👇 softer progression
-            --dru-card--surface-light: #dbeafe;
-            --dru-card--surface-raised-light: #bfdbfe;
-            --dru-card--surface-hover-light: #bfdbfe;
-            --dru-card--surface-raised-hover-light: #a5c9ff;
+            --surface-light: #dbeafe;
+            --surface-raised-light: #bfdbfe;
+            --surface-hover-light: #bfdbfe;
+            --surface-raised-hover-light: #a5c9ff;
 
-            --dru-card--accent-light: #{$accent};
-            --dru-card--accent-disabled-light: #{$accent-disabled};
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
 
             // subtle border
-            --dru-card--border-light: #93c5fd;
+            --border-light: #93c5fd;
             --dru-card--border-section: transparent;
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
             --dru-icon-color: #2563eb;
         }
 
         &-solid {
             // 👇 lighter surface
-            --dru-card--surface-light: #3b82f6;
-            --dru-card--surface-raised-light: #3b82f6;
+            --surface-light: #3b82f6;
+            --surface-raised-light: #3b82f6;
 
             // darker hover (still feels “press”)
-            --dru-card--surface-hover-light: #2f6fe0;
-            --dru-card--surface-raised-hover-light: #2563eb;
+            --surface-hover-light: #2f6fe0;
+            --surface-raised-hover-light: #2563eb;
 
             // text stays clean
-            --dru-card--text-light: #fff;
-            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
+            --text-light: #fff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
-            --dru-card--border-light: #1d4ed8;
+            --border-light: #1d4ed8;
 
-            --dru-card--accent-light: #1d4ed8;
-            --dru-card--ring-light: #{$ring};
+            --accent-light: #1d4ed8;
+            --ring-light: #{$ring};
             --dru-icon-color: #ffffff;
         }
 
         &-outlined {
             // no fill, very subtle surface
-            --dru-card--surface-light: transparent;
-            --dru-card--surface-raised-light: transparent;
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
 
-            --dru-card--surface-hover-light: rgba(37, 99, 235, 0.04);
-            --dru-card--surface-raised-hover-light: rgba(37, 99, 235, 0.08);
+            --surface-hover-light: rgba(37, 99, 235, 0.04);
+            --surface-raised-hover-light: rgba(37, 99, 235, 0.08);
 
             // accent drives everything
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
             // border becomes primary visual
-            --dru-card--border-light: #{$accent};
+            --border-light: #{$accent};
             --dru-card--border-section: transparent;
 
             // text uses accent
-            --dru-card--text-light: #1d4ed8; // slightly darker for readability
-            --dru-card--text-muted-light: rgba(29, 78, 216, 0.7);
+            --text-light: #1d4ed8; // slightly darker for readability
+            --text-muted-light: rgba(29, 78, 216, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             // icon follows accent
             --dru-icon-color: #{$accent};
@@ -185,24 +185,24 @@ $compPrefix: 'dru--alert';
 
         &-subtle {
             // very soft background
-            --dru-card--surface-light: rgba(37, 99, 235, 0.06);
-            --dru-card--surface-raised-light: rgba(37, 99, 235, 0.08);
+            --surface-light: rgba(37, 99, 235, 0.06);
+            --surface-raised-light: rgba(37, 99, 235, 0.08);
 
-            --dru-card--surface-hover-light: rgba(37, 99, 235, 0.10);
-            --dru-card--surface-raised-hover-light: rgba(37, 99, 235, 0.12);
+            --surface-hover-light: rgba(37, 99, 235, 0.10);
+            --surface-raised-hover-light: rgba(37, 99, 235, 0.12);
 
             // no border
-            --dru-card--border-light: transparent;
+            --border-light: transparent;
             --dru-card--border-section: transparent;
 
             // still keep accent for system consistency
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
             // softer text than outlined
-            --dru-card--text-light: #1e40af; // blue-800
-            --dru-card--text-muted-light: rgba(30, 64, 175, 0.7);
+            --text-light: #1e40af; // blue-800
+            --text-muted-light: rgba(30, 64, 175, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             // icon slightly toned down
             --dru-icon-color: #2563eb;
@@ -306,76 +306,76 @@ $compPrefix: 'dru--alert';
 
         &-base {
             // neutral gray (not near-white)
-            --dru-card--surface-light: #f3f4f6; // gray-100
-            --dru-card--surface-raised-light: #e5e7eb; // gray-200
-            --dru-card--surface-hover-light: #e5e7eb;
-            --dru-card--surface-raised-hover-light: #d1d5db;
+            --surface-light: #f3f4f6; // gray-100
+            --surface-raised-light: #e5e7eb; // gray-200
+            --surface-hover-light: #e5e7eb;
+            --surface-raised-hover-light: #d1d5db;
 
-            --dru-card--accent-light: #{$accent};
-            --dru-card--accent-disabled-light: #{$accent-disabled};
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
 
-            --dru-card--border-light: #e5e7eb;
+            --border-light: #e5e7eb;
             --dru-card--border-section: transparent;
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
             --dru-icon-color: #4b5563;
         }
 
         &-solid {
-            --dru-card--surface-light: #6b7280; // gray-500
-            --dru-card--surface-raised-light: #6b7280;
+            --surface-light: #6b7280; // gray-500
+            --surface-raised-light: #6b7280;
 
-            --dru-card--surface-hover-light: #4b5563; // gray-600
-            --dru-card--surface-raised-hover-light: #4b5563;
+            --surface-hover-light: #4b5563; // gray-600
+            --surface-raised-hover-light: #4b5563;
 
-            --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
-            --dru-card--border-light: #4b5563;
+            --border-light: #4b5563;
 
-            --dru-card--accent-light: #374151; // gray-700
-            --dru-card--ring-light: #{$ring};
+            --accent-light: #374151; // gray-700
+            --ring-light: #{$ring};
 
             --dru-icon-color: #ffffff;
         }
 
         &-outlined {
-            --dru-card--surface-light: transparent;
-            --dru-card--surface-raised-light: transparent;
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
 
-            --dru-card--surface-hover-light: rgba(75, 85, 99, 0.04);
-            --dru-card--surface-raised-hover-light: rgba(75, 85, 99, 0.08);
+            --surface-hover-light: rgba(75, 85, 99, 0.04);
+            --surface-raised-hover-light: rgba(75, 85, 99, 0.08);
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--border-light: #{$accent};
+            --border-light: #{$accent};
             --dru-card--border-section: transparent;
 
-            --dru-card--text-light: #374151;
-            --dru-card--text-muted-light: rgba(55, 65, 81, 0.7);
+            --text-light: #374151;
+            --text-muted-light: rgba(55, 65, 81, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #{$accent};
         }
 
         &-subtle {
-            --dru-card--surface-light: rgba(75, 85, 99, 0.06);
-            --dru-card--surface-raised-light: rgba(75, 85, 99, 0.08);
+            --surface-light: rgba(75, 85, 99, 0.06);
+            --surface-raised-light: rgba(75, 85, 99, 0.08);
 
-            --dru-card--surface-hover-light: rgba(75, 85, 99, 0.10);
-            --dru-card--surface-raised-hover-light: rgba(75, 85, 99, 0.12);
+            --surface-hover-light: rgba(75, 85, 99, 0.10);
+            --surface-raised-hover-light: rgba(75, 85, 99, 0.12);
 
-            --dru-card--border-light: transparent;
+            --border-light: transparent;
             --dru-card--border-section: transparent;
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--text-light: #1f2937; // gray-800
-            --dru-card--text-muted-light: rgba(31, 41, 55, 0.7);
+            --text-light: #1f2937; // gray-800
+            --text-muted-light: rgba(31, 41, 55, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #4b5563;
         }
@@ -472,76 +472,76 @@ $compPrefix: 'dru--alert';
         $ring: rgba(8, 145, 178, 0.5);
 
         &-base {
-            --dru-card--surface-light: #ecfeff; // cyan-50
-            --dru-card--surface-raised-light: #cffafe; // cyan-100
-            --dru-card--surface-hover-light: #cffafe;
-            --dru-card--surface-raised-hover-light: #a5f3fc;
+            --surface-light: #ecfeff; // cyan-50
+            --surface-raised-light: #cffafe; // cyan-100
+            --surface-hover-light: #cffafe;
+            --surface-raised-hover-light: #a5f3fc;
 
-            --dru-card--accent-light: #{$accent};
-            --dru-card--accent-disabled-light: #{$accent-disabled};
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
 
-            --dru-card--border-light: #cffafe;
+            --border-light: #cffafe;
             --dru-card--border-section: transparent;
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
             --dru-icon-color: #0891b2;
         }
 
         &-solid {
-            --dru-card--surface-light: #06b6d4; // cyan-500
-            --dru-card--surface-raised-light: #06b6d4;
+            --surface-light: #06b6d4; // cyan-500
+            --surface-raised-light: #06b6d4;
 
-            --dru-card--surface-hover-light: #0891b2; // cyan-600
-            --dru-card--surface-raised-hover-light: #0891b2;
+            --surface-hover-light: #0891b2; // cyan-600
+            --surface-raised-hover-light: #0891b2;
 
-            --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
-            --dru-card--border-light: #0e7490;
+            --border-light: #0e7490;
 
-            --dru-card--accent-light: #0e7490;
-            --dru-card--ring-light: #{$ring};
+            --accent-light: #0e7490;
+            --ring-light: #{$ring};
 
             --dru-icon-color: #ffffff;
         }
 
         &-outlined {
-            --dru-card--surface-light: transparent;
-            --dru-card--surface-raised-light: transparent;
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
 
-            --dru-card--surface-hover-light: rgba(8, 145, 178, 0.04);
-            --dru-card--surface-raised-hover-light: rgba(8, 145, 178, 0.08);
+            --surface-hover-light: rgba(8, 145, 178, 0.04);
+            --surface-raised-hover-light: rgba(8, 145, 178, 0.08);
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--border-light: #{$accent};
+            --border-light: #{$accent};
             --dru-card--border-section: transparent;
 
-            --dru-card--text-light: #0e7490; // cyan-700
-            --dru-card--text-muted-light: rgba(14, 116, 144, 0.7);
+            --text-light: #0e7490; // cyan-700
+            --text-muted-light: rgba(14, 116, 144, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #{$accent};
         }
 
         &-subtle {
-            --dru-card--surface-light: rgba(8, 145, 178, 0.06);
-            --dru-card--surface-raised-light: rgba(8, 145, 178, 0.08);
+            --surface-light: rgba(8, 145, 178, 0.06);
+            --surface-raised-light: rgba(8, 145, 178, 0.08);
 
-            --dru-card--surface-hover-light: rgba(8, 145, 178, 0.10);
-            --dru-card--surface-raised-hover-light: rgba(8, 145, 178, 0.12);
+            --surface-hover-light: rgba(8, 145, 178, 0.10);
+            --surface-raised-hover-light: rgba(8, 145, 178, 0.12);
 
-            --dru-card--border-light: transparent;
+            --border-light: transparent;
             --dru-card--border-section: transparent;
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--text-light: #164e63; // cyan-900
-            --dru-card--text-muted-light: rgba(22, 78, 99, 0.7);
+            --text-light: #164e63; // cyan-900
+            --text-muted-light: rgba(22, 78, 99, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #0891b2;
         }
@@ -638,76 +638,76 @@ $compPrefix: 'dru--alert';
 
         &-base {
             // soft success background
-            --dru-card--surface-light: #f0fdf4; // green-50
-            --dru-card--surface-raised-light: #dcfce7; // green-100
-            --dru-card--surface-hover-light: #dcfce7;
-            --dru-card--surface-raised-hover-light: #bbf7d0;
+            --surface-light: #f0fdf4; // green-50
+            --surface-raised-light: #dcfce7; // green-100
+            --surface-hover-light: #dcfce7;
+            --surface-raised-hover-light: #bbf7d0;
 
-            --dru-card--accent-light: #{$accent};
-            --dru-card--accent-disabled-light: #{$accent-disabled};
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
 
-            --dru-card--border-light: #dcfce7;
+            --border-light: #dcfce7;
             --dru-card--border-section: transparent;
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
             --dru-icon-color: #16a34a;
         }
 
         &-solid {
-            --dru-card--surface-light: #22c55e; // green-500
-            --dru-card--surface-raised-light: #22c55e;
+            --surface-light: #22c55e; // green-500
+            --surface-raised-light: #22c55e;
 
-            --dru-card--surface-hover-light: #16a34a; // green-600
-            --dru-card--surface-raised-hover-light: #16a34a;
+            --surface-hover-light: #16a34a; // green-600
+            --surface-raised-hover-light: #16a34a;
 
-            --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
-            --dru-card--border-light: #15803d; // green-700
+            --border-light: #15803d; // green-700
 
-            --dru-card--accent-light: #15803d;
-            --dru-card--ring-light: #{$ring};
+            --accent-light: #15803d;
+            --ring-light: #{$ring};
 
             --dru-icon-color: #ffffff;
         }
 
         &-outlined {
-            --dru-card--surface-light: transparent;
-            --dru-card--surface-raised-light: transparent;
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
 
-            --dru-card--surface-hover-light: rgba(22, 163, 74, 0.04);
-            --dru-card--surface-raised-hover-light: rgba(22, 163, 74, 0.08);
+            --surface-hover-light: rgba(22, 163, 74, 0.04);
+            --surface-raised-hover-light: rgba(22, 163, 74, 0.08);
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--border-light: #{$accent};
+            --border-light: #{$accent};
             --dru-card--border-section: transparent;
 
-            --dru-card--text-light: #166534; // green-800
-            --dru-card--text-muted-light: rgba(22, 101, 52, 0.7);
+            --text-light: #166534; // green-800
+            --text-muted-light: rgba(22, 101, 52, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #{$accent};
         }
 
         &-subtle {
-            --dru-card--surface-light: rgba(22, 163, 74, 0.06);
-            --dru-card--surface-raised-light: rgba(22, 163, 74, 0.08);
+            --surface-light: rgba(22, 163, 74, 0.06);
+            --surface-raised-light: rgba(22, 163, 74, 0.08);
 
-            --dru-card--surface-hover-light: rgba(22, 163, 74, 0.10);
-            --dru-card--surface-raised-hover-light: rgba(22, 163, 74, 0.12);
+            --surface-hover-light: rgba(22, 163, 74, 0.10);
+            --surface-raised-hover-light: rgba(22, 163, 74, 0.12);
 
-            --dru-card--border-light: transparent;
+            --border-light: transparent;
             --dru-card--border-section: transparent;
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--text-light: #14532d; // green-900
-            --dru-card--text-muted-light: rgba(20, 83, 45, 0.7);
+            --text-light: #14532d; // green-900
+            --text-muted-light: rgba(20, 83, 45, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #16a34a;
         }
@@ -803,79 +803,79 @@ $compPrefix: 'dru--alert';
         $ring: rgba(217, 119, 6, 0.5);
 
         &-base {
-            --dru-card--surface-light: #fffbeb; // amber-50
-            --dru-card--surface-raised-light: #fef3c7; // amber-100
-            --dru-card--surface-hover-light: #fef3c7;
-            --dru-card--surface-raised-hover-light: #fde68a;
+            --surface-light: #fffbeb; // amber-50
+            --surface-raised-light: #fef3c7; // amber-100
+            --surface-hover-light: #fef3c7;
+            --surface-raised-hover-light: #fde68a;
 
-            --dru-card--accent-light: #{$accent};
-            --dru-card--accent-disabled-light: #{$accent-disabled};
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
 
-            --dru-card--border-light: #fef3c7;
+            --border-light: #fef3c7;
             --dru-card--border-section: transparent;
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             // darker for readability
             --dru-icon-color: #b45309; // amber-700
         }
 
         &-solid {
-            --dru-card--surface-light: #f59e0b; // amber-500
-            --dru-card--surface-raised-light: #f59e0b;
+            --surface-light: #f59e0b; // amber-500
+            --surface-raised-light: #f59e0b;
 
-            --dru-card--surface-hover-light: #d97706; // amber-600
-            --dru-card--surface-raised-hover-light: #d97706;
+            --surface-hover-light: #d97706; // amber-600
+            --surface-raised-hover-light: #d97706;
 
             // ⚠️ IMPORTANT: dark text
-            --dru-card--text-light: #0b1220;
-            --dru-card--text-muted-light: rgba(11, 18, 32, 0.7);
+            --text-light: #0b1220;
+            --text-muted-light: rgba(11, 18, 32, 0.7);
 
             --dru-card--border-section: transparent;
-            --dru-card--border-light: #d97706;
+            --border-light: #d97706;
 
-            --dru-card--accent-light: #b45309;
-            --dru-card--ring-light: #{$ring};
+            --accent-light: #b45309;
+            --ring-light: #{$ring};
 
             --dru-icon-color: #0b1220;
         }
 
         &-outlined {
-            --dru-card--surface-light: transparent;
-            --dru-card--surface-raised-light: transparent;
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
 
-            --dru-card--surface-hover-light: rgba(217, 119, 6, 0.04);
-            --dru-card--surface-raised-hover-light: rgba(217, 119, 6, 0.08);
+            --surface-hover-light: rgba(217, 119, 6, 0.04);
+            --surface-raised-hover-light: rgba(217, 119, 6, 0.08);
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--border-light: #{$accent};
+            --border-light: #{$accent};
             --dru-card--border-section: transparent;
 
-            --dru-card--text-light: #92400e; // amber-800
-            --dru-card--text-muted-light: rgba(146, 64, 14, 0.7);
+            --text-light: #92400e; // amber-800
+            --text-muted-light: rgba(146, 64, 14, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #{$accent};
         }
 
         &-subtle {
-            --dru-card--surface-light: rgba(217, 119, 6, 0.06);
-            --dru-card--surface-raised-light: rgba(217, 119, 6, 0.08);
+            --surface-light: rgba(217, 119, 6, 0.06);
+            --surface-raised-light: rgba(217, 119, 6, 0.08);
 
-            --dru-card--surface-hover-light: rgba(217, 119, 6, 0.10);
-            --dru-card--surface-raised-hover-light: rgba(217, 119, 6, 0.12);
+            --surface-hover-light: rgba(217, 119, 6, 0.10);
+            --surface-raised-hover-light: rgba(217, 119, 6, 0.12);
 
-            --dru-card--border-light: transparent;
+            --border-light: transparent;
             --dru-card--border-section: transparent;
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--text-light: #78350f; // amber-900
-            --dru-card--text-muted-light: rgba(120, 53, 15, 0.7);
+            --text-light: #78350f; // amber-900
+            --text-muted-light: rgba(120, 53, 15, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #d97706;
         }
@@ -972,78 +972,78 @@ $compPrefix: 'dru--alert';
         $ring: rgba(220, 38, 38, 0.5);
 
         &-base {
-            --dru-card--surface-light: #fef2f2; // red-50
-            --dru-card--surface-raised-light: #fee2e2; // red-100
-            --dru-card--surface-hover-light: #fee2e2;
-            --dru-card--surface-raised-hover-light: #fecaca;
+            --surface-light: #fef2f2; // red-50
+            --surface-raised-light: #fee2e2; // red-100
+            --surface-hover-light: #fee2e2;
+            --surface-raised-hover-light: #fecaca;
 
-            --dru-card--accent-light: #{$accent};
-            --dru-card--accent-disabled-light: #{$accent-disabled};
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
 
-            --dru-card--border-light: #fee2e2;
+            --border-light: #fee2e2;
             --dru-card--border-section: transparent;
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #dc2626;
         }
 
         &-solid {
-            --dru-card--surface-light: #ef4444; // red-500
-            --dru-card--surface-raised-light: #ef4444;
+            --surface-light: #ef4444; // red-500
+            --surface-raised-light: #ef4444;
 
-            --dru-card--surface-hover-light: #dc2626; // red-600
-            --dru-card--surface-raised-hover-light: #dc2626;
+            --surface-hover-light: #dc2626; // red-600
+            --surface-raised-hover-light: #dc2626;
 
             // ✔ white works for red
-            --dru-card--text-light: #ffffff;
-            --dru-card--text-muted-light: rgba(255, 255, 255, 0.85);
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
 
             --dru-card--border-section: transparent;
-            --dru-card--border-light: #b91c1c; // red-700
+            --border-light: #b91c1c; // red-700
 
-            --dru-card--accent-light: #b91c1c;
-            --dru-card--ring-light: #{$ring};
+            --accent-light: #b91c1c;
+            --ring-light: #{$ring};
 
             --dru-icon-color: #ffffff;
         }
 
         &-outlined {
-            --dru-card--surface-light: transparent;
-            --dru-card--surface-raised-light: transparent;
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
 
-            --dru-card--surface-hover-light: rgba(220, 38, 38, 0.04);
-            --dru-card--surface-raised-hover-light: rgba(220, 38, 38, 0.08);
+            --surface-hover-light: rgba(220, 38, 38, 0.04);
+            --surface-raised-hover-light: rgba(220, 38, 38, 0.08);
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--border-light: #{$accent};
+            --border-light: #{$accent};
             --dru-card--border-section: transparent;
 
-            --dru-card--text-light: #991b1b; // red-800
-            --dru-card--text-muted-light: rgba(153, 27, 27, 0.7);
+            --text-light: #991b1b; // red-800
+            --text-muted-light: rgba(153, 27, 27, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #{$accent};
         }
 
         &-subtle {
-            --dru-card--surface-light: rgba(220, 38, 38, 0.06);
-            --dru-card--surface-raised-light: rgba(220, 38, 38, 0.08);
+            --surface-light: rgba(220, 38, 38, 0.06);
+            --surface-raised-light: rgba(220, 38, 38, 0.08);
 
-            --dru-card--surface-hover-light: rgba(220, 38, 38, 0.10);
-            --dru-card--surface-raised-hover-light: rgba(220, 38, 38, 0.12);
+            --surface-hover-light: rgba(220, 38, 38, 0.10);
+            --surface-raised-hover-light: rgba(220, 38, 38, 0.12);
 
-            --dru-card--border-light: transparent;
+            --border-light: transparent;
             --dru-card--border-section: transparent;
 
-            --dru-card--accent-light: #{$accent};
+            --accent-light: #{$accent};
 
-            --dru-card--text-light: #7f1d1d; // red-900
-            --dru-card--text-muted-light: rgba(127, 29, 29, 0.7);
+            --text-light: #7f1d1d; // red-900
+            --text-muted-light: rgba(127, 29, 29, 0.7);
 
-            --dru-card--ring-light: #{$ring};
+            --ring-light: #{$ring};
 
             --dru-icon-color: #dc2626;
         }

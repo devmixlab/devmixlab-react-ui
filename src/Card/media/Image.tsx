@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
-import { prefix as classPrefix } from '.././Card';
+import { cardPrefix as classPrefix } from '.././Card';
 import { Box, type BoxProps } from '../../Box/Box';
 import { createPolymorphic } from '../../types/polymorphic';
 

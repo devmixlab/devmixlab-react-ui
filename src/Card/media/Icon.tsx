@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
-import { prefix as classPrefix } from '.././Card';
+import { cardPrefix as classPrefix } from '.././Card';
 import { Box, type BoxProps } from '../../Box/Box';
 import { createPolymorphic } from '../../types/polymorphic';
 
@@ -29,11 +29,7 @@ const prefix = (name: string = '') => {
 // };
 
 export const IconImpl = ({ className, size = 'md', ...rest }: IconProps, ref: React.Ref<any>) => {
-    const cl = clsx(prefix(), prefix(`--${size}`), className);
-
-    // const sizeProps = sizeMap[size];
-
-    return <Box {...rest} className={cl} />;
+    return <Box {...rest} className={clsx(prefix(), className)} data-size={size} />;
 };
 
 export const Icon = createPolymorphic<IconProps>(forwardRef(IconImpl), 'Card.Media.Icon');
