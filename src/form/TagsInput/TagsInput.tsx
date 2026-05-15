@@ -541,6 +541,9 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
             // no more tags -> move focus to input
             if (nextIndex == null) {
+                if (withSelection) {
+                    return;
+                }
                 if (inputEnabled) {
                     setActiveId(null);
 
@@ -552,6 +555,18 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     requestAnimationFrame(() => {
                         inputRef.current?.focus();
                     });
+                } else {
+                    const nextSideIndex = findNextEnabled(
+                        tags,
+                        direction < 0 ? tags.length - 1 : 0,
+                        direction,
+                    );
+                    if (nextSideIndex != null) {
+                        const sideTagId = getId(nextSideIndex);
+                        setSelectedIds(new Set());
+                        setSelectionAnchor(sideTagId);
+                        setActiveId(sideTagId);
+                    }
                 }
 
                 return;
