@@ -36,6 +36,8 @@ export type CardProps = {
     disabled?: boolean;
     intent?: string;
     variant?: string;
+
+    focused?: boolean;
 } & BoxProps &
     SpreadProps;
 
@@ -59,6 +61,9 @@ export const CardImpl = (
         accentSide = 'left',
         intent,
         variant,
+
+        focused,
+
         d = 'flex',
         direction = 'column',
         ...rest
@@ -116,6 +121,7 @@ export const CardImpl = (
                 data-accent={accent ? accentSide : undefined}
                 data-intent={intent}
                 data-density={density}
+                data-focused={focused || undefined}
                 {...restProps}
                 d={d}
                 direction={direction}

@@ -65,6 +65,7 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     Object.entries(booleanClassMap).forEach(([key, className]) => {
         if (rest[key] === true) {
             classes.push(classPrefix(className));
+            locked.add(key);
         }
     });
 

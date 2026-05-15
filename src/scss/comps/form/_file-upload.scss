@@ -22,6 +22,9 @@ $sizes: (
 }
 
 .#{$file-upload-prefix} {
+    .#{$p}--card{
+        --border-section: none;
+    }
     //display: inline-flex;
     //flex-wrap: wrap;
     //--slot-h: auto;

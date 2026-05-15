@@ -95,4 +95,12 @@ $sizes: (
             pointer-events: none;
         }
     }
+
+    &[data-layout='stacked'] {
+        flex-direction: column;
+        align-items: stretch;
+        .#{$p}--tag {
+            width: 100%;
+        }
+    }
 }

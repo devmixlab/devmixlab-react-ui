@@ -4,6 +4,7 @@ import { mergeRefs } from '../../utils/mergeRefs';
 import { Size } from '../form.tokens';
 import { Close, IconWrapper, Upload } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
+import { Card } from '../../Card';
 
 type FileUploadItem = {
     id: string;
@@ -203,6 +204,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     // fullWidth
                     value={tags}
                     inputEnabled={false}
+                    layout="stacked"
                     // editable={false}
                     disabled={disabled}
                     readOnly={loading}
@@ -210,6 +212,23 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     size={size}
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
+                    renderTag={({ tag, focused }) => {
+                        return (
+                            <Card
+                                focused={focused}
+                                interactive
+                                d="flex"
+                                direction="row"
+                                density="xs"
+                                w="full"
+                            >
+                                <Card.Section d="flex" gap="sm">
+                                    <Card.Section grow>{tag.label}</Card.Section>
+                                    <Card.Section>close</Card.Section>
+                                </Card.Section>
+                            </Card>
+                        );
+                    }}
                     onTagRemove={(_, index) => {
                         removeFile(index);
                     }}

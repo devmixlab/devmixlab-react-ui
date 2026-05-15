@@ -21,6 +21,8 @@ type RenderTagParams = {
     index: number;
     remove: () => void;
     disabled?: boolean;
+    selected?: boolean;
+    focused?: boolean;
 };
 
 type TagItem = {
@@ -54,6 +56,8 @@ export type TagsInputProps = Omit<TextInputProps, 'value' | 'defaultValue' | 'on
 
     normalizeTag?: (label: string) => string;
     renderTag?: (params: RenderTagParams) => React.ReactNode;
+
+    layout?: 'inline' | 'stacked';
 
     invalid?: boolean;
     readOnly?: boolean;
@@ -105,6 +109,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
 
             normalizeTag,
             renderTag,
+
+            layout = 'inline',
 
             invalid,
             readOnly = false,
@@ -875,6 +881,7 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                     </>
                 }
                 data-full-width={fullWidth || undefined}
+                data-layout={layout}
             >
                 {tags.map((tag, i) => {
                     const remove = () => removeTag(i);
@@ -920,6 +927,8 @@ const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                             index: i,
                             remove,
                             disabled: disabled || tag.disabled,
+                            selected: isSelected(i),
+                            focused: !tag.disabled && !disabled && activeId === id,
                         });
                         return React.isValidElement(node) ? tagNodeWrapper(tag, i, id, node) : node;
                     }
