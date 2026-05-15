@@ -55,6 +55,9 @@ const Badge = ({
             className={cl}
             rounded={isDot ? undefined : rounded}
             aria-hidden={isDot ? true : undefined}
+            data-intent={intent}
+            data-variant={variant}
+            data-size={size}
             {...props}
         >
             {!isDot && <span className={prefix('__content')}>{content}</span>}

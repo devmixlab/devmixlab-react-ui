@@ -327,18 +327,19 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             >
                                 {layout === 'stacked' && (
                                     <Card.Section w="full" d="flex" align="center" gap="sm">
-                                        <Card.Section>
+                                        <Card.Section d="flex" align="center">
                                             {/*<Box size={30}>{fileKindIconMap[kind]}</Box>*/}
                                             {/*<Box size={30}>{fileKindLabelMap[kind]}</Box>*/}
                                             <Badge
-                                            // px="xs"
-                                            // py="2xs"
-                                            // rounded="sm"
-                                            // bg="neutral-100"
-                                            // fontSize="xs"
-                                            // fontWeight="700"
-                                            // lineHeight="1"
-                                            // color="muted"
+                                                intent="info"
+                                                // px="xs"
+                                                // py="2xs"
+                                                // rounded="sm"
+                                                // bg="neutral-100"
+                                                // fontSize="xs"
+                                                // fontWeight="700"
+                                                // lineHeight="1"
+                                                // color="muted"
                                             >
                                                 {fileKindLabelMap[kind]}
                                             </Badge>

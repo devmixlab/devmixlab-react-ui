@@ -1,0 +1,146 @@
+@use '../functions' as functions;
+@use '../mixins' as mixins;
+
+@use '../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$badge-prefix: #{$p}--badge;
+
+$sizes: (
+    xs: (font-size: 0.65rem, padding-x: 0.35em, padding-y: 0.1em),
+    sm: (font-size: 0.7rem, padding-x: 0.4em, padding-y: 0.12em),
+    md: (font-size: 0.75rem, padding-x: 0.5em, padding-y: 0.15em),
+    lg: (font-size: 0.85rem, padding-x: 0.6em, padding-y: 0.2em),
+    xl: (font-size: 0.95rem, padding-x: 0.7em, padding-y: 0.25em),
+);
+
+$dot-scale: (
+    xs: 0.45em,
+    sm: 0.5em,
+    md: 0.55em,
+    lg: 0.6em,
+    xl: 0.65em,
+);
+
+$intents: (primary, secondary, info, warning, success, danger);
+
+.#{$badge-prefix} {
+
+    border: 1px solid var(--border-color, transparent);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+    font-weight: 500;
+    white-space: nowrap;
+
+    background-color: var(--bg, transparent);
+    color: var(--text-color);
+
+    .__content {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    &--numeric {
+        min-width: 1.5em;
+
+        .#{$badge-prefix}--content {
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    &--dot {
+        padding: 0;
+        width: 0.5em;
+        height: 0.5em;
+        border-radius: 50%;
+        flex-shrink: 0;
+
+        @each $size, $values in $sizes {
+            &.#{$badge-prefix}--size-#{$size} {
+                padding: 0;
+            }
+        }
+    }
+
+    @each $size, $value in $dot-scale {
+        &--size-#{$size}.#{$badge-prefix}--dot {
+            width: $value;
+            height: $value;
+        }
+    }
+
+    @each $size, $values in $sizes {
+        &--size-#{$size} {
+            font-size: map-get($values, font-size);
+            padding: map-get($values, padding-y) map-get($values, padding-x);
+        }
+    }
+
+    @each $intent in $intents {
+        &[data-intent='#{$intent}'] {
+            // SOLID (strong)
+            &[data-variant='solid'] {
+                --bg: #{functions.intent-color($intent, 500)};
+                --text-color: #{functions.intent-color($intent, 0)};
+            }
+
+            // BASE (default subtle)
+            &[data-variant='base'] {
+                --bg: #{functions.intent-color($intent, 100)};
+                --text-color: #{functions.intent-color($intent, 700)};
+                --border-color: #{functions.intent-color($intent, 200)};
+            }
+
+            // OUTLINED
+            &[data-variant='outlined'] {
+                --text-color: #{functions.intent-color($intent, 600)};
+                --border-color: #{functions.intent-color($intent, 300)};
+            }
+
+            // GHOST (very minimal)
+            &[data-variant='ghost'] {
+                --text-color: #{functions.intent-color($intent, 600)};
+            }
+
+            //&--dot {
+            //    background-color: var(--intent-500);
+            //}
+
+            @include cfg.dark {
+                // SOLID
+                &[data-variant='solid'] {
+                    --bg: #{functions.intent-color($intent, 600)};
+                    --text-color: #{functions.intent-color($intent, 50)};
+                }
+
+                // BASE
+                &[data-variant='base'] {
+                    --bg: #{functions.intent-color($intent, 900)};
+                    --text-color: #{functions.intent-color($intent, 200)};
+                    --border-color: #{functions.intent-color($intent, 700)};
+                }
+
+                // OUTLINED
+                &[data-variant='outlined'] {
+                    --text-color: #{functions.intent-color($intent, 300)};
+                    --border-color: #{functions.intent-color($intent, 700)};
+                }
+
+                // GHOST
+                &[data-variant='ghost'] {
+                    --text-color: #{functions.intent-color($intent, 300)};
+                }
+
+                // DOT
+                //&--dot {
+                //    background-color: var(--intent-400);
+                //}
+            }
+        }
+    }
+}
