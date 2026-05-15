@@ -151,6 +151,14 @@ const TagsInputInner = <TTag extends BaseTagItem>(
     const tagRefs = useRef<Record<string | number, HTMLDivElement | null>>({});
     const [activeId, setActiveId] = useState<string | number | null>(null);
 
+    const focusTag = (id: string | number | null) => {
+        if (id == null) return;
+
+        requestAnimationFrame(() => {
+            tagRefs.current[id]?.focus();
+        });
+    };
+
     // Selection
     // const [selectionStart, setSelectionStart] = useState<number | null>(null);
     // const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
@@ -451,10 +459,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                 const nextId = getId(nextIndex);
 
                 setActiveId(nextId);
-
-                requestAnimationFrame(() => {
-                    tagRefs.current[nextId]?.focus();
-                });
+                focusTag(nextId);
                 return;
             }
         }
@@ -492,10 +497,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             const nextId = next[focusIndex].id ?? next[focusIndex].value;
 
             setActiveId(nextId);
-
-            requestAnimationFrame(() => {
-                tagRefs.current[nextId]?.focus();
-            });
+            focusTag(nextId);
         }
 
         props.onKeyDown?.(e);
@@ -513,28 +515,6 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             e.preventDefault();
             setSelectedIds(new Set(tags.map((t) => t.id ?? t.value)));
         }
-
-        // const moveSelection = (direction: -1 | 1, withSelection: boolean) => {
-        //     const nextIndex = findNextEnabled(tags, index + direction, direction);
-        //
-        //     if (nextIndex == null) return;
-        //
-        //     const nextId = getId(nextIndex);
-        //
-        //     if (withSelection) {
-        //         setSelectionAnchor(anchor);
-        //         selectRange(anchor, nextId);
-        //     } else {
-        //         setSelectedIds(new Set());
-        //         setSelectionAnchor(null);
-        //     }
-        //
-        //     setActiveId(nextId);
-        //
-        //     requestAnimationFrame(() => {
-        //         tagRefs.current[nextId]?.focus();
-        //     });
-        // };
 
         const moveSelection = (direction: -1 | 1, withSelection: boolean) => {
             const nextIndex = findNextEnabled(tags, index + direction, direction);
@@ -583,10 +563,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             }
 
             setActiveId(nextId);
-
-            requestAnimationFrame(() => {
-                tagRefs.current[nextId]?.focus();
-            });
+            focusTag(nextId);
         };
 
         if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
@@ -680,10 +657,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             const nextId = nextTag.id ?? nextTag.value;
 
             setActiveId(nextId);
-
-            requestAnimationFrame(() => {
-                tagRefs.current[nextId]?.focus();
-            });
+            focusTag(nextId);
         }
 
         if (e.key === 'Enter') {
@@ -737,10 +711,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
         setActiveId(nextId);
         setSelectionAnchor(nextId);
-
-        requestAnimationFrame(() => {
-            tagRefs.current[nextId]?.focus();
-        });
+        focusTag(nextId);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -837,7 +808,12 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             <div
                 ref={(el) => {
                     if (tag.id != null) {
-                        tagRefs.current[tag.id] = el;
+                        // tagRefs.current[tag.id] = el;
+                        if (el) {
+                            tagRefs.current[tag.id] = el;
+                        } else {
+                            delete tagRefs.current[tag.id];
+                        }
                     }
                 }}
                 key={id}
@@ -875,17 +851,6 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                 }}
                 onKeyDown={(e) => handleTagKeyDown(e)}
                 onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
-                // onClick={(e) => {
-                //     e.stopPropagation();
-                //
-                //     if (readOnly || tag.disabled) return;
-                //
-                //     setActiveId(id);
-                //
-                //     requestAnimationFrame(() => {
-                //         tagRefs.current[id]?.focus();
-                //     });
-                // }}
                 onClick={(e) => {
                     e.stopPropagation();
 
@@ -923,10 +888,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     }
 
                     setActiveId(id);
-
-                    requestAnimationFrame(() => {
-                        tagRefs.current[id]?.focus();
-                    });
+                    focusTag(id);
                 }}
                 style={{ display: 'inline-flex' }}
                 className={classPrefix('--tag')}
