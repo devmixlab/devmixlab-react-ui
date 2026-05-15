@@ -15,12 +15,12 @@ const prefix = (name: string = '') => {
 };
 
 export const ImageImpl = (
-    { className, src, alt = '', ...rest }: ImageProps,
+    { className, src, alt = '', objFit = 'cover', ...rest }: ImageProps,
     ref: React.Ref<any>,
 ) => {
     const cl = clsx(prefix(), className);
 
-    return <Box {...rest} as="img" ref={ref} src={src} alt={alt} className={cl} />;
+    return <Box {...rest} objFit={objFit} as="img" ref={ref} src={src} alt={alt} className={cl} />;
 };
 
 export const Image = createPolymorphic<ImageProps, 'img'>(forwardRef(ImageImpl), 'Card.Image');

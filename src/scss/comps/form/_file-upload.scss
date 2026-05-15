@@ -34,6 +34,12 @@ $sizes: (
     //--height: auto;
     //gap: var(--gap);
     cursor: pointer;
+
+    .#{$p}--file-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
     //
     //@each $size, $value in $sizes {
     //    &[data-size='#{$size}'] {

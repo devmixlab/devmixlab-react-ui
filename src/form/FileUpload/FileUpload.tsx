@@ -11,6 +11,8 @@ type FileUploadItem = {
     id: string;
     file: File;
 
+    previewUrl?: string;
+
     progress?: number;
 
     status?: 'idle' | 'uploading' | 'success' | 'error';
@@ -35,6 +37,8 @@ type FileUploadProps = {
 
     start?: React.ReactNode;
     actions?: React.ReactNode;
+
+    layout?: 'stacked' | 'grid'; // 'compact' gallery masonry;
 
     size?: Size;
     loading?: boolean;
@@ -63,6 +67,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
             start,
             actions,
+
+            layout = 'stacked',
 
             size = 'md',
             loading = false,
@@ -105,6 +111,9 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             const selectedItems: FileUploadItem[] = selected.map((file) => ({
                 id: crypto.randomUUID(),
                 file,
+
+                previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+
                 progress: 0,
                 status: 'idle',
             }));
@@ -134,27 +143,30 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         };
 
         const removeFile = (index: number) => {
+            const removed = files[index];
+
+            if (removed?.previewUrl) {
+                URL.revokeObjectURL(removed.previewUrl);
+            }
+
             const next = files.filter((_, i) => i !== index);
+
             setFiles(next);
         };
 
         const clearFiles = () => {
+            files.forEach((item) => {
+                if (item.previewUrl) {
+                    URL.revokeObjectURL(item.previewUrl);
+                }
+            });
+
             setFiles([]);
 
             if (inputRef.current) {
                 inputRef.current.value = '';
             }
         };
-
-        // const tags = useMemo(
-        //     () =>
-        //         files.map((file) => ({
-        //             id: getFileKey(file),
-        //             label: file.name,
-        //             value: file.name,
-        //         })),
-        //     [files],
-        // );
 
         const tags = useMemo(
             () =>
@@ -165,6 +177,11 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             ? `${item.file.name} ${item.progress ?? 0}%`
                             : item.file.name,
                     value: item.file.name,
+
+                    previewUrl: item.previewUrl,
+                    file: item.file,
+                    status: item.status,
+                    progress: item.progress,
                 })),
             [files],
         );
@@ -226,7 +243,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     // fullWidth
                     value={tags}
                     inputEnabled={false}
-                    layout="stacked"
+                    layout={layout === 'stacked' ? 'stacked' : undefined}
                     // editable={false}
                     disabled={disabled}
                     readOnly={loading}
@@ -235,6 +252,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
                     renderTag={({ tag, focused, remove }) => {
+                        // const item = files.find((f) => f.id === tag.id);
+
                         return (
                             <Card
                                 focused={focused}
@@ -245,17 +264,33 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                 density="xs"
                                 w="full"
                             >
-                                <Card.Section w="full" d="flex" align="center" gap="sm">
-                                    <Card.Section grow>{tag.label}</Card.Section>
-                                    <Card.Section>
-                                        <button
-                                            onClick={remove}
-                                            className={classPrefix('--clear-button')}
-                                        >
-                                            <CloseIcon />
-                                        </button>
+                                {layout === 'stacked' && (
+                                    <Card.Section w="full" d="flex" align="center" gap="sm">
+                                        {tag?.previewUrl && (
+                                            <Card.Section>
+                                                <Card.Media.Image
+                                                    objFit="contain"
+                                                    h={40}
+                                                    w={60}
+                                                    src={tag.previewUrl}
+                                                />
+                                            </Card.Section>
+                                        )}
+                                        <Card.Section grow minW={0}>
+                                            <div className={classPrefix('--file-name')}>
+                                                {tag.label}
+                                            </div>
+                                        </Card.Section>
+                                        <Card.Section>
+                                            <button
+                                                onClick={remove}
+                                                className={classPrefix('--clear-button')}
+                                            >
+                                                <CloseIcon />
+                                            </button>
+                                        </Card.Section>
                                     </Card.Section>
-                                </Card.Section>
+                                )}
                             </Card>
                         );
                     }}
