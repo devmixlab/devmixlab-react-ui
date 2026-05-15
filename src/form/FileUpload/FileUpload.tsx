@@ -194,7 +194,12 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             inputRef.current?.click();
         };
 
-        const processFiles = (selected: File[]) => {
+        const processFiles = (
+            selected: File[],
+            options?: {
+                fromDrop?: boolean;
+            },
+        ) => {
             const selectedItems: FileUploadItem[] = selected.map((file) => ({
                 id: crypto.randomUUID(),
                 file,
@@ -222,9 +227,9 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
             const exceeded = maxFiles != null && merged.length > maxFiles;
 
-            setMaxExceeded(exceeded);
+            const shouldFlashExceeded = exceeded && !(options?.fromDrop && isMaxReached);
 
-            if (exceeded) {
+            if (shouldFlashExceeded) {
                 setMaxExceeded(true);
 
                 onMaxFilesExceeded?.(selected, files);
@@ -289,7 +294,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
             if (!dropped.length) return;
 
-            processFiles(dropped);
+            processFiles(dropped, { fromDrop: true });
         };
 
         const removeFile = (tag: FileUploadTag) => {

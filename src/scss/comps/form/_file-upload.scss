@@ -150,12 +150,15 @@ $sizes: (
 
     &[data-max-exceeded] {
         outline: 2px solid var(--#{$p}-accent-danger);
-        outline-offset: 4px;
+        outline-offset: -2px;
 
-        animation: file-upload-max-exceeded 1.2s ease;
-        //.#{$p}--card {
-        //    opacity: 0.85;
-        //}
+        background: color-mix(
+            in srgb,
+            var(--#{$p}-accent-danger) 6%,
+            transparent
+        );
+
+        animation: file-upload-max-exceeded 2s ease;
     }
 }
 
@@ -172,13 +175,21 @@ $sizes: (
 @keyframes file-upload-max-exceeded {
     0% {
         outline-color: transparent;
+        background: transparent;
     }
 
     15% {
         outline-color: var(--#{$p}-accent-danger);
+
+        background: color-mix(
+            in srgb,
+            var(--#{$p}-accent-danger) 8%,
+            transparent
+        );
     }
 
     100% {
         outline-color: transparent;
+        background: transparent;
     }
 }
