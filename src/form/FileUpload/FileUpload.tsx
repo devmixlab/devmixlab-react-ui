@@ -2,10 +2,21 @@ import React, { forwardRef, useMemo, useRef, useState } from 'react';
 import { TagsInput, type BaseTagItem } from '../TagsInput/TagsInput';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { Size } from '../form.tokens';
-import { Close, IconWrapper, Upload } from '../../Icon';
+import { Badge } from '../../Badge/Badge';
+import { Close as CloseIcon, IconWrapper as IconWrapper, Upload as UploadIcon } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { Card } from '../../Card';
-import { Close as CloseIcon } from '../../Icon';
+// import { Close as CloseIcon } from '../../Icon';
+
+type FileKind =
+    | 'image'
+    | 'pdf'
+    | 'document'
+    | 'spreadsheet'
+    | 'archive'
+    | 'audio'
+    | 'video'
+    | 'generic';
 
 type FileUploadTag = BaseTagItem & {
     previewUrl?: string;
@@ -55,6 +66,46 @@ type FileUploadProps = {
 };
 
 const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
+
+const fileKindLabelMap: Record<FileKind, string> = {
+    image: 'IMG',
+    pdf: 'PDF',
+    document: 'DOC',
+    spreadsheet: 'XLS',
+    archive: 'ZIP',
+    audio: 'AUD',
+    video: 'VID',
+    generic: 'FILE',
+};
+
+const getFileKind = (file: File): FileKind => {
+    const type = file.type.toLowerCase();
+    const ext = file.name.split('.').pop()?.toLowerCase();
+
+    if (type.startsWith('image/')) return 'image';
+
+    if (type.includes('pdf') || ext === 'pdf') {
+        return 'pdf';
+    }
+
+    if (type.includes('word') || ['doc', 'docx', 'rtf', 'txt'].includes(ext ?? '')) {
+        return 'document';
+    }
+
+    if (type.includes('sheet') || ['xls', 'xlsx', 'csv'].includes(ext ?? '')) {
+        return 'spreadsheet';
+    }
+
+    if (type.includes('zip') || ['zip', 'rar', '7z', 'tar', 'gz'].includes(ext ?? '')) {
+        return 'archive';
+    }
+
+    if (type.startsWith('audio/')) return 'audio';
+
+    if (type.startsWith('video/')) return 'video';
+
+    return 'generic';
+};
 
 export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
     (
@@ -196,7 +247,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             [files],
         );
 
-        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <Close />;
+        const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <CloseIcon />;
 
         const uploadButton = (
             <button
@@ -212,7 +263,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 className={classPrefix('--upload-button')}
                 data-disabled={disabled || loading || undefined}
             >
-                {uploadIcon ?? <Upload />}
+                {uploadIcon ?? <UploadIcon />}
             </button>
         );
 
@@ -262,6 +313,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
                     renderTag={({ tag, focused, remove }) => {
+                        const kind = getFileKind(tag.file);
+
                         return (
                             <Card
                                 focused={focused}
@@ -274,16 +327,32 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             >
                                 {layout === 'stacked' && (
                                     <Card.Section w="full" d="flex" align="center" gap="sm">
-                                        {tag?.previewUrl && (
-                                            <Card.Section>
-                                                <Card.Media.Image
-                                                    objFit="contain"
-                                                    h={40}
-                                                    w={60}
-                                                    src={tag.previewUrl}
-                                                />
-                                            </Card.Section>
-                                        )}
+                                        <Card.Section>
+                                            {/*<Box size={30}>{fileKindIconMap[kind]}</Box>*/}
+                                            {/*<Box size={30}>{fileKindLabelMap[kind]}</Box>*/}
+                                            <Badge
+                                            // px="xs"
+                                            // py="2xs"
+                                            // rounded="sm"
+                                            // bg="neutral-100"
+                                            // fontSize="xs"
+                                            // fontWeight="700"
+                                            // lineHeight="1"
+                                            // color="muted"
+                                            >
+                                                {fileKindLabelMap[kind]}
+                                            </Badge>
+                                            {/*{tag.previewUrl ? (*/}
+                                            {/*    <Card.Media.Image*/}
+                                            {/*        objFit="contain"*/}
+                                            {/*        // h="full"*/}
+                                            {/*        w={60}*/}
+                                            {/*        src={tag.previewUrl}*/}
+                                            {/*    />*/}
+                                            {/*) : (*/}
+                                            {/*    <Box size={30}>{fileKindIconMap[kind]}</Box>*/}
+                                            {/*)}*/}
+                                        </Card.Section>
                                         <Card.Section grow minW={0}>
                                             <div className={classPrefix('--file-name')}>
                                                 {tag.label}

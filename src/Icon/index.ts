@@ -10,3 +10,12 @@ export { TriangleDown } from './TriangleDown';
 export { ChevronUp } from './ChevronUp';
 export { ChevronDown } from './ChevronDown';
 export { Indeterminate } from './Indeterminate';
+
+export { Image } from './Image';
+export { Pdf } from './Pdf';
+export { Document } from './Document';
+export { Spreadsheet } from './Spreadsheet';
+export { Archive } from './Archive';
+export { Audio } from './Audio';
+export { Video } from './Video';
+export { File } from './File';
