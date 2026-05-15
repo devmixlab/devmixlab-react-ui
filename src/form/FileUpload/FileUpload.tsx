@@ -239,6 +239,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             <Card
                                 focused={focused}
                                 // interactive
+                                focusable
                                 d="flex"
                                 direction="row"
                                 density="xs"

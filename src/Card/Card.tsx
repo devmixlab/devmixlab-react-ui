@@ -32,7 +32,12 @@ export type CardProps = {
     density?: Density;
     accent?: boolean;
     accentSide?: 'left' | 'top';
+
     interactive?: boolean;
+    hoverable?: boolean;
+    pressable?: boolean;
+    focusable?: boolean;
+
     disabled?: boolean;
     intent?: string;
     variant?: string;
@@ -55,7 +60,12 @@ export const CardImpl = (
         className,
         as = 'div',
         density = 'md',
+
         interactive = false,
+        hoverable = false,
+        pressable = false,
+        focusable = false,
+
         disabled = false,
         accent = false,
         accentSide = 'left',
@@ -74,7 +84,12 @@ export const CardImpl = (
 
     const isNaturallyInteractive = (as === 'a' && href != null) || as === 'button';
     const isDisabled = disabled;
+
     const finalInteractive = !isDisabled && (isNaturallyInteractive || interactive);
+    const finalHoverable = hoverable ?? finalInteractive;
+    const finalPressable = pressable ?? finalInteractive;
+    const finalFocusable = focusable ?? finalInteractive;
+
     const isButtonLike = finalInteractive && !isNaturallyInteractive;
 
     return (
@@ -117,6 +132,9 @@ export const CardImpl = (
                 }
                 disabled={as === 'button' ? isDisabled : undefined}
                 data-interactive={finalInteractive || undefined}
+                data-hoverable={finalHoverable || undefined}
+                data-pressable={finalPressable || undefined}
+                data-focusable={finalFocusable || undefined}
                 data-disabled={isDisabled || undefined}
                 data-accent={accent ? accentSide : undefined}
                 data-intent={intent}

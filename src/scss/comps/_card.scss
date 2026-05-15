@@ -184,23 +184,51 @@ $card-prefix: #{$p}--card;
         }
     }
 
+    //&[data-interactive] {
+    //    cursor: pointer;
+    //    transition: transform 120ms ease, background-color 120ms ease;
+    //    user-select: none;
+    //
+    //    &:not([data-disabled]):hover {
+    //        background-color: var(--surface-hover);
+    //
+    //        //will-change: transform;
+    //        transform: translateY(-1px);
+    //    }
+    //
+    //    &:not([data-disabled]):active {
+    //        user-select: none;
+    //        transform: translateY(0.5px);
+    //    }
+    //
+    //    &:not([data-disabled])[data-focused],
+    //    &:not([data-disabled]):focus-visible {
+    //        outline: 2px solid var(--ring);
+    //        outline-offset: 2px;
+    //    }
+    //}
+
     &[data-interactive] {
         cursor: pointer;
-        transition: transform 120ms ease, background-color 120ms ease;
         user-select: none;
+    }
+
+    &[data-hoverable] {
+        transition: transform 120ms ease, background-color 120ms ease;
 
         &:not([data-disabled]):hover {
             background-color: var(--surface-hover);
-
-            //will-change: transform;
             transform: translateY(-1px);
         }
+    }
 
+    &[data-pressable] {
         &:not([data-disabled]):active {
-            user-select: none;
             transform: translateY(0.5px);
         }
+    }
 
+    &[data-focusable] {
         &:not([data-disabled])[data-focused],
         &:not([data-disabled]):focus-visible {
             outline: 2px solid var(--ring);
