@@ -16,7 +16,8 @@ type Responsiveify<T> = {
 
 export type Props = {
     appearanceNone?: boolean;
-} & DerivedProps;
+    grow?: boolean | 0 | DerivedProps['grow'];
+} & Omit<DerivedProps, 'grow'>;
 
 export type BoxProps = Responsiveify<Props>;
 
@@ -31,6 +32,7 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         widthFromContext && widthFromContext > 0 ? widthFromContext : useWindowWidth();
     const bp = getActiveBreakpoint(windowWidth);
 
+    const booleanKeys = new Set(Object.keys(booleanClassMap));
     const restProps = rest;
 
     // Transition composition
@@ -75,6 +77,11 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     restEntries.forEach(([rawKey, value]) => {
         const key = rawKey as string;
         if (locked.has(key)) return;
+
+        if (key == 'grow') return;
+
+        // prevent leaking boolean utility props
+        // if (booleanKeys.has(key)) return;
 
         const resolved = resolveResponsive(value, bp);
 
@@ -135,7 +142,7 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     return (
         <DerivedBox
             ref={ref}
-            {...(propsToPassNext as Props)}
+            {...(propsToPassNext as DerivedProps)}
             className={clsx(classes, className)}
         />
     );

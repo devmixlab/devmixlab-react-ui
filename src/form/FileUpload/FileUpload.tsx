@@ -5,6 +5,7 @@ import { Size } from '../form.tokens';
 import { Close, IconWrapper, Upload } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { Card } from '../../Card';
+import { Close as CloseIcon } from '../../Icon';
 
 type FileUploadItem = {
     id: string;
@@ -212,7 +213,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     size={size}
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
-                    renderTag={({ tag, focused }) => {
+                    renderTag={({ tag, focused, remove }) => {
                         return (
                             <Card
                                 focused={focused}
@@ -222,9 +223,16 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                 density="xs"
                                 w="full"
                             >
-                                <Card.Section d="flex" gap="sm">
+                                <Card.Section w="full" d="flex" align="center" gap="sm">
                                     <Card.Section grow>{tag.label}</Card.Section>
-                                    <Card.Section>close</Card.Section>
+                                    <Card.Section>
+                                        <button
+                                            onClick={remove}
+                                            className={classPrefix('--clear-button')}
+                                        >
+                                            <CloseIcon />
+                                        </button>
+                                    </Card.Section>
                                 </Card.Section>
                             </Card>
                         );
