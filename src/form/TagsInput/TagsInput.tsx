@@ -193,6 +193,10 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         const next = new Set<string | number>();
 
         for (let i = start; i <= end; i++) {
+            const tag = tags[i];
+
+            if (tag?.disabled) continue;
+
             const id = getId(i);
 
             if (id != null) {
@@ -456,16 +460,43 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             return;
         }
 
-        // ⬅️ move to last tag
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a' && !inputValue && tags.length) {
+            e.preventDefault();
+
+            setSelectedIds(new Set(tags.map((t) => t.id ?? t.value)));
+
+            const firstIndex = findNextEnabled(tags, 0, 1);
+
+            if (firstIndex != null) {
+                const firstId = getId(firstIndex);
+
+                setSelectionAnchor(firstId);
+                setActiveId(firstId);
+                focusTag(firstId);
+            }
+
+            return;
+        }
+
         if (e.key === 'ArrowLeft' && !inputValue && tags.length) {
             e.preventDefault();
 
             const nextIndex = findNextEnabled(tags, tags.length - 1, -1);
+
             if (nextIndex !== null) {
                 const nextId = getId(nextIndex);
 
+                if (e.shiftKey) {
+                    setSelectedIds(new Set([nextId]));
+                    setSelectionAnchor(nextId);
+                } else {
+                    setSelectedIds(new Set());
+                    setSelectionAnchor(nextId);
+                }
+
                 setActiveId(nextId);
                 focusTag(nextId);
+
                 return;
             }
         }
@@ -719,7 +750,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         const next = tags.filter((tag, i) => {
             const id = getId(i);
 
-            if (selectedIds.has(id)) {
+            if (selectedIds.has(id) && !tag.disabled) {
                 onTagRemove?.(tag, i);
                 return false;
             }
