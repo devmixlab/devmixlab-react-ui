@@ -25,6 +25,10 @@ type FileUploadProps = {
     defaultValue?: FileUploadItem[];
     onChange?: (files: FileUploadItem[]) => void;
 
+    maxFiles?: number;
+    onMaxFilesExceeded?: (attempted: File[], current: FileUploadItem[]) => void;
+    onMaxFilesReached?: (current: FileUploadItem[]) => void;
+
     clearable?: boolean;
     clearIcon?: React.ReactNode;
     uploadIcon?: React.ReactNode;
@@ -49,6 +53,10 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             defaultValue = [],
             onChange,
 
+            maxFiles,
+            onMaxFilesExceeded,
+            onMaxFilesReached,
+
             clearable = true,
             clearIcon,
             uploadIcon,
@@ -70,6 +78,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
         const files = isControlled ? value! : filesState;
 
+        const isMaxReached = maxFiles != null && files.length >= maxFiles;
+
         const setFiles = (next: FileUploadItem[]) => {
             if (!isControlled) {
                 setFilesState(next);
@@ -79,9 +89,14 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         };
 
         const openFileDialog = () => {
-            if (!disabled && !loading) {
-                inputRef.current?.click();
+            if (disabled || loading) return;
+
+            if (isMaxReached) {
+                onMaxFilesReached?.(files);
+                return;
             }
+
+            inputRef.current?.click();
         };
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +109,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 status: 'idle',
             }));
 
-            const next = multiple
+            const merged = multiple
                 ? [
                       ...files,
                       ...selectedItems.filter(
@@ -105,6 +120,12 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                       ),
                   ]
                 : selectedItems;
+
+            if (maxFiles != null && merged.length > maxFiles) {
+                onMaxFilesExceeded?.(selected, files);
+            }
+
+            const next = maxFiles != null ? merged.slice(0, maxFiles) : merged;
 
             setFiles(next);
 
@@ -217,7 +238,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                         return (
                             <Card
                                 focused={focused}
-                                interactive
+                                // interactive
                                 d="flex"
                                 direction="row"
                                 density="xs"
