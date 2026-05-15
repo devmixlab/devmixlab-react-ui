@@ -522,35 +522,69 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             setSelectedIds(new Set(tags.map((t) => t.id ?? t.value)));
         }
 
-        const moveSelection = (direction: -1 | 1, withSelection: boolean) => {
-            const nextIndex = findNextEnabled(tags, index + direction, direction);
+        // const moveSelection = (direction: -1 | 1, withSelection: boolean) => {
+        //     const nextIndex = findNextEnabled(tags, index + direction, direction);
+        //
+        //     // no more tags -> move focus to input
+        //     if (nextIndex == null) {
+        //         if (withSelection) {
+        //             return;
+        //         }
+        //         if (inputEnabled) {
+        //             setActiveId(null);
+        //
+        //             if (!withSelection) {
+        //                 setSelectedIds(new Set());
+        //                 setSelectionAnchor(null);
+        //             }
+        //
+        //             focusInput();
+        //         } else {
+        //             const nextSideIndex = findNextEnabled(
+        //                 tags,
+        //                 direction < 0 ? tags.length - 1 : 0,
+        //                 direction,
+        //             );
+        //             if (nextSideIndex != null) {
+        //                 const sideTagId = getId(nextSideIndex);
+        //                 setSelectedIds(new Set());
+        //                 setSelectionAnchor(sideTagId);
+        //                 setActiveId(sideTagId);
+        //             }
+        //         }
+        //
+        //         return;
+        //     }
+        //
+        //     const nextId = getId(nextIndex);
+        //
+        //     if (withSelection) {
+        //         setSelectionAnchor(anchor);
+        //         selectRange(anchor, nextId);
+        //     } else {
+        //         setSelectedIds(new Set());
+        //         setSelectionAnchor(nextId);
+        //     }
+        //
+        //     setActiveId(nextId);
+        //     focusTag(nextId);
+        // };
 
-            // no more tags -> move focus to input
+        const moveSelection = (
+            direction: -1 | 1,
+            withSelection: boolean,
+            explicitIndex?: number | null,
+        ) => {
+            const nextIndex = explicitIndex ?? findNextEnabled(tags, index + direction, direction);
+
             if (nextIndex == null) {
-                if (withSelection) {
-                    return;
-                }
+                if (withSelection) return;
+
                 if (inputEnabled) {
                     setActiveId(null);
-
-                    if (!withSelection) {
-                        setSelectedIds(new Set());
-                        setSelectionAnchor(null);
-                    }
-
+                    setSelectedIds(new Set());
+                    setSelectionAnchor(null);
                     focusInput();
-                } else {
-                    const nextSideIndex = findNextEnabled(
-                        tags,
-                        direction < 0 ? tags.length - 1 : 0,
-                        direction,
-                    );
-                    if (nextSideIndex != null) {
-                        const sideTagId = getId(nextSideIndex);
-                        setSelectedIds(new Set());
-                        setSelectionAnchor(sideTagId);
-                        setActiveId(sideTagId);
-                    }
                 }
 
                 return;
@@ -569,6 +603,18 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             setActiveId(nextId);
             focusTag(nextId);
         };
+
+        if (e.key === 'Home') {
+            e.preventDefault();
+            moveSelection(-1, e.shiftKey, findNextEnabled(tags, 0, 1));
+            return;
+        }
+
+        if (e.key === 'End') {
+            e.preventDefault();
+            moveSelection(1, e.shiftKey, findNextEnabled(tags, tags.length - 1, -1));
+            return;
+        }
 
         if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
             e.preventDefault();
