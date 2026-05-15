@@ -147,12 +147,32 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
         const isMaxReached = maxFiles != null && files.length >= maxFiles;
 
-        const setFiles = (next: FileUploadItem[]) => {
-            if (!isControlled) {
-                setFilesState(next);
+        // const setFiles = (next: FileUploadItem[]) => {
+        //     if (!isControlled) {
+        //         setFilesState(next);
+        //     }
+        //
+        //     onChange?.(next);
+        // };
+
+        const setFiles = (
+            next: FileUploadItem[] | ((prev: FileUploadItem[]) => FileUploadItem[]),
+        ) => {
+            if (isControlled) {
+                const resolved = typeof next === 'function' ? next(files) : next;
+
+                onChange?.(resolved);
+
+                return;
             }
 
-            onChange?.(next);
+            setFilesState((prev) => {
+                const resolved = typeof next === 'function' ? next(prev) : next;
+
+                onChange?.(resolved);
+
+                return resolved;
+            });
         };
 
         const openFileDialog = () => {
@@ -203,16 +223,16 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             e.target.value = '';
         };
 
-        const removeFile = (index: number) => {
-            const removed = files[index];
+        const removeFile = (tag: FileUploadTag) => {
+            setFiles((prev) => {
+                const removed = prev.find((f) => f.id === tag.id);
 
-            if (removed?.previewUrl) {
-                URL.revokeObjectURL(removed.previewUrl);
-            }
+                if (removed?.previewUrl) {
+                    URL.revokeObjectURL(removed.previewUrl);
+                }
 
-            const next = files.filter((_, i) => i !== index);
-
-            setFiles(next);
+                return prev.filter((f) => f.id !== tag.id);
+            });
         };
 
         const clearFiles = () => {
@@ -373,8 +393,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             </Card>
                         );
                     }}
-                    onTagRemove={(_, index) => {
-                        removeFile(index);
+                    onTagRemove={(tag, index) => {
+                        removeFile(tag);
                     }}
                     actions={
                         <>

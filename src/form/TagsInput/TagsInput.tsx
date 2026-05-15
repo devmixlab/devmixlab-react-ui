@@ -698,6 +698,15 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             return !inRange || tag.disabled;
         });
 
+        tags.forEach((tag, i) => {
+            const inRange = i >= range.start && i <= range.end;
+
+            if (inRange && !tag.disabled) {
+                // console.log(4343);
+                onTagRemove?.(tag, i);
+            }
+        });
+
         setTags(next);
 
         // 👇 NEW: compute next focus
@@ -724,6 +733,56 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             });
         }
     };
+    // const removeSelected = () => {
+    //     const range = getSelectedRange();
+    //     if (!range) return;
+    //
+    //     const removed: Array<{ tag: TTag; index: number }> = [];
+    //
+    //     const next = tags.filter((tag, i) => {
+    //         const inRange = i >= range.start && i <= range.end;
+    //
+    //         if (!inRange) return true;
+    //
+    //         const removable = isRemovable(tag, i);
+    //
+    //         if (!removable) return true;
+    //
+    //         removed.push({ tag, index: i });
+    //
+    //         return false;
+    //     });
+    //
+    //     removed.forEach(({ tag, index }) => {
+    //         onTagRemove?.(tag, index);
+    //     });
+    //
+    //     setTags(next);
+    //
+    //     setSelectionStart(null);
+    //     setSelectionEnd(null);
+    //
+    //     if (next.length === 0) {
+    //         setActiveId(null);
+    //
+    //         requestAnimationFrame(() => {
+    //             inputRef.current?.focus();
+    //         });
+    //
+    //         return;
+    //     }
+    //
+    //     const nextIndex = range.start < next.length ? range.start : next.length - 1;
+    //
+    //     const nextTag = next[nextIndex];
+    //     const nextId = nextTag.id ?? nextTag.value;
+    //
+    //     setActiveId(nextId);
+    //
+    //     requestAnimationFrame(() => {
+    //         tagRefs.current[nextId]?.focus();
+    //     });
+    // };
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!inputEnabled) return;
 
