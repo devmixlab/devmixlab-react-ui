@@ -51,6 +51,7 @@ type FileUploadProps = {
     maxFiles?: number;
     onMaxFilesExceeded?: (attempted: File[], current: FileUploadItem[]) => void;
     onMaxFilesReached?: (current: FileUploadItem[]) => void;
+    showPreview?: boolean;
 
     clearable?: boolean;
     clearIcon?: React.ReactNode;
@@ -121,6 +122,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             maxFiles,
             onMaxFilesExceeded,
             onMaxFilesReached,
+            showPreview = false,
 
             clearable = true,
             clearIcon,
@@ -193,7 +195,10 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 id: crypto.randomUUID(),
                 file,
 
-                previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+                previewUrl:
+                    showPreview && file.type.startsWith('image/')
+                        ? URL.createObjectURL(file)
+                        : undefined,
 
                 progress: 0,
                 status: 'idle',
@@ -355,31 +360,18 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                             justify="center"
                                             w={50}
                                         >
-                                            {/*<Box size={30}>{fileKindIconMap[kind]}</Box>*/}
-                                            {/*<Box size={30}>{fileKindLabelMap[kind]}</Box>*/}
-                                            <Badge
-                                                intent="info"
-                                                // px="xs"
-                                                // py="2xs"
-                                                // rounded="sm"
-                                                // bg="neutral-100"
-                                                // fontSize="xs"
-                                                // fontWeight="700"
-                                                // lineHeight="1"
-                                                // color="muted"
-                                            >
-                                                {fileKindLabelMap[kind]}
-                                            </Badge>
-                                            {/*{tag.previewUrl ? (*/}
-                                            {/*    <Card.Media.Image*/}
-                                            {/*        objFit="contain"*/}
-                                            {/*        // h="full"*/}
-                                            {/*        w={60}*/}
-                                            {/*        src={tag.previewUrl}*/}
-                                            {/*    />*/}
-                                            {/*) : (*/}
-                                            {/*    <Box size={30}>{fileKindIconMap[kind]}</Box>*/}
-                                            {/*)}*/}
+                                            {showPreview && tag.previewUrl ? (
+                                                <Card.Media.Image
+                                                    objFit="contain"
+                                                    // h="full"
+                                                    w={60}
+                                                    src={tag.previewUrl}
+                                                />
+                                            ) : (
+                                                <Badge intent="info">
+                                                    {fileKindLabelMap[kind]}
+                                                </Badge>
+                                            )}
                                         </Card.Section>
                                         <Card.Section grow>
                                             <div className={classPrefix('--file-name')}>
