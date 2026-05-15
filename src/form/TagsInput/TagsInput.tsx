@@ -564,7 +564,24 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     setSelectedIds(new Set());
                     setSelectionAnchor(null);
                     focusInput();
+                    return;
                 }
+
+                // token-only mode → circular navigation
+                const wrappedIndex = findNextEnabled(
+                    tags,
+                    direction < 0 ? tags.length - 1 : 0,
+                    direction,
+                );
+
+                if (wrappedIndex == null) return;
+
+                const wrappedId = getId(wrappedIndex);
+
+                setSelectedIds(new Set());
+                setSelectionAnchor(wrappedId);
+                setActiveId(wrappedId);
+                focusTag(wrappedId);
 
                 return;
             }
