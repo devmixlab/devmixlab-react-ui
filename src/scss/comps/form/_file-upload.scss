@@ -13,6 +13,12 @@ $sizes: (
     lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
 );
 
+$inline-sizes: (
+    sm: (previewWrapperHeight: 24px, cardHeight: 30px),
+    md: (previewWrapperHeight: 32px, cardHeight: 38px),
+    lg: (previewWrapperHeight: 40px, cardHeight: 46px),
+);
+
 @mixin applySize($size) {
     $conf: map.get($sizes, $size);
 
@@ -22,8 +28,38 @@ $sizes: (
 }
 
 .#{$file-upload-prefix} {
+
+    &[data-layout='inline'], &[data-layout='stacked'] {
+        @each $size, $value in $inline-sizes {
+            &[data-size='#{$size}'] {
+                --preview-wrapper-height: #{map.get($value, previewWrapperHeight)};
+                --card-height: #{map.get($value, cardHeight)};
+                //--preview-wrapper-height: 40px;
+            }
+        }
+    }
+
+    .#{$p}--info-wrapper {
+        height: var(--preview-wrapper-height, 40px);
+        //aspect-ratio: 1;
+        aspect-ratio: 16 / 9;
+        //overflow: hidden;
+        border-radius: 6px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .#{$p}--file-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+
     .#{$p}--card {
         --border-section: none;
+        height: 100%;
 
         .#{$p}--card__section {
             border: none;
@@ -32,9 +68,12 @@ $sizes: (
         }
     }
 
-    &.#{$p}--tags-input .#{$p}--tag {
-        min-width: 0;
-        width: 100%;
+    //&.#{$p}--tags-input .#{$p}--tag {
+    //    min-width: 0;
+    //    width: 100%;
+    //}
+    .#{$p}--tag {
+        height: var(--card-height);
     }
 
     &.#{$p}--field-root {
@@ -45,13 +84,17 @@ $sizes: (
         //}
     }
 
-    &[data-actions-vertical].#{$p}--field-root {
-        .#{$p}--group,
-        .#{$p}--slot {
-            flex-direction: column-reverse;
-            justify-content: start;
-        }
-        //.#{$p}--group
+    //&[data-actions-vertical].#{$p}--field-root {
+    //    .#{$p}--group,
+    //    .#{$p}--slot {
+    //        flex-direction: column-reverse;
+    //        justify-content: start;
+    //    }
+    //    //.#{$p}--group
+    //}
+
+    &[data-layout='inline'] {
+
     }
 
     //display: inline-flex;

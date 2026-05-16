@@ -60,7 +60,7 @@ export type TagsInputProps<TTag extends BaseTagItem = BaseTagItem> = Omit<
     normalizeTag?: (label: string) => string;
     renderTag?: (params: RenderTagParams<TTag>) => React.ReactNode;
 
-    layout?: 'inline' | 'stacked';
+    layout?: 'inline' | 'stacked' | 'grid';
 
     invalid?: boolean;
     readOnly?: boolean;

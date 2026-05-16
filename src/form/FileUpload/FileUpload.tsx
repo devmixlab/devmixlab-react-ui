@@ -1,5 +1,5 @@
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
-import { TagsInput, type BaseTagItem } from '../TagsInput/TagsInput';
+import { TagsInput, type BaseTagItem, type TagsInputProps } from '../TagsInput/TagsInput';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { Size } from '../form.tokens';
 import { Badge } from '../../Badge/Badge';
@@ -71,6 +71,9 @@ type FileUploadProps = {
 
     size?: Size;
     loading?: boolean;
+
+    rounded?: TagsInputProps['rounded'];
+    itemRounded?: TagsInputProps['rounded'];
 };
 
 const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
@@ -145,6 +148,9 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
             size = 'md',
             loading = false,
+
+            rounded,
+            itemRounded,
         },
         ref,
     ) => {
@@ -420,11 +426,13 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 />
 
                 <TagsInput<FileUploadTag>
+                    rounded={rounded ?? size ?? 'md'}
                     className={classPrefix('--file-upload')}
                     fullWidth
                     value={tags}
                     inputEnabled={false}
-                    layout={layout === 'stacked' ? 'stacked' : undefined}
+                    // layout={layout === 'stacked' ? 'stacked' : undefined}
+                    layout="grid"
                     // editable={false}
                     disabled={disabled}
                     readOnly={loading}
@@ -439,6 +447,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             <Card
                                 active={selected}
                                 focused={focused}
+                                rounded={itemRounded ?? size ?? 'md'}
                                 // interactive
                                 focusable
                                 d="flex"
@@ -448,92 +457,48 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                 density="xs"
                                 w="full"
                             >
-                                {layout === 'stacked' && (
-                                    <Card.Section w="full" d="flex" align="center" gap="sm">
-                                        <Card.Section
-                                            shrink={0}
-                                            d="flex"
-                                            align="center"
-                                            justify="center"
-                                            w={50}
-                                        >
+                                <Card.Section w="full" d="flex" align="center" gap="sm">
+                                    <Card.Section
+                                        shrink={0}
+                                        d="flex"
+                                        align="center"
+                                        justify="center"
+                                        // h={30}
+                                        density="none"
+                                    >
+                                        <div className={classPrefix('--info-wrapper')}>
                                             {showPreview && tag.previewUrl ? (
                                                 <Card.Media.Image
-                                                    objFit="contain"
-                                                    // h="full"
-                                                    w={60}
+                                                    className={classPrefix('--file-preview')}
                                                     src={tag.previewUrl}
                                                 />
                                             ) : (
-                                                <Badge intent="info">
+                                                <Badge size={size} intent="info">
                                                     {fileKindLabelMap[kind]}
                                                 </Badge>
                                             )}
-                                        </Card.Section>
-                                        <Card.Section grow>
-                                            <div className={classPrefix('--file-name')}>
-                                                {tag.label}
-                                            </div>
-                                        </Card.Section>
-                                        <Card.Section
-                                            shrink={0}
-                                            d="flex"
-                                            align="center"
-                                            justify="center"
-                                            w={32}
-                                        >
-                                            <button
-                                                onClick={remove}
-                                                className={classPrefix('--clear-button')}
-                                            >
-                                                <CloseIcon />
-                                            </button>
-                                        </Card.Section>
+                                        </div>
                                     </Card.Section>
-                                )}
-                                {layout === 'grid' && (
-                                    <Card.Section w="full" d="flex" align="center" gap="sm">
-                                        <Card.Section
-                                            shrink={0}
-                                            d="flex"
-                                            align="center"
-                                            justify="center"
-                                            w={50}
-                                        >
-                                            {showPreview && tag.previewUrl ? (
-                                                <Card.Media.Image
-                                                    objFit="contain"
-                                                    // h="full"
-                                                    w={60}
-                                                    src={tag.previewUrl}
-                                                />
-                                            ) : (
-                                                <Badge intent="info">
-                                                    {fileKindLabelMap[kind]}
-                                                </Badge>
-                                            )}
-                                        </Card.Section>
-                                        <Card.Section grow>
-                                            <div className={classPrefix('--file-name')}>
-                                                {tag.label}
-                                            </div>
-                                        </Card.Section>
-                                        <Card.Section
-                                            shrink={0}
-                                            d="flex"
-                                            align="center"
-                                            justify="center"
-                                            w={32}
-                                        >
-                                            <button
-                                                onClick={remove}
-                                                className={classPrefix('--clear-button')}
-                                            >
-                                                <CloseIcon />
-                                            </button>
-                                        </Card.Section>
+                                    <Card.Section grow>
+                                        <div className={classPrefix('--file-name')}>
+                                            {tag.label}
+                                        </div>
                                     </Card.Section>
-                                )}
+                                    <Card.Section
+                                        shrink={0}
+                                        d="flex"
+                                        align="center"
+                                        justify="center"
+                                        w={32}
+                                    >
+                                        <button
+                                            onClick={remove}
+                                            className={classPrefix('--clear-button')}
+                                        >
+                                            <CloseIcon />
+                                        </button>
+                                    </Card.Section>
+                                </Card.Section>
                             </Card>
                         );
                     }}
