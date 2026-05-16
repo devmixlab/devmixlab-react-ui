@@ -66,6 +66,7 @@ type FileUploadProps = {
     defaultValue?: FileUploadItem[];
     onChange?: (files: FileUploadItem[]) => void;
 
+    uploadTrigger?: 'button' | 'tile' | 'both';
     maxFiles?: number;
     onMaxFilesExceeded?: (attempted: File[], current: FileUploadItem[]) => void;
     onMaxFilesReached?: (current: FileUploadItem[]) => void;
@@ -152,6 +153,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             defaultValue = [],
             onChange,
 
+            uploadTrigger,
             maxFiles,
             onMaxFilesExceeded,
             onMaxFilesReached,
@@ -178,6 +180,10 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         ref,
     ) => {
         const tagsInputLayout = tagsInputLayoutMap[layout];
+
+        const defaultUploadTrigger =
+            layout === 'grid' || layout === 'gallery' || layout === 'masonry' ? 'tile' : 'button';
+        const resolvedUploadTrigger = uploadTrigger ?? defaultUploadTrigger;
 
         const inputRef = useRef<HTMLInputElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
@@ -388,10 +394,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             }));
 
             const useUploadTile =
-                layout === 'inline' ||
-                layout === 'grid' ||
-                layout === 'gallery' ||
-                layout === 'masonry';
+                resolvedUploadTrigger === 'tile' || resolvedUploadTrigger === 'both';
 
             if (useUploadTile && !disabled && !loading && !isMaxReached) {
                 mapped.push({
@@ -403,7 +406,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             }
 
             return mapped;
-        }, [files, layout, disabled, loading, isMaxReached]);
+        }, [files, layout, disabled, loading, isMaxReached, resolvedUploadTrigger]);
 
         const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <CloseIcon />;
 
@@ -477,7 +480,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                         if ('__upload__' in tag) {
                             return (
                                 <Card
-                                    active={selected}
+                                    // active={selected}
                                     focused={focused}
                                     rounded={itemRounded ?? size ?? 'md'}
                                     focusable
@@ -519,8 +522,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                 // interactive
                                 focusable
                                 d="flex"
-                                // d={layout === 'stacked' ? 'flex' : undefined}
-                                // grid={layout === 'grid' ? true : undefined}
                                 direction="row"
                                 density="xs"
                                 w="full"
@@ -574,10 +575,19 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                         if ('__upload__' in tag) return;
                         removeFile(tag);
                     }}
+                    // actions={
+                    //     <>
+                    //         {actions}
+                    //         {uploadButton}
+                    //         {clearButton}
+                    //     </>
+                    // }
                     actions={
                         <>
                             {actions}
-                            {uploadButton}
+                            {(resolvedUploadTrigger === 'button' ||
+                                resolvedUploadTrigger === 'both') &&
+                                uploadButton}
                             {clearButton}
                         </>
                     }

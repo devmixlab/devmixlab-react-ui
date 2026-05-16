@@ -29,7 +29,7 @@ $inline-sizes: (
 
 .#{$file-upload-prefix} {
 
-    &[data-layout='inline'], &[data-layout='stacked'] {
+    &[data-layout='inline'], &[data-layout='stacked'], &[data-layout='grid'] {
         @each $size, $value in $inline-sizes {
             &[data-size='#{$size}'] {
                 --preview-wrapper-height: #{map.get($value, previewWrapperHeight)};
@@ -40,12 +40,12 @@ $inline-sizes: (
     }
 
     --upload-card-bg: #{functions.intent-color('secondary', 200)};
-    --upload-card-bg-hover: #{functions.intent-color('secondary', 300)};
+    --upload-card-bg-hover: #{functions.intent-color('secondary', 250)};
     --upload-card-border: #{functions.intent-color('secondary', 500)};
 
     @include cfg.dark {
         --upload-card-bg: #{functions.intent-color('secondary', 900)};
-        --upload-card-bg-hover: #{functions.intent-color('secondary', 800)};
+        --upload-card-bg-hover: #{functions.intent-color('secondary', 850)};
         --upload-card-border: #{functions.intent-color('secondary', 700)};
     }
 
