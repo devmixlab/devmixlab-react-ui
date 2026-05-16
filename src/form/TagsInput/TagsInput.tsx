@@ -64,6 +64,7 @@ export type TagsInputProps<TTag extends BaseTagItem = BaseTagItem> = Omit<
     renderTag?: (params: RenderTagParams<TTag>) => React.ReactNode;
 
     layout?: Layout;
+    gridCol?: BoxProps['col'];
 
     invalid?: boolean;
     readOnly?: boolean;
@@ -117,6 +118,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         renderTag,
 
         layout = 'inline',
+        gridCol = { base: 12, md: 6, lg: 4 },
 
         invalid,
         readOnly = false,
@@ -868,7 +870,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
     ) => {
         return (
             <Box
-                col={layout === 'grid' ? { base: 12, md: 6, lg: 4 } : undefined}
+                col={layout === 'grid' ? gridCol : undefined}
                 ref={(el) => {
                     if (tag.id != null) {
                         // tagRefs.current[tag.id] = el;
@@ -968,6 +970,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             size={size}
             start={start} // optional
             grid={layout === 'grid' || undefined}
+            gap={layout === 'grid' ? size : undefined}
             actions={
                 <>
                     {actions}
@@ -996,7 +999,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     return (
                         <Box
                             key={tag.id ?? tag.value}
-                            col={layout === 'grid' ? { base: 12, md: 6, lg: 4 } : undefined}
+                            col={layout === 'grid' ? gridCol : undefined}
                             // w={layout === 'grid' ? 'full' : undefined}
                             d="flex"
                         >

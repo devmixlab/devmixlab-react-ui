@@ -7,36 +7,42 @@
 $p: cfg.$prefix;
 $file-upload-prefix: #{$p}--file-upload;
 
+//$sizes: (
+//    sm: (height: 32px, spacingY: 6px, spacingTop: 8px),
+//    md: (height: 40px, spacingY: 10px, spacingTop: 12px),
+//    lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
+//);
+
 $sizes: (
-    sm: (height: 32px, spacingY: 6px, spacingTop: 8px),
-    md: (height: 40px, spacingY: 10px, spacingTop: 12px),
-    lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
+    sm: (previewWrapperHeight: 24px, cardHeight: 30px, galleryCardHeight: 150px),
+    md: (previewWrapperHeight: 32px, cardHeight: 38px, galleryCardHeight: 250px),
+    lg: (previewWrapperHeight: 40px, cardHeight: 46px, galleryCardHeight: 350px),
 );
 
-$inline-sizes: (
-    sm: (previewWrapperHeight: 24px, cardHeight: 30px),
-    md: (previewWrapperHeight: 32px, cardHeight: 38px),
-    lg: (previewWrapperHeight: 40px, cardHeight: 46px),
-);
-
-@mixin applySize($size) {
-    $conf: map.get($sizes, $size);
-
-    --min-height: #{map.get($conf, height)};
-    --top-offset: #{map.get($conf, spacingTop)};
-    --y-offset: #{map.get($conf, spacingY)};
-}
+//@mixin applySize($size) {
+//    $conf: map.get($sizes, $size);
+//
+//    --min-height: #{map.get($conf, height)};
+//    --top-offset: #{map.get($conf, spacingTop)};
+//    --y-offset: #{map.get($conf, spacingY)};
+//}
 
 .#{$file-upload-prefix} {
 
     &[data-layout='inline'], &[data-layout='stacked'], &[data-layout='grid'] {
-        @each $size, $value in $inline-sizes {
+        @each $size, $value in $sizes {
             &[data-size='#{$size}'] {
                 --preview-wrapper-height: #{map.get($value, previewWrapperHeight)};
                 --card-height: #{map.get($value, cardHeight)};
                 //--preview-wrapper-height: 40px;
+                &[data-file-upload-layout='gallery'] {
+                    --card-height: #{map.get($value, galleryCardHeight)};
+                }
             }
         }
+        //&[data-file-upload-layout='gallery'] {
+        //    --card-height: 200px;
+        //}
     }
 
     --upload-card-bg: #{functions.intent-color('secondary', 200)};
@@ -91,6 +97,10 @@ $inline-sizes: (
         &:hover {
             background-color: var(--upload-card-bg-hover);
         }
+
+        //&:not([data-not-empty]) {
+        //    width: 100%;
+        //}
     }
 
     //&.#{$p}--tags-input .#{$p}--tag {
@@ -127,7 +137,10 @@ $inline-sizes: (
     //--slot-h: auto;
     //--height: auto;
     //gap: var(--gap);
-    cursor: pointer;
+    cursor: default;
+    &[data-upload-trigger='button'] {
+        cursor: pointer;
+    }
 
     .#{$p}--file-name {
         overflow: hidden;

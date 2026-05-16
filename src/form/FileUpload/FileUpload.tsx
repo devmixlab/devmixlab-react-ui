@@ -465,6 +465,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     className={classPrefix('--file-upload')}
                     fullWidth={tagsInputLayout === 'grid' ? undefined : true}
                     // fullWidth
+                    // gridCol={files.length === 0 ? 12 : undefined}
                     value={tags}
                     inputEnabled={false}
                     // layout={layout === 'stacked' ? 'stacked' : undefined}
@@ -489,6 +490,11 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                     density="xs"
                                     w="full"
                                     onClick={openFileDialog}
+                                    // onKeyDown={(event) => {
+                                    //     if (event.key === 'Enter') {
+                                    //         openFileDialog();
+                                    //     }
+                                    // }}
                                     cursor="pointer"
                                     className={classPrefix('--upload-card')}
                                 >
@@ -526,48 +532,103 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                 density="xs"
                                 w="full"
                             >
-                                <Card.Section w="full" d="flex" align="center" gap="sm">
+                                {layout === 'gallery' && (
                                     <Card.Section
-                                        shrink={0}
+                                        w="full"
                                         d="flex"
-                                        align="center"
+                                        direction="column"
                                         justify="center"
-                                        // h={30}
-                                        density="none"
+                                        align="center"
+                                        gap="sm"
                                     >
-                                        <div className={classPrefix('--info-wrapper')}>
-                                            {showPreview && tag.previewUrl ? (
+                                        {showPreview && tag.previewUrl ? (
+                                            <Box h="100%">
                                                 <Card.Media.Image
-                                                    className={classPrefix('--file-preview')}
+                                                    // className={classPrefix('--file-preview')}
                                                     src={tag.previewUrl}
+                                                    objFit="contain"
+                                                    h="100%"
                                                 />
-                                            ) : (
-                                                <Badge size={size} intent="info">
-                                                    {fileKindLabelMap[kind]}
-                                                </Badge>
-                                            )}
-                                        </div>
+                                            </Box>
+                                        ) : (
+                                            <>
+                                                <Card.Section
+                                                    w="full"
+                                                    d="flex"
+                                                    align="center"
+                                                    justify="center"
+                                                    gap="sm"
+                                                >
+                                                    <Card.Media.Icon size="xl">
+                                                        {fileKindLabelMap[kind]}
+                                                    </Card.Media.Icon>
+                                                    {/*<Badge size={size} intent="info">*/}
+                                                    {/*    // {fileKindLabelMap[kind]}*/}
+                                                    {/*    //{' '}*/}
+                                                    {/*</Badge>*/}
+                                                </Card.Section>
+                                                <Card.Section
+                                                    // <>w="full"
+                                                    // d="flex"
+                                                    // align="center"
+                                                    // gap="sm"</>
+                                                    ta="center"
+                                                    w="100%"
+                                                >
+                                                    <div className={classPrefix('--file-name')}>
+                                                        {tag.label}
+                                                    </div>
+                                                </Card.Section>
+                                            </>
+                                        )}
                                     </Card.Section>
-                                    <Card.Section grow>
-                                        <div className={classPrefix('--file-name')}>
-                                            {tag.label}
-                                        </div>
-                                    </Card.Section>
-                                    <Card.Section
-                                        shrink={0}
-                                        d="flex"
-                                        align="center"
-                                        justify="center"
-                                        w={32}
-                                    >
-                                        <button
-                                            onClick={remove}
-                                            className={classPrefix('--clear-button')}
+                                )}
+                                {(layout === 'inline' ||
+                                    layout === 'stacked' ||
+                                    layout === 'grid') && (
+                                    <Card.Section w="full" d="flex" align="center" gap="sm">
+                                        <Card.Section
+                                            shrink={0}
+                                            d="flex"
+                                            align="center"
+                                            justify="center"
+                                            // h={30}
+                                            density="none"
                                         >
-                                            <CloseIcon />
-                                        </button>
+                                            <div className={classPrefix('--info-wrapper')}>
+                                                {showPreview && tag.previewUrl ? (
+                                                    <Card.Media.Image
+                                                        className={classPrefix('--file-preview')}
+                                                        src={tag.previewUrl}
+                                                    />
+                                                ) : (
+                                                    <Badge size={size} intent="info">
+                                                        {fileKindLabelMap[kind]}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </Card.Section>
+                                        <Card.Section grow>
+                                            <div className={classPrefix('--file-name')}>
+                                                {tag.label}
+                                            </div>
+                                        </Card.Section>
+                                        <Card.Section
+                                            shrink={0}
+                                            d="flex"
+                                            align="center"
+                                            justify="center"
+                                            w={32}
+                                        >
+                                            <button
+                                                onClick={remove}
+                                                className={classPrefix('--clear-button')}
+                                            >
+                                                <CloseIcon />
+                                            </button>
+                                        </Card.Section>
                                     </Card.Section>
-                                </Card.Section>
+                                )}
                             </Card>
                         );
                     }}
@@ -591,7 +652,11 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                             {clearButton}
                         </>
                     }
-                    onClick={!files.length ? openFileDialog : undefined}
+                    onClick={
+                        !files.length && resolvedUploadTrigger === 'button'
+                            ? openFileDialog
+                            : undefined
+                    }
                     onDragEnter={handleDragEnter}
                     onDragLeave={handleDragLeave}
                     onDragOver={handleDragOver}
@@ -602,6 +667,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     data-dragging={isDragging || undefined}
                     data-max-exceeded={maxExceeded || undefined}
                     data-drag-rejected={isDragging && isMaxReached ? true : undefined}
+                    data-file-upload-layout={layout}
+                    data-upload-trigger={resolvedUploadTrigger}
                 />
             </>
         );
