@@ -11,6 +11,7 @@ import { Badge } from '../../Badge/Badge';
 import { Close as CloseIcon, IconWrapper as IconWrapper, Upload as UploadIcon } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { Card } from '../../Card';
+import { Box } from '../../Box/Box';
 // import { Close as CloseIcon } from '../../Icon';
 
 type FileValidationResult = boolean | string;
@@ -29,6 +30,10 @@ type FileKind =
     | 'video'
     | 'generic';
 
+type UploadPseudoTag = BaseTagItem & {
+    __upload__: true;
+};
+
 type FileUploadTag = BaseTagItem & {
     previewUrl?: string;
 
@@ -38,6 +43,8 @@ type FileUploadTag = BaseTagItem & {
 
     status?: 'idle' | 'uploading' | 'success' | 'error';
 };
+
+type RenderableTag = FileUploadTag | UploadPseudoTag;
 
 type FileUploadItem = {
     id: string;
@@ -365,23 +372,38 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             }
         };
 
-        const tags = useMemo<FileUploadTag[]>(
-            () =>
-                files.map((item) => ({
-                    id: item.id,
-                    label:
-                        item.status === 'uploading'
-                            ? `${item.file.name} ${item.progress ?? 0}%`
-                            : item.file.name,
-                    value: item.file.name,
+        const tags = useMemo<RenderableTag[]>(() => {
+            const mapped: RenderableTag[] = files.map((item) => ({
+                id: item.id,
+                label:
+                    item.status === 'uploading'
+                        ? `${item.file.name} ${item.progress ?? 0}%`
+                        : item.file.name,
+                value: item.file.name,
 
-                    previewUrl: item.previewUrl,
-                    file: item.file,
-                    status: item.status,
-                    progress: item.progress,
-                })),
-            [files],
-        );
+                previewUrl: item.previewUrl,
+                file: item.file,
+                status: item.status,
+                progress: item.progress,
+            }));
+
+            const useUploadTile =
+                layout === 'inline' ||
+                layout === 'grid' ||
+                layout === 'gallery' ||
+                layout === 'masonry';
+
+            if (useUploadTile && !disabled && !loading && !isMaxReached) {
+                mapped.push({
+                    id: '__upload__',
+                    value: '__upload__',
+                    label: 'Upload',
+                    __upload__: true,
+                });
+            }
+
+            return mapped;
+        }, [files, layout, disabled, loading, isMaxReached]);
 
         const finalClearIcon = clearIcon ? <IconWrapper>{clearIcon}</IconWrapper> : <CloseIcon />;
 
@@ -435,7 +457,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     onChange={handleChange}
                 />
 
-                <TagsInput<FileUploadTag>
+                <TagsInput<RenderableTag>
                     rounded={rounded ?? size ?? 'md'}
                     className={classPrefix('--file-upload')}
                     fullWidth={tagsInputLayout === 'grid' ? undefined : true}
@@ -452,6 +474,41 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     inputMode="none"
                     placeholder={files.length ? '' : 'Choose files...'}
                     renderTag={({ tag, focused, remove, selected }) => {
+                        if ('__upload__' in tag) {
+                            return (
+                                <Card
+                                    active={selected}
+                                    focused={focused}
+                                    rounded={itemRounded ?? size ?? 'md'}
+                                    focusable
+                                    d="flex"
+                                    direction="row"
+                                    density="xs"
+                                    w="full"
+                                    onClick={openFileDialog}
+                                    cursor="pointer"
+                                    className={classPrefix('--upload-card')}
+                                >
+                                    <Card.Section
+                                        w="full"
+                                        d="flex"
+                                        align="center"
+                                        justify="center"
+                                        gap="sm"
+                                        px={size}
+                                    >
+                                        <Box
+                                            size="1.2em"
+                                            className={classPrefix('--upload-card__icon')}
+                                        >
+                                            {uploadIcon ?? <UploadIcon />}
+                                        </Box>
+                                        Add more ...
+                                    </Card.Section>
+                                </Card>
+                            );
+                        }
+
                         const kind = getFileKind(tag.file);
 
                         return (
@@ -514,6 +571,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                         );
                     }}
                     onTagRemove={(tag, index) => {
+                        if ('__upload__' in tag) return;
                         removeFile(tag);
                     }}
                     actions={
