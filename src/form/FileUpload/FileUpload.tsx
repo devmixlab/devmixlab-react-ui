@@ -1,5 +1,10 @@
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
-import { TagsInput, type BaseTagItem, type TagsInputProps } from '../TagsInput/TagsInput';
+import {
+    TagsInput,
+    type BaseTagItem,
+    type TagsInputProps,
+    type Layout as TagsInputLayout,
+} from '../TagsInput/TagsInput';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { Size } from '../form.tokens';
 import { Badge } from '../../Badge/Badge';
@@ -11,6 +16,8 @@ import { Card } from '../../Card';
 type FileValidationResult = boolean | string;
 
 type ValidateFile = (file: File) => FileValidationResult;
+
+export type Layout = 'inline' | 'stacked' | 'grid' | 'compact' | 'gallery' | 'masonry';
 
 type FileKind =
     | 'image'
@@ -67,7 +74,7 @@ type FileUploadProps = {
     start?: React.ReactNode;
     actions?: React.ReactNode;
 
-    layout?: 'stacked' | 'grid'; // 'compact' gallery masonry;
+    layout?: Layout; // 'compact' gallery masonry;
 
     size?: Size;
     loading?: boolean;
@@ -118,6 +125,15 @@ const getFileKind = (file: File): FileKind => {
     return 'generic';
 };
 
+const tagsInputLayoutMap = {
+    compact: 'inline',
+    inline: 'inline',
+    stacked: 'stacked',
+    grid: 'grid',
+    gallery: 'grid',
+    masonry: 'grid',
+} satisfies Record<string, TagsInputLayout>;
+
 export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
     (
         {
@@ -154,6 +170,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         },
         ref,
     ) => {
+        const tagsInputLayout = tagsInputLayoutMap[layout];
+
         const inputRef = useRef<HTMLInputElement>(null);
         const combinedRef = mergeRefs(inputRef, ref);
 
@@ -170,14 +188,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const files = isControlled ? value! : filesState;
 
         const isMaxReached = maxFiles != null && files.length >= maxFiles;
-
-        // const setFiles = (next: FileUploadItem[]) => {
-        //     if (!isControlled) {
-        //         setFilesState(next);
-        //     }
-        //
-        //     onChange?.(next);
-        // };
 
         const setFiles = (
             next: FileUploadItem[] | ((prev: FileUploadItem[]) => FileUploadItem[]),
@@ -428,11 +438,12 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 <TagsInput<FileUploadTag>
                     rounded={rounded ?? size ?? 'md'}
                     className={classPrefix('--file-upload')}
-                    fullWidth
+                    fullWidth={tagsInputLayout === 'grid' ? undefined : true}
+                    // fullWidth
                     value={tags}
                     inputEnabled={false}
                     // layout={layout === 'stacked' ? 'stacked' : undefined}
-                    layout="grid"
+                    layout={tagsInputLayout}
                     // editable={false}
                     disabled={disabled}
                     readOnly={loading}

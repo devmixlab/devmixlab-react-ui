@@ -35,7 +35,7 @@ export type ChipProps = {
     onKeyDown?: React.KeyboardEventHandler<any>;
     target?: React.HTMLAttributeAnchorTarget;
     rel?: string;
-};
+} & BoxProps;
 
 const Chip = forwardRef(
     (

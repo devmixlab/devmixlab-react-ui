@@ -8,7 +8,7 @@ import { FieldRoot } from '../FieldRoot/FieldRoot';
 import clsx from 'clsx';
 import { Chip } from '../../Chip/Chip';
 import { mergeRefs } from '../../utils/mergeRefs';
-import type { BoxProps } from '../../Box/Box';
+import { Box, BoxProps } from '../../Box/Box';
 // import { Size, Variant } from '../Input/input.tokens';
 import { Size } from '../form.tokens';
 import { Variant } from '../FieldRoot/FieldRoot';
@@ -31,6 +31,8 @@ type RenderTagParams<TTag extends BaseTagItem> = {
     selected?: boolean;
     focused?: boolean;
 };
+
+export type Layout = 'inline' | 'stacked' | 'grid';
 
 export const slugify = (str: string) =>
     str
@@ -60,7 +62,7 @@ export type TagsInputProps<TTag extends BaseTagItem = BaseTagItem> = Omit<
     normalizeTag?: (label: string) => string;
     renderTag?: (params: RenderTagParams<TTag>) => React.ReactNode;
 
-    layout?: 'inline' | 'stacked' | 'grid';
+    layout?: Layout;
 
     invalid?: boolean;
     readOnly?: boolean;
@@ -112,7 +114,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         normalizeTag,
         renderTag,
 
-        layout = 'inline',
+        layout = 'grid',
 
         invalid,
         readOnly = false,
@@ -863,7 +865,8 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         tagNode: React.ReactNode,
     ) => {
         return (
-            <div
+            <Box
+                col={layout === 'grid' ? { base: 12, md: 6, lg: 4 } : undefined}
                 ref={(el) => {
                     if (tag.id != null) {
                         // tagRefs.current[tag.id] = el;
@@ -946,7 +949,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                 data-prevent-focus
             >
                 {tagNode}
-            </div>
+            </Box>
         );
     };
 
@@ -962,6 +965,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             variant={variant}
             size={size}
             start={start} // optional
+            grid={layout === 'grid' || undefined}
             actions={
                 <>
                     {actions}
@@ -994,7 +998,9 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                                 className={classPrefix('--mirror')}
                                 aria-hidden
                             />
-                            <input
+                            <Box
+                                as="input"
+                                w={layout === 'grid' ? 'full' : undefined}
                                 ref={editInputRef}
                                 value={editingValue}
                                 onChange={(e) => setEditingValue(e.target.value)}
@@ -1037,6 +1043,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     i,
                     id,
                     <Chip
+                        w={layout === 'grid' ? 'full' : undefined}
                         size={size}
                         removable={!tag.disabled}
                         disabled={tag.disabled || disabled}
