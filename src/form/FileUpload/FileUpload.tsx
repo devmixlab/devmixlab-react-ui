@@ -8,6 +8,10 @@ import { classPrefix } from '../../utils/classPrefix';
 import { Card } from '../../Card';
 // import { Close as CloseIcon } from '../../Icon';
 
+type FileValidationResult = boolean | string;
+
+type ValidateFile = (file: File) => FileValidationResult;
+
 type FileKind =
     | 'image'
     | 'pdf'
@@ -52,6 +56,9 @@ type FileUploadProps = {
     onMaxFilesExceeded?: (attempted: File[], current: FileUploadItem[]) => void;
     onMaxFilesReached?: (current: FileUploadItem[]) => void;
     showPreview?: boolean;
+
+    validateFile?: ValidateFile;
+    onFileReject?: (file: File, reason?: string) => void;
 
     clearable?: boolean;
     clearIcon?: React.ReactNode;
@@ -123,6 +130,9 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             onMaxFilesExceeded,
             onMaxFilesReached,
             showPreview = false,
+
+            validateFile,
+            onFileReject,
 
             clearable = true,
             clearIcon,
@@ -200,7 +210,23 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 fromDrop?: boolean;
             },
         ) => {
-            const selectedItems: FileUploadItem[] = selected.map((file) => ({
+            const validFiles: File[] = [];
+
+            selected.forEach((file) => {
+                const result = validateFile?.(file);
+
+                const rejected = result === false || typeof result === 'string';
+
+                if (rejected) {
+                    onFileReject?.(file, typeof result === 'string' ? result : undefined);
+
+                    return;
+                }
+
+                validFiles.push(file);
+            });
+
+            const selectedItems: FileUploadItem[] = validFiles.map((file) => ({
                 id: crypto.randomUUID(),
                 file,
 
@@ -416,11 +442,56 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                 // interactive
                                 focusable
                                 d="flex"
+                                // d={layout === 'stacked' ? 'flex' : undefined}
+                                // grid={layout === 'grid' ? true : undefined}
                                 direction="row"
                                 density="xs"
                                 w="full"
                             >
                                 {layout === 'stacked' && (
+                                    <Card.Section w="full" d="flex" align="center" gap="sm">
+                                        <Card.Section
+                                            shrink={0}
+                                            d="flex"
+                                            align="center"
+                                            justify="center"
+                                            w={50}
+                                        >
+                                            {showPreview && tag.previewUrl ? (
+                                                <Card.Media.Image
+                                                    objFit="contain"
+                                                    // h="full"
+                                                    w={60}
+                                                    src={tag.previewUrl}
+                                                />
+                                            ) : (
+                                                <Badge intent="info">
+                                                    {fileKindLabelMap[kind]}
+                                                </Badge>
+                                            )}
+                                        </Card.Section>
+                                        <Card.Section grow>
+                                            <div className={classPrefix('--file-name')}>
+                                                {tag.label}
+                                            </div>
+                                        </Card.Section>
+                                        <Card.Section
+                                            shrink={0}
+                                            d="flex"
+                                            align="center"
+                                            justify="center"
+                                            w={32}
+                                        >
+                                            <button
+                                                onClick={remove}
+                                                className={classPrefix('--clear-button')}
+                                            >
+                                                <CloseIcon />
+                                            </button>
+                                        </Card.Section>
+                                    </Card.Section>
+                                )}
+                                {layout === 'grid' && (
                                     <Card.Section w="full" d="flex" align="center" gap="sm">
                                         <Card.Section
                                             shrink={0}
