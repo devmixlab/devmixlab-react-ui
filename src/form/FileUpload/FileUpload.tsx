@@ -490,11 +490,11 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                     density="xs"
                                     w="full"
                                     onClick={openFileDialog}
-                                    // onKeyDown={(event) => {
-                                    //     if (event.key === 'Enter') {
-                                    //         openFileDialog();
-                                    //     }
-                                    // }}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter') {
+                                            openFileDialog();
+                                        }
+                                    }}
                                     cursor="pointer"
                                     className={classPrefix('--upload-card')}
                                 >

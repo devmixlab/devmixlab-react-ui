@@ -905,7 +905,18 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                         setSelectionAnchor(null);
                     }
                 }}
-                onKeyDown={(e) => handleTagKeyDown(e)}
+                // onKeyDown={(e) => handleTagKeyDown(e)}
+                onKeyDown={(e) => {
+                    handleTagKeyDown(e);
+
+                    if (
+                        e.key === 'Enter' &&
+                        React.isValidElement(tagNode) &&
+                        typeof tagNode.props.onKeyDown === 'function'
+                    ) {
+                        tagNode.props.onKeyDown(e);
+                    }
+                }}
                 onDoubleClick={isEditable(tag, i) ? () => startEdit(i) : undefined}
                 onClick={(e) => {
                     e.stopPropagation();
