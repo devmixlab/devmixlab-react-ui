@@ -54,6 +54,7 @@ export type TagsInputProps<TTag extends BaseTagItem = BaseTagItem> = Omit<
 
     inputEnabled?: boolean;
     placeholder?: string;
+    inputPlaceholder?: string;
     fullWidth?: boolean;
 
     editable?: boolean | ((tag: TTag, index: number) => boolean);
@@ -103,6 +104,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
         inputEnabled = true,
         placeholder,
+        inputPlaceholder = '...',
         fullWidth = false,
 
         value,
@@ -114,7 +116,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         normalizeTag,
         renderTag,
 
-        layout = 'stacked',
+        layout = 'inline',
 
         invalid,
         readOnly = false,
@@ -1074,6 +1076,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />
                     <input
                         ref={combinedRef}
+                        placeholder={inputPlaceholder}
                         disabled={disabled || readOnly}
                         value={inputValue}
                         onChange={handleChange}
