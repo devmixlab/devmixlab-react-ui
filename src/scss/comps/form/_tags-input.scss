@@ -81,6 +81,15 @@ $sizes: (
         align-items: center;
     }
 
+    &[data-layout='grid'] {
+        .#{$p}--tag-edit {
+            display: flex;
+            flex: 1 1 auto;
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
     .#{$p}--tag {
         display: inline-flex;
         &[data-disabled] {

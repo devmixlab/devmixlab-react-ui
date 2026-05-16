@@ -114,7 +114,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         normalizeTag,
         renderTag,
 
-        layout = 'grid',
+        layout = 'stacked',
 
         invalid,
         readOnly = false,
@@ -992,7 +992,12 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                 // 🔥 EDIT MODE
                 if (editingIndex === i && isEditable(tag, i)) {
                     return (
-                        <React.Fragment key={tag.id ?? tag.value}>
+                        <Box
+                            key={tag.id ?? tag.value}
+                            col={layout === 'grid' ? { base: 12, md: 6, lg: 4 } : undefined}
+                            // w={layout === 'grid' ? 'full' : undefined}
+                            d="flex"
+                        >
                             <span
                                 ref={editMirrorRef}
                                 className={classPrefix('--mirror')}
@@ -1000,7 +1005,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                             />
                             <Box
                                 as="input"
-                                w={layout === 'grid' ? 'full' : undefined}
+                                // w={layout === 'grid' ? 'full' : undefined}
                                 ref={editInputRef}
                                 value={editingValue}
                                 onChange={(e) => setEditingValue(e.target.value)}
@@ -1020,7 +1025,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                                 }}
                                 className={classPrefix('--tag-edit')}
                             />
-                        </React.Fragment>
+                        </Box>
                     );
                 }
 
