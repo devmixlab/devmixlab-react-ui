@@ -23,15 +23,6 @@ $button-sizes: (
 }
 
 $intents: (brown, primary, secondary, info, warning, success, danger);
-//$intent-palette-map: (
-//    brown: $yellow,
-//    primary: $blue,
-//    secondary: $slate,
-//    info: $cyan,
-//    warning: $amber,
-//    success: $green,
-//    danger: $red,
-//);
 
 .#{$button-group-prefix} {
     display: inline-flex;
@@ -293,28 +284,35 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
             --dru-button-ring: #{functions.intent-color($intent, 600)};
 
             &[data-variant='solid'] {
-                --dru-button-bg: #{functions.intent-color($intent, 600)};
-                --dru-button-bg-hover: #{functions.intent-color($intent, 700)};
-                --dru-button-text: #{functions.intent-color($intent, 0)};
-                --dru-button-border: transparent;
+                --#{$p}-button-bg: #{functions.intent-color($intent, 600)};
+                --#{$p}-button-bg-hover: #{functions.intent-color($intent, 700)};
+                --#{$p}-button-bg-active: #{functions.intent-color($intent, 800)};
 
-                &:not(:disabled):not(.dru--button--disabled) {
+                --#{$p}-button-text: #{functions.intent-color($intent, 0)};
+                --#{$p}-button-border: transparent;
+
+                &:not([data-disabled]) {
+                    &:hover {
+                        --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
+                    }
+
                     &:active {
-                        filter: brightness(0.95);
+                        --#{$p}-button-bg: var(--#{$p}-button-bg-active);
                     }
                 }
 
-                &.dru--button--active {
-                    --dru-button-bg: #{functions.intent-color($intent, 800)};
-                    --dru-button-bg-hover: #{functions.intent-color($intent, 900)};
+                &.#{$p}--button--active {
+                    --#{$p}-button-bg: #{functions.intent-color($intent, 800)};
+                    --#{$p}-button-bg-hover: #{functions.intent-color($intent, 900)};
+                    --#{$p}-button-bg-active: #{functions.intent-color($intent, 950)};
 
-                    &:not(:disabled):not(.dru--button--disabled) {
+                    &:not([data-disabled]) {
                         &:hover {
-                            --dru-button-bg-hover: #{functions.intent-color($intent, 800)};
+                            --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
                         }
 
                         &:active {
-                            filter: brightness(0.95);
+                            --#{$p}-button-bg: var(--#{$p}-button-bg-active);
                         }
                     }
                 }
@@ -323,27 +321,35 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
             &[data-variant='base'] {
                 --dru-button-bg: #{functions.intent-color($intent, 200)};
                 --dru-button-bg-hover: #{functions.intent-color($intent, 300)};
+                --dru-button-bg-active: #{functions.intent-color($intent, 400)};
+
                 --dru-button-text: #{functions.intent-color($intent, 900)};
                 --dru-button-border: #{functions.intent-color($intent, 400)};
 
-                &:not(:disabled):not(.dru--button--disabled) {
+                &:not([data-disabled]) {
+                    &:hover {
+                        --dru-button-bg: var(--dru-button-bg-hover);
+                    }
+
                     &:active {
-                        filter: brightness(0.97);
+                        --dru-button-bg: var(--dru-button-bg-active);
                     }
                 }
 
-                &.dru--button--active {
+                &[data-active] {
                     --dru-button-bg: #{functions.intent-color($intent, 300)};
                     --dru-button-bg-hover: #{functions.intent-color($intent, 400)};
+                    --dru-button-bg-active: #{functions.intent-color($intent, 500)};
+
                     --dru-button-border: #{functions.intent-color($intent, 500)};
 
-                    &:not(:disabled):not(.dru--button--disabled) {
+                    &:not([data-disabled]) {
                         &:hover {
-                            --dru-button-bg-hover: var(--intent-300);
+                            --dru-button-bg: var(--dru-button-bg-hover);
                         }
 
                         &:active {
-                            filter: brightness(0.97);
+                            --dru-button-bg: var(--dru-button-bg-active);
                         }
                     }
                 }
@@ -352,8 +358,11 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
             &[data-variant='outlined'] {
                 --dru-button-bg: transparent;
                 --dru-button-bg-hover: #{functions.intent-color($intent, 100)};
+                --dru-button-bg-active: #{functions.intent-color($intent, 200)};
+
                 --dru-button-text: #{functions.intent-color($intent, 600)};
                 --dru-button-border: #{functions.intent-color($intent, 300)};
+                --dru-button-border-hover: #{functions.intent-color($intent, 500)};
 
                 position: relative;
 
@@ -363,41 +372,52 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                     inset: -1px;
                     border-radius: inherit;
 
-                    border: 1px solid transparent;
+                    border: 1px solid var(--dru-button-border-hover);
+
                     pointer-events: none;
 
                     opacity: 0;
-                    transition: border-color 0.15s ease, opacity 0.15s ease;
+
+                    transition:
+                        border-color 0.15s ease,
+                        opacity 0.15s ease;
                 }
 
                 &:not([data-disabled]) {
+                    &:hover {
+                        --dru-button-bg: var(--dru-button-bg-hover);
+                    }
+
                     &:hover::after {
-                        border-color: #{functions.intent-color($intent, 500)}; // smoother jump
                         opacity: 1;
                     }
 
                     &:active {
-                        filter: brightness(0.98);
+                        --dru-button-bg: var(--dru-button-bg-active);
                     }
                 }
 
                 &[data-active] {
                     --dru-button-bg: #{functions.intent-color($intent, 100)};
+                    --dru-button-bg-hover: #{functions.intent-color($intent, 200)};
+                    --dru-button-bg-active: #{functions.intent-color($intent, 300)};
+
                     --dru-button-border: #{functions.intent-color($intent, 600)};
+                    --dru-button-border-hover: #{functions.intent-color($intent, 600)};
+
                     --dru-button-text: #{functions.intent-color($intent, 700)};
 
                     &:not([data-disabled]) {
                         &:hover {
-                            --dru-button-bg-hover: #{functions.intent-color($intent, 100)};
+                            --dru-button-bg: var(--dru-button-bg-hover);
                         }
 
                         &:hover::after {
-                            border-color: #{functions.intent-color($intent, 600)}; // stable
                             opacity: 1;
                         }
 
                         &:active {
-                            filter: brightness(0.98);
+                            --dru-button-bg: var(--dru-button-bg-active);
                         }
                     }
                 }
@@ -406,52 +426,78 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
             &[data-variant='ghost'] {
                 --dru-button-bg: transparent;
                 --dru-button-bg-hover: #{functions.intent-color($intent, 100)};
+                --dru-button-bg-active: #{functions.intent-color($intent, 200)};
+
                 --dru-button-text: #{functions.intent-color($intent, 600)};
+                --dru-button-text-hover: #{functions.intent-color($intent, 700)};
+                --dru-button-text-active: #{functions.intent-color($intent, 800)};
 
                 &:not([data-disabled]) {
                     &:hover {
-                        --dru-button-text: #{functions.intent-color($intent, 700)};
+                        --dru-button-bg: var(--dru-button-bg-hover);
+                        --dru-button-text: var(--dru-button-text-hover);
                     }
 
                     &:active {
-                        filter: brightness(0.99);
+                        --dru-button-bg: var(--dru-button-bg-active);
+                        --dru-button-text: var(--dru-button-text-active);
                     }
                 }
 
                 &[data-active] {
                     --dru-button-bg: #{functions.intent-color($intent, 100)};
+                    --dru-button-bg-hover: #{functions.intent-color($intent, 200)};
+                    --dru-button-bg-active: #{functions.intent-color($intent, 300)};
+
                     --dru-button-text: #{functions.intent-color($intent, 700)};
+                    --dru-button-text-hover: #{functions.intent-color($intent, 800)};
+                    --dru-button-text-active: #{functions.intent-color($intent, 900)};
 
                     &:not([data-disabled]) {
+                        &:hover {
+                            --dru-button-bg: var(--dru-button-bg-hover);
+                            --dru-button-text: var(--dru-button-text-hover);
+                        }
+
                         &:active {
-                            filter: brightness(0.99);
+                            --dru-button-bg: var(--dru-button-bg-active);
+                            --dru-button-text: var(--dru-button-text-active);
                         }
                     }
                 }
             }
 
             &[data-variant='link'] {
-                --dru-button-text: #{functions.intent-color($intent, 600)};
+                --dru-button-text: #{functions.intent-color($intent, 500)};
+                --dru-button-text-hover: #{functions.intent-color($intent, 700)};
+                --dru-button-text-active: #{functions.intent-color($intent, 900)};
 
                 &:not([data-disabled]) {
                     &:hover {
-                        --dru-button-text: #{functions.intent-color($intent, 700)};
+                        --dru-button-text: var(--dru-button-text-hover);
+
                         text-decoration: underline;
                     }
 
                     &:active {
-                        filter: brightness(0.97);
+                        --dru-button-text: var(--dru-button-text-active);
                     }
                 }
 
                 &[data-active] {
-                    --dru-button-text: #{functions.intent-color($intent, 800)};
+                    --dru-button-text: #{functions.intent-color($intent, 700)};
+                    --dru-button-text-hover: #{functions.intent-color($intent, 900)};
+                    --dru-button-text-active: #{functions.intent-color($intent, 900)};
 
                     &:not([data-disabled]) {
                         text-decoration: underline;
 
+                        &:hover {
+                            --dru-button-text: var(--dru-button-text-hover);
+                        }
+
                         &:active {
-                            filter: brightness(0.97);
+                            --dru-button-text: var(--dru-button-text-active);
                         }
                     }
                 }
@@ -461,57 +507,72 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                 --dru-button-ring: #{functions.intent-color($intent, 400)}; // lighter for dark bg
 
                 &[data-variant='solid'] {
-                    --dru-button-bg: #{functions.intent-color($intent, 500)};
-                    --dru-button-bg-hover: #{functions.intent-color($intent, 400)};
-                    --dru-button-text: #0b1220;
-                    --dru-button-border: transparent;
+                    --#{$p}-button-bg: #{functions.intent-color($intent, 500)};
+                    --#{$p}-button-bg-hover: #{functions.intent-color($intent, 400)};
+                    --#{$p}-button-bg-active: #{functions.intent-color($intent, 300)};
+
+                    --#{$p}-button-text: #0b1220;
+                    --#{$p}-button-border: transparent;
 
                     &:not([data-disabled]) {
+                        &:hover {
+                            --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
+                        }
+
                         &:active {
-                            filter: brightness(1.08);
+                            --#{$p}-button-bg: var(--#{$p}-button-bg-active);
                         }
                     }
 
-                    &[data-active] {
-                        --dru-button-bg: #{functions.intent-color($intent, 600)};
-                        --dru-button-bg-hover: #{functions.intent-color($intent, 500)};
+                    &.#{$p}--button--active {
+                        --#{$p}-button-bg: #{functions.intent-color($intent, 300)};
+                        --#{$p}-button-bg-hover: #{functions.intent-color($intent, 200)};
+                        --#{$p}-button-bg-active: #{functions.intent-color($intent, 100)};
 
                         &:not([data-disabled]) {
                             &:hover {
-                                --dru-button-bg-hover: #{functions.intent-color($intent, 600)};
+                                --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
                             }
 
                             &:active {
-                                filter: brightness(1.08);
+                                --#{$p}-button-bg: var(--#{$p}-button-bg-active);
                             }
                         }
                     }
                 }
 
                 &[data-variant='base'] {
-                    --dru-button-bg: #{functions.intent-color($intent, 900)};
+                    --dru-button-bg: #{functions.intent-color($intent, 800)};
                     --dru-button-bg-hover: #{functions.intent-color($intent, 700)};
-                    --dru-button-text: #{functions.intent-color($intent, 200)};
-                    --dru-button-border: #{functions.intent-color($intent, 500)};
+                    --dru-button-bg-active: #{functions.intent-color($intent, 600)};
+
+                    --dru-button-text: #{functions.intent-color($intent, 100)};
+                    --dru-button-border: #{functions.intent-color($intent, 600)};
 
                     &:not([data-disabled]) {
+                        &:hover {
+                            --dru-button-bg: var(--dru-button-bg-hover);
+                        }
+
                         &:active {
-                            filter: brightness(1.05);
+                            --dru-button-bg: var(--dru-button-bg-active);
                         }
                     }
 
                     &[data-active] {
                         --dru-button-bg: #{functions.intent-color($intent, 700)};
-                        --dru-button-bg-hover: #{functions.intent-color($intent, 500)};
-                        --dru-button-border: #{functions.intent-color($intent, 400)};
+                        --dru-button-bg-hover: #{functions.intent-color($intent, 600)};
+                        --dru-button-bg-active: #{functions.intent-color($intent, 500)};
+
+                        --dru-button-border: #{functions.intent-color($intent, 500)};
 
                         &:not([data-disabled]) {
                             &:hover {
-                                --dru-button-bg-hover: #{functions.intent-color($intent, 700)};
+                                --dru-button-bg: var(--dru-button-bg-hover);
                             }
 
                             &:active {
-                                filter: brightness(1.05);
+                                --dru-button-bg: var(--dru-button-bg-active);
                             }
                         }
                     }
@@ -519,9 +580,13 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
 
                 &[data-variant='outlined'] {
                     --dru-button-bg: transparent;
-                    --dru-button-bg-hover: color-mix(in srgb, #{functions.intent-color($intent, 500)} 15%, transparent);
-                    --dru-button-text: #{functions.intent-color($intent, 400)};
-                    --dru-button-border: #{functions.intent-color($intent, 500)};
+                    --dru-button-bg-hover: #{functions.intent-color($intent, 900)};
+                    --dru-button-bg-active: #{functions.intent-color($intent, 800)};
+
+                    --dru-button-text: #{functions.intent-color($intent, 300)};
+
+                    --dru-button-border: #{functions.intent-color($intent, 700)};
+                    --dru-button-border-hover: #{functions.intent-color($intent, 500)};
 
                     position: relative;
 
@@ -529,39 +594,55 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                         content: '';
                         position: absolute;
                         inset: -1px;
+
                         border-radius: inherit;
 
-                        border: 1px solid transparent;
+                        border: 1px solid var(--dru-button-border-hover);
+
                         pointer-events: none;
 
-                        transition: border-color 0.15s ease, opacity 0.15s ease;
                         opacity: 0;
+
+                        transition:
+                            border-color 0.15s ease,
+                            opacity 0.15s ease;
                     }
 
                     &:not([data-disabled]) {
+                        &:hover {
+                            --dru-button-bg: var(--dru-button-bg-hover);
+                        }
+
                         &:hover::after {
-                            border-color: var(--intent-300);
                             opacity: 1;
                         }
 
                         &:active {
-                            filter: brightness(1.05);
+                            --dru-button-bg: var(--dru-button-bg-active);
                         }
                     }
 
                     &[data-active] {
-                        --dru-button-bg: color-mix(in srgb, #{functions.intent-color($intent, 500)} 20%, transparent);
-                        --dru-button-border: #{functions.intent-color($intent, 300)};
+                        --dru-button-bg: #{functions.intent-color($intent, 900)};
+                        --dru-button-bg-hover: #{functions.intent-color($intent, 800)};
+                        --dru-button-bg-active: #{functions.intent-color($intent, 700)};
+
+                        --dru-button-border: #{functions.intent-color($intent, 500)};
+                        --dru-button-border-hover: #{functions.intent-color($intent, 400)};
+
                         --dru-button-text: #{functions.intent-color($intent, 200)};
 
                         &:not([data-disabled]) {
+                            &:hover {
+                                --dru-button-bg: var(--dru-button-bg-hover);
+                            }
+
                             &:hover::after {
-                                border-color: #{functions.intent-color($intent, 200)};
                                 opacity: 1;
                             }
 
                             &:active {
-                                filter: brightness(1.05);
+                                --dru-button-bg: var(--dru-button-bg-active);
                             }
                         }
                     }
@@ -569,26 +650,43 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
 
                 &[data-variant='ghost'] {
                     --dru-button-bg: transparent;
-                    --dru-button-bg-hover: color-mix(in srgb, #{functions.intent-color($intent, 500)} 15%, transparent);
-                    --dru-button-text: #{functions.intent-color($intent, 400)};
+                    --dru-button-bg-hover: #{functions.intent-color($intent, 900)};
+                    --dru-button-bg-active: #{functions.intent-color($intent, 800)};
 
-                    &:not([data-disaled]) {
+                    --dru-button-text: #{functions.intent-color($intent, 300)};
+                    --dru-button-text-hover: #{functions.intent-color($intent, 200)};
+                    --dru-button-text-active: #{functions.intent-color($intent, 100)};
+
+                    &:not([data-disabled]) {
                         &:hover {
-                            --dru-button-text: #{functions.intent-color($intent, 300)};
+                            --dru-button-bg: var(--dru-button-bg-hover);
+                            --dru-button-text: var(--dru-button-text-hover);
                         }
 
                         &:active {
-                            filter: brightness(1.03);
+                            --dru-button-bg: var(--dru-button-bg-active);
+                            --dru-button-text: var(--dru-button-text-active);
                         }
                     }
 
                     &[data-active] {
-                        --dru-button-bg: color-mix(in srgb, #{functions.intent-color($intent, 500)} 20%, transparent);
+                        --dru-button-bg: #{functions.intent-color($intent, 800)};
+                        --dru-button-bg-hover: #{functions.intent-color($intent, 700)};
+                        --dru-button-bg-active: #{functions.intent-color($intent, 600)};
+
                         --dru-button-text: #{functions.intent-color($intent, 200)};
+                        --dru-button-text-hover: #{functions.intent-color($intent, 100)};
+                        --dru-button-text-active: #{functions.intent-color($intent, 0)};
 
                         &:not([data-disabled]) {
+                            &:hover {
+                                --dru-button-bg: var(--dru-button-bg-hover);
+                                --dru-button-text: var(--dru-button-text-hover);
+                            }
+
                             &:active {
-                                filter: brightness(1.03);
+                                --dru-button-bg: var(--dru-button-bg-active);
+                                --dru-button-text: var(--dru-button-text-active);
                             }
                         }
                     }
@@ -596,26 +694,35 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
 
                 &[data-variant='link'] {
                     --dru-button-text: #{functions.intent-color($intent, 400)};
+                    --dru-button-text-hover: #{functions.intent-color($intent, 200)};
+                    --dru-button-text-active: #{functions.intent-color($intent, 100)};
 
                     &:not([data-disabled]) {
                         &:hover {
-                            --dru-button-text: #{functions.intent-color($intent, 300)};
+                            --dru-button-text: var(--dru-button-text-hover);
+
                             text-decoration: underline;
                         }
 
                         &:active {
-                            filter: brightness(1.05);
+                            --dru-button-text: var(--dru-button-text-active);
                         }
                     }
 
                     &[data-active] {
                         --dru-button-text: #{functions.intent-color($intent, 200)};
+                        --dru-button-text-hover: #{functions.intent-color($intent, 100)};
+                        --dru-button-text-active: #{functions.intent-color($intent, 0)};
 
                         &:not([data-disabled]) {
                             text-decoration: underline;
 
+                            &:hover {
+                                --dru-button-text: var(--dru-button-text-hover);
+                            }
+
                             &:active {
-                                filter: brightness(1.05);
+                                --dru-button-text: var(--dru-button-text-active);
                             }
                         }
                     }
