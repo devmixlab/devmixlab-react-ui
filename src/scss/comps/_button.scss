@@ -86,6 +86,13 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
     }
 }
 
+@mixin icon {
+    width: 1.2em;
+    height: 1.2em;
+    font-size: 1.2em;
+    display: block;
+}
+
 .#{$button-prefix} {
 
     @each $size, $props in $button-sizes {
@@ -109,7 +116,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
     white-space: nowrap;
 
     border: 1px solid var(--dru-button-border);
-    //border-radius: var(--dru-button-radius, 0.5rem);
 
     cursor: pointer;
     user-select: none;
@@ -117,14 +123,13 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
 
     background-color: var(--dru-button-bg);
     color: var(--dru-button-text);
-    //border-color: var(--dru-button-border);
 
     transition: background-color var(--transition),
     color var(--transition),
     border-color var(--transition),
     box-shadow var(--transition);
 
-    &.#{$button-prefix}__loader {
+    .#{$button-prefix}__loader {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -132,32 +137,32 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
         min-width: 1em;
     }
 
-    &--loading {
+    &[data-loading] {
         pointer-events: none;
         cursor: wait;
         position: relative;
     }
 
-    &--loading-center {
-        .dru--button__loader {
+    &[data-loading-position='center'] {
+        .#{$button-prefix}__loader {
             position: absolute;
             inset: 0;
             margin: auto;
         }
 
-        .dru--button__content {
+        .#{$button-prefix}__content {
             visibility: hidden;
         }
     }
 
-    &--loading-start {
-        .dru--button__loader {
+    &[data-loading-position='start'] {
+        .#{$button-prefix}__loader {
             margin-right: 0.5em;
         }
     }
 
-    &--loading-end {
-        .dru--button__loader {
+    &[data-loading-position='end'] {
+        .#{$button-prefix}__loader {
             margin-left: 0.5em;
         }
     }
@@ -167,116 +172,54 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
         outline-offset: 2px;
     }
 
-    &--no-interaction {
+    &[data-no-interaction] {
         cursor: default;
-
-        // 🔥 kill interactions
         pointer-events: none;
-
         filter: none;
         text-decoration: none;
-
-        // optional: remove transitions if you want it fully static
         transition: none;
     }
 
-    //&:disabled,
-    &.dru--button--disabled {
+    &[data-disabled] {
         cursor: not-allowed;
-        opacity: 0.7;
-
-        // 🔥 kill ALL interaction styles
-        text-decoration: none;
-        filter: none;
-
-        //--dru-button-bg-hover: var(--dru-button-bg);
+        opacity: 0.8;
     }
 
-    &--icon-only {
+    &[data-icon-only] {
         padding: 0;
         aspect-ratio: 1;
 
-        .dru--button__icon {
+        .#{$button-prefix}__icon {
             display: none;
         }
     }
 
-    &.#{$button-prefix}__icon {
+    .#{$button-prefix}__icon {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         > svg,
         > .MuiSvgIcon-root {
-            width: 1.2em;
-            height: 1.2em;
-            font-size: 1em;
-            display: block;
+            @include icon;
         }
     }
 
-    &.#{$button-prefix}__content {
+    .#{$button-prefix}__content {
         > svg,
         > .MuiSvgIcon-root {
-            width: 1.2em;
-            height: 1.2em;
-            font-size: 1em;
-            display: block;
+            @include icon;
         }
     }
 
-    &--numeric {
+    &[data-numeric] {
         font-variant-numeric: tabular-nums;
         padding-inline: 0;
         aspect-ratio: 1;
-        &.dru--button--long {
+        &[data-long-number] {
             aspect-ratio: auto;
             padding: 0 0.5rem;
         }
     }
-
-
-
-    &:not(.dru--button--static):not(:disabled) {
-        &:hover {
-            --dru-button-bg: var(--dru-button-bg-hover);
-        }
-    }
-
-    // OUTLINED
-    &--outlined {
-        --dru-button-bg: transparent;
-    }
-
-    //SUBTLE (always has background)
-    &--subtle {
-        --dru-button-bg: var(--dru-button-bg-subtle);
-        --dru-button-border: transparent;
-        --dru-button-bg-subtle-hover: transparent;
-    }
-
-    //GHOST (no bg, only on hover)
-    &--ghost {
-        --dru-button-bg: transparent;
-        --dru-button-border: transparent;
-    }
-
-    //LINK
-    &--link {
-        --dru-button-bg: none;
-        border: none;
-        padding: 0;
-        height: auto;
-
-        color: var(--dru-button-text);
-
-        &:not(.dru--button--static):not(:disabled) {
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-    }
-
-
 
     @each $intent in $intents {
         &[data-intent='#{$intent}'] {
@@ -316,6 +259,11 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                         }
                     }
                 }
+
+                &[data-disabled] {
+                    --#{$p}-button-bg: #{functions.intent-color($intent, 200)};
+                    --#{$p}-button-text: #{functions.intent-color($intent, 500)};
+                }
             }
 
             &[data-variant='base'] {
@@ -352,6 +300,12 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                             --dru-button-bg: var(--dru-button-bg-active);
                         }
                     }
+                }
+
+                &[data-disabled] {
+                    --dru-button-bg: #{functions.intent-color($intent, 100)};
+                    --dru-button-text: #{functions.intent-color($intent, 500)};
+                    --dru-button-border: #{functions.intent-color($intent, 300)};
                 }
             }
 
@@ -421,6 +375,13 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                         }
                     }
                 }
+
+                &[data-disabled] {
+                    --dru-button-bg: transparent;
+                    --dru-button-text: #{functions.intent-color($intent, 400)};
+                    --dru-button-border: #{functions.intent-color($intent, 200)};
+                    --dru-button-border-hover: #{functions.intent-color($intent, 200)};
+                }
             }
 
             &[data-variant='ghost'] {
@@ -465,6 +426,13 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                         }
                     }
                 }
+
+                &[data-disabled] {
+                    --dru-button-bg: transparent;
+                    --dru-button-text: #{functions.intent-color($intent, 400)};
+                    --dru-button-text-hover: #{functions.intent-color($intent, 400)};
+                    --dru-button-text-active: #{functions.intent-color($intent, 400)};
+                }
             }
 
             &[data-variant='link'] {
@@ -500,6 +468,14 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                             --dru-button-text: var(--dru-button-text-active);
                         }
                     }
+                }
+
+                &[data-disabled] {
+                    --dru-button-text: #{functions.intent-color($intent, 300)};
+                    --dru-button-text-hover: #{functions.intent-color($intent, 300)};
+                    --dru-button-text-active: #{functions.intent-color($intent, 300)};
+
+                    text-decoration: none;
                 }
             }
 
@@ -539,6 +515,12 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                             }
                         }
                     }
+
+                    &[data-disabled] {
+                        --#{$p}-button-bg: #{functions.intent-color($intent, 800)};
+                        --#{$p}-button-text: #{functions.intent-color($intent, 300)};
+                        --#{$p}-button-border: transparent;
+                    }
                 }
 
                 &[data-variant='base'] {
@@ -575,6 +557,12 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                                 --dru-button-bg: var(--dru-button-bg-active);
                             }
                         }
+                    }
+
+                    &[data-disabled] {
+                        --dru-button-bg: #{functions.intent-color($intent, 925)};
+                        --dru-button-text: #{functions.intent-color($intent, 400)};
+                        --dru-button-border: #{functions.intent-color($intent, 800)};
                     }
                 }
 
@@ -646,6 +634,15 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                             }
                         }
                     }
+
+                    &[data-disabled] {
+                        --dru-button-bg: transparent;
+
+                        --dru-button-text: #{functions.intent-color($intent, 500)};
+
+                        --dru-button-border: #{functions.intent-color($intent, 850)};
+                        --dru-button-border-hover: #{functions.intent-color($intent, 850)};
+                    }
                 }
 
                 &[data-variant='ghost'] {
@@ -690,6 +687,14 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                             }
                         }
                     }
+
+                    &[data-disabled] {
+                        --dru-button-bg: transparent;
+
+                        --dru-button-text: #{functions.intent-color($intent, 500)};
+                        --dru-button-text-hover: #{functions.intent-color($intent, 500)};
+                        --dru-button-text-active: #{functions.intent-color($intent, 500)};
+                    }
                 }
 
                 &[data-variant='link'] {
@@ -725,6 +730,14 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                                 --dru-button-text: var(--dru-button-text-active);
                             }
                         }
+                    }
+
+                    &[data-disabled] {
+                        --dru-button-text: #{functions.intent-color($intent, 600)};
+                        --dru-button-text-hover: #{functions.intent-color($intent, 600)};
+                        --dru-button-text-active: #{functions.intent-color($intent, 600)};
+
+                        text-decoration: none;
                     }
                 }
             }

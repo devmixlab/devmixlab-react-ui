@@ -1,0 +1,58 @@
+@use '../functions' as functions;
+@use '../mixins' as mixins;
+
+@use '../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$spinner-prefix: #{$p}--spinner;
+
+.#{$spinner-prefix} {
+    &-default{
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+
+        border: 0.12em solid var(--dru-spinner-color, currentColor);;
+        border-right-color: transparent;
+        border-radius: 50%;
+
+        animation: dru-spin 0.6s linear infinite;
+
+        //&--sm {
+        //    font-size: 0.75rem;
+        //}
+        //
+        //&--md {
+        //    font-size: 1rem;
+        //}
+        //
+        //&--lg {
+        //    font-size: 1.25rem;
+        //}
+
+        @keyframes dru-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    }
+}
+
+//.dru--spinner--sm {
+//    font-size: 0.75rem;
+//}
+//
+//.dru--spinner--md {
+//    font-size: 1rem;
+//}
+//
+//.dru--spinner--lg {
+//    font-size: 1.25rem;
+//}
+//
+//@keyframes dru-spin {
+//    to {
+//        transform: rotate(360deg);
+//    }
+//}
