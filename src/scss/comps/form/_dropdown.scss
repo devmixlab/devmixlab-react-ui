@@ -1,0 +1,29 @@
+@use '../../functions' as functions;
+@use '../../mixins' as mixins;
+
+@use '../../config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$dropdown-prefix: #{$p}--dropdown;
+
+//$sizes: (
+//    sm: (height: 32px, fontSize: 14px),
+//    md: (height: 40px, fontSize: 16px),
+//    lg: (height: 48px, fontSize: 18px),
+//);
+
+.#{$dropdown-prefix} {
+
+    //@each $size, $value in $sizes {
+    //    &[data-size='#{$size}'] {
+    //        --height: #{map.get($value, height)};
+    //        --min-height: auto;
+    //        --fs: #{map.get($value, fontSize)};
+    //    }
+    //}
+
+    //.#{$p}--slot-end, .#{$p}--slot-start {
+    //    pointer-events: none;
+    //}
+}

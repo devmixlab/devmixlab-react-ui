@@ -19,6 +19,7 @@ export { NumberInput } from './src/form/NumberInput/NumberInput';
 export { TagsInput } from './src/form/TagsInput/TagsInput';
 export { Textarea } from './src/form/Textarea/Textarea';
 export { Select } from './src/form/Select/Select';
+export { Dropdown } from './src/form/Dropdown/Dropdown';
 export { Checkbox } from './src/form/Checkbox/Checkbox';
 export { CheckboxGroup } from './src/form/Checkbox/CheckboxGroup';
 export { Switch } from './src/form/Switch/Switch';
