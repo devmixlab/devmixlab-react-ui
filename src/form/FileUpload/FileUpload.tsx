@@ -549,7 +549,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                         {showPreview && tag.previewUrl ? (
                                             <Box h="100%">
                                                 <Card.Media.Image
-                                                    // className={classPrefix('--file-preview')}
                                                     src={tag.previewUrl}
                                                     objFit="contain"
                                                     h="100%"
@@ -567,19 +566,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                                     <Card.Media.Icon size="xl">
                                                         {fileKindLabelMap[kind]}
                                                     </Card.Media.Icon>
-                                                    {/*<Badge size={size} intent="info">*/}
-                                                    {/*    // {fileKindLabelMap[kind]}*/}
-                                                    {/*    //{' '}*/}
-                                                    {/*</Badge>*/}
                                                 </Card.Section>
-                                                <Card.Section
-                                                    // <>w="full"
-                                                    // d="flex"
-                                                    // align="center"
-                                                    // gap="sm"</>
-                                                    ta="center"
-                                                    w="100%"
-                                                >
+                                                <Card.Section ta="center" w="100%">
                                                     <div className={classPrefix('--file-name')}>
                                                         {tag.label}
                                                     </div>
@@ -588,10 +576,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                         )}
                                         <Box
                                             as="button"
-                                            // size="1.2em"
-                                            // pos="absolute"
-                                            // top={0}
-                                            // right={0}
                                             onClick={remove}
                                             className={classPrefix('--clear-button')}
                                         >
