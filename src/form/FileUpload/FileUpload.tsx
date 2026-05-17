@@ -11,7 +11,7 @@ import { Badge } from '../../Badge/Badge';
 import { Close as CloseIcon, IconWrapper as IconWrapper, Upload as UploadIcon } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { Card } from '../../Card';
-import { Box } from '../../Box/Box';
+import { Box, BoxProps } from '../../Box/Box';
 // import { Close as CloseIcon } from '../../Icon';
 
 type FileValidationResult = boolean | string;
@@ -83,6 +83,7 @@ type FileUploadProps = {
     actions?: React.ReactNode;
 
     layout?: Layout; // 'compact' gallery masonry;
+    gridCol?: BoxProps['col'];
 
     size?: Size;
     loading?: boolean;
@@ -170,6 +171,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             actions,
 
             layout = 'stacked',
+            gridCol = { base: 12, md: 6, lg: 4 },
 
             size = 'md',
             loading = false,
@@ -466,6 +468,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     fullWidth={tagsInputLayout === 'grid' ? undefined : true}
                     // fullWidth
                     // gridCol={files.length === 0 ? 12 : undefined}
+                    gridCol={gridCol}
                     value={tags}
                     inputEnabled={false}
                     // layout={layout === 'stacked' ? 'stacked' : undefined}
@@ -531,6 +534,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                 direction="row"
                                 density="xs"
                                 w="full"
+                                // pos="relative"
                             >
                                 {layout === 'gallery' && (
                                     <Card.Section
@@ -540,6 +544,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                         justify="center"
                                         align="center"
                                         gap="sm"
+                                        pos="relative"
                                     >
                                         {showPreview && tag.previewUrl ? (
                                             <Box h="100%">
@@ -581,6 +586,17 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                                                 </Card.Section>
                                             </>
                                         )}
+                                        <Box
+                                            as="button"
+                                            // size="1.2em"
+                                            // pos="absolute"
+                                            // top={0}
+                                            // right={0}
+                                            onClick={remove}
+                                            className={classPrefix('--clear-button')}
+                                        >
+                                            <CloseIcon />
+                                        </Box>
                                     </Card.Section>
                                 )}
                                 {(layout === 'inline' ||
