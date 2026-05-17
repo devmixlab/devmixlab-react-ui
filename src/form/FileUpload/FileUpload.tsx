@@ -12,13 +12,14 @@ import { Close as CloseIcon, IconWrapper as IconWrapper, Upload as UploadIcon } 
 import { classPrefix } from '../../utils/classPrefix';
 import { Card } from '../../Card';
 import { Box, BoxProps } from '../../Box/Box';
-// import { Close as CloseIcon } from '../../Icon';
 
 type FileValidationResult = boolean | string;
 
 type ValidateFile = (file: File) => FileValidationResult;
 
 export type Layout = 'inline' | 'stacked' | 'grid' | 'compact' | 'gallery' | 'masonry';
+
+type Status = 'idle' | 'uploading' | 'success' | 'error';
 
 type FileKind =
     | 'image'
@@ -41,7 +42,7 @@ type FileUploadTag = BaseTagItem & {
 
     progress?: number;
 
-    status?: 'idle' | 'uploading' | 'success' | 'error';
+    status?: Status;
 };
 
 type RenderableTag = FileUploadTag | UploadPseudoTag;
@@ -54,7 +55,7 @@ type FileUploadItem = {
 
     progress?: number;
 
-    status?: 'idle' | 'uploading' | 'success' | 'error';
+    status?: Status;
 };
 
 type FileUploadProps = {
@@ -82,7 +83,7 @@ type FileUploadProps = {
     start?: React.ReactNode;
     actions?: React.ReactNode;
 
-    layout?: Layout; // 'compact' gallery masonry;
+    layout?: Layout;
     gridCol?: BoxProps['col'];
 
     size?: Size;
@@ -466,12 +467,9 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     rounded={rounded ?? size ?? 'md'}
                     className={classPrefix('--file-upload')}
                     fullWidth={tagsInputLayout === 'grid' ? undefined : true}
-                    // fullWidth
-                    // gridCol={files.length === 0 ? 12 : undefined}
                     gridCol={gridCol}
                     value={tags}
                     inputEnabled={false}
-                    // layout={layout === 'stacked' ? 'stacked' : undefined}
                     layout={tagsInputLayout}
                     // editable={false}
                     disabled={disabled}
@@ -636,13 +634,6 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                         if ('__upload__' in tag) return;
                         removeFile(tag);
                     }}
-                    // actions={
-                    //     <>
-                    //         {actions}
-                    //         {uploadButton}
-                    //         {clearButton}
-                    //     </>
-                    // }
                     actions={
                         <>
                             {actions}
