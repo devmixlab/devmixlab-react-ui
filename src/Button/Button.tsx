@@ -10,8 +10,6 @@ import { DefaultSpinner } from '../Spinner/DefaultSpinner';
 export type ButtonProps = {
     className?: string;
     children?: React.ReactNode;
-    // as?: React.ElementType;
-    // type?: 'button' | 'submit' | 'reset';
     intent?: Intent;
     variant?: Variant;
     size?: Size;
@@ -76,19 +74,19 @@ const ButtonImpl = (
     const cl = clsx(
         className,
         prefix(),
-        prefix(`--${variant}`),
-        prefix(`--${intent}`),
-        prefix(`--size-${size}`),
+        // prefix(`--${variant}`),
+        // prefix(`--${intent}`),
+        // prefix(`--size-${size}`),
         {
-            [prefix(`--numeric`)]: number != null,
-            [prefix(`--long`)]: isLongNumber(number, 2),
-            [prefix(`--disabled`)]: disabled,
-            [prefix(`--active`)]: active,
-            [prefix(`--no-interaction`)]: noInteraction,
+            // [prefix(`--numeric`)]: number != null,
+            // [prefix(`--long`)]: isLongNumber(number, 2),
+            // [prefix(`--disabled`)]: disabled,
+            // [prefix(`--active`)]: active,
+            // [prefix(`--no-interaction`)]: noInteraction,
             // [bs.fullWidth]: fullWidth,
-            [prefix(`--icon-only`)]: iconOnly,
-            [prefix(`--loading`)]: showSpinner,
-            [prefix(`--loading-${loadingPosition}`)]: showSpinner,
+            // [prefix(`--icon-only`)]: iconOnly,
+            // [prefix(`--loading`)]: showSpinner,
+            // [prefix(`--loading-${loadingPosition}`)]: showSpinner,
         },
     );
 
@@ -150,6 +148,17 @@ const ButtonImpl = (
             {...restProps}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
+            data-size={size}
+            data-intent={intent}
+            data-variant={variant}
+            data-numeric={number != null ? true : undefined}
+            data-long-number={isLongNumber(number, 2) ? true : undefined}
+            data-disabled={disabled || undefined}
+            data-active={active || undefined}
+            data-no-interaction={noInteraction || undefined}
+            data-icon-only={iconOnly || undefined}
+            data-loading={showSpinner || undefined}
+            data-loading-position={showSpinner ? loadingPosition : undefined}
         >
             {/* START ICON */}
             {startIcon &&
