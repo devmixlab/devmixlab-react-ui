@@ -93,6 +93,50 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
     display: block;
 }
 
+@mixin states {
+    &[data-variant='solid'], &[data-variant='base'] {
+        &:not([data-disabled]) {
+            &:hover {
+                --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
+            }
+
+            &:active {
+                --#{$p}-button-bg: var(--#{$p}-button-bg-active);
+            }
+        }
+    }
+
+    &[data-variant='outlined'] {
+        &:not([data-disabled]) {
+            &:hover {
+                --dru-button-bg: var(--dru-button-bg-hover);
+            }
+
+            &:hover::after {
+                opacity: 1;
+            }
+
+            &:active {
+                --dru-button-bg: var(--dru-button-bg-active);
+            }
+        }
+    }
+
+    &[data-variant='ghost'] {
+        &:not([data-disabled]) {
+            &:hover {
+                --dru-button-bg: var(--dru-button-bg-hover);
+                --dru-button-text: var(--dru-button-text-hover);
+            }
+
+            &:active {
+                --dru-button-bg: var(--dru-button-bg-active);
+                --dru-button-text: var(--dru-button-text-active);
+            }
+        }
+    }
+}
+
 .#{$button-prefix} {
 
     @each $size, $props in $button-sizes {
@@ -183,6 +227,7 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
     &[data-disabled] {
         cursor: not-allowed;
         opacity: 0.8;
+        transition: none;
     }
 
     &[data-icon-only] {
@@ -221,6 +266,11 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
         }
     }
 
+    @include states;
+    @include cfg.dark {
+        @include states;
+    }
+
     @each $intent in $intents {
         &[data-intent='#{$intent}'] {
 
@@ -234,30 +284,10 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                 --#{$p}-button-text: #{functions.intent-color($intent, 0)};
                 --#{$p}-button-border: transparent;
 
-                &:not([data-disabled]) {
-                    &:hover {
-                        --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
-                    }
-
-                    &:active {
-                        --#{$p}-button-bg: var(--#{$p}-button-bg-active);
-                    }
-                }
-
                 &.#{$p}--button--active {
                     --#{$p}-button-bg: #{functions.intent-color($intent, 800)};
                     --#{$p}-button-bg-hover: #{functions.intent-color($intent, 900)};
                     --#{$p}-button-bg-active: #{functions.intent-color($intent, 950)};
-
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
-                        }
-
-                        &:active {
-                            --#{$p}-button-bg: var(--#{$p}-button-bg-active);
-                        }
-                    }
                 }
 
                 &[data-disabled] {
@@ -274,32 +304,12 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                 --dru-button-text: #{functions.intent-color($intent, 900)};
                 --dru-button-border: #{functions.intent-color($intent, 400)};
 
-                &:not([data-disabled]) {
-                    &:hover {
-                        --dru-button-bg: var(--dru-button-bg-hover);
-                    }
-
-                    &:active {
-                        --dru-button-bg: var(--dru-button-bg-active);
-                    }
-                }
-
                 &[data-active] {
                     --dru-button-bg: #{functions.intent-color($intent, 300)};
                     --dru-button-bg-hover: #{functions.intent-color($intent, 400)};
                     --dru-button-bg-active: #{functions.intent-color($intent, 500)};
 
                     --dru-button-border: #{functions.intent-color($intent, 500)};
-
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --dru-button-bg: var(--dru-button-bg-hover);
-                        }
-
-                        &:active {
-                            --dru-button-bg: var(--dru-button-bg-active);
-                        }
-                    }
                 }
 
                 &[data-disabled] {
@@ -337,20 +347,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                         opacity 0.15s ease;
                 }
 
-                &:not([data-disabled]) {
-                    &:hover {
-                        --dru-button-bg: var(--dru-button-bg-hover);
-                    }
-
-                    &:hover::after {
-                        opacity: 1;
-                    }
-
-                    &:active {
-                        --dru-button-bg: var(--dru-button-bg-active);
-                    }
-                }
-
                 &[data-active] {
                     --dru-button-bg: #{functions.intent-color($intent, 100)};
                     --dru-button-bg-hover: #{functions.intent-color($intent, 200)};
@@ -360,20 +356,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                     --dru-button-border-hover: #{functions.intent-color($intent, 600)};
 
                     --dru-button-text: #{functions.intent-color($intent, 700)};
-
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --dru-button-bg: var(--dru-button-bg-hover);
-                        }
-
-                        &:hover::after {
-                            opacity: 1;
-                        }
-
-                        &:active {
-                            --dru-button-bg: var(--dru-button-bg-active);
-                        }
-                    }
                 }
 
                 &[data-disabled] {
@@ -393,18 +375,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                 --dru-button-text-hover: #{functions.intent-color($intent, 700)};
                 --dru-button-text-active: #{functions.intent-color($intent, 800)};
 
-                &:not([data-disabled]) {
-                    &:hover {
-                        --dru-button-bg: var(--dru-button-bg-hover);
-                        --dru-button-text: var(--dru-button-text-hover);
-                    }
-
-                    &:active {
-                        --dru-button-bg: var(--dru-button-bg-active);
-                        --dru-button-text: var(--dru-button-text-active);
-                    }
-                }
-
                 &[data-active] {
                     --dru-button-bg: #{functions.intent-color($intent, 100)};
                     --dru-button-bg-hover: #{functions.intent-color($intent, 200)};
@@ -413,18 +383,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                     --dru-button-text: #{functions.intent-color($intent, 700)};
                     --dru-button-text-hover: #{functions.intent-color($intent, 800)};
                     --dru-button-text-active: #{functions.intent-color($intent, 900)};
-
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --dru-button-bg: var(--dru-button-bg-hover);
-                            --dru-button-text: var(--dru-button-text-hover);
-                        }
-
-                        &:active {
-                            --dru-button-bg: var(--dru-button-bg-active);
-                            --dru-button-text: var(--dru-button-text-active);
-                        }
-                    }
                 }
 
                 &[data-disabled] {
@@ -490,30 +448,10 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                     --#{$p}-button-text: #0b1220;
                     --#{$p}-button-border: transparent;
 
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
-                        }
-
-                        &:active {
-                            --#{$p}-button-bg: var(--#{$p}-button-bg-active);
-                        }
-                    }
-
                     &.#{$p}--button--active {
                         --#{$p}-button-bg: #{functions.intent-color($intent, 300)};
                         --#{$p}-button-bg-hover: #{functions.intent-color($intent, 200)};
                         --#{$p}-button-bg-active: #{functions.intent-color($intent, 100)};
-
-                        &:not([data-disabled]) {
-                            &:hover {
-                                --#{$p}-button-bg: var(--#{$p}-button-bg-hover);
-                            }
-
-                            &:active {
-                                --#{$p}-button-bg: var(--#{$p}-button-bg-active);
-                            }
-                        }
                     }
 
                     &[data-disabled] {
@@ -531,32 +469,12 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                     --dru-button-text: #{functions.intent-color($intent, 100)};
                     --dru-button-border: #{functions.intent-color($intent, 600)};
 
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --dru-button-bg: var(--dru-button-bg-hover);
-                        }
-
-                        &:active {
-                            --dru-button-bg: var(--dru-button-bg-active);
-                        }
-                    }
-
                     &[data-active] {
                         --dru-button-bg: #{functions.intent-color($intent, 700)};
                         --dru-button-bg-hover: #{functions.intent-color($intent, 600)};
                         --dru-button-bg-active: #{functions.intent-color($intent, 500)};
 
                         --dru-button-border: #{functions.intent-color($intent, 500)};
-
-                        &:not([data-disabled]) {
-                            &:hover {
-                                --dru-button-bg: var(--dru-button-bg-hover);
-                            }
-
-                            &:active {
-                                --dru-button-bg: var(--dru-button-bg-active);
-                            }
-                        }
                     }
 
                     &[data-disabled] {
@@ -596,20 +514,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                             opacity 0.15s ease;
                     }
 
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --dru-button-bg: var(--dru-button-bg-hover);
-                        }
-
-                        &:hover::after {
-                            opacity: 1;
-                        }
-
-                        &:active {
-                            --dru-button-bg: var(--dru-button-bg-active);
-                        }
-                    }
-
                     &[data-active] {
                         --dru-button-bg: #{functions.intent-color($intent, 900)};
                         --dru-button-bg-hover: #{functions.intent-color($intent, 800)};
@@ -619,20 +523,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                         --dru-button-border-hover: #{functions.intent-color($intent, 400)};
 
                         --dru-button-text: #{functions.intent-color($intent, 200)};
-
-                        &:not([data-disabled]) {
-                            &:hover {
-                                --dru-button-bg: var(--dru-button-bg-hover);
-                            }
-
-                            &:hover::after {
-                                opacity: 1;
-                            }
-
-                            &:active {
-                                --dru-button-bg: var(--dru-button-bg-active);
-                            }
-                        }
                     }
 
                     &[data-disabled] {
@@ -654,18 +544,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                     --dru-button-text-hover: #{functions.intent-color($intent, 200)};
                     --dru-button-text-active: #{functions.intent-color($intent, 100)};
 
-                    &:not([data-disabled]) {
-                        &:hover {
-                            --dru-button-bg: var(--dru-button-bg-hover);
-                            --dru-button-text: var(--dru-button-text-hover);
-                        }
-
-                        &:active {
-                            --dru-button-bg: var(--dru-button-bg-active);
-                            --dru-button-text: var(--dru-button-text-active);
-                        }
-                    }
-
                     &[data-active] {
                         --dru-button-bg: #{functions.intent-color($intent, 800)};
                         --dru-button-bg-hover: #{functions.intent-color($intent, 700)};
@@ -674,18 +552,6 @@ $intents: (brown, primary, secondary, info, warning, success, danger);
                         --dru-button-text: #{functions.intent-color($intent, 200)};
                         --dru-button-text-hover: #{functions.intent-color($intent, 100)};
                         --dru-button-text-active: #{functions.intent-color($intent, 0)};
-
-                        &:not([data-disabled]) {
-                            &:hover {
-                                --dru-button-bg: var(--dru-button-bg-hover);
-                                --dru-button-text: var(--dru-button-text-hover);
-                            }
-
-                            &:active {
-                                --dru-button-bg: var(--dru-button-bg-active);
-                                --dru-button-text: var(--dru-button-text-active);
-                            }
-                        }
                     }
 
                     &[data-disabled] {
