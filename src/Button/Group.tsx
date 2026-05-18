@@ -44,13 +44,16 @@ const GroupImpl = (
     const isFullNotAllowed = orientation === 'vertical' && rounded === 'full';
     const finalRounded = isFullNotAllowed ? 'sm' : rounded;
 
-    const cl = clsx(prefix(), prefix(`--orientation-${orientation}`), className, {
-        [prefix('--full-width')]: fullWidth,
-        [prefix('--equal-width')]: equalWidth,
-    });
-
     return (
-        <Box ref={ref} role="group" className={cl} {...rest}>
+        <Box
+            ref={ref}
+            role="group"
+            className={clsx(prefix(), className)}
+            {...rest}
+            data-orientation={orientation}
+            data-full-width={fullWidth || undefined}
+            data-equal-width={equalWidth || undefined}
+        >
             {items.map((child: React.ReactElement<any>, index: number) => {
                 const roundedLeft = orientation === 'horizontal' && index == 0 && finalRounded;
                 const roundedRight =

@@ -47,6 +47,10 @@ $p: cfg.$prefix;
     @include mixins.intent-vars($violet-oklch, 'violet');
     @include mixins.intent-vars($purple-oklch, 'purple');
 
+    @include mixins.intent-vars($beige-oklch, 'beige');
+    @include mixins.intent-vars($tan-oklch, 'tan');
+    @include mixins.intent-vars($brown-oklch, 'brown');
+
     // accent secondary
     --#{$p}-accent-secondary: #{functions.intent-color('secondary', 400)};
     --#{$p}-accent-secondary-active: #{functions.intent-color('secondary', 500)};
