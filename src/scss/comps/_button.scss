@@ -22,7 +22,7 @@ $button-sizes: (
     }
 }
 
-$intents: (olive, navy, brown, primary, secondary, info, warning, success, danger);
+$intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, primary, secondary, info, warning, success, danger);
 
 .#{$button-group-prefix} {
     display: inline-flex;

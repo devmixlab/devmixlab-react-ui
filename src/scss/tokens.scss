@@ -1,4 +1,5 @@
 @use 'palette' as *;
+@use 'palette.oklch' as *;
 @use 'config' as cfg;
 @use './mixins' as mixins;
 @use 'functions' as functions;
@@ -25,18 +26,26 @@ $p: cfg.$prefix;
     --#{$p}-control-opacity-disabled: 0.5;
 
     // intent palette
-    @include mixins.intent-vars($gray, 'secondary');
-    @include mixins.intent-vars($blue, 'primary');
-    @include mixins.intent-vars($red, 'danger');
-    @include mixins.intent-vars($amber, 'warning');
-    @include mixins.intent-vars($green, 'success');
-    @include mixins.intent-vars($cyan, 'info');
-    @include mixins.intent-vars($gray, 'gray');
-    @include mixins.intent-vars($neutral, 'neutral');
-    @include mixins.intent-vars($zinc, 'zinc');
-    @include mixins.intent-vars($brown, 'brown');
-    @include mixins.intent-vars($navy, 'navy');
-    @include mixins.intent-vars($olive, 'olive');
+    @include mixins.intent-vars($gray-oklch, 'secondary');
+    @include mixins.intent-vars($blue-oklch, 'primary');
+    @include mixins.intent-vars($red-oklch, 'danger');
+    @include mixins.intent-vars($amber-oklch, 'warning');
+    @include mixins.intent-vars($green-oklch, 'success');
+    @include mixins.intent-vars($cyan-oklch, 'info');
+    @include mixins.intent-vars($gray-oklch, 'gray');
+    @include mixins.intent-vars($neutral-oklch, 'neutral');
+    @include mixins.intent-vars($zinc-oklch, 'zinc');
+    @include mixins.intent-vars($brown-oklch, 'brown');
+    @include mixins.intent-vars($navy-oklch, 'navy');
+    @include mixins.intent-vars($olive-oklch, 'olive');
+
+    @include mixins.intent-vars($rose-oklch, 'rose');
+    @include mixins.intent-vars($fuchsia-oklch, 'fuchsia');
+    @include mixins.intent-vars($pink-oklch, 'pink');
+
+    @include mixins.intent-vars($indigo-oklch, 'indigo');
+    @include mixins.intent-vars($violet-oklch, 'violet');
+    @include mixins.intent-vars($purple-oklch, 'purple');
 
     // accent secondary
     --#{$p}-accent-secondary: #{functions.intent-color('secondary', 400)};
