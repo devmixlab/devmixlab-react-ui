@@ -339,8 +339,6 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                 --border: #{functions.intent-color($intent, 300)};
                 --border-hover: #{functions.intent-color($intent, 500)};
 
-                position: relative;
-
                 &[data-active] {
                     // selected state should feel settled,
                     // not dramatically stronger on hover
@@ -507,8 +505,6 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
 
                     --border: #{functions.intent-color($intent, 700)};
                     --border-hover: #{functions.intent-color($intent, 500)};
-
-                    position: relative;
 
                     &[data-active] {
                         // active outlined buttons already stand out
