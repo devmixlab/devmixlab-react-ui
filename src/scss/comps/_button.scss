@@ -98,6 +98,33 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
     display: block;
 }
 
+@mixin outlined-overlay {
+    position: relative;
+
+    &::after {
+        content: '';
+
+        position: absolute;
+        inset: 0;
+
+        border-radius: inherit;
+
+        border: 1px solid var(--border-hover);
+
+        pointer-events: none;
+
+        opacity: 0;
+
+        transition:
+            border-color var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
+            opacity var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+    }
+
+    &:not([data-disabled]):hover::after {
+        opacity: 1;
+    }
+}
+
 .#{$button-prefix} {
 
     @each $size, $props in $button-sizes {
@@ -299,6 +326,8 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
             }
 
             &[data-variant='outlined'] {
+                @include outlined-overlay;
+
                 --bg: transparent;
                 --bg-hover: #{functions.intent-color($intent, 100)};
                 --bg-active: #{functions.intent-color($intent, 200)};
@@ -311,27 +340,6 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                 --border-hover: #{functions.intent-color($intent, 500)};
 
                 position: relative;
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    border-radius: inherit;
-
-                    border: 1px solid var(--border-hover);
-
-                    pointer-events: none;
-
-                    opacity: 0;
-
-                    transition:
-                        border-color var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
-                        opacity var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
-                }
-
-                &:not([data-disabled]):hover::after {
-                    opacity: 1;
-                }
 
                 &[data-active] {
                     // selected state should feel settled,
@@ -489,6 +497,8 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                 }
 
                 &[data-variant='outlined'] {
+                    @include outlined-overlay;
+
                     --bg: transparent;
                     --bg-hover: #{functions.intent-color($intent, 900)};
                     --bg-active: #{functions.intent-color($intent, 800)};
@@ -499,28 +509,6 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                     --border-hover: #{functions.intent-color($intent, 500)};
 
                     position: relative;
-
-                    &::after {
-                        content: '';
-                        position: absolute;
-                        inset: 0;
-
-                        border-radius: inherit;
-
-                        border: 1px solid var(--border-hover);
-
-                        pointer-events: none;
-
-                        opacity: 0;
-
-                        transition:
-                            border-color var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
-                            opacity var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
-                    }
-
-                    &:not([data-disabled]):hover::after {
-                        opacity: 1;
-                    }
 
                     &[data-active] {
                         // active outlined buttons already stand out
