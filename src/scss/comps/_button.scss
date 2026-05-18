@@ -33,9 +33,11 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         .#{$button-prefix}:not(:last-child):not([data-active]) {
             border-bottom: none;
         }
+
         .#{$button-prefix}[data-active]:not(:last-child):has(+ [data-active]) {
             border-bottom: none;
         }
+
         .#{$button-prefix}[data-active] + .#{$button-prefix}:not([data-active]) {
             border-top: none;
         }
@@ -47,9 +49,11 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         .#{$button-prefix}:not(:last-child):not([data-active]) {
             border-right: none;
         }
+
         .#{$button-prefix}[data-active]:not(:last-child):has(+ [data-active]) {
             border-right: none;
         }
+
         .#{$button-prefix}[data-active] + .#{$button-prefix}:not([data-active]) {
             border-left: none;
         }
@@ -80,6 +84,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         &[data-active] {
             z-index: 2;
         }
+
         &:hover {
             z-index: 3;
         }
@@ -103,7 +108,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         }
     }
 
-    --transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-press);
+    --transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
 
     display: inline-flex;
     align-items: center;
@@ -124,10 +129,10 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
     background-color: var(--bg);
     color: var(--text);
 
-    transition: background-color var(--transition),
-    color var(--transition),
-    border-color var(--transition),
-    box-shadow var(--transition);
+    transition:
+        background-color var(--transition),
+        color var(--transition),
+        border-color var(--transition);
 
     &:not([data-disabled]) {
         &:hover {
@@ -138,6 +143,10 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         &:active {
             background-color: var(--bg-active);
             color: var(--text-active);
+            transition:
+                background-color var(--#{$p}-duration-fast) var(--#{$p}-ease-press),
+                color var(--#{$p}-duration-fast) var(--#{$p}-ease-press),
+                border-color var(--#{$p}-duration-fast) var(--#{$p}-ease-press);
         }
     }
 
@@ -211,6 +220,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         display: inline-flex;
         align-items: center;
         justify-content: center;
+
         > svg,
         > .MuiSvgIcon-root {
             @include icon;
@@ -228,6 +238,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         font-variant-numeric: tabular-nums;
         padding-inline: 0;
         aspect-ratio: 1;
+
         &[data-long-number] {
             aspect-ratio: auto;
             padding: 0 0.5rem;
@@ -304,7 +315,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                 &::after {
                     content: '';
                     position: absolute;
-                    inset: -1px;
+                    inset: 0;
                     border-radius: inherit;
 
                     border: 1px solid var(--border-hover);
@@ -314,8 +325,8 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                     opacity: 0;
 
                     transition:
-                        border-color 0.15s ease,
-                        opacity 0.15s ease;
+                        border-color var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
+                        opacity var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
                 }
 
                 &:not([data-disabled]):hover::after {
@@ -492,7 +503,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                     &::after {
                         content: '';
                         position: absolute;
-                        inset: -1px;
+                        inset: 0;
 
                         border-radius: inherit;
 
@@ -503,8 +514,8 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                         opacity: 0;
 
                         transition:
-                            border-color 0.15s ease,
-                            opacity 0.15s ease;
+                            border-color var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
+                            opacity var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
                     }
 
                     &:not([data-disabled]):hover::after {
