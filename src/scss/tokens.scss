@@ -34,6 +34,9 @@ $p: cfg.$prefix;
     @include mixins.intent-vars($gray, 'gray');
     @include mixins.intent-vars($neutral, 'neutral');
     @include mixins.intent-vars($zinc, 'zinc');
+    @include mixins.intent-vars($brown, 'brown');
+    @include mixins.intent-vars($navy, 'navy');
+    @include mixins.intent-vars($olive, 'olive');
 
     // accent secondary
     --#{$p}-accent-secondary: #{functions.intent-color('secondary', 400)};
