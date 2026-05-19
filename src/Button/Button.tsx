@@ -15,6 +15,8 @@ export type ButtonProps = {
     size?: Size;
     number?: number; // to format value as tabular-nums
     disabled?: boolean;
+    pseudoFocused?: boolean;
+    pseudoActive?: boolean;
     active?: boolean; // selected / current (pagination, tabs)
     noInteraction?: boolean; // removes hover/active interaction styles
     // fullWidth?: boolean;
@@ -28,7 +30,7 @@ export type ButtonProps = {
     loadingComponent?: React.ReactNode;
 };
 
-type ButtonImplProps = ButtonProps & {
+export type ButtonImplProps = ButtonProps & {
     as?: React.ElementType;
     type?: 'button' | 'submit' | 'reset';
 } & {
@@ -47,6 +49,8 @@ const ButtonImpl = (
         size = 'md',
         number,
         disabled = false,
+        pseudoFocused,
+        pseudoActive,
         active = false,
         noInteraction = false,
         // fullWidth = false,
@@ -138,7 +142,7 @@ const ButtonImpl = (
             aria-busy={showSpinner}
             aria-disabled={isDisabled}
             role={!isButton ? 'button' : undefined}
-            tabIndex={!isButton && !isDisabled ? 0 : undefined}
+            tabIndex={pseudoFocused !== undefined ? -1 : !isButton && !isDisabled ? 0 : undefined}
             as={as}
             type={isButton ? type : undefined}
             ref={ref}
@@ -159,6 +163,8 @@ const ButtonImpl = (
             data-icon-only={iconOnly || undefined}
             data-loading={showSpinner || undefined}
             data-loading-position={showSpinner ? loadingPosition : undefined}
+            data-pseudo-focused={pseudoFocused}
+            data-pseudo-active={pseudoActive}
         >
             {/* START ICON */}
             {startIcon &&

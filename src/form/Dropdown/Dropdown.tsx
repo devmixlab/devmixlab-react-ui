@@ -1,7 +1,17 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-
+import {
+    useFloating,
+    useDismiss,
+    useInteractions,
+    offset,
+    flip,
+    shift,
+    autoUpdate,
+    Placement,
+} from '@floating-ui/react';
 import { Box, type BoxProps } from '../../Box/Box';
+import { Button, type ButtonImplProps } from '../../Button/Button';
 import { FieldRoot, type Variant } from '../FieldRoot/FieldRoot';
 import { useFormFieldContext } from '../FormField/formField.context';
 
@@ -14,40 +24,52 @@ import { Size } from '../form.tokens';
 
 export type DropdownProps = {
     children?: React.ReactNode;
+    className?: string;
+
+    placement?: Placement;
 
     value?: string;
+
     defaultValue?: string;
 
     onChange?: (value: string) => void;
 
     placeholder?: React.ReactNode;
 
-    disabled?: boolean;
     invalid?: boolean;
 
-    variant?: Variant;
-    size?: Size;
+    triggerRender?: (props: {
+        selectedOption?: DropdownOptionProps;
+        opened?: boolean;
+        disabled?: boolean;
+    }) => React.ReactElement;
 
-    rounded?: BoxProps['rounded'];
-
-    start?: React.ReactNode;
-    end?: React.ReactNode;
-    actions?: React.ReactNode;
-    controls?: React.ReactNode;
-
-    className?: string;
-};
+    optionRender?: (props: {
+        option: DropdownOptionProps;
+        selected: boolean;
+        active: boolean;
+    }) => React.ReactNode;
+} & ButtonImplProps;
 
 type DropdownComponent = React.ForwardRefExoticComponent<
-    DropdownProps & React.RefAttributes<HTMLButtonElement>
+    DropdownProps & React.RefAttributes<HTMLDivElement>
 > & {
     Option: typeof DropdownOption;
 };
 
-const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
+const prefix = (name: string = '') => {
+    return classPrefix(`--dropdown${name}`);
+};
+
+const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
     (
         {
             children,
+            className,
+
+            placement = 'bottom-end',
+
+            type = 'button',
 
             value,
             defaultValue,
@@ -55,37 +77,52 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
 
             placeholder = 'Select option',
 
-            disabled = false,
             invalid = false,
-
-            variant = 'outlined',
-            size = 'md',
+            disabled = false,
 
             rounded = 'md',
+            size = 'md',
 
-            start,
-            end,
-            actions,
-            controls,
+            optionRender,
+            triggerRender,
 
-            className,
+            ...rest
         },
         ref,
     ) => {
-        const triggerRef = useRef<HTMLButtonElement>(null);
-        const dropdownRef = useRef<HTMLDivElement>(null);
+        const [triggerFocused, setTriggerFocused] = useState(false);
+        const [pressed, setPressed] = useState(false);
 
-        const parsedOptions = React.Children.toArray(children)
+        const [opened, setOpened] = useState(false);
+
+        const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
+            open: opened,
+            onOpenChange: setOpened,
+
+            placement,
+
+            transform: false,
+
+            whileElementsMounted: autoUpdate,
+
+            middleware: [offset(4), flip(), shift({ padding: 8 })],
+        });
+
+        const dismiss = useDismiss(context);
+
+        const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
+
+        const parsedOptions: DropdownOptionProps[] = React.Children.toArray(children)
             .filter((child): child is React.ReactElement<DropdownOptionProps> =>
                 React.isValidElement(child),
             )
             .map((child) => ({
                 value: child.props.value,
                 disabled: child.props.disabled,
-                label: child.props.children,
+                children: child.props.children,
             }));
 
-        const combinedRef = mergeRefs(triggerRef, ref);
+        const combinedRef = mergeRefs(refs.setReference, ref);
 
         const ctx = useFormFieldContext();
 
@@ -96,8 +133,6 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
         const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue);
 
         const selectedValue = isControlled ? value : internalValue;
-
-        const [opened, setOpened] = useState(false);
 
         const selectedOption = useMemo(
             () => parsedOptions.find((option) => option.value === selectedValue),
@@ -114,92 +149,102 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             setOpened(false);
         };
 
-        useEffect(() => {
-            if (!opened) return;
+        const handleKeyDown = (e: React.KeyboardEvent) => {
+            switch (e.key) {
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
 
-            const handlePointerDown = (event: MouseEvent) => {
-                const target = event.target as Node;
+                    setOpened((prev) => !prev);
 
-                if (triggerRef.current?.contains(target) || dropdownRef.current?.contains(target)) {
-                    return;
-                }
+                    break;
 
-                setOpened(false);
-            };
+                case 'ArrowDown':
+                    e.preventDefault();
 
-            const handleKeyDown = (event: KeyboardEvent) => {
-                if (event.key === 'Escape') {
+                    if (!opened) {
+                        setOpened(true);
+                    } else {
+                        focusFirstOption();
+                    }
+
+                    break;
+
+                case 'ArrowUp':
+                    e.preventDefault();
+
+                    if (!opened) {
+                        setOpened(true);
+                    } else {
+                        focusLastOption();
+                    }
+
+                    break;
+
+                case 'Escape':
                     setOpened(false);
-                }
-            };
-
-            window.addEventListener('mousedown', handlePointerDown);
-            window.addEventListener('keydown', handleKeyDown);
-
-            return () => {
-                window.removeEventListener('mousedown', handlePointerDown);
-                window.removeEventListener('keydown', handleKeyDown);
-            };
-        }, [opened]);
-
-        const cl = clsx(className, classPrefix('--dropdown'));
-
-        const finalControls = (
-            <>
-                {controls}
-                <TriangleDownIcon />
-            </>
-        );
+                    break;
+            }
+        };
 
         return (
-            <Box pos="relative" w="full">
-                <FieldRoot
-                    className={cl}
-                    invalid={isInvalid}
-                    disabled={disabled}
-                    rounded={rounded}
-                    focusTargetRef={triggerRef}
-                    start={start}
-                    end={end}
-                    actions={actions}
-                    controls={finalControls}
-                    variant={variant}
-                    size={size}
+            <Box className={prefix()} w="full">
+                <Box
+                    ref={combinedRef}
+                    {...getReferenceProps()}
+                    className={prefix('__trigger')}
+                    onClick={() => {
+                        if (disabled) return;
+                        setOpened((prev) => !prev);
+                    }}
+                    tabIndex={disabled ? -1 : 0}
+                    onFocus={() => setTriggerFocused(true)}
+                    onBlur={() => setTriggerFocused(false)}
+                    onKeyDown={handleKeyDown}
+                    onKeyUp={(e: React.KeyboardEvent) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            setPressed(false);
+                        }
+                    }}
+                    aria-invalid={isInvalid || undefined}
+                    aria-expanded={opened}
+                    aria-haspopup="listbox"
                 >
-                    <Box
-                        as="button"
-                        ref={combinedRef}
-                        type="button"
-                        className={classPrefix('--field')}
-                        disabled={disabled}
-                        aria-invalid={isInvalid || undefined}
-                        aria-expanded={opened}
-                        aria-haspopup="listbox"
-                        onClick={() => {
-                            if (disabled) return;
-
-                            setOpened((prev) => !prev);
-                        }}
-                    >
-                        {selectedOption?.label ?? (
-                            <Box as="span" opacity={0.6}>
-                                {placeholder}
-                            </Box>
-                        )}
-                    </Box>
-                </FieldRoot>
-
+                    {triggerRender ? (
+                        triggerRender({
+                            selectedOption,
+                            opened,
+                            disabled,
+                        })
+                    ) : (
+                        <Button
+                            type={type}
+                            disabled={disabled}
+                            pseudoFocused={triggerFocused}
+                            pseudoActive={pressed}
+                            rounded={rounded}
+                            size={size}
+                            className={className}
+                            {...rest}
+                            active={opened}
+                        >
+                            {selectedOption?.children ?? (
+                                <Box as="span" opacity={0.8}>
+                                    {placeholder}
+                                </Box>
+                            )}
+                        </Button>
+                    )}
+                </Box>
                 {opened && (
                     <Box
-                        ref={dropdownRef}
-                        pos="absolute"
-                        top="calc(100% + 4px)"
-                        left={0}
-                        w="full"
-                        zIndex={1000}
+                        ref={refs.setFloating}
+                        style={floatingStyles}
+                        {...getFloatingProps()}
                         rounded={rounded}
-                        className={classPrefix('--dropdown-menu')}
+                        className={prefix('__menu')}
                         role="listbox"
+                        shadow="lg"
                     >
                         {parsedOptions.map((option) => {
                             const selected = option.value === selectedValue;
@@ -207,24 +252,24 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                             return (
                                 <Box
                                     key={option.value}
-                                    as="button"
-                                    type="button"
-                                    w="full"
-                                    textAlign="left"
-                                    px={size}
-                                    py="sm"
-                                    disabled={option.disabled}
-                                    className={classPrefix('--dropdown-option')}
-                                    data-selected={selected || undefined}
+                                    tabIndex={option.disabled ? -1 : 0}
+                                    className={prefix('__option-wrapper')}
                                     onClick={() => {
                                         if (option.disabled) return;
-
                                         handleSelect(option.value);
                                     }}
                                     role="option"
                                     aria-selected={selected}
+                                    data-selected={selected || undefined}
+                                    data-disabled={option.disabled}
                                 >
-                                    {option.label}
+                                    {optionRender ? (
+                                        optionRender({ option, selected, active: false })
+                                    ) : (
+                                        <Box px={size} py="sm" className={prefix('__option')}>
+                                            {option.children}
+                                        </Box>
+                                    )}
                                 </Box>
                             );
                         })}
@@ -239,7 +284,7 @@ Dropdown.displayName = 'Dropdown';
 
 type DropdownOptionProps = {
     value: string;
-    disabled?: boolean;
+    disabled: boolean;
     children: React.ReactNode;
 };
 

@@ -215,6 +215,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
         }
     }
 
+    &[data-pseudo-focused='true'],
     &:focus-visible {
         outline: 2px solid var(--ring);
         outline-offset: 2px;

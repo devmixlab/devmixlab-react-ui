@@ -54,6 +54,7 @@
         "vitest": "^4.1.3"
     },
     "dependencies": {
+        "@floating-ui/react": "^0.27.19",
         "decimal.js": "^10.6.0"
     }
 }
