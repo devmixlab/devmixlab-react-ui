@@ -107,6 +107,9 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             });
         }, [optionFocused]);
 
+        const typeaheadRef = useRef('');
+        const typeaheadTimestampRef = useRef(0);
+
         const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
         const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
             open: opened,
@@ -135,6 +138,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             )
             .map((child) => ({
                 value: child.props.value,
+                label: child.props.label,
                 disabled: child.props.disabled,
                 children: child.props.children,
             }));
@@ -172,6 +176,18 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
             const pressedKey = e.key;
+
+            if (
+                pressedKey.length === 1 &&
+                pressedKey !== ' ' &&
+                !e.ctrlKey &&
+                !e.metaKey &&
+                !e.altKey
+            ) {
+                focusByTypeahead(pressedKey);
+
+                return;
+            }
 
             if (pressedKey == 'Enter' || pressedKey == ' ') {
                 e.preventDefault();
@@ -282,6 +298,18 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const handleOptionKeyDown = (e: React.KeyboardEvent, index: number) => {
             const pressedKey = e.key;
 
+            if (
+                pressedKey.length === 1 &&
+                pressedKey !== ' ' &&
+                !e.ctrlKey &&
+                !e.metaKey &&
+                !e.altKey
+            ) {
+                focusByTypeahead(pressedKey);
+
+                return;
+            }
+
             if (pressedKey == 'ArrowDown') {
                 e.preventDefault();
                 focusNext();
@@ -306,6 +334,32 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 setOptionFocuses(null);
                 setOptionPressed(null);
             }
+        };
+
+        const focusByTypeahead = (key: string) => {
+            const now = Date.now();
+
+            if (now - typeaheadTimestampRef.current > 500) {
+                typeaheadRef.current = '';
+            }
+
+            typeaheadTimestampRef.current = now;
+
+            typeaheadRef.current += key.toLowerCase();
+
+            const search = typeaheadRef.current;
+
+            const matchedIndex = parsedOptions.findIndex((option) => {
+                if (option.disabled) return false;
+
+                const text = (option.label ?? option.value).toLowerCase().trim();
+
+                return text.startsWith(search);
+            });
+
+            if (matchedIndex === -1) return;
+
+            optionRefs.current[matchedIndex]?.focus();
         };
 
         return (
@@ -487,7 +541,8 @@ Dropdown.displayName = 'Dropdown';
 
 type DropdownOptionProps = {
     value: string;
-    disabled: boolean;
+    label?: string;
+    disabled?: boolean;
     children: React.ReactNode;
 };
 
