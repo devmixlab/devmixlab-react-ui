@@ -90,11 +90,12 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         },
         ref,
     ) => {
+        const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
         const [triggerFocused, setTriggerFocused] = useState(false);
         const [pressed, setPressed] = useState(false);
-
         const [opened, setOpened] = useState(false);
 
+        const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
         const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
             open: opened,
             onOpenChange: setOpened,
@@ -149,6 +150,20 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             setOpened(false);
         };
 
+        const focusFirstOption = () => {
+            const first = optionRefs.current.find(Boolean);
+
+            first?.focus();
+        };
+
+        const focusLastOption = () => {
+            const reversed = [...optionRefs.current].reverse();
+
+            const last = reversed.find(Boolean);
+
+            last?.focus();
+        };
+
         const handleKeyDown = (e: React.KeyboardEvent) => {
             switch (e.key) {
                 case 'Enter':
@@ -198,8 +213,14 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                         setOpened((prev) => !prev);
                     }}
                     tabIndex={disabled ? -1 : 0}
-                    onFocus={() => setTriggerFocused(true)}
-                    onBlur={() => setTriggerFocused(false)}
+                    onFocus={(e) => {
+                        setTriggerFocusedVisible(e.currentTarget.matches(':focus-visible'));
+                        setTriggerFocused(true);
+                    }}
+                    onBlur={() => {
+                        setTriggerFocused(false);
+                        setTriggerFocusedVisible(false);
+                    }}
                     onKeyDown={handleKeyDown}
                     onKeyUp={(e: React.KeyboardEvent) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -220,7 +241,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                         <Button
                             type={type}
                             disabled={disabled}
-                            pseudoFocused={triggerFocused}
+                            pseudoFocused={triggerFocusedVisible}
                             pseudoActive={pressed}
                             rounded={rounded}
                             size={size}
@@ -246,13 +267,16 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                         role="listbox"
                         shadow="lg"
                     >
-                        {parsedOptions.map((option) => {
+                        {parsedOptions.map((option, index) => {
                             const selected = option.value === selectedValue;
 
                             return (
                                 <Box
-                                    key={option.value}
+                                    ref={(node) => {
+                                        optionRefs.current[index] = node;
+                                    }}
                                     tabIndex={option.disabled ? -1 : 0}
+                                    key={option.value}
                                     className={prefix('__option-wrapper')}
                                     onClick={() => {
                                         if (option.disabled) return;
