@@ -208,45 +208,39 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         };
 
         const findNextFocusableOption = (
-            index: number,
+            startIndex: number,
             direction: 1 | -1 = 1,
-        ): { option: DropdownOptionProps; index: number } | null => {
-            const nextIndex = index + direction;
-            const next = parsedOptions[nextIndex];
+        ): number | null => {
+            if (!parsedOptions.length) return null;
 
-            if (!next) return null;
-            return !next.disabled
-                ? { option: next, index: nextIndex }
-                : findNextFocusableOption(nextIndex, direction);
-        };
+            let index = startIndex;
 
-        const focusNext = (direction: 1 | -1 = 1) => {
-            let fallbackIndex = direction === 1 ? 0 : parsedOptions.length - 1;
+            for (let i = 0; i < parsedOptions.length; i++) {
+                index = (index + direction + parsedOptions.length) % parsedOptions.length;
 
-            let foundFallbackIndex = false;
-
-            for (let i = fallbackIndex; i >= 0 && i < parsedOptions.length; i += direction) {
-                const option = parsedOptions[i];
+                const option = parsedOptions[index];
 
                 if (!option.disabled) {
-                    fallbackIndex = i;
-                    foundFallbackIndex = true;
-
-                    break;
+                    return index;
                 }
             }
 
-            if (!foundFallbackIndex) return;
+            return null;
+        };
 
-            if (optionFocusedVisible == null) {
-                optionRefs.current[fallbackIndex]?.focus();
+        const focusNext = (direction: 1 | -1 = 1) => {
+            const startIndex =
+                optionFocused == null
+                    ? direction === 1
+                        ? parsedOptions.length - 1
+                        : 0
+                    : optionFocused;
 
-                return;
-            }
+            const nextIndex = findNextFocusableOption(startIndex, direction);
 
-            const nextObj = findNextFocusableOption(optionFocusedVisible, direction);
+            if (nextIndex == null) return;
 
-            optionRefs.current[nextObj?.index ?? fallbackIndex]?.focus();
+            optionRefs.current[nextIndex]?.focus();
         };
 
         const handleOptionKeyDown = (e: React.KeyboardEvent, index: number) => {
