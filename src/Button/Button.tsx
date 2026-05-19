@@ -163,8 +163,8 @@ const ButtonImpl = (
             data-icon-only={iconOnly || undefined}
             data-loading={showSpinner || undefined}
             data-loading-position={showSpinner ? loadingPosition : undefined}
-            data-pseudo-focused={pseudoFocused}
-            data-pseudo-active={pseudoActive}
+            data-pseudo-focused={pseudoFocused || undefined}
+            data-pseudo-active={pseudoActive || undefined}
         >
             {/* START ICON */}
             {startIcon &&

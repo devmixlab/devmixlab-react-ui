@@ -85,14 +85,13 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         ref,
     ) => {
         const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
-        const [triggerFocused, setTriggerFocused] = useState(false);
         const [optionFocusedVisible, setOptionFocusedVisible] = useState<number | null>(null);
         const [optionFocused, setOptionFocused] = useState<number | null>(null);
         const [optionPressed, setOptionPressed] = useState<number | null>(null);
         const [pressed, setPressed] = useState(false);
         const [opened, setOpened] = useState(false);
 
-        const setOptionFocuses = (index: number, indexVisible?: number) => {
+        const setOptionFocuses = (index: number | null, indexVisible?: number | null) => {
             setOptionFocused(index);
             setOptionFocusedVisible(indexVisible ?? index);
         };
@@ -126,7 +125,10 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
             middleware: [offset(4), flip(), shift({ padding: 8 })],
         });
-        const triggerEl = refs.reference.current as HTMLDivElement | null;
+
+        const focusTrigger = () => {
+            (refs.reference.current as HTMLDivElement | null)?.focus();
+        };
 
         const dismiss = useDismiss(context);
 
@@ -167,64 +169,41 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             onChange?.(nextValue);
 
             setOpened(false);
-            triggerEl?.focus();
-        };
+            focusTrigger();
 
-        // const focusNextOption = (index) => {
-        //     const first = optionRefs.current.find(Boolean);
-        //
-        //     first?.focus();
-        // };
-
-        const focusFirstOption = () => {
-            const first = optionRefs.current.find(Boolean);
-
-            first?.focus();
-        };
-
-        const focusLastOption = () => {
-            const reversed = [...optionRefs.current].reverse();
-
-            const last = reversed.find(Boolean);
-
-            last?.focus();
+            setOptionFocuses(null);
+            setOptionPressed(null);
         };
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
-            switch (e.key) {
-                case 'Enter':
-                case ' ':
-                    e.preventDefault();
+            const pressedKey = e.key;
 
-                    setOpened((prev) => !prev);
+            if (pressedKey == 'Enter' || pressedKey == ' ') {
+                e.preventDefault();
 
-                    break;
+                setPressed(true);
+                setOpened((prev) => !prev);
+            } else if (pressedKey == 'ArrowDown') {
+                e.preventDefault();
 
-                case 'ArrowDown':
-                    e.preventDefault();
+                if (!opened) {
+                    setOpened(true);
+                    return;
+                }
 
-                    if (!opened) {
-                        setOpened(true);
-                    } else {
-                        focusFirstOption();
-                    }
+                focusNext();
+            } else if (pressedKey == 'ArrowUp') {
+                e.preventDefault();
 
-                    break;
+                if (!opened) {
+                    setOpened(true);
+                    return;
+                }
 
-                case 'ArrowUp':
-                    e.preventDefault();
-
-                    if (!opened) {
-                        setOpened(true);
-                    } else {
-                        focusLastOption();
-                    }
-
-                    break;
-
-                case 'Escape':
-                    setOpened(false);
-                    break;
+                focusNext(-1);
+            } else if (pressedKey == 'Escape') {
+                setOpened(false);
+                focusTrigger();
             }
         };
 
@@ -241,74 +220,52 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 : findNextFocusableOption(nextIndex, direction);
         };
 
-        const handleOptionKeyDown = (e: React.KeyboardEvent) => {
+        const focusNext = (direction: 1 | -1 = 1) => {
+            let fallbackIndex = direction === 1 ? 0 : parsedOptions.length - 1;
+
+            let foundFallbackIndex = false;
+
+            for (let i = fallbackIndex; i >= 0 && i < parsedOptions.length; i += direction) {
+                const option = parsedOptions[i];
+
+                if (!option.disabled) {
+                    fallbackIndex = i;
+                    foundFallbackIndex = true;
+
+                    break;
+                }
+            }
+
+            if (!foundFallbackIndex) return;
+
+            if (optionFocusedVisible == null) {
+                optionRefs.current[fallbackIndex]?.focus();
+
+                return;
+            }
+
+            const nextObj = findNextFocusableOption(optionFocusedVisible, direction);
+
+            optionRefs.current[nextObj?.index ?? fallbackIndex]?.focus();
+        };
+
+        const handleOptionKeyDown = (e: React.KeyboardEvent, index: number) => {
             const pressedKey = e.key;
 
             if (pressedKey == 'ArrowDown') {
                 e.preventDefault();
-
-                if (optionFocusedVisible == null) {
-                    setOptionFocuses(0);
-                    return;
-                }
-
-                const nextObj = findNextFocusableOption(optionFocusedVisible, 1);
-                setOptionFocuses(nextObj?.index ?? 0);
-                optionRefs.current[nextObj?.index ?? 0]?.focus();
+                focusNext();
             } else if (pressedKey == 'ArrowUp') {
                 e.preventDefault();
-
-                if (optionFocusedVisible == null) {
-                    setOptionFocuses(parsedOptions.length - 1);
-                    return;
-                }
-
-                const nextObj = findNextFocusableOption(optionFocusedVisible, -1);
-                setOptionFocuses(nextObj?.index ?? parsedOptions.length - 1);
-            } else if (pressedKey == 'Enter') {
+                focusNext(-1);
+            } else if (pressedKey == 'Enter' || pressedKey === ' ') {
+                setOptionPressed(index);
                 if (optionFocused == null) return;
-                const option = parsedOptions[optionFocused];
-                handleSelect(option.value);
+                handleSelect(parsedOptions[optionFocused].value);
+            } else if (pressedKey == 'Escape') {
+                setOpened(false);
+                focusTrigger();
             }
-            // switch (e.key) {
-            //     // case 'Enter':
-            //     // case ' ':
-            //     //     e.preventDefault();
-            //     //
-            //     //     setOpened((prev) => !prev);
-            //     //
-            //     //     break;
-            //
-            //     case 'ArrowDown':
-            //         e.preventDefault();
-            //
-            //         if (optionFocusedVisible == null) {
-            //             setOptionFocuses(0);
-            //             return;
-            //         }
-            //
-            //         const nextObj = findNextFocusableOption(optionFocusedVisible, 1);
-            //         setOptionFocuses(nextObj?.index ?? 0);
-
-            //         break;
-            //
-            //     case 'ArrowUp':
-            //         e.preventDefault();
-            //
-            //         if (optionFocusedVisible == null) {
-            //             setOptionFocuses(parsedOptions.length - 1);
-            //             return;
-            //         }
-            //
-            //         const nextObj = findNextFocusableOption(optionFocusedVisible, -1);
-            //         setOptionFocuses(nextObj?.index ?? parsedOptions.length - 1);
-            //
-            //         break;
-            //
-            //     case 'Escape':
-            //         setOpened(false);
-            //         break;
-            // }
         };
 
         return (
@@ -316,9 +273,11 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 className={prefix()}
                 w="full"
                 data-size={size}
-                style={{
-                    '--visible-options': visibleOptions,
-                }}
+                style={
+                    {
+                        '--visible-options': visibleOptions,
+                    } as React.CSSProperties
+                }
             >
                 <Box
                     ref={combinedRef}
@@ -326,22 +285,38 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     className={prefix('__trigger')}
                     onClick={() => {
                         if (disabled) return;
+
                         setOpened((prev) => !prev);
                     }}
                     tabIndex={disabled ? -1 : 0}
                     onFocus={(e) => {
+                        if (disabled) return;
+
                         setTriggerFocusedVisible(e.currentTarget.matches(':focus-visible'));
-                        setTriggerFocused(true);
                     }}
                     onBlur={() => {
-                        setTriggerFocused(false);
                         setTriggerFocusedVisible(false);
                     }}
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={(e) => {
+                        if (disabled) return;
+
+                        handleKeyDown(e);
+                    }}
                     onKeyUp={(e: React.KeyboardEvent) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             setPressed(false);
                         }
+                    }}
+                    onMouseDown={() => {
+                        if (disabled) return;
+
+                        setPressed(true);
+                    }}
+                    onMouseUp={() => {
+                        setPressed(false);
+                    }}
+                    onMouseLeave={() => {
+                        setPressed(false);
                     }}
                     aria-invalid={isInvalid || undefined}
                     aria-expanded={opened}
@@ -417,15 +392,17 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                                     }}
                                     onKeyDown={(e) => {
                                         if (finalDisabled) return;
-                                        console.log(index);
+
                                         handleOptionKeyDown(e, index);
                                     }}
                                     onKeyUp={(e: React.KeyboardEvent) => {
                                         if (e.key === 'Enter' || e.key === ' ') {
-                                            setOptionPressed(index);
+                                            setOptionPressed(null);
                                         }
                                     }}
                                     onMouseDown={() => {
+                                        if (finalDisabled) return;
+
                                         setOptionPressed(index);
                                     }}
                                     onMouseUp={() => {
@@ -436,8 +413,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                                     }}
                                     role="option"
                                     aria-selected={selected}
-                                    // data-selected={selected || undefined}
-                                    // data-disabled={option.disabled}
                                 >
                                     {optionRender ? (
                                         optionRender({ option, selected, active: false })
