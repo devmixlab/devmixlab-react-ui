@@ -1,5 +1,4 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
-import clsx from 'clsx';
 import {
     useFloating,
     useDismiss,
@@ -10,17 +9,12 @@ import {
     autoUpdate,
     Placement,
 } from '@floating-ui/react';
-import { Box, type BoxProps } from '../../Box/Box';
+import { Box } from '../../Box/Box';
 import { Button, type ButtonImplProps } from '../../Button/Button';
-import { FieldRoot, type Variant } from '../FieldRoot/FieldRoot';
 import { useFormFieldContext } from '../FormField/formField.context';
-
-import { TriangleDown as TriangleDownIcon } from '../../Icon';
-
 import { mergeRefs } from '../../utils/mergeRefs';
 import { classPrefix } from '../../utils/classPrefix';
-
-import { Size } from '../form.tokens';
+import { useStableId } from '../../utils/useStableId';
 
 export type DropdownProps = {
     children?: React.ReactNode;
@@ -84,6 +78,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         },
         ref,
     ) => {
+        const dropdownId = useStableId('dropdown');
         const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
         const [optionFocusedVisible, setOptionFocusedVisible] = useState<number | null>(null);
         const [optionFocused, setOptionFocused] = useState<number | null>(null);
@@ -201,12 +196,29 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 }
 
                 focusNext(-1);
+            } else if (pressedKey == 'Home') {
+                e.preventDefault();
+
+                focusFirst();
+            } else if (pressedKey == 'End') {
+                e.preventDefault();
+
+                focusLast();
             } else if (pressedKey == 'Escape') {
                 setOpened(false);
                 focusTrigger();
+                setOptionFocuses(null);
+                setOptionPressed(null);
             }
         };
 
+        /*
+         * ring buffers
+         * circular queues
+         * cyclic iterators
+         * toroidal grids
+         * round-robin schedulers
+         * */
         const findNextFocusableOption = (
             startIndex: number,
             direction: 1 | -1 = 1,
@@ -216,6 +228,12 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             let index = startIndex;
 
             for (let i = 0; i < parsedOptions.length; i++) {
+                /*
+                 * circular indexing, wrap-around indexing, safe modulo wrap-around
+                 * circular indexing using modular arithmetic
+                 * The mathematical idea behind it is: modular arithmetic
+                 * You’ll also hear: index normalization
+                 * */
                 index = (index + direction + parsedOptions.length) % parsedOptions.length;
 
                 const option = parsedOptions[index];
@@ -226,6 +244,24 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             }
 
             return null;
+        };
+
+        const focusFirst = () => {
+            const firstIndex = parsedOptions.findIndex((option) => !option.disabled);
+
+            if (firstIndex === -1) return;
+
+            optionRefs.current[firstIndex]?.focus();
+        };
+
+        const focusLast = () => {
+            for (let i = parsedOptions.length - 1; i >= 0; i--) {
+                if (!parsedOptions[i].disabled) {
+                    optionRefs.current[i]?.focus();
+
+                    return;
+                }
+            }
         };
 
         const focusNext = (direction: 1 | -1 = 1) => {
@@ -252,6 +288,14 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             } else if (pressedKey == 'ArrowUp') {
                 e.preventDefault();
                 focusNext(-1);
+            } else if (pressedKey == 'Home') {
+                e.preventDefault();
+
+                focusFirst();
+            } else if (pressedKey == 'End') {
+                e.preventDefault();
+
+                focusLast();
             } else if (pressedKey == 'Enter' || pressedKey === ' ') {
                 setOptionPressed(index);
                 if (optionFocused == null) return;
@@ -259,6 +303,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             } else if (pressedKey == 'Escape') {
                 setOpened(false);
                 focusTrigger();
+                setOptionFocuses(null);
+                setOptionPressed(null);
             }
         };
 
@@ -406,7 +452,9 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                                         setOptionPressed(null);
                                     }}
                                     role="option"
-                                    aria-selected={selected}
+                                    id={`${dropdownId}-option-${index}`}
+                                    aria-selected={selected || undefined}
+                                    aria-disabled={finalDisabled || undefined}
                                 >
                                     {optionRender ? (
                                         optionRender({ option, selected, active: false })
