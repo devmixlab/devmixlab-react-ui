@@ -26,16 +26,12 @@ export type DropdownProps = {
     children?: React.ReactNode;
     className?: string;
 
+    visibleOptions?: number;
     placement?: Placement;
-
     value?: string;
-
     defaultValue?: string;
-
     onChange?: (value: string) => void;
-
     placeholder?: React.ReactNode;
-
     invalid?: boolean;
 
     triggerRender?: (props: {
@@ -67,14 +63,12 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             children,
             className,
 
+            visibleOptions = 6,
             placement = 'bottom-end',
-
             type = 'button',
-
             value,
             defaultValue,
             onChange,
-
             placeholder = 'Select option',
 
             invalid = false,
@@ -92,8 +86,32 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
     ) => {
         const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
         const [triggerFocused, setTriggerFocused] = useState(false);
+        const [optionFocusedVisible, setOptionFocusedVisible] = useState<number | null>(null);
+        const [optionFocused, setOptionFocused] = useState<number | null>(null);
+        const [optionPressed, setOptionPressed] = useState<number | null>(null);
         const [pressed, setPressed] = useState(false);
         const [opened, setOpened] = useState(false);
+
+        const setOptionFocuses = (index: number, indexVisible?: number) => {
+            setOptionFocused(index);
+            setOptionFocusedVisible(indexVisible ?? index);
+        };
+
+        useEffect(() => {
+            if (!opened) {
+                setOptionFocuses(null);
+            }
+        }, [opened]);
+
+        useEffect(() => {
+            if (optionFocused == null) return;
+
+            const node = optionRefs.current[optionFocused];
+
+            node?.scrollIntoView({
+                block: 'nearest',
+            });
+        }, [optionFocused]);
 
         const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
         const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
@@ -108,6 +126,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
             middleware: [offset(4), flip(), shift({ padding: 8 })],
         });
+        const triggerEl = refs.reference.current as HTMLDivElement | null;
 
         const dismiss = useDismiss(context);
 
@@ -148,7 +167,14 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             onChange?.(nextValue);
 
             setOpened(false);
+            triggerEl?.focus();
         };
+
+        // const focusNextOption = (index) => {
+        //     const first = optionRefs.current.find(Boolean);
+        //
+        //     first?.focus();
+        // };
 
         const focusFirstOption = () => {
             const first = optionRefs.current.find(Boolean);
@@ -202,8 +228,98 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             }
         };
 
+        const findNextFocusableOption = (
+            index: number,
+            direction: 1 | -1 = 1,
+        ): { option: DropdownOptionProps; index: number } | null => {
+            const nextIndex = index + direction;
+            const next = parsedOptions[nextIndex];
+
+            if (!next) return null;
+            return !next.disabled
+                ? { option: next, index: nextIndex }
+                : findNextFocusableOption(nextIndex, direction);
+        };
+
+        const handleOptionKeyDown = (e: React.KeyboardEvent) => {
+            const pressedKey = e.key;
+
+            if (pressedKey == 'ArrowDown') {
+                e.preventDefault();
+
+                if (optionFocusedVisible == null) {
+                    setOptionFocuses(0);
+                    return;
+                }
+
+                const nextObj = findNextFocusableOption(optionFocusedVisible, 1);
+                setOptionFocuses(nextObj?.index ?? 0);
+                optionRefs.current[nextObj?.index ?? 0]?.focus();
+            } else if (pressedKey == 'ArrowUp') {
+                e.preventDefault();
+
+                if (optionFocusedVisible == null) {
+                    setOptionFocuses(parsedOptions.length - 1);
+                    return;
+                }
+
+                const nextObj = findNextFocusableOption(optionFocusedVisible, -1);
+                setOptionFocuses(nextObj?.index ?? parsedOptions.length - 1);
+            } else if (pressedKey == 'Enter') {
+                if (optionFocused == null) return;
+                const option = parsedOptions[optionFocused];
+                handleSelect(option.value);
+            }
+            // switch (e.key) {
+            //     // case 'Enter':
+            //     // case ' ':
+            //     //     e.preventDefault();
+            //     //
+            //     //     setOpened((prev) => !prev);
+            //     //
+            //     //     break;
+            //
+            //     case 'ArrowDown':
+            //         e.preventDefault();
+            //
+            //         if (optionFocusedVisible == null) {
+            //             setOptionFocuses(0);
+            //             return;
+            //         }
+            //
+            //         const nextObj = findNextFocusableOption(optionFocusedVisible, 1);
+            //         setOptionFocuses(nextObj?.index ?? 0);
+
+            //         break;
+            //
+            //     case 'ArrowUp':
+            //         e.preventDefault();
+            //
+            //         if (optionFocusedVisible == null) {
+            //             setOptionFocuses(parsedOptions.length - 1);
+            //             return;
+            //         }
+            //
+            //         const nextObj = findNextFocusableOption(optionFocusedVisible, -1);
+            //         setOptionFocuses(nextObj?.index ?? parsedOptions.length - 1);
+            //
+            //         break;
+            //
+            //     case 'Escape':
+            //         setOpened(false);
+            //         break;
+            // }
+        };
+
         return (
-            <Box className={prefix()} w="full">
+            <Box
+                className={prefix()}
+                w="full"
+                data-size={size}
+                style={{
+                    '--visible-options': visibleOptions,
+                }}
+            >
                 <Box
                     ref={combinedRef}
                     {...getReferenceProps()}
@@ -269,28 +385,74 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     >
                         {parsedOptions.map((option, index) => {
                             const selected = option.value === selectedValue;
+                            const finalDisabled = disabled || option.disabled || false;
 
                             return (
                                 <Box
                                     ref={(node) => {
                                         optionRefs.current[index] = node;
                                     }}
-                                    tabIndex={option.disabled ? -1 : 0}
+                                    tabIndex={finalDisabled ? -1 : 0}
                                     key={option.value}
                                     className={prefix('__option-wrapper')}
                                     onClick={() => {
-                                        if (option.disabled) return;
+                                        if (finalDisabled) return;
+
                                         handleSelect(option.value);
+                                    }}
+                                    onFocus={(e) => {
+                                        if (finalDisabled) return;
+
+                                        setOptionFocusedVisible(
+                                            e.currentTarget.matches(':focus-visible')
+                                                ? index
+                                                : null,
+                                        );
+                                        setOptionFocused(index);
+                                    }}
+                                    onBlur={() => {
+                                        setOptionFocused(null);
+                                        setOptionFocusedVisible(null);
+                                        setOptionPressed(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (finalDisabled) return;
+                                        console.log(index);
+                                        handleOptionKeyDown(e, index);
+                                    }}
+                                    onKeyUp={(e: React.KeyboardEvent) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            setOptionPressed(index);
+                                        }
+                                    }}
+                                    onMouseDown={() => {
+                                        setOptionPressed(index);
+                                    }}
+                                    onMouseUp={() => {
+                                        setOptionPressed(null);
+                                    }}
+                                    onMouseLeave={() => {
+                                        setOptionPressed(null);
                                     }}
                                     role="option"
                                     aria-selected={selected}
-                                    data-selected={selected || undefined}
-                                    data-disabled={option.disabled}
+                                    // data-selected={selected || undefined}
+                                    // data-disabled={option.disabled}
                                 >
                                     {optionRender ? (
                                         optionRender({ option, selected, active: false })
                                     ) : (
-                                        <Box px={size} py="sm" className={prefix('__option')}>
+                                        <Box
+                                            className={prefix('__option')}
+                                            data-pseudo-focused={
+                                                optionFocusedVisible === index ? true : undefined
+                                            }
+                                            data-pseudo-active={
+                                                optionPressed === index ? true : undefined
+                                            }
+                                            data-selected={selected || undefined}
+                                            data-disabled={option.disabled}
+                                        >
                                             {option.children}
                                         </Box>
                                     )}
