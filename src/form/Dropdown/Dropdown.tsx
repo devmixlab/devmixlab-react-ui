@@ -15,10 +15,14 @@ import { useFormFieldContext } from '../FormField/formField.context';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';
+import { SearchInput } from '../SearchInput/SearchInput';
 
 export type DropdownProps = {
     children?: React.ReactNode;
     className?: string;
+
+    searchable?: boolean;
+    searchPlaceholder?: string;
 
     visibleOptions?: number;
     placement?: Placement;
@@ -57,6 +61,9 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             children,
             className,
 
+            searchable = false,
+            searchPlaceholder,
+
             visibleOptions = 6,
             placement = 'bottom-end',
             type = 'button',
@@ -85,6 +92,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const [optionPressed, setOptionPressed] = useState<number | null>(null);
         const [pressed, setPressed] = useState(false);
         const [opened, setOpened] = useState(false);
+        const [search, setSearch] = useState('');
 
         const setOptionFocuses = (index: number | null, indexVisible?: number | null) => {
             setOptionFocused(index);
@@ -94,6 +102,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         useEffect(() => {
             if (!opened) {
                 setOptionFocuses(null);
+                if (searchable && search.length > 0) setSearch('');
             }
         }, [opened]);
 
@@ -106,6 +115,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 block: 'nearest',
             });
         }, [optionFocused]);
+
+        const searchInputRef = useRef<HTMLInputElement | null>(null);
 
         const typeaheadRef = useRef('');
         const typeaheadTimestampRef = useRef(0);
@@ -142,6 +153,33 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 disabled: child.props.disabled,
                 children: child.props.children,
             }));
+
+        const filteredOptions = useMemo(() => {
+            if (!searchable || !search.trim()) {
+                return parsedOptions;
+            }
+
+            const normalized = search.toLowerCase().trim();
+
+            return parsedOptions.filter((option) => {
+                const text = (option.label ?? option.value).toLowerCase().trim();
+
+                return text.includes(normalized);
+            });
+        }, [parsedOptions, search, searchable]);
+
+        const findLastFocusableIndex = (options: DropdownOptionProps[]) => {
+            for (let i = options.length - 1; i >= 0; i--) {
+                if (!options[i].disabled) {
+                    return i;
+                }
+            }
+
+            return -1;
+        };
+
+        const firstFocusableIndex = filteredOptions.findIndex((option) => !option.disabled);
+        const lastFocusableIndex = findLastFocusableIndex(filteredOptions);
 
         const combinedRef = mergeRefs(refs.setReference, ref);
 
@@ -239,20 +277,20 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             startIndex: number,
             direction: 1 | -1 = 1,
         ): number | null => {
-            if (!parsedOptions.length) return null;
+            if (!filteredOptions.length) return null;
 
             let index = startIndex;
 
-            for (let i = 0; i < parsedOptions.length; i++) {
+            for (let i = 0; i < filteredOptions.length; i++) {
                 /*
                  * circular indexing, wrap-around indexing, safe modulo wrap-around
                  * circular indexing using modular arithmetic
                  * The mathematical idea behind it is: modular arithmetic
                  * You’ll also hear: index normalization
                  * */
-                index = (index + direction + parsedOptions.length) % parsedOptions.length;
+                index = (index + direction + filteredOptions.length) % filteredOptions.length;
 
-                const option = parsedOptions[index];
+                const option = filteredOptions[index];
 
                 if (!option.disabled) {
                     return index;
@@ -263,7 +301,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         };
 
         const focusFirst = () => {
-            const firstIndex = parsedOptions.findIndex((option) => !option.disabled);
+            const firstIndex = filteredOptions.findIndex((option) => !option.disabled);
 
             if (firstIndex === -1) return;
 
@@ -271,8 +309,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         };
 
         const focusLast = () => {
-            for (let i = parsedOptions.length - 1; i >= 0; i--) {
-                if (!parsedOptions[i].disabled) {
+            for (let i = filteredOptions.length - 1; i >= 0; i--) {
+                if (!filteredOptions[i].disabled) {
                     optionRefs.current[i]?.focus();
 
                     return;
@@ -284,7 +322,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             const startIndex =
                 optionFocused == null
                     ? direction === 1
-                        ? parsedOptions.length - 1
+                        ? filteredOptions.length - 1
                         : 0
                     : optionFocused;
 
@@ -312,9 +350,23 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
             if (pressedKey == 'ArrowDown') {
                 e.preventDefault();
+
+                if (searchable && index === lastFocusableIndex) {
+                    searchInputRef.current?.focus();
+
+                    return;
+                }
+
                 focusNext();
             } else if (pressedKey == 'ArrowUp') {
                 e.preventDefault();
+
+                if (searchable && index === firstFocusableIndex) {
+                    searchInputRef.current?.focus();
+
+                    return;
+                }
+
                 focusNext(-1);
             } else if (pressedKey == 'Home') {
                 e.preventDefault();
@@ -327,7 +379,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             } else if (pressedKey == 'Enter' || pressedKey === ' ') {
                 setOptionPressed(index);
                 if (optionFocused == null) return;
-                handleSelect(parsedOptions[optionFocused].value);
+                handleSelect(filteredOptions[optionFocused].value);
             } else if (pressedKey == 'Escape') {
                 setOpened(false);
                 focusTrigger();
@@ -349,7 +401,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
             const search = typeaheadRef.current;
 
-            const matchedIndex = parsedOptions.findIndex((option) => {
+            const matchedIndex = filteredOptions.findIndex((option) => {
                 if (option.disabled) return false;
 
                 const text = (option.label ?? option.value).toLowerCase().trim();
@@ -452,84 +504,123 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                         role="listbox"
                         shadow="lg"
                     >
-                        {parsedOptions.map((option, index) => {
-                            const selected = option.value === selectedValue;
-                            const finalDisabled = disabled || option.disabled || false;
-
-                            return (
-                                <Box
-                                    ref={(node) => {
-                                        optionRefs.current[index] = node;
-                                    }}
-                                    tabIndex={finalDisabled ? -1 : 0}
-                                    key={option.value}
-                                    className={prefix('__option-wrapper')}
-                                    onClick={() => {
-                                        if (finalDisabled) return;
-
-                                        handleSelect(option.value);
-                                    }}
-                                    onFocus={(e) => {
-                                        if (finalDisabled) return;
-
-                                        setOptionFocusedVisible(
-                                            e.currentTarget.matches(':focus-visible')
-                                                ? index
-                                                : null,
-                                        );
-                                        setOptionFocused(index);
-                                    }}
-                                    onBlur={() => {
-                                        setOptionFocused(null);
-                                        setOptionFocusedVisible(null);
-                                        setOptionPressed(null);
-                                    }}
+                        {searchable && (
+                            <Box className={prefix('__search-wrapper')}>
+                                <SearchInput
+                                    ref={searchInputRef}
+                                    value={search}
+                                    clearable
+                                    onValueChange={setSearch}
+                                    autoFocus
                                     onKeyDown={(e) => {
-                                        if (finalDisabled) return;
-
-                                        handleOptionKeyDown(e, index);
-                                    }}
-                                    onKeyUp={(e: React.KeyboardEvent) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
+                                        if (e.key === 'ArrowDown') {
+                                            e.preventDefault();
+                                            focusFirst();
+                                        } else if (e.key == 'Escape') {
+                                            setOpened(false);
+                                            focusTrigger();
+                                            setOptionFocuses(null);
                                             setOptionPressed(null);
                                         }
                                     }}
-                                    onMouseDown={() => {
-                                        if (finalDisabled) return;
+                                    // size={size}
+                                />
 
-                                        setOptionPressed(index);
-                                    }}
-                                    onMouseUp={() => {
-                                        setOptionPressed(null);
-                                    }}
-                                    onMouseLeave={() => {
-                                        setOptionPressed(null);
-                                    }}
-                                    role="option"
-                                    id={`${dropdownId}-option-${index}`}
-                                    aria-selected={selected || undefined}
-                                    aria-disabled={finalDisabled || undefined}
-                                >
-                                    {optionRender ? (
-                                        optionRender({ option, selected, active: false })
-                                    ) : (
-                                        <Box
-                                            className={prefix('__option')}
-                                            data-pseudo-focused={
-                                                optionFocusedVisible === index ? true : undefined
+                                {search.trim() && (
+                                    <Box
+                                        className={prefix('__search-results')}
+                                        px="sm"
+                                        py="xs"
+                                        opacity={0.7}
+                                        fontSize="sm"
+                                    >
+                                        Showing {filteredOptions.length} of {parsedOptions.length}
+                                    </Box>
+                                )}
+                            </Box>
+                        )}
+                        <Box className={prefix('__menu-wrapper')}>
+                            {filteredOptions.map((option, index) => {
+                                const selected = option.value === selectedValue;
+                                const finalDisabled = disabled || option.disabled || false;
+
+                                return (
+                                    <Box
+                                        ref={(node) => {
+                                            optionRefs.current[index] = node;
+                                        }}
+                                        tabIndex={finalDisabled ? -1 : 0}
+                                        key={option.value}
+                                        className={prefix('__option-wrapper')}
+                                        onClick={() => {
+                                            if (finalDisabled) return;
+
+                                            handleSelect(option.value);
+                                        }}
+                                        onFocus={(e) => {
+                                            if (finalDisabled) return;
+
+                                            setOptionFocusedVisible(
+                                                e.currentTarget.matches(':focus-visible')
+                                                    ? index
+                                                    : null,
+                                            );
+                                            setOptionFocused(index);
+                                        }}
+                                        onBlur={() => {
+                                            setOptionFocused(null);
+                                            setOptionFocusedVisible(null);
+                                            setOptionPressed(null);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (finalDisabled) return;
+
+                                            handleOptionKeyDown(e, index);
+                                        }}
+                                        onKeyUp={(e: React.KeyboardEvent) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                setOptionPressed(null);
                                             }
-                                            data-pseudo-active={
-                                                optionPressed === index ? true : undefined
-                                            }
-                                            data-selected={selected || undefined}
-                                            data-disabled={option.disabled}
-                                        >
-                                            {option.children}
-                                        </Box>
-                                    )}
-                                </Box>
-                            );
-                        })}
+                                        }}
+                                        onMouseDown={() => {
+                                            if (finalDisabled) return;
+
+                                            setOptionPressed(index);
+                                        }}
+                                        onMouseUp={() => {
+                                            setOptionPressed(null);
+                                        }}
+                                        onMouseLeave={() => {
+                                            setOptionPressed(null);
+                                        }}
+                                        role="option"
+                                        id={`${dropdownId}-option-${index}`}
+                                        aria-selected={selected || undefined}
+                                        aria-disabled={finalDisabled || undefined}
+                                    >
+                                        {optionRender ? (
+                                            optionRender({ option, selected, active: false })
+                                        ) : (
+                                            <Box
+                                                className={prefix('__option')}
+                                                data-pseudo-focused={
+                                                    optionFocusedVisible === index
+                                                        ? true
+                                                        : undefined
+                                                }
+                                                data-pseudo-active={
+                                                    optionPressed === index ? true : undefined
+                                                }
+                                                data-selected={selected || undefined}
+                                                data-disabled={option.disabled}
+                                            >
+                                                {option.children}
+                                            </Box>
+                                        )}
+                                    </Box>
+                                );
+                            })}
+                        </Box>
                     </Box>
                 )}
             </Box>
