@@ -14,6 +14,7 @@ import { ModalContext, useModalContext } from './Modal.context';
 import { Close as CloseIcon } from '../Icon';
 import { useStableId } from '../utils/useStableId';
 import { getNextZIndex } from '../utils/zIndex';
+import { modalManager } from './Modal.manager';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | 'fullscreen';
 
@@ -91,10 +92,6 @@ const prefix = (name: string = '') => {
     return classPrefix(`--modal${name}`);
 };
 
-let openedModals = 0;
-
-const modalStack: number[] = [];
-
 const Modal = forwardRef<HTMLDivElement, ModalProps>(
     (
         {
@@ -123,6 +120,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
     ) => {
         const contentRef = useRef<HTMLDivElement | null>(null);
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
+        // Stable numeric ID used as the key into every ModalManager registry.
         const modalIdRef = useRef(Math.random());
 
         // ── Animation lifecycle ──────────────────────────────────────────────
@@ -152,13 +150,11 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         useEffect(() => {
             if (opened) {
                 cancelPending();
-
-                // 1. Mount the portal and paint the initial 'entering' frame first.
                 setShouldRender(true);
                 setAnimationState('entering');
 
-                // 2. Wait for the browser to actually paint that frame, THEN advance
-                //    to 'entered' so CSS transitions have a from-state to animate from.
+                // Wait for the browser to paint the 'entering' frame before
+                // advancing to 'entered' so CSS transitions have a from-state.
                 rafRef.current = requestAnimationFrame(() => {
                     rafRef.current = null;
                     timerRef.current = setTimeout(() => {
@@ -170,11 +166,9 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             } else {
                 cancelPending();
 
-                // Use functional update to read current state without a stale closure.
                 setAnimationState((current) => {
-                    if (current === 'exited') return current; // already unmounted
+                    if (current === 'exited') return current;
 
-                    // Schedule unmount after the exit animation completes.
                     timerRef.current = setTimeout(() => {
                         timerRef.current = null;
                         setAnimationState('exited');
@@ -189,42 +183,35 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             return cancelPending;
         }, [opened, animationDuration, cancelPending, onAnimationEntered, onAnimationExited]);
 
-        // ── Modal stack tracking ─────────────────────────────────────────────
+        // ── Modal stack ──────────────────────────────────────────────────────
+        // Registers this instance with the manager so Escape-key routing knows
+        // which modal is on top.
         useEffect(() => {
             if (!opened) return;
+            const id = modalIdRef.current;
+            modalManager.push(id);
+            return () => modalManager.remove(id);
+        }, [opened]);
 
-            modalStack.push(modalIdRef.current);
-
-            return () => {
-                const index = modalStack.indexOf(modalIdRef.current);
-                if (index !== -1) modalStack.splice(index, 1);
-            };
+        // ── Scroll lock ──────────────────────────────────────────────────────
+        // The manager's counter ensures the lock is applied on the first open
+        // and released only when the last modal closes.
+        useEffect(() => {
+            if (!opened) return;
+            modalManager.acquire();
+            return () => modalManager.release();
         }, [opened]);
 
         // ── Focus management ─────────────────────────────────────────────────
-        //
-        // previousFocusRef is captured the moment `opened` becomes true, before
-        // any child modal has a chance to steal focus. Storing it in a ref (rather
-        // than as a local variable inside the shouldRender layout effect) means each
-        // modal independently remembers what was focused when *it* opened, so nested
-        // modals closing in sequence each restore focus to the right element.
-        //
-        const previousFocusRef = useRef<HTMLElement | null>(null);
-
+        // captureFocus runs before the modal moves focus into itself; restoreFocus
+        // runs when opened becomes false. The manager maps each modal ID to its
+        // captured element, so nested modals each restore to the right target.
         useEffect(() => {
+            const id = modalIdRef.current;
             if (opened) {
-                // Snapshot focus before this modal moves it.
-                previousFocusRef.current = document.activeElement as HTMLElement | null;
+                modalManager.captureFocus(id);
             } else {
-                // Restore on close. rAF defers until after the React tree has
-                // updated so the target is guaranteed to be in the DOM.
-                const target = previousFocusRef.current;
-                requestAnimationFrame(() => {
-                    if (target && document.contains(target)) {
-                        target.focus();
-                    }
-                });
-                previousFocusRef.current = null;
+                modalManager.restoreFocus(id);
             }
         }, [opened]);
 
@@ -249,8 +236,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
             const onKeyDown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
-                    const isTopModal = modalStack[modalStack.length - 1] === modalIdRef.current;
-                    if (!isTopModal) return;
+                    if (!modalManager.isTop(modalIdRef.current)) return;
                     onClose?.();
                     return;
                 }
@@ -282,25 +268,10 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
             window.addEventListener('keydown', onKeyDown);
 
-            // Only tear down the keydown listener here — focus restoration is
-            // handled by the `opened` effect above so it uses the snapshotted ref.
             return () => {
                 window.removeEventListener('keydown', onKeyDown);
             };
         }, [shouldRender, onClose]);
-
-        // ── Body scroll lock ─────────────────────────────────────────────────
-        useEffect(() => {
-            if (!opened) return;
-
-            openedModals += 1;
-            if (openedModals === 1) document.body.style.overflow = 'hidden';
-
-            return () => {
-                openedModals -= 1;
-                if (openedModals === 0) document.body.style.overflow = '';
-            };
-        }, [opened]);
 
         // ── Stable IDs ───────────────────────────────────────────────────────
         const modalId = id ?? useStableId('modal');
