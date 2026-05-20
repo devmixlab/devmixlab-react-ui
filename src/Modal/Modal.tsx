@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { ModalContext, useModalContext } from './Modal.context';
 import { Close as CloseIcon } from '../Icon';
 import { useStableId } from '../utils/useStableId';
+import { getNextZIndex } from '../utils/zIndex';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | 'fullscreen';
 
@@ -68,11 +69,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
             className,
 
-            zIndex = 1000,
+            zIndex,
         },
         ref,
     ) => {
         const contentRef = useRef<HTMLDivElement | null>(null);
+        const zIndexRef = useRef(zIndex ?? getNextZIndex());
 
         useEffect(() => {
             if (!opened) return;
@@ -168,7 +170,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     className={prefix()}
                     position="fixed"
                     inset={0}
-                    zIndex={zIndex}
+                    zIndex={zIndexRef.current}
                     data-size={size}
                     data-placement={placement}
                     data-separated={separated || undefined}
