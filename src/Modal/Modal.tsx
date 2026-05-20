@@ -95,14 +95,10 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
         const modalIdRef = useRef(Math.random());
 
-        const prefersReducedMotion =
-            typeof window !== 'undefined' &&
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
         // ── Presence ─────────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
             present: opened,
-            duration: prefersReducedMotion ? 0 : animationDuration,
+            duration: animationDuration,
             onEntered: onAnimationEntered,
             onExited: onAnimationExited,
         });

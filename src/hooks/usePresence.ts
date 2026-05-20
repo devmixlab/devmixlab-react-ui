@@ -77,6 +77,12 @@ export function usePresence({
     const rafRef = useRef<number | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const finalDuration = prefersReducedMotion ? 0 : duration;
+
     const cancelPending = useCallback(() => {
         if (rafRef.current !== null) {
             cancelAnimationFrame(rafRef.current);
@@ -100,7 +106,7 @@ export function usePresence({
                     timerRef.current = null;
                     setState('entered');
                     onEntered?.();
-                }, duration);
+                }, finalDuration);
             });
         } else {
             cancelPending();
@@ -114,14 +120,14 @@ export function usePresence({
                     setState('exited');
                     setIsMounted(false);
                     onExited?.();
-                }, duration);
+                }, finalDuration);
 
                 return 'exiting';
             });
         }
 
         return cancelPending;
-    }, [present, duration, cancelPending, onEntered, onExited]);
+    }, [present, finalDuration, cancelPending, onEntered, onExited]);
 
     return { isMounted, state };
 }
