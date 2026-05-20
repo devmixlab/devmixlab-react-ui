@@ -18,7 +18,6 @@ type Variant =
     | 'body-sm'
     | 'caption'
     | 'micro';
-type Size = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type Intent = 'default' | 'secondary' | 'primary' | 'warning' | 'danger' | 'success' | 'info';
 type Emphasis = 'subtle' | 'muted' | 'base' | 'strong';
 
@@ -29,15 +28,14 @@ export type BaseProps = {
     inline?: boolean;
     variant?: Variant;
     emphasis?: Emphasis;
-} & Omit<BoxProps, 'size'>;
+    mono?: boolean;
+} & BoxProps;
 
 type TextBehaviorProps =
     | { truncate?: boolean; lineClamp?: never }
     | { lineClamp?: number; truncate?: never };
 
-type TextSizeProps = { size?: Size; tz?: never } | { tz?: Size; size?: never };
-
-export type TextProps = TextSizeProps & TextBehaviorProps & BaseProps;
+export type TextProps = TextBehaviorProps & BaseProps;
 
 const TextImpl = (
     {
@@ -49,6 +47,7 @@ const TextImpl = (
         className,
         inline,
         variant = 'body-md',
+        mono = false,
         ...rest
     }: TextProps,
     ref: React.Ref<any>,
@@ -69,6 +68,7 @@ const TextImpl = (
             data-intent={intent}
             data-truncate={isTruncated || undefined}
             data-clamp={isClamped || undefined}
+            data-mono={mono || undefined}
         />
     );
 };

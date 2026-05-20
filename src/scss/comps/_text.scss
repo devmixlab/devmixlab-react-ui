@@ -107,6 +107,17 @@ $variants: (
         -webkit-box-orient: vertical;
     }
 
+    &[data-mono] {
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            SF Mono,
+            Consolas,
+            Liberation Mono,
+            Menlo,
+            monospace;
+    }
+
     @each $intent in (primary, warning, danger, success, info) {
         &[data-intent='#{$intent}'] {
             --text-color-subtle: #{functions.intent-color($intent, 500)};

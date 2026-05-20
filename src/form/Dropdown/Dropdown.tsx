@@ -21,6 +21,7 @@ import { Text } from '../../Text/Text';
 export type DropdownProps = {
     children?: React.ReactNode;
     className?: string;
+    id?: string;
 
     searchable?: boolean;
     searchPlaceholder?: string;
@@ -38,12 +39,6 @@ export type DropdownProps = {
         opened?: boolean;
         disabled?: boolean;
     }) => React.ReactElement;
-
-    optionRender?: (props: {
-        option: DropdownOptionProps;
-        selected: boolean;
-        active: boolean;
-    }) => React.ReactNode;
 } & ButtonImplProps;
 
 type DropdownComponent = React.ForwardRefExoticComponent<
@@ -61,6 +56,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         {
             children,
             className,
+            id,
 
             searchable = false,
             searchPlaceholder,
@@ -79,14 +75,13 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             rounded = 'md',
             size = 'md',
 
-            optionRender,
             triggerRender,
 
             ...rest
         },
         ref,
     ) => {
-        const dropdownId = useStableId('dropdown');
+        const dropdownId = id ?? useStableId('dropdown');
         const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
         const [optionFocusedVisible, setOptionFocusedVisible] = useState<number | null>(null);
         const [optionFocused, setOptionFocused] = useState<number | null>(null);
@@ -468,6 +463,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     aria-invalid={isInvalid || undefined}
                     aria-expanded={opened}
                     aria-haspopup="listbox"
+                    aria-controls={opened ? dropdownId : undefined}
                 >
                     {triggerRender ? (
                         triggerRender({
@@ -498,6 +494,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 {opened && (
                     <Box
                         ref={refs.setFloating}
+                        id={dropdownId}
                         style={floatingStyles}
                         {...getFloatingProps()}
                         rounded={rounded}
@@ -508,11 +505,13 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                         {searchable && (
                             <Box className={prefix('__search-wrapper')}>
                                 <SearchInput
+                                    // size={size}
                                     ref={searchInputRef}
                                     value={search}
                                     clearable
                                     onValueChange={setSearch}
                                     autoFocus
+                                    placeholder={searchPlaceholder ?? 'Search...'}
                                     onKeyDown={(e) => {
                                         if (e.key === 'ArrowDown') {
                                             e.preventDefault();
@@ -530,19 +529,28 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                                 {search.trim() && (
                                     <Text
                                         className={prefix('__search-results')}
-                                        textSize="sm"
-                                        tone="muted"
-                                        // px="sm"
-                                        // py="xs"
-                                        // opacity={0.7}
-                                        // fontSize="sm"
+                                        variant="body-sm"
+                                        emphasis="muted"
+                                        pt="sm"
                                     >
                                         Showing {filteredOptions.length} of {parsedOptions.length}
                                     </Text>
                                 )}
+
+                                {filteredOptions.length === 0 && (
+                                    <Text
+                                        variant="body-sm"
+                                        emphasis="muted"
+                                        px="md"
+                                        pb="sm"
+                                        pt="md"
+                                    >
+                                        No results found
+                                    </Text>
+                                )}
                             </Box>
                         )}
-                        <Box className={prefix('__menu-wrapper')}>
+                        <Box tabIndex={-1} className={prefix('__menu-wrapper')}>
                             {filteredOptions.map((option, index) => {
                                 const selected = option.value === selectedValue;
                                 const finalDisabled = disabled || option.disabled || false;
@@ -601,25 +609,19 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                                         aria-selected={selected || undefined}
                                         aria-disabled={finalDisabled || undefined}
                                     >
-                                        {optionRender ? (
-                                            optionRender({ option, selected, active: false })
-                                        ) : (
-                                            <Box
-                                                className={prefix('__option')}
-                                                data-pseudo-focused={
-                                                    optionFocusedVisible === index
-                                                        ? true
-                                                        : undefined
-                                                }
-                                                data-pseudo-active={
-                                                    optionPressed === index ? true : undefined
-                                                }
-                                                data-selected={selected || undefined}
-                                                data-disabled={option.disabled}
-                                            >
-                                                {option.children}
-                                            </Box>
-                                        )}
+                                        <Box
+                                            className={prefix('__option')}
+                                            data-pseudo-focused={
+                                                optionFocusedVisible === index ? true : undefined
+                                            }
+                                            data-pseudo-active={
+                                                optionPressed === index ? true : undefined
+                                            }
+                                            data-selected={selected || undefined}
+                                            data-disabled={option.disabled}
+                                        >
+                                            {option.children}
+                                        </Box>
                                     </Box>
                                 );
                             })}
