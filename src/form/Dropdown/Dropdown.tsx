@@ -16,6 +16,7 @@ import { mergeRefs } from '../../utils/mergeRefs';
 import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';
 import { SearchInput } from '../SearchInput/SearchInput';
+import { Text } from '../../Text/Text';
 
 export type DropdownProps = {
     children?: React.ReactNode;
@@ -527,15 +528,17 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                                 />
 
                                 {search.trim() && (
-                                    <Box
+                                    <Text
                                         className={prefix('__search-results')}
-                                        px="sm"
-                                        py="xs"
-                                        opacity={0.7}
-                                        fontSize="sm"
+                                        textSize="sm"
+                                        tone="muted"
+                                        // px="sm"
+                                        // py="xs"
+                                        // opacity={0.7}
+                                        // fontSize="sm"
                                     >
                                         Showing {filteredOptions.length} of {parsedOptions.length}
-                                    </Box>
+                                    </Text>
                                 )}
                             </Box>
                         )}

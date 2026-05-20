@@ -1,80 +1,54 @@
 import React, { CSSProperties, forwardRef } from 'react';
-import { CLASS_PREFIX } from '../constants';
-
 import { Box, type BoxProps } from '../Box/Box';
 import clsx from 'clsx';
-
 import { createPolymorphic } from '../types/polymorphic';
+import { classPrefix } from '../utils/classPrefix';
 
-export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--text${name}`;
+const prefix = (name: string = '') => {
+    return classPrefix(`--text${name}`);
 };
 
-type VariantConfig = {
-    textSize: TextSize;
-    fw: BoxProps['fontWeight'];
-    tone?: TextTone;
-};
-
-const variantStyles = {
-    'heading-lg': {
-        textSize: 'xl',
-        fw: 'bold',
-    },
-    'heading-md': {
-        textSize: 'lg',
-        fw: 'semibold',
-    },
-    'body-md': {
-        textSize: 'md',
-        fw: 'normal',
-    },
-    'body-sm': {
-        textSize: 'sm',
-        fw: 'normal',
-        tone: 'secondary',
-    },
-    caption: {
-        textSize: 'xs',
-        fw: 'medium',
-        tone: 'muted',
-    },
-} as const satisfies Record<string, VariantConfig>;
-
-type VariantStyle = keyof typeof variantStyles;
-
-type TextSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'inherit';
-type TextTone = 'default' | 'secondary' | 'muted';
+type Variant =
+    | 'display-lg'
+    | 'display-md'
+    | 'heading-lg'
+    | 'heading-md'
+    | 'body-lg'
+    | 'body-md'
+    | 'body-sm'
+    | 'caption'
+    | 'micro';
+type Size = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type Intent = 'default' | 'secondary' | 'primary' | 'warning' | 'danger' | 'success' | 'info';
+type Emphasis = 'subtle' | 'muted' | 'base' | 'strong';
 
 export type BaseProps = {
     as?: React.ElementType;
-    tone?: TextTone;
+    intent?: Intent;
     className?: string;
-    style?: CSSProperties;
     inline?: boolean;
-    variant?: VariantStyle;
-} & BoxProps;
+    variant?: Variant;
+    emphasis?: Emphasis;
+} & Omit<BoxProps, 'size'>;
 
 type TextBehaviorProps =
     | { truncate?: boolean; lineClamp?: never }
     | { lineClamp?: number; truncate?: never };
 
-type TextSizeProps = { textSize?: TextSize; tz?: never } | { tz?: TextSize; textSize?: never };
+type TextSizeProps = { size?: Size; tz?: never } | { tz?: Size; size?: never };
 
 export type TextProps = TextSizeProps & TextBehaviorProps & BaseProps;
 
 const TextImpl = (
     {
         as,
-        textSize,
-        tz,
-        tone,
+        emphasis = 'base',
+        intent = 'default',
         truncate = false,
         lineClamp,
         className,
-        style,
         inline,
-        variant,
+        variant = 'body-md',
         ...rest
     }: TextProps,
     ref: React.Ref<any>,
@@ -84,39 +58,17 @@ const TextImpl = (
     const isClamped = typeof lineClamp === 'number' && lineClamp > 0;
     const isTruncated = !isClamped && truncate;
 
-    const clampStyle = isClamped
-        ? {
-              WebkitLineClamp: lineClamp,
-          }
-        : undefined;
-
-    const truncateStyle = isTruncated
-        ? {
-              display: inline ? 'inline-block' : undefined,
-          }
-        : undefined;
-
-    const variantStyle: VariantConfig | undefined = variant ? variantStyles[variant] : undefined;
-
-    const resolvedSize = textSize ?? tz ?? variantStyle?.textSize ?? 'md';
-    const resolvedTone = tone ?? variantStyle?.tone ?? 'default';
-    const resolvedFw = rest.fw ?? variantStyle?.fw;
-
     return (
         <Box
             ref={ref}
             as={Component}
-            className={clsx(
-                prefix(),
-                prefix(`--${resolvedSize}`),
-                prefix(`--tone-${resolvedTone}`),
-                isTruncated && prefix('--truncate'),
-                isClamped && prefix('--clamp'),
-                className,
-            )}
-            style={{ ...style, ...truncateStyle, ...clampStyle }}
+            className={clsx(prefix(), className)}
             {...rest}
-            fw={resolvedFw}
+            data-variant={variant}
+            data-emphasis={emphasis}
+            data-intent={intent}
+            data-truncate={isTruncated || undefined}
+            data-clamp={isClamped || undefined}
         />
     );
 };
