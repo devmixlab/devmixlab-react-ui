@@ -350,3 +350,12 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
 // The old modal-enter keyframe is no longer needed — animation is now handled
 // entirely by CSS transitions driven by [data-animation-state].
+
+@media (prefers-reduced-motion: reduce) {
+    .#{$modal-prefix}__overlay,
+    .#{$modal-prefix}__content-wrapper,
+    .#{$modal-prefix}__content {
+        transition: none !important;
+        animation: none !important;
+    }
+}
