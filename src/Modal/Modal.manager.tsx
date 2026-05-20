@@ -22,6 +22,9 @@
  */
 
 class ModalManager {
+    private originalBodyOverflow = '';
+    private originalBodyPaddingRight = '';
+
     // ── Stack ──────────────────────────────────────────────────────────────
 
     private stack: number[] = [];
@@ -45,16 +48,28 @@ class ModalManager {
 
     acquire(): void {
         this.openCount += 1;
-        if (this.openCount === 1) {
-            document.body.style.overflow = 'hidden';
+
+        if (this.openCount !== 1) return;
+
+        this.originalBodyOverflow = document.body.style.overflow;
+        this.originalBodyPaddingRight = document.body.style.paddingRight;
+
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+        document.body.style.overflow = 'hidden';
+
+        if (scrollbarWidth > 0) {
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
         }
     }
 
     release(): void {
-        this.openCount -= 1;
-        if (this.openCount === 0) {
-            document.body.style.overflow = '';
-        }
+        this.openCount = Math.max(0, this.openCount - 1);
+
+        if (this.openCount !== 0) return;
+
+        document.body.style.overflow = this.originalBodyOverflow;
+        document.body.style.paddingRight = this.originalBodyPaddingRight;
     }
 
     // ── Focus registry ─────────────────────────────────────────────────────

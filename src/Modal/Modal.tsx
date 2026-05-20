@@ -271,10 +271,9 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                         lastElement.focus();
                     }
                 } else {
-                    if (!modal.contains(activeElement)) {
+                    if (activeElement === lastElement) {
                         e.preventDefault();
                         firstElement.focus();
-                        return;
                     }
                 }
             };
