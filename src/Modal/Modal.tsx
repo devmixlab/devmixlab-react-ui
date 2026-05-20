@@ -214,10 +214,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
                     <div
                         className={prefix('__content-wrapper')}
-                        onClick={() => {
+                        onClick={(e) => {
                             if (!closeOnOverlayClick) return;
 
-                            onClose?.();
+                            if (e.target === e.currentTarget) {
+                                onClose?.();
+                            }
                         }}
                     >
                         <div
@@ -236,9 +238,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             aria-modal="true"
                             aria-labelledby={headerId}
                             aria-describedby={bodyId}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
                         >
                             {children}
                         </div>
