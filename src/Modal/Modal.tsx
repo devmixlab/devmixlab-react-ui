@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Box } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
@@ -8,6 +8,15 @@ import { Close as CloseIcon } from '../Icon';
 import { useStableId } from '../utils/useStableId';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | 'fullscreen';
+
+const FOCUSABLE_SELECTORS = [
+    'a[href]',
+    'button:not([disabled])',
+    'textarea:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+].join(',');
 
 export type ModalProps = {
     children?: React.ReactNode;
@@ -63,14 +72,59 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         },
         ref,
     ) => {
-        if (!opened) return null;
+        const contentRef = useRef<HTMLDivElement | null>(null);
 
         useEffect(() => {
             if (!opened) return;
 
+            const previousFocusedElement = document.activeElement as HTMLElement | null;
+
+            const modal = contentRef.current;
+
+            if (!modal) return;
+
+            const getFocusableElements = () => {
+                return Array.from(modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)).filter(
+                    (element) => {
+                        return !element.hasAttribute('disabled') && element.tabIndex !== -1;
+                    },
+                );
+            };
+
+            const focusableElements = getFocusableElements();
+
+            focusableElements[0]?.focus();
+
             const onKeyDown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
                     onClose?.();
+                    return;
+                }
+
+                if (e.key !== 'Tab') return;
+
+                const elements = getFocusableElements();
+
+                if (!elements.length) {
+                    e.preventDefault();
+                    return;
+                }
+
+                const firstElement = elements[0];
+                const lastElement = elements[elements.length - 1];
+
+                const activeElement = document.activeElement;
+
+                if (e.shiftKey) {
+                    if (activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    }
+                } else {
+                    if (activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
                 }
             };
 
@@ -78,13 +132,29 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
             return () => {
                 window.removeEventListener('keydown', onKeyDown);
+
+                previousFocusedElement?.focus();
             };
         }, [opened, onClose]);
+
+        useEffect(() => {
+            if (!opened) return;
+
+            const originalOverflow = document.body.style.overflow;
+
+            document.body.style.overflow = 'hidden';
+
+            return () => {
+                document.body.style.overflow = originalOverflow;
+            };
+        }, [opened]);
 
         const modalId = id ?? useStableId('modal');
 
         const headerId = `${modalId}-header`;
         const bodyId = `${modalId}-body`;
+
+        if (!opened) return null;
 
         return createPortal(
             <ModalContext.Provider
@@ -114,7 +184,15 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                         }}
                     >
                         <div
-                            ref={ref}
+                            ref={(node) => {
+                                contentRef.current = node;
+
+                                if (typeof ref === 'function') {
+                                    ref(node);
+                                } else if (ref) {
+                                    ref.current = node;
+                                }
+                            }}
                             className={clsx(prefix('__content'), className)}
                             role="dialog"
                             aria-modal="true"

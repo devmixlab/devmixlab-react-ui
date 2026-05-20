@@ -115,22 +115,18 @@ $sizes: (
     --close-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
     --content-wrapper-align-items: center;
 
+    --focus-ring-color: var(--#{$p}-accent-primary);
+
     --section-border-color: #{functions.intent-color(zinc, 200)};
-
     --content-bg: #{functions.intent-color(zinc, 0)};
-
     --overlay-bg: rgb(0 0 0 / 48%);
-
     --close-color: #{functions.intent-color(zinc, 600)};
     --close-bg-hover: #{functions.intent-color(zinc, 100)};
 
     @include cfg.dark {
         --section-border-color: #{functions.intent-color(zinc, 800)};
-
         --content-bg: #{functions.intent-color(zinc, 900)};
-
         --overlay-bg: rgb(0 0 0 / 72%);
-
         --close-color: #{functions.intent-color(zinc, 400)};
         --close-bg-hover: #{functions.intent-color(zinc, 800)};
     }
@@ -275,8 +271,16 @@ $sizes: (
             transform: scale(0.96);
         }
 
+        &:focus {
+            outline: none;
+        }
+
         &:focus-visible {
             opacity: 1;
+
+            background-color: var(--close-bg-hover);
+
+            box-shadow: 0 0 0 2px var(--focus-ring-color);
         }
     }
 
