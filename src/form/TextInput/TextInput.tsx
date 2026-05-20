@@ -110,6 +110,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         const handleClearClick = (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation();
             clearValue();
+            inputRef.current?.focus();
         };
 
         const showClearable = clearable && isTextLike && hasValue && !disabled && !readOnly;
