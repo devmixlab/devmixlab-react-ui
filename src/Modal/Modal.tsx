@@ -74,7 +74,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         ref,
     ) => {
         const contentRef = useRef<HTMLDivElement | null>(null);
-        const zIndexRef = useRef(zIndex ?? getNextZIndex());
+        const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
 
         useEffect(() => {
             if (!opened) return;
