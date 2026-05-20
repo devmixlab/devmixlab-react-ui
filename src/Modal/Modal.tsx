@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Box } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
@@ -76,9 +76,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const contentRef = useRef<HTMLDivElement | null>(null);
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
 
-        useEffect(() => {
-            if (!opened) return;
-
+        useLayoutEffect(() => {
             const previousFocusedElement = document.activeElement as HTMLElement | null;
 
             const modal = contentRef.current;
@@ -95,7 +93,11 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
             const focusableElements = getFocusableElements();
 
-            focusableElements[0]?.focus();
+            if (focusableElements.length > 0) {
+                focusableElements[0].focus();
+            } else {
+                modal.focus();
+            }
 
             const onKeyDown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
@@ -195,6 +197,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                                     ref.current = node;
                                 }
                             }}
+                            tabIndex={-1}
                             className={clsx(prefix('__content'), className)}
                             role="dialog"
                             aria-modal="true"
@@ -223,7 +226,7 @@ type ModalSectionProps = {
     closeButton?: boolean;
 };
 
-const ModalHeader = ({ children, className, closeButton = true }: ModalSectionProps) => {
+const ModalHeader = ({ children, className, closeButton = false }: ModalSectionProps) => {
     const ctx = useModalContext();
 
     return (
