@@ -17,11 +17,14 @@ import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';
 import { SearchInput } from '../SearchInput/SearchInput';
 import { Text } from '../../Text/Text';
+import { ChevronDown as ChevronDownIcon } from '../../Icon';
 
 export type DropdownProps = {
     children?: React.ReactNode;
     className?: string;
     id?: string;
+
+    chevron?: boolean;
 
     searchable?: boolean;
     searchPlaceholder?: string;
@@ -57,6 +60,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             children,
             className,
             id,
+
+            chevron = true,
 
             searchable = false,
             searchPlaceholder,
@@ -482,6 +487,15 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                             className={className}
                             {...rest}
                             active={opened}
+                            endIcon={
+                                chevron && (
+                                    <ChevronDownIcon
+                                        className={prefix('__chevron')}
+                                        data-opened={opened || undefined}
+                                        aria-hidden
+                                    />
+                                )
+                            }
                         >
                             {selectedOption?.children ?? (
                                 <Box as="span" opacity={0.8}>

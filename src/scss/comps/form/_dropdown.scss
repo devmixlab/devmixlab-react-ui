@@ -102,6 +102,21 @@ $sizes: (
         }
     }
 
+    .#{$dropdown-prefix}__chevron {
+        flex-shrink: 0;
+
+        opacity: 0.8;
+
+        transition:
+            transform var(--option-transition),
+            opacity var(--option-transition);
+
+        &[data-opened] {
+            transform: rotate(180deg);
+            opacity: 1;
+        }
+    }
+
     .#{$dropdown-prefix}__menu {
         min-width: max-content;
 
