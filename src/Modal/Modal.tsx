@@ -40,6 +40,7 @@ export type ModalProps = {
     onAnimationExited?: () => void;
 
     closeOnEscape?: boolean;
+    initialFocus?: React.RefObject<HTMLElement>;
 };
 
 type ModalComponent = React.ForwardRefExoticComponent<
@@ -69,6 +70,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             onAnimationEntered,
             onAnimationExited,
             closeOnEscape = true,
+            initialFocus,
         },
         forwardedRef,
     ) => {
@@ -120,6 +122,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             onEscape: onClose,
             isActive: () => modalManager.isTop(modalIdRef.current),
             closeOnEscape,
+            initialFocus,
         });
 
         // ── Refs ─────────────────────────────────────────────────────────────

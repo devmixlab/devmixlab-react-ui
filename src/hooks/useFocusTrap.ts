@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, RefObject } from 'react';
+import React, { useLayoutEffect, useRef, RefObject } from 'react';
 
 const FOCUSABLE_SELECTORS = [
     'a[href]',
@@ -34,6 +34,7 @@ export type UseFocusTrapOptions = {
     isActive?: () => boolean;
 
     closeOnEscape?: boolean;
+    initialFocus?: React.RefObject<HTMLElement>;
 };
 
 /**
@@ -65,6 +66,7 @@ export function useFocusTrap({
     onEscape,
     isActive = () => true,
     closeOnEscape = true,
+    initialFocus,
 }: UseFocusTrapOptions): void {
     // Keep latest callbacks in refs so the keydown handler never goes stale
     // without needing to be re-registered when props change.
@@ -92,7 +94,7 @@ export function useFocusTrap({
         // Move focus in.
         const focusable = getFocusable();
         if (focusable.length > 0) {
-            focusable[0].focus();
+            initialFocus?.current ? initialFocus.current.focus() : focusable[0].focus();
         } else {
             container.focus();
         }
