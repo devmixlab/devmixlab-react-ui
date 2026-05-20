@@ -38,6 +38,8 @@ export type ModalProps = {
     onAnimationEntered?: () => void;
     /** Called when the modal has fully exited (animation complete, just before unmount). */
     onAnimationExited?: () => void;
+
+    closeOnEscape?: boolean;
 };
 
 type ModalComponent = React.ForwardRefExoticComponent<
@@ -66,6 +68,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             animationDuration = 200,
             onAnimationEntered,
             onAnimationExited,
+            closeOnEscape = true,
         },
         forwardedRef,
     ) => {
@@ -116,6 +119,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             containerRef: contentRef,
             onEscape: onClose,
             isActive: () => modalManager.isTop(modalIdRef.current),
+            closeOnEscape,
         });
 
         // ── Refs ─────────────────────────────────────────────────────────────

@@ -32,6 +32,8 @@ export type UseFocusTrapOptions = {
      * @default () => true
      */
     isActive?: () => boolean;
+
+    closeOnEscape?: boolean;
 };
 
 /**
@@ -62,6 +64,7 @@ export function useFocusTrap({
     containerRef,
     onEscape,
     isActive = () => true,
+    closeOnEscape = true,
 }: UseFocusTrapOptions): void {
     // Keep latest callbacks in refs so the keydown handler never goes stale
     // without needing to be re-registered when props change.
@@ -95,7 +98,7 @@ export function useFocusTrap({
         }
 
         const onKeyDown = (e: KeyboardEvent): void => {
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' && closeOnEscape) {
                 if (isActiveRef.current()) onEscapeRef.current?.();
                 return;
             }
