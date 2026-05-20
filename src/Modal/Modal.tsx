@@ -51,6 +51,10 @@ const prefix = (name: string = '') => {
     return classPrefix(`--modal${name}`);
 };
 
+let openedModals = 0;
+
+const modalStack: number[] = [];
+
 const Modal = forwardRef<HTMLDivElement, ModalProps>(
     (
         {
@@ -75,6 +79,21 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
     ) => {
         const contentRef = useRef<HTMLDivElement | null>(null);
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
+        const modalIdRef = useRef(Math.random());
+
+        useEffect(() => {
+            if (!opened) return;
+
+            modalStack.push(modalIdRef.current);
+
+            return () => {
+                const index = modalStack.indexOf(modalIdRef.current);
+
+                if (index !== -1) {
+                    modalStack.splice(index, 1);
+                }
+            };
+        }, [opened]);
 
         useLayoutEffect(() => {
             const previousFocusedElement = document.activeElement as HTMLElement | null;
@@ -101,6 +120,10 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
             const onKeyDown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
+                    const isTopModal = modalStack[modalStack.length - 1] === modalIdRef.current;
+
+                    if (!isTopModal) return;
+
                     onClose?.();
                     return;
                 }
@@ -137,19 +160,29 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             return () => {
                 window.removeEventListener('keydown', onKeyDown);
 
-                previousFocusedElement?.focus();
+                requestAnimationFrame(() => {
+                    if (previousFocusedElement && document.contains(previousFocusedElement)) {
+                        previousFocusedElement.focus();
+                    }
+                });
             };
         }, [opened, onClose]);
 
         useEffect(() => {
             if (!opened) return;
 
-            const originalOverflow = document.body.style.overflow;
+            openedModals += 1;
 
-            document.body.style.overflow = 'hidden';
+            if (openedModals === 1) {
+                document.body.style.overflow = 'hidden';
+            }
 
             return () => {
-                document.body.style.overflow = originalOverflow;
+                openedModals -= 1;
+
+                if (openedModals === 0) {
+                    document.body.style.overflow = '';
+                }
             };
         }, [opened]);
 
