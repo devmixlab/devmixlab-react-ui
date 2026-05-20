@@ -41,6 +41,7 @@ export type ModalProps = {
 
     closeOnEscape?: boolean;
     initialFocus?: React.RefObject<HTMLElement>;
+    portalContainer?: HTMLElement;
 };
 
 type ModalComponent = React.ForwardRefExoticComponent<
@@ -71,6 +72,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             onAnimationExited,
             closeOnEscape = true,
             initialFocus,
+            portalContainer,
         },
         forwardedRef,
     ) => {
@@ -172,7 +174,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     </div>
                 </Box>
             </ModalContext.Provider>,
-            document.body,
+            portalContainer != null ? portalContainer : document.body,
         );
     },
 ) as ModalComponent;
