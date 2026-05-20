@@ -215,6 +215,8 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         padding: var(--wrapper-padding);
 
         overflow: auto;
+
+        //overscroll-behavior: contain;
     }
 
     // ── Content panel ──────────────────────────────────────────────────────
@@ -331,6 +333,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
     &__body {
         flex: 1;
         overflow: auto;
+        overscroll-behavior: contain;
         padding: var(--body-padding-y) var(--body-padding-x);
     }
 
