@@ -9,7 +9,6 @@ $modal-prefix: #{$p}--modal;
 
 $sizes: (
     xs: (
-        maxWidth: 20rem,
         wrapperPadding: 1rem,
         headerPaddingX: 1rem,
         headerPaddingY: 0.75rem,
@@ -21,7 +20,6 @@ $sizes: (
         borderRadius: 0.75rem,
     ),
     sm: (
-        maxWidth: 30rem,
         wrapperPadding: 1.25rem,
         headerPaddingX: 1.25rem,
         headerPaddingY: 0.875rem,
@@ -33,7 +31,6 @@ $sizes: (
         borderRadius: 0.875rem,
     ),
     md: (
-        maxWidth: 40rem,
         wrapperPadding: 1.5rem,
         headerPaddingX: 1.5rem,
         headerPaddingY: 1rem,
@@ -45,7 +42,6 @@ $sizes: (
         borderRadius: 1rem,
     ),
     lg: (
-        maxWidth: 50rem,
         wrapperPadding: 1.75rem,
         headerPaddingX: 1.75rem,
         headerPaddingY: 1.125rem,
@@ -57,7 +53,6 @@ $sizes: (
         borderRadius: 1rem,
     ),
     xl: (
-        maxWidth: 64rem,
         wrapperPadding: 2rem,
         headerPaddingX: 2rem,
         headerPaddingY: 1.25rem,
@@ -69,7 +64,6 @@ $sizes: (
         borderRadius: 1.25rem,
     ),
     '2xl': (
-        maxWidth: 80rem,
         wrapperPadding: 2rem,
         headerPaddingX: 2rem,
         headerPaddingY: 1.25rem,
@@ -81,8 +75,6 @@ $sizes: (
         borderRadius: 1.25rem,
     ),
     full: (
-        maxWidth: calc(100vw - 2rem),
-        height: calc(100vh - 2rem),
         wrapperPadding: 1rem,
         headerPaddingX: 2rem,
         headerPaddingY: 1.25rem,
@@ -94,9 +86,6 @@ $sizes: (
         borderRadius: 1.25rem,
     ),
     fullscreen: (
-        maxWidth: 100vw,
-        width: 100vw,
-        height: 100vh,
         wrapperPadding: 0,
         headerPaddingX: 2rem,
         headerPaddingY: 1.5rem,
@@ -137,10 +126,6 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
-            --content-max-width: #{map.get($value, maxWidth)};
-            --content-height: #{if(map.has-key($value, height), map.get($value, height), auto)};
-            --content-width: #{if(map.has-key($value, width), map.get($value, width), 100%)};
-
             --wrapper-padding: #{map.get($value, wrapperPadding)};
 
             --header-padding-x: #{map.get($value, headerPaddingX)};
@@ -225,10 +210,6 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         display: flex;
         flex-direction: column;
-
-        width: var(--content-width);
-        height: var(--content-height);
-        max-width: var(--content-max-width);
 
         border-radius: var(--content-border-radius);
 

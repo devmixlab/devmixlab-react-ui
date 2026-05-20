@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Box } from '../Box/Box';
+import { Box, BoxProps } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
 import clsx from 'clsx';
 import { ModalContext, useModalContext } from './Modal.context';
@@ -11,6 +11,7 @@ import { modalManager } from './Modal.manager';
 import { usePresence } from '../hooks/usePresence';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { mergeRefs } from '../utils/mergeRefs';
+import { maxWidths, widths, maxHeights, heights } from './Modal.constants';
 
 export type { PresenceState as AnimationState } from '../hooks/usePresence';
 
@@ -42,6 +43,11 @@ export type ModalProps = {
     closeOnEscape?: boolean;
     initialFocus?: React.RefObject<HTMLElement>;
     portalContainer?: HTMLElement;
+
+    height?: BoxProps['height'];
+    maxHeight?: BoxProps['maxHeight'];
+    width?: BoxProps['width'];
+    maxWidth?: BoxProps['maxWidth'];
 };
 
 type ModalComponent = React.ForwardRefExoticComponent<
@@ -73,9 +79,18 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             closeOnEscape = true,
             initialFocus,
             portalContainer,
+            height,
+            maxHeight,
+            width,
+            maxWidth,
         },
         forwardedRef,
     ) => {
+        const resolvedHeight = height ?? heights[size];
+        const resolvedMaxHeight = maxHeight ?? maxHeights[size];
+        const resolvedWidth = width ?? maxWidths[size];
+        const resolvedMaxWidth = maxWidth ?? maxWidths[size];
+
         const contentRef = useRef<HTMLDivElement | null>(null);
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
         const modalIdRef = useRef(Math.random());
@@ -159,8 +174,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             if (e.target === e.currentTarget) onClose?.();
                         }}
                     >
-                        <div
+                        <Box
                             ref={mergedContentRef}
+                            h={resolvedHeight}
+                            maxH={resolvedMaxHeight}
+                            w={resolvedWidth}
+                            maxW={resolvedMaxWidth}
                             tabIndex={-1}
                             className={clsx(prefix('__content'), className)}
                             role="dialog"
@@ -170,7 +189,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             data-animation-state={animationState}
                         >
                             {children}
-                        </div>
+                        </Box>
                     </div>
                 </Box>
             </ModalContext.Provider>,
