@@ -9,3 +9,10 @@
     white-space: nowrap;
     border: 0;
 }
+
+@mixin icon {
+    width: 1.2em;
+    height: 1.2em;
+    font-size: 1.2em;
+    display: block;
+}

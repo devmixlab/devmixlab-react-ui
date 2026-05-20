@@ -29,6 +29,8 @@ export { RadioGroup } from './src/form/Radio/RadioGroup';
 export { FileUpload } from './src/form/FileUpload/FileUpload';
 export { FormField } from './src/form/FormField';
 
+export { Modal } from './src/Modal/Modal';
+
 export { Warning as WarningIcon } from './src/Icon/Warning';
 
 export { Badge } from './src/Badge/Badge';
