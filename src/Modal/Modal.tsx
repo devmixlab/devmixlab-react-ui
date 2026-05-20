@@ -123,6 +123,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         // Stable numeric ID used as the key into every ModalManager registry.
         const modalIdRef = useRef(Math.random());
 
+        const prefersReducedMotion =
+            typeof window !== 'undefined' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const effectiveAnimationDuration = prefersReducedMotion ? 0 : animationDuration;
+
         // ── Animation lifecycle ──────────────────────────────────────────────
         //
         // `shouldRender` keeps the portal in the DOM during the exit animation.
@@ -161,7 +167,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                         timerRef.current = null;
                         setAnimationState('entered');
                         onAnimationEntered?.();
-                    }, animationDuration);
+                    }, effectiveAnimationDuration);
                 });
             } else {
                 cancelPending();
@@ -174,14 +180,20 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                         setAnimationState('exited');
                         setShouldRender(false);
                         onAnimationExited?.();
-                    }, animationDuration);
+                    }, effectiveAnimationDuration);
 
                     return 'exiting';
                 });
             }
 
             return cancelPending;
-        }, [opened, animationDuration, cancelPending, onAnimationEntered, onAnimationExited]);
+        }, [
+            opened,
+            effectiveAnimationDuration,
+            cancelPending,
+            onAnimationEntered,
+            onAnimationExited,
+        ]);
 
         // ── Modal stack ──────────────────────────────────────────────────────
         // Registers this instance with the manager so Escape-key routing knows
