@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useReducedMotion } from './useReducedMotion';
 
 export type PresenceState = 'entering' | 'entered' | 'exiting' | 'exited';
 
@@ -77,10 +78,7 @@ export function usePresence({
     const rafRef = useRef<number | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const prefersReducedMotion =
-        typeof window !== 'undefined' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+    const prefersReducedMotion = useReducedMotion();
     const finalDuration = prefersReducedMotion ? 0 : duration;
 
     const cancelPending = useCallback(() => {
