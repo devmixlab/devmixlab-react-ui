@@ -188,7 +188,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 
         return (
             <PopoverContext.Provider value={value}>
-                <Box ref={mergeRefs(ref, null)} className={prefix()}>
+                <Box ref={ref} className={prefix()}>
                     {children}
                 </Box>
             </PopoverContext.Provider>
@@ -336,7 +336,12 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             onEscape: () => {
                 setOpened(false);
 
-                (refs.reference.current as HTMLElement | null)?.focus();
+                alert(11);
+
+                // (refs.reference.current as HTMLElement | null)?.focus();
+                requestAnimationFrame(() => {
+                    (refs.reference.current as HTMLElement | null)?.focus();
+                });
             },
         });
 
@@ -364,7 +369,6 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 className={[prefix('__panel'), className].filter(Boolean).join(' ')}
                 shadow="lg"
                 rounded="md"
-                /*{...getFloatingProps()}*/
                 {...getFloatingProps({
                     onKeyDown: (e: React.KeyboardEvent) => {
                         if (closeOnEscape && e.key === 'Escape') {
