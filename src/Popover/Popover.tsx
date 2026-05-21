@@ -1,45 +1,58 @@
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { createContext, forwardRef, useContext, useMemo, useState } from 'react';
 import type { Placement } from '@floating-ui/react';
-import { Box } from '../Box/Box';
-import { Button, type ButtonImplProps } from '../Button/Button';
+import { Box, BoxProps } from '../Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
 import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
 import { useFloatingLayer } from '../hooks';
+import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
+import { Button, ButtonProps } from '../Button/Button';
+import { ChevronDown as ChevronDownIcon } from '../Icon';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
+export type PopoverSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
+
 type PopoverProps = {
-    /** The floating content rendered inside the popover panel. */
-    content: React.ReactNode;
+    children: React.ReactNode;
 
-    /** Controlled open state. */
+    size?: PopoverSize;
+
     open?: boolean;
-
-    /** Default open state for uncontrolled usage. */
     defaultOpen?: boolean;
-
-    /** Called when the open state changes. */
     onOpenChange?: (open: boolean) => void;
 
-    /** Where the popover floats relative to the trigger. */
+    disabled?: boolean;
+
     placement?: Placement;
+};
 
-    /** Custom trigger element. Receives `opened` and `disabled`. */
-    triggerRender?: (props: { opened: boolean; disabled: boolean }) => React.ReactElement;
+type triggerRenderProps = {
+    disabled: boolean;
+    opened: boolean;
+    focusedVisible: boolean;
+    pressed: boolean;
+};
 
-    /** Extra class applied to the popover panel. */
-    panelClassName?: string;
-
-    id?: string;
+type PopoverTriggerProps = {
     className?: string;
-} & Omit<ButtonImplProps, 'active'>;
+    children: React.ReactElement;
+    asChild?: boolean;
+    chevron?: boolean;
+    render?: (props: triggerRenderProps) => React.ReactNode;
+};
+
+type PopoverPanelProps = {
+    children: React.ReactNode;
+    className?: string;
+};
 
 type PopoverComponent = React.ForwardRefExoticComponent<
     PopoverProps & React.RefAttributes<HTMLDivElement>
 > & {
+    Trigger: typeof PopoverTrigger;
     Panel: typeof PopoverPanel;
 };
 
@@ -47,7 +60,9 @@ type PopoverComponent = React.ForwardRefExoticComponent<
 // Helpers
 // ---------------------------------------------------------------------------
 
-const prefix = (name: string = '') => classPrefix(`--popover${name}`);
+const prefix = (name: string = '') => {
+    return classPrefix(`--popover${name}`);
+};
 
 // ---------------------------------------------------------------------------
 // Popover
@@ -56,55 +71,36 @@ const prefix = (name: string = '') => classPrefix(`--popover${name}`);
 const Popover = forwardRef<HTMLDivElement, PopoverProps>(
     (
         {
-            content,
+            children,
+
+            size = 'auto',
 
             open,
             defaultOpen = false,
             onOpenChange,
 
-            placement = 'bottom-start',
-            type = 'button',
-
             disabled = false,
-            rounded = 'md',
-            size = 'md',
 
-            triggerRender,
-            panelClassName,
-
-            id,
-            className,
-            children,
-
-            ...rest
+            placement = 'bottom-start',
         },
         ref,
     ) => {
-        const popoverId = id ?? useStableId('popover');
-
-        // ------------------------------------------------------------------
-        // Open state — controlled / uncontrolled
-        // ------------------------------------------------------------------
-
         const isControlled = open !== undefined;
+
         const [internalOpen, setInternalOpen] = useState(defaultOpen);
-        const opened = isControlled ? open! : internalOpen;
+
+        const opened = isControlled ? open : internalOpen;
 
         const setOpened = (next: boolean) => {
-            if (!isControlled) setInternalOpen(next);
+            if (!isControlled) {
+                setInternalOpen(next);
+            }
+
             onOpenChange?.(next);
         };
 
-        // ------------------------------------------------------------------
-        // Trigger press / focus state
-        // ------------------------------------------------------------------
-
-        const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
-        const [pressed, setPressed] = useState(false);
-
-        // ------------------------------------------------------------------
-        // Floating layer
-        // ------------------------------------------------------------------
+        const triggerId = useStableId('popover-trigger');
+        const panelId = useStableId('popover-panel');
 
         const { refs, floatingStyles, getReferenceProps, getFloatingProps } = useFloatingLayer(
             opened,
@@ -112,145 +108,210 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             placement,
         );
 
-        const combinedRef = mergeRefs(refs.setReference, ref);
+        const value = useMemo<PopoverContextValue>(
+            () => ({
+                opened,
+                setOpened,
 
-        // ------------------------------------------------------------------
-        // Focus helpers
-        // ------------------------------------------------------------------
+                disabled,
 
-        const focusTrigger = () => {
-            (refs.reference.current as HTMLDivElement | null)?.focus();
-        };
+                refs,
+                floatingStyles,
 
-        const panelRef = useRef<HTMLDivElement | null>(null);
+                getReferenceProps,
+                getFloatingProps,
 
-        // ------------------------------------------------------------------
-        // Keyboard handler on the trigger
-        // ------------------------------------------------------------------
-
-        const handleKeyDown = (e: React.KeyboardEvent) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setPressed(true);
-                setOpened(!opened);
-            } else if (e.key === 'Escape') {
-                setOpened(false);
-                focusTrigger();
-            } else if (e.key === 'Tab' && opened) {
-                // Let Tab move into the panel naturally; Shift+Tab from panel
-                // closing is handled by dismiss (click-outside / focus-out).
-            }
-        };
-
-        // ------------------------------------------------------------------
-        // Render
-        // ------------------------------------------------------------------
+                triggerId,
+                panelId,
+            }),
+            [
+                opened,
+                disabled,
+                refs,
+                floatingStyles,
+                getReferenceProps,
+                getFloatingProps,
+                triggerId,
+                panelId,
+            ],
+        );
 
         return (
-            <Box className={prefix()} data-size={size}>
-                {/* Trigger */}
-                <Box
-                    ref={combinedRef}
-                    {...getReferenceProps()}
-                    className={prefix('__trigger')}
-                    onClick={() => {
-                        if (disabled) return;
-                        setOpened(!opened);
-                    }}
-                    tabIndex={disabled ? -1 : 0}
-                    onFocus={(e) => {
-                        if (disabled) return;
-                        setTriggerFocusedVisible(e.currentTarget.matches(':focus-visible'));
-                    }}
-                    onBlur={() => setTriggerFocusedVisible(false)}
-                    onKeyDown={(e) => {
-                        if (disabled) return;
-                        handleKeyDown(e);
-                    }}
-                    onKeyUp={(e: React.KeyboardEvent) => {
-                        if (e.key === 'Enter' || e.key === ' ') setPressed(false);
-                    }}
-                    onMouseDown={() => {
-                        if (disabled) return;
-                        setPressed(true);
-                    }}
-                    onMouseUp={() => setPressed(false)}
-                    onMouseLeave={() => setPressed(false)}
-                    aria-expanded={opened}
-                    aria-haspopup="dialog"
-                    aria-controls={opened ? popoverId : undefined}
-                >
-                    {triggerRender ? (
-                        triggerRender({ opened, disabled })
-                    ) : (
-                        <Button
-                            type={type}
-                            disabled={disabled}
-                            pseudoFocused={triggerFocusedVisible}
-                            pseudoActive={pressed}
-                            rounded={rounded}
-                            size={size}
-                            className={className}
-                            active={opened}
-                            {...rest}
-                        >
-                            {children}
-                        </Button>
-                    )}
+            <PopoverContext.Provider value={value}>
+                <Box ref={mergeRefs(ref, null)} className={prefix()}>
+                    {children}
                 </Box>
-
-                {/* Floating panel */}
-                {opened && (
-                    <Box
-                        ref={(node) => {
-                            refs.setFloating(node);
-                            panelRef.current = node;
-                        }}
-                        id={popoverId}
-                        style={floatingStyles}
-                        {...getFloatingProps()}
-                        rounded={rounded}
-                        className={[prefix('__panel'), panelClassName].filter(Boolean).join(' ')}
-                        role="dialog"
-                        aria-modal={false}
-                        shadow="lg"
-                        onKeyDown={(e: React.KeyboardEvent) => {
-                            if (e.key === 'Escape') {
-                                setOpened(false);
-                                focusTrigger();
-                            }
-                        }}
-                    >
-                        {content}
-                    </Box>
-                )}
-            </Box>
+            </PopoverContext.Provider>
         );
     },
 ) as PopoverComponent;
 
 Popover.displayName = 'Popover';
 
+const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
+    ({ children, className, chevron = false, render, ...rest }, ref) => {
+        const {
+            opened,
+            setOpened,
+
+            disabled,
+
+            refs,
+            getReferenceProps,
+
+            triggerId,
+            panelId,
+        } = usePopoverContext();
+
+        const combinedRef = mergeRefs(refs.setReference, ref);
+
+        // ------------------------------------------------------------------
+        // Trigger press state
+        // ------------------------------------------------------------------
+
+        const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
+        const [pressed, setPressed] = useState(false);
+
+        const handleKeyDown = (e: React.KeyboardEvent) => {
+            const key = e.key;
+
+            if (key === 'Enter' || key === ' ') {
+                e.preventDefault();
+                setPressed(true);
+                setOpened(!opened);
+            }
+        };
+
+        return (
+            <Box
+                ref={combinedRef}
+                {...getReferenceProps()}
+                className={prefix('__trigger')}
+                onClick={() => {
+                    if (disabled) return;
+                    setOpened(!opened);
+                }}
+                tabIndex={disabled ? -1 : 0}
+                onFocus={(e) => {
+                    if (disabled) return;
+                    setTriggerFocusedVisible(e.currentTarget.matches(':focus-visible'));
+                }}
+                onBlur={() => setTriggerFocusedVisible(false)}
+                onKeyDown={(e) => {
+                    if (disabled) return;
+                    handleKeyDown(e);
+                }}
+                onKeyUp={(e: React.KeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') setPressed(false);
+                }}
+                onMouseDown={() => {
+                    if (disabled) return;
+                    setPressed(true);
+                }}
+                onMouseUp={() => setPressed(false)}
+                onMouseLeave={() => setPressed(false)}
+                aria-expanded={opened}
+                aria-controls={opened ? panelId : undefined}
+                aria-haspopup="dialog"
+            >
+                {render ? (
+                    render({
+                        disabled: disabled ?? false,
+                        opened,
+                        focusedVisible: triggerFocusedVisible,
+                        pressed,
+                    })
+                ) : (
+                    <Button
+                        type="button"
+                        disabled={disabled}
+                        pseudoFocused={triggerFocusedVisible}
+                        pseudoActive={pressed}
+                        className={className}
+                        {...rest}
+                        active={opened}
+                        endIcon={
+                            chevron && (
+                                <ChevronDownIcon
+                                    className={prefix('__chevron')}
+                                    data-opened={opened || undefined}
+                                    aria-hidden
+                                />
+                            )
+                        }
+                    >
+                        {children}
+                    </Button>
+                )}
+            </Box>
+        );
+    },
+);
+
+PopoverTrigger.displayName = 'PopoverTrigger';
+
 // ---------------------------------------------------------------------------
-// PopoverPanel — optional named slot for structured content
+// Panel
 // ---------------------------------------------------------------------------
 
-type PopoverPanelProps = {
-    children: React.ReactNode;
-    className?: string;
-};
+const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
+    ({ children, className }, ref) => {
+        const {
+            opened,
+            setOpened,
 
-const PopoverPanel = ({ children, className }: PopoverPanelProps) => {
-    return (
-        <Box className={[prefix('__panel-inner'), className].filter(Boolean).join(' ')}>
-            {children}
-        </Box>
-    );
-};
+            refs,
+            floatingStyles,
+            getFloatingProps,
+
+            triggerId,
+            panelId,
+        } = usePopoverContext();
+
+        if (!opened) {
+            return null;
+        }
+
+        return (
+            <Box
+                ref={mergeRefs(refs.setFloating, ref)}
+                id={panelId}
+                role="dialog"
+                aria-modal={false}
+                aria-labelledby={triggerId}
+                style={floatingStyles}
+                className={[prefix('__panel'), className].filter(Boolean).join(' ')}
+                shadow="lg"
+                rounded="md"
+                {...getFloatingProps({
+                    onKeyDown: (e: React.KeyboardEvent) => {
+                        if (e.key === 'Escape') {
+                            setOpened(false);
+
+                            (refs.reference.current as HTMLElement | null)?.focus();
+                        }
+                    },
+                })}
+            >
+                {children}
+            </Box>
+        );
+    },
+);
 
 PopoverPanel.displayName = 'PopoverPanel';
 
+// ---------------------------------------------------------------------------
+// Compound API
+// ---------------------------------------------------------------------------
+
+Popover.Trigger = PopoverTrigger;
 Popover.Panel = PopoverPanel;
 
+// ---------------------------------------------------------------------------
+// Exports
+// ---------------------------------------------------------------------------
+
 export { Popover };
-export type { PopoverProps, PopoverPanelProps };
+
+export type { PopoverProps, PopoverTriggerProps, PopoverPanelProps, triggerRenderProps };
