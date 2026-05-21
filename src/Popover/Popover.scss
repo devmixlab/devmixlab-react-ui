@@ -41,10 +41,10 @@ $sizes: (
         width: 48rem,
     ),
 
-    full: (
-        width: calc(100vw - 2rem),
-        //width: 100%,
-    ),
+    //full: (
+    //    width: calc(100vw - 2rem),
+    //    //width: 100%,
+    //),
 );
 
 .#{$popover-prefix} {
@@ -56,7 +56,11 @@ $sizes: (
         position: absolute;
         z-index: 1000;
 
-        min-width: max-content;
+        //min-width: max-content;
+        width: max-content;
+        min-width: 0;
+        max-width: calc(100vw - 1rem);
+
         //max-width: min(
         //    32rem,
         //    calc(100vw - 1rem)
@@ -93,6 +97,11 @@ $sizes: (
             animation: popover-out 100ms ease;
         }
 
+        &[data-align='viewport'] {
+            left: 50% !important;
+            transform: translateX(-50%);
+        }
+
         //max-width: calc(100vw - 1rem);
 
         @each $name, $styles in $sizes {
@@ -101,6 +110,10 @@ $sizes: (
                     #{$property}: $value;
                 }
             }
+        }
+
+        &[data-match-trigger-width] {
+            width: var(--popover-trigger-width);
         }
     }
 

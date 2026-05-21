@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useState } from 'react';
+import React, { CSSProperties, forwardRef, useMemo, useState } from 'react';
 import type { Placement } from '@floating-ui/react';
 import { Box } from '../Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
@@ -46,10 +46,21 @@ type PopoverTriggerProps = {
     render?: (props: TriggerRenderProps) => React.ReactNode;
 };
 
+type PopoverPanelAlign = 'trigger' | 'viewport';
+// type PopoverPanelWidth =
+//     | 'content' // intrinsic/max-content
+//     | 'trigger' // match trigger width
+//     | 'viewport'; // almost full screen width
+
 type PopoverPanelProps = {
     children: React.ReactNode;
     className?: string;
     size?: PopoverPanelSize;
+
+    /**
+     * Makes panel width match trigger width.
+     */
+    matchTriggerWidth?: boolean;
 };
 
 type PopoverComponent = React.ForwardRefExoticComponent<
@@ -263,7 +274,7 @@ PopoverTrigger.displayName = 'PopoverTrigger';
 // ---------------------------------------------------------------------------
 
 const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
-    ({ children, className, size = 'auto' }, ref) => {
+    ({ children, className, size = 'auto', matchTriggerWidth = false }, ref) => {
         const {
             opened,
             setOpened,
@@ -289,7 +300,14 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 role={role}
                 aria-modal={role === 'dialog' ? false : undefined}
                 aria-labelledby={role === 'dialog' ? triggerId : undefined}
-                style={floatingStyles}
+                style={
+                    {
+                        ...floatingStyles,
+                        '--popover-trigger-width': refs.reference.current
+                            ? `${refs.reference.current.getBoundingClientRect().width}px`
+                            : undefined,
+                    } as CSSProperties
+                }
                 className={[prefix('__panel'), className].filter(Boolean).join(' ')}
                 shadow="lg"
                 rounded="md"
@@ -303,6 +321,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                     },
                 })}
                 data-size={size}
+                data-match-trigger-width={matchTriggerWidth || undefined}
             >
                 {children}
             </Box>
