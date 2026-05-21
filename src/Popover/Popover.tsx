@@ -4,7 +4,7 @@ import { Box, BoxProps } from '../Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
 import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
-import { useFloatingLayer, useFocusTrap } from '../hooks';
+import { useFloatingLayer, useFocusTrap, usePresence } from '../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
 import { Button } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
@@ -326,8 +326,20 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             closeOnEscape,
         } = usePopoverContext();
 
+        // ── Presence ──────────────────────────────────────────────────────
+        const { isMounted, state: animationState } = usePresence({
+            present: opened,
+            duration: 200,
+
+            // onExited: () => {
+            //     requestAnimationFrame(() => {
+            //         (refs.reference.current as HTMLElement | null)?.focus();
+            //     });
+            // },
+        });
+
         useFocusTrap({
-            active: modal && opened,
+            active: modal && isMounted,
 
             containerRef: refs.floating,
 
@@ -336,16 +348,15 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             onEscape: () => {
                 setOpened(false);
 
-                alert(11);
-
                 // (refs.reference.current as HTMLElement | null)?.focus();
-                requestAnimationFrame(() => {
-                    (refs.reference.current as HTMLElement | null)?.focus();
-                });
+                // requestAnimationFrame(() => {
+                //     (refs.reference.current as HTMLElement | null)?.focus();
+                // });
             },
         });
 
-        if (!opened) {
+        // ── Unmount after exit animation ─────────────────────────────────
+        if (!isMounted) {
             return null;
         }
 
@@ -378,6 +389,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         }
                     },
                 })}
+                data-animation-state={animationState}
                 data-size={size}
                 data-match-trigger-width={matchTriggerWidth || undefined}
                 {...rest}

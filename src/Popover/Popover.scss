@@ -45,6 +45,14 @@ $sizes: (
 .#{$popover-prefix} {
     --transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
+    --panel-bg: #{functions.intent-color(gray, 200)};
+    --panel-border: #{functions.intent-color(zinc, 300)};
+
+    @include cfg.dark {
+        --panel-bg: #{functions.intent-color('zinc', 900)};
+        --panel-border: #{functions.intent-color('zinc', 800)};
+    }
+
     position: relative;
     display: inline-flex;
     flex-direction: column;
@@ -61,6 +69,16 @@ $sizes: (
         &[data-opened] {
             transform: rotate(180deg);
             opacity: 1;
+        }
+    }
+
+    &__trigger {
+        display: inline-flex;
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
         }
     }
 
@@ -81,8 +99,8 @@ $sizes: (
 
         outline: none;
 
-        background: var(--surface-primary);
-        border: 1px solid var(--border-subtle);
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
 
         border-radius: inherit;
 
@@ -101,12 +119,29 @@ $sizes: (
             top
         );
 
-        &[data-state='open'] {
-            animation: popover-in 140ms ease;
+        &[data-animation-state='entering'] {
+            opacity: 0;
+            transform: scale(0.96);
         }
 
-        &[data-state='closed'] {
-            animation: popover-out 100ms ease;
+        &[data-animation-state='entered'] {
+            opacity: 1;
+            transform: scale(1);
+
+            transition:
+                opacity 120ms ease,
+                transform 120ms ease;
+        }
+
+        &[data-animation-state='exiting'] {
+            opacity: 0;
+            transform: scale(0.96);
+
+            transition:
+                opacity 380ms ease,
+                transform 380ms ease;
+
+            pointer-events: none;
         }
 
         &[data-align='viewport'] {
@@ -152,26 +187,26 @@ $sizes: (
 // Animations
 // ---------------------------------------------------------------------------
 
-@keyframes popover-in {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes popover-out {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    to {
-        opacity: 0;
-        transform: scale(0.98);
-    }
-}
+//@keyframes popover-in {
+//    from {
+//        opacity: 0;
+//        transform: scale(0.36);
+//    }
+//
+//    to {
+//        opacity: 1;
+//        transform: scale(1);
+//    }
+//}
+//
+//@keyframes popover-out {
+//    from {
+//        opacity: 1;
+//        transform: scale(1);
+//    }
+//
+//    to {
+//        opacity: 0;
+//        transform: scale(0.38);
+//    }
+//}
