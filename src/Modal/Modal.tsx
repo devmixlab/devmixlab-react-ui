@@ -17,6 +17,8 @@ export type { PresenceState as AnimationState } from '../hooks/usePresence';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | 'fullscreen';
 
+type ModalAnimation = 'none' | 'fade' | 'scale' | 'slide-top' | 'slide-bottom';
+
 export type ModalProps = {
     children?: React.ReactNode;
     id?: string;
@@ -48,6 +50,8 @@ export type ModalProps = {
     maxHeight?: BoxProps['maxHeight'];
     width?: BoxProps['width'];
     maxWidth?: BoxProps['maxWidth'];
+
+    animation?: ModalAnimation;
 };
 
 type ModalComponent = React.ForwardRefExoticComponent<
@@ -83,6 +87,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             maxHeight,
             width,
             maxWidth,
+            animation = 'scale',
         },
         forwardedRef,
     ) => {
@@ -159,6 +164,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     data-placement={placement}
                     data-separated={separated || undefined}
                     data-animation-state={animationState}
+                    data-animation={animation}
                 >
                     <div className={prefix('__overlay')} data-animation-state={animationState} />
 
@@ -183,6 +189,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             aria-labelledby={headerId}
                             aria-describedby={bodyId}
                             data-animation-state={animationState}
+                            data-animation={animation}
                         >
                             {children}
                         </Box>
