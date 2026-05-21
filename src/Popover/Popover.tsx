@@ -1,6 +1,6 @@
 import React, { CSSProperties, forwardRef, useMemo, useState } from 'react';
 import type { Placement } from '@floating-ui/react';
-import { Box } from '../Box/Box';
+import { Box, BoxProps } from '../Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
 import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
@@ -14,7 +14,7 @@ import { clsx } from 'clsx';
 // Types
 // ---------------------------------------------------------------------------
 
-export type PopoverPanelSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
+export type PopoverPanelSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 export type PopoverRole = 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
 
@@ -66,12 +66,6 @@ type PopoverTriggerProps = {
     render?: (props: TriggerRenderProps) => React.ReactNode;
 };
 
-type PopoverPanelAlign = 'trigger' | 'viewport';
-// type PopoverPanelWidth =
-//     | 'content' // intrinsic/max-content
-//     | 'trigger' // match trigger width
-//     | 'viewport'; // almost full screen width
-
 type PopoverPanelProps = {
     children: React.ReactNode;
     className?: string;
@@ -81,7 +75,7 @@ type PopoverPanelProps = {
      * Makes panel width match trigger width.
      */
     matchTriggerWidth?: boolean;
-};
+} & BoxProps;
 
 type PopoverComponent = React.ForwardRefExoticComponent<
     PopoverProps & React.RefAttributes<HTMLDivElement>
@@ -314,7 +308,7 @@ PopoverTrigger.displayName = 'PopoverTrigger';
 // ---------------------------------------------------------------------------
 
 const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
-    ({ children, className, size = 'auto', matchTriggerWidth = false }, ref) => {
+    ({ children, className, size = 'auto', matchTriggerWidth = false, ...rest }, ref) => {
         const {
             opened,
             setOpened,
@@ -382,6 +376,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 })}
                 data-size={size}
                 data-match-trigger-width={matchTriggerWidth || undefined}
+                {...rest}
             >
                 {children}
             </Box>

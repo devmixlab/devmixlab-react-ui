@@ -40,17 +40,29 @@ $sizes: (
     '3xl': (
         width: 48rem,
     ),
-
-    //full: (
-    //    width: calc(100vw - 2rem),
-    //    //width: 100%,
-    //),
 );
 
 .#{$popover-prefix} {
+    --transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+
     position: relative;
     display: inline-flex;
     flex-direction: column;
+
+    .#{$popover-prefix}__chevron {
+        flex-shrink: 0;
+
+        opacity: 0.8;
+
+        transition:
+            transform var(--transition),
+            opacity var(--transition);
+
+        &[data-opened] {
+            transform: rotate(180deg);
+            opacity: 1;
+        }
+    }
 
     &__panel {
         position: absolute;
