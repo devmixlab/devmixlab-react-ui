@@ -20,6 +20,13 @@ type PopoverContextValue = {
 
     triggerId: string;
     panelId: string;
+
+    offset: number;
+
+    closeOnEscape: boolean;
+    closeOnOutsideClick: boolean;
+
+    modal: boolean;
 };
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);

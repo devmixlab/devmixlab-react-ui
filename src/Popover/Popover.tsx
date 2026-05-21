@@ -30,6 +30,26 @@ type PopoverProps = {
     disabled?: boolean;
 
     placement?: Placement;
+
+    /**
+     * Distance between trigger and panel.
+     */
+    offset?: number;
+
+    /**
+     * Whether pressing Escape closes the popover.
+     */
+    closeOnEscape?: boolean;
+
+    /**
+     * Whether clicking outside closes the popover.
+     */
+    closeOnOutsideClick?: boolean;
+
+    /**
+     * Whether focus should be trapped inside the popover.
+     */
+    modal?: boolean;
 };
 
 type TriggerRenderProps = {
@@ -96,6 +116,13 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             disabled = false,
 
             placement = 'bottom-start',
+
+            offset = 8,
+
+            closeOnEscape = true,
+            closeOnOutsideClick = true,
+
+            modal = false,
         },
         ref,
     ) => {
@@ -120,6 +147,8 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             opened,
             setOpened,
             placement,
+            offset,
+            closeOnOutsideClick,
         );
 
         const value = useMemo<PopoverContextValue>(
@@ -138,6 +167,13 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 triggerId,
                 panelId,
                 role,
+
+                offset,
+
+                closeOnEscape,
+                closeOnOutsideClick,
+
+                modal,
             }),
             [
                 opened,
@@ -149,6 +185,10 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 triggerId,
                 panelId,
                 role,
+                offset,
+                closeOnEscape,
+                closeOnOutsideClick,
+                modal,
             ],
         );
 
@@ -280,6 +320,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             setOpened,
 
             role,
+            modal,
 
             refs,
             floatingStyles,
@@ -287,6 +328,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
             triggerId,
             panelId,
+
+            closeOnEscape,
         } = usePopoverContext();
 
         if (!opened) {
@@ -298,7 +341,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 ref={mergeRefs(refs.setFloating, ref)}
                 id={panelId}
                 role={role}
-                aria-modal={role === 'dialog' ? false : undefined}
+                aria-modal={modal || undefined}
+                // aria-modal={role === 'dialog' ? false : undefined}
                 aria-labelledby={role === 'dialog' ? triggerId : undefined}
                 style={
                     {
@@ -313,7 +357,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 rounded="md"
                 {...getFloatingProps({
                     onKeyDown: (e: React.KeyboardEvent) => {
-                        if (e.key === 'Escape') {
+                        if (closeOnEscape && e.key === 'Escape') {
                             setOpened(false);
 
                             (refs.reference.current as HTMLElement | null)?.focus();
