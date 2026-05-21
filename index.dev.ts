@@ -30,6 +30,7 @@ export { FileUpload } from './src/form/FileUpload/FileUpload';
 export { FormField } from './src/form/FormField';
 
 export { Modal } from './src/Modal/Modal';
+export { Popover } from './src/Popover';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';
 
