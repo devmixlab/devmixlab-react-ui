@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Box, BoxProps } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
@@ -91,9 +91,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         },
         forwardedRef,
     ) => {
+        const [hasHeader, setHasHeader] = useState(false);
+        const [hasBody, setHasBody] = useState(false);
+
         const resolvedHeight = height ?? heights[size];
         const resolvedMaxHeight = maxHeight ?? maxHeights[size];
-        const resolvedWidth = width ?? maxWidths[size];
+        const resolvedWidth = width ?? widths[size];
         const resolvedMaxWidth = maxWidth ?? maxWidths[size];
 
         const contentRef = useRef<HTMLDivElement | null>(null);
@@ -154,7 +157,9 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         if (!isMounted) return null;
 
         return createPortal(
-            <ModalContext.Provider value={{ onClose, headerId, bodyId }}>
+            <ModalContext.Provider
+                value={{ onClose, headerId, bodyId, hasHeader, setHasHeader, hasBody, setHasBody }}
+            >
                 <Box
                     className={prefix()}
                     position="fixed"
@@ -186,8 +191,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             className={clsx(prefix('__content'), className)}
                             role="dialog"
                             aria-modal="true"
-                            aria-labelledby={headerId}
-                            aria-describedby={bodyId}
+                            aria-labelledby={hasHeader ? headerId : undefined}
+                            aria-describedby={hasBody ? bodyId : undefined}
                             data-animation-state={animationState}
                             data-animation={animation}
                         >
@@ -213,6 +218,15 @@ type ModalSectionProps = {
 
 const ModalHeader = ({ children, className, closeButton = false }: ModalSectionProps) => {
     const ctx = useModalContext();
+
+    useEffect(() => {
+        ctx?.setHasHeader(true);
+
+        return () => {
+            ctx?.setHasHeader(false);
+        };
+    }, [ctx]);
+
     return (
         <div id={ctx?.headerId} className={clsx(prefix('__header'), className)}>
             <div className={prefix('__header-content')}>{children}</div>
@@ -233,6 +247,15 @@ ModalHeader.displayName = 'ModalHeader';
 
 const ModalBody = ({ children, className }: ModalSectionProps) => {
     const ctx = useModalContext();
+
+    useEffect(() => {
+        ctx?.setHasBody(true);
+
+        return () => {
+            ctx?.setHasBody(false);
+        };
+    }, [ctx]);
+
     return (
         <div id={ctx?.bodyId} className={clsx(prefix('__body'), className)}>
             {children}
