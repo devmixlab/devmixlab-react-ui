@@ -1,13 +1,14 @@
-import React, { createContext, forwardRef, useContext, useMemo, useState } from 'react';
+import React, { forwardRef, useMemo, useState } from 'react';
 import type { Placement } from '@floating-ui/react';
-import { Box, BoxProps } from '../Box/Box';
+import { Box } from '../Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
 import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
 import { useFloatingLayer } from '../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
-import { Button, ButtonProps } from '../Button/Button';
+import { Button } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
+import { clsx } from 'clsx';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -15,10 +16,13 @@ import { ChevronDown as ChevronDownIcon } from '../Icon';
 
 export type PopoverSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
 
+export type PopoverRole = 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
+
 type PopoverProps = {
     children: React.ReactNode;
 
     size?: PopoverSize;
+    role?: PopoverRole;
 
     open?: boolean;
     defaultOpen?: boolean;
@@ -29,7 +33,7 @@ type PopoverProps = {
     placement?: Placement;
 };
 
-type triggerRenderProps = {
+type TriggerRenderProps = {
     disabled: boolean;
     opened: boolean;
     focusedVisible: boolean;
@@ -39,9 +43,8 @@ type triggerRenderProps = {
 type PopoverTriggerProps = {
     className?: string;
     children: React.ReactElement;
-    asChild?: boolean;
     chevron?: boolean;
-    render?: (props: triggerRenderProps) => React.ReactNode;
+    render?: (props: TriggerRenderProps) => React.ReactNode;
 };
 
 type PopoverPanelProps = {
@@ -74,6 +77,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             children,
 
             size = 'auto',
+            role,
 
             open,
             defaultOpen = false,
@@ -114,6 +118,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 setOpened,
 
                 disabled,
+                popoverSize: size,
 
                 refs,
                 floatingStyles,
@@ -123,6 +128,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 
                 triggerId,
                 panelId,
+                role,
             }),
             [
                 opened,
@@ -133,6 +139,8 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 getFloatingProps,
                 triggerId,
                 panelId,
+                size,
+                role,
             ],
         );
 
@@ -155,6 +163,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             setOpened,
 
             disabled,
+            role,
 
             refs,
             getReferenceProps,
@@ -185,6 +194,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
         return (
             <Box
                 ref={combinedRef}
+                id={triggerId}
                 {...getReferenceProps()}
                 className={prefix('__trigger')}
                 onClick={() => {
@@ -212,11 +222,11 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 onMouseLeave={() => setPressed(false)}
                 aria-expanded={opened}
                 aria-controls={opened ? panelId : undefined}
-                aria-haspopup="dialog"
+                aria-haspopup={role}
             >
                 {render ? (
                     render({
-                        disabled: disabled ?? false,
+                        disabled: !!disabled,
                         opened,
                         focusedVisible: triggerFocusedVisible,
                         pressed,
@@ -224,10 +234,11 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 ) : (
                     <Button
                         type="button"
+                        tabIndex={-1}
                         disabled={disabled}
                         pseudoFocused={triggerFocusedVisible}
                         pseudoActive={pressed}
-                        className={className}
+                        className={clsx(prefix('__trigger-button'), className)}
                         {...rest}
                         active={opened}
                         endIcon={
@@ -260,6 +271,9 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             opened,
             setOpened,
 
+            popoverSize,
+            role,
+
             refs,
             floatingStyles,
             getFloatingProps,
@@ -276,9 +290,9 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             <Box
                 ref={mergeRefs(refs.setFloating, ref)}
                 id={panelId}
-                role="dialog"
-                aria-modal={false}
-                aria-labelledby={triggerId}
+                role={role}
+                aria-modal={role === 'dialog' ? false : undefined}
+                aria-labelledby={role === 'dialog' ? triggerId : undefined}
                 style={floatingStyles}
                 className={[prefix('__panel'), className].filter(Boolean).join(' ')}
                 shadow="lg"
@@ -292,6 +306,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         }
                     },
                 })}
+                data-size={popoverSize}
             >
                 {children}
             </Box>
@@ -314,4 +329,4 @@ Popover.Panel = PopoverPanel;
 
 export { Popover };
 
-export type { PopoverProps, PopoverTriggerProps, PopoverPanelProps, triggerRenderProps };
+export type { PopoverProps, PopoverTriggerProps, PopoverPanelProps, TriggerRenderProps };
