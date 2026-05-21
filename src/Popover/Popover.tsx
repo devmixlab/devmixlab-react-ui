@@ -4,7 +4,7 @@ import { Box } from '../Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
 import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
-import { useFloatingLayer } from '../hooks';
+import { useFloatingLayer, useFocusTrap } from '../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
 import { Button } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
@@ -332,6 +332,20 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             closeOnEscape,
         } = usePopoverContext();
 
+        useFocusTrap({
+            active: modal && opened,
+
+            containerRef: refs.floating,
+
+            closeOnEscape,
+
+            onEscape: () => {
+                setOpened(false);
+
+                (refs.reference.current as HTMLElement | null)?.focus();
+            },
+        });
+
         if (!opened) {
             return null;
         }
@@ -341,6 +355,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 ref={mergeRefs(refs.setFloating, ref)}
                 id={panelId}
                 role={role}
+                tabIndex={-1}
                 aria-modal={modal || undefined}
                 // aria-modal={role === 'dialog' ? false : undefined}
                 aria-labelledby={role === 'dialog' ? triggerId : undefined}
@@ -355,6 +370,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 className={[prefix('__panel'), className].filter(Boolean).join(' ')}
                 shadow="lg"
                 rounded="md"
+                /*{...getFloatingProps()}*/
                 {...getFloatingProps({
                     onKeyDown: (e: React.KeyboardEvent) => {
                         if (closeOnEscape && e.key === 'Escape') {
