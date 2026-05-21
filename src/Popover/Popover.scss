@@ -42,7 +42,8 @@ $sizes: (
     ),
 
     full: (
-        width: calc(100vw - 1rem),
+        width: calc(100vw - 2rem),
+        //width: 100%,
     ),
 );
 

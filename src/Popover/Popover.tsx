@@ -14,14 +14,13 @@ import { clsx } from 'clsx';
 // Types
 // ---------------------------------------------------------------------------
 
-export type PopoverSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
+export type PopoverPanelSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
 
 export type PopoverRole = 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
 
 type PopoverProps = {
     children: React.ReactNode;
 
-    size?: PopoverSize;
     role?: PopoverRole;
 
     open?: boolean;
@@ -50,6 +49,7 @@ type PopoverTriggerProps = {
 type PopoverPanelProps = {
     children: React.ReactNode;
     className?: string;
+    size?: PopoverPanelSize;
 };
 
 type PopoverComponent = React.ForwardRefExoticComponent<
@@ -76,7 +76,6 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         {
             children,
 
-            size = 'auto',
             role,
 
             open,
@@ -118,7 +117,6 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 setOpened,
 
                 disabled,
-                popoverSize: size,
 
                 refs,
                 floatingStyles,
@@ -139,7 +137,6 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 getFloatingProps,
                 triggerId,
                 panelId,
-                size,
                 role,
             ],
         );
@@ -266,12 +263,11 @@ PopoverTrigger.displayName = 'PopoverTrigger';
 // ---------------------------------------------------------------------------
 
 const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
-    ({ children, className }, ref) => {
+    ({ children, className, size = 'auto' }, ref) => {
         const {
             opened,
             setOpened,
 
-            popoverSize,
             role,
 
             refs,
@@ -306,7 +302,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         }
                     },
                 })}
-                data-size={popoverSize}
+                data-size={size}
             >
                 {children}
             </Box>
