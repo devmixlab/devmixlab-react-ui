@@ -136,7 +136,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             modal = false,
 
             enterDuration = 0,
-            exitDuration = 100,
+            exitDuration = 80,
             onAnimationEntered,
             onAnimationExited,
         },
@@ -365,8 +365,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         // ── Presence ──────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
             present: opened,
-            enterDuration: enterDuration,
-            exitDuration: exitDuration,
+            enterDuration,
+            exitDuration,
             onEntered: onAnimationEntered,
             onExited: onAnimationExited,
 
