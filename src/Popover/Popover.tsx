@@ -1,10 +1,16 @@
 import React, { CSSProperties, forwardRef, useMemo, useState } from 'react';
+import {
+    FloatingTree,
+    FloatingPortal,
+    FloatingFocusManager,
+    FloatingNode,
+} from '@floating-ui/react';
 import type { Placement } from '@floating-ui/react';
 import { Box, BoxProps } from '../Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
 import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
-import { useFloatingLayer, useFocusTrap, usePresence } from '../hooks';
+import { useFloatingLayer, usePresence } from '../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
 import { Button } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
@@ -16,21 +22,25 @@ import { clsx } from 'clsx';
 
 export type PopoverPanelSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
-export type PopoverRole = 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
+export type PopoverRole = 'dialog' | 'menu' | 'listbox';
 
 type PopoverProps = {
     children: React.ReactNode;
 
+    tree?: boolean;
     role?: PopoverRole;
 
+    // State
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
 
     disabled?: boolean;
 
+    /**
+     * Placement of panel.
+     */
     placement?: Placement;
-
     /**
      * Distance between trigger and panel.
      */
@@ -118,7 +128,8 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         {
             children,
 
-            role,
+            tree = false,
+            role = 'dialog',
 
             open,
             defaultOpen = false,
@@ -127,7 +138,6 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             disabled = false,
 
             placement = 'bottom-start',
-
             offset = 8,
 
             closeOnEscape = true,
@@ -136,7 +146,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             modal = false,
 
             enterDuration = 0,
-            exitDuration = 80,
+            exitDuration = 200,
             onAnimationEntered,
             onAnimationExited,
         },
@@ -147,6 +157,15 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         const [internalOpen, setInternalOpen] = useState(defaultOpen);
 
         const opened = isControlled ? open : internalOpen;
+
+        // ── Presence ──────────────────────────────────────────────────────
+        const { isMounted, state: animationState } = usePresence({
+            present: opened,
+            enterDuration,
+            exitDuration,
+            onEntered: onAnimationEntered,
+            onExited: onAnimationExited,
+        });
 
         const setOpened = (next: boolean) => {
             if (!isControlled) {
@@ -159,13 +178,15 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         const triggerId = useStableId('popover-trigger');
         const panelId = useStableId('popover-panel');
 
-        const { refs, floatingStyles, getReferenceProps, getFloatingProps } = useFloatingLayer(
-            opened,
-            setOpened,
-            placement,
-            offset,
-            closeOnOutsideClick,
-        );
+        const { context, refs, floatingStyles, getReferenceProps, getFloatingProps, nodeId } =
+            useFloatingLayer({
+                opened,
+                onOpenChange: setOpened,
+                placement,
+                offsetValue: offset,
+                closeOnOutsideClick,
+                closeOnEscape,
+            });
 
         const value = useMemo<PopoverContextValue>(
             () => ({
@@ -175,6 +196,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 disabled,
 
                 refs,
+                context,
                 floatingStyles,
 
                 getReferenceProps,
@@ -184,46 +206,43 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 panelId,
                 role,
 
-                offset,
-
-                closeOnEscape,
-                closeOnOutsideClick,
-
                 modal,
 
-                enterDuration,
-                exitDuration,
-                onAnimationEntered,
-                onAnimationExited,
+                isMounted,
+                animationState,
             }),
             [
                 opened,
                 disabled,
                 refs,
+                context,
                 floatingStyles,
                 getReferenceProps,
                 getFloatingProps,
                 triggerId,
                 panelId,
                 role,
-                offset,
-                closeOnEscape,
-                closeOnOutsideClick,
                 modal,
-                enterDuration,
-                exitDuration,
-                onAnimationEntered,
-                onAnimationExited,
+                isMounted,
+                animationState,
             ],
         );
 
-        return (
-            <PopoverContext.Provider value={value}>
-                <Box ref={ref} className={prefix()}>
-                    {children}
-                </Box>
-            </PopoverContext.Provider>
+        const content = (
+            <FloatingNode id={nodeId}>
+                <PopoverContext.Provider value={value}>
+                    <Box ref={ref} className={prefix()}>
+                        {children}
+                    </Box>
+                </PopoverContext.Provider>
+            </FloatingNode>
         );
+
+        if (tree) {
+            return <FloatingTree>{content}</FloatingTree>;
+        }
+
+        return content;
     },
 ) as PopoverComponent;
 
@@ -341,58 +360,20 @@ PopoverTrigger.displayName = 'PopoverTrigger';
 const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
     ({ children, className, size = 'auto', matchTriggerWidth = false, ...rest }, ref) => {
         const {
-            opened,
-            setOpened,
-
             role,
             modal,
 
             refs,
+            context,
             floatingStyles,
             getFloatingProps,
 
             triggerId,
             panelId,
 
-            closeOnEscape,
-
-            enterDuration,
-            exitDuration,
-            onAnimationEntered,
-            onAnimationExited,
+            isMounted,
+            animationState,
         } = usePopoverContext();
-
-        // ── Presence ──────────────────────────────────────────────────────
-        const { isMounted, state: animationState } = usePresence({
-            present: opened,
-            enterDuration,
-            exitDuration,
-            onEntered: onAnimationEntered,
-            onExited: onAnimationExited,
-
-            // onExited: () => {
-            //     requestAnimationFrame(() => {
-            //         (refs.reference.current as HTMLElement | null)?.focus();
-            //     });
-            // },
-        });
-
-        useFocusTrap({
-            active: modal && isMounted,
-
-            containerRef: refs.floating,
-
-            closeOnEscape,
-
-            // onEscape: () => {
-            //     setOpened(false);
-            //
-            //     // (refs.reference.current as HTMLElement | null)?.focus();
-            //     // requestAnimationFrame(() => {
-            //     //     (refs.reference.current as HTMLElement | null)?.focus();
-            //     // });
-            // },
-        });
 
         // ── Unmount after exit animation ─────────────────────────────────
         if (!isMounted) {
@@ -400,41 +381,40 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         }
 
         return (
-            <Box
-                ref={mergeRefs(refs.setFloating, ref)}
-                id={panelId}
-                role={role}
-                tabIndex={-1}
-                aria-modal={modal || undefined}
-                // aria-modal={role === 'dialog' ? false : undefined}
-                aria-labelledby={role === 'dialog' ? triggerId : undefined}
-                style={
-                    {
-                        ...floatingStyles,
-                        '--popover-trigger-width': refs.reference.current
-                            ? `${refs.reference.current.getBoundingClientRect().width}px`
-                            : undefined,
-                    } as CSSProperties
-                }
-                className={[prefix('__panel'), className].filter(Boolean).join(' ')}
-                shadow="lg"
-                rounded="md"
-                {...getFloatingProps({
-                    onKeyDown: (e: React.KeyboardEvent) => {
-                        if (closeOnEscape && e.key === 'Escape') {
-                            setOpened(false);
-
-                            (refs.reference.current as HTMLElement | null)?.focus();
+            <FloatingPortal>
+                <FloatingFocusManager context={context} modal={modal}>
+                    <Box
+                        ref={mergeRefs(refs.setFloating, ref)}
+                        id={panelId}
+                        role={role}
+                        tabIndex={-1}
+                        aria-modal={modal || undefined}
+                        // aria-modal={role === 'dialog' ? false : undefined}
+                        aria-labelledby={role === 'dialog' ? triggerId : undefined}
+                        style={
+                            {
+                                ...floatingStyles,
+                                '--popover-trigger-width': refs.reference.current
+                                    ? `${refs.reference.current.getBoundingClientRect().width}px`
+                                    : undefined,
+                                // left: '1rem',
+                                // right: '1rem',
+                                // width: 'calc(100vw - 2rem)',
+                            } as CSSProperties
                         }
-                    },
-                })}
-                data-animation-state={animationState}
-                data-size={size}
-                data-match-trigger-width={matchTriggerWidth || undefined}
-                {...rest}
-            >
-                {children}
-            </Box>
+                        className={[prefix('__panel'), className].filter(Boolean).join(' ')}
+                        shadow="lg"
+                        rounded="md"
+                        {...getFloatingProps()}
+                        data-animation-state={animationState}
+                        data-size={size}
+                        data-match-trigger-width={matchTriggerWidth || undefined}
+                        {...rest}
+                    >
+                        {children}
+                    </Box>
+                </FloatingFocusManager>
+            </FloatingPortal>
         );
     },
 );

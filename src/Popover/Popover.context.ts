@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
 import { useFloatingLayer } from '../hooks';
+import { PresenceState } from '../hooks/usePresence';
 import { PopoverRole } from './Popover';
 
 type PopoverContextValue = {
@@ -10,6 +11,7 @@ type PopoverContextValue = {
     disabled?: boolean;
     role?: PopoverRole;
 
+    context: ReturnType<typeof useFloatingLayer>['context'];
     refs: ReturnType<typeof useFloatingLayer>['refs'];
 
     floatingStyles: ReturnType<typeof useFloatingLayer>['floatingStyles'];
@@ -21,17 +23,10 @@ type PopoverContextValue = {
     triggerId: string;
     panelId: string;
 
-    offset: number;
-
-    closeOnEscape: boolean;
-    closeOnOutsideClick: boolean;
-
     modal: boolean;
 
-    enterDuration: number;
-    exitDuration: number;
-    onAnimationEntered?: () => void;
-    onAnimationExited?: () => void;
+    isMounted: boolean;
+    animationState: PresenceState;
 };
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);

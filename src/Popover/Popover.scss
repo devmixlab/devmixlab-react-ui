@@ -45,13 +45,13 @@ $sizes: (
 .#{$popover-prefix} {
     --transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
-    --panel-bg: #{functions.intent-color(gray, 200)};
-    --panel-border: #{functions.intent-color(zinc, 300)};
-
-    @include cfg.dark {
-        --panel-bg: #{functions.intent-color('zinc', 900)};
-        --panel-border: #{functions.intent-color('zinc', 800)};
-    }
+    //--panel-bg: #{functions.intent-color(gray, 200)};
+    //--panel-border: #{functions.intent-color(zinc, 300)};
+    //
+    //@include cfg.dark {
+    //    --panel-bg: #{functions.intent-color('zinc', 900)};
+    //    --panel-border: #{functions.intent-color('zinc', 800)};
+    //}
 
     position: relative;
     display: inline-flex;
@@ -83,6 +83,14 @@ $sizes: (
     }
 
     &__panel {
+        --panel-bg: #{functions.intent-color(gray, 200)};
+        --panel-border: #{functions.intent-color(zinc, 300)};
+
+        @include cfg.dark {
+            --panel-bg: #{functions.intent-color('zinc', 900)};
+            --panel-border: #{functions.intent-color('zinc', 800)};
+        }
+
         position: absolute;
         z-index: 1000;
 
@@ -104,7 +112,7 @@ $sizes: (
 
         border-radius: inherit;
 
-        overflow: hidden;
+        //overflow: hidden;
 
         box-shadow:
             0 10px 38px rgba(0, 0, 0, 0.12),
@@ -118,6 +126,11 @@ $sizes: (
             --floating-transform-origin,
             top
         );
+
+        &:focus-visible {
+            outline: 2px solid var(--#{$p}-accent-primary);
+
+        }
 
         &[data-animation-state='entering'] {
             opacity: 0;

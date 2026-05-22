@@ -63,6 +63,18 @@ export function usePresence({
     const rafRef = useRef<number | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    // Keep latest callbacks without restarting effects.
+    const onEnteredRef = useRef(onEntered);
+    const onExitedRef = useRef(onExited);
+
+    useEffect(() => {
+        onEnteredRef.current = onEntered;
+    }, [onEntered]);
+
+    useEffect(() => {
+        onExitedRef.current = onExited;
+    }, [onExited]);
+
     const prefersReducedMotion = useReducedMotion();
 
     const finalEnterDuration = prefersReducedMotion ? 0 : enterDuration;
@@ -81,14 +93,22 @@ export function usePresence({
     }, []);
 
     useEffect(() => {
+        cancelPending();
+
         if (present) {
-            cancelPending();
-
             setIsMounted(true);
-            setState('entering');
 
-            // Double RAF guarantees the browser paints the
-            // initial entering state before transitioning.
+            setState((current) => {
+                // Already visible.
+                if (current === 'entering' || current === 'entered') {
+                    return current;
+                }
+
+                return 'entering';
+            });
+
+            // Double RAF guarantees browser paints
+            // the entering state before transitioning.
             rafRef.current = requestAnimationFrame(() => {
                 rafRef.current = requestAnimationFrame(() => {
                     rafRef.current = null;
@@ -98,15 +118,14 @@ export function usePresence({
 
                         setState('entered');
 
-                        onEntered?.();
+                        onEnteredRef.current?.();
                     }, finalEnterDuration);
                 });
             });
         } else {
-            cancelPending();
-
             setState((current) => {
-                if (current === 'exited') {
+                // Already gone.
+                if (current === 'exited' || current === 'exiting') {
                     return current;
                 }
 
@@ -116,7 +135,7 @@ export function usePresence({
                     setState('exited');
                     setIsMounted(false);
 
-                    onExited?.();
+                    onExitedRef.current?.();
                 }, finalExitDuration);
 
                 return 'exiting';
@@ -124,7 +143,7 @@ export function usePresence({
         }
 
         return cancelPending;
-    }, [present, finalEnterDuration, finalExitDuration, cancelPending, onEntered, onExited]);
+    }, [present, finalEnterDuration, finalExitDuration, cancelPending]);
 
     return {
         isMounted,
