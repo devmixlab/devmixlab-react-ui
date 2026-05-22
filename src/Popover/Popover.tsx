@@ -50,6 +50,23 @@ type PopoverProps = {
      * Whether focus should be trapped inside the popover.
      */
     modal?: boolean;
+
+    /**
+     * Duration (ms) of the enter animations.
+     * @default 200
+     */
+    enterDuration?: number;
+    /**
+     * Duration (ms) of the exit animations.
+     * The modal stays mounted for this long after `opened` becomes false so the
+     * exit animation can finish before the DOM node is removed.
+     * @default 200
+     */
+    exitDuration?: number;
+    /** Called when the modal has fully entered (animation complete). */
+    onAnimationEntered?: () => void;
+    /** Called when the modal has fully exited (animation complete, just before unmount). */
+    onAnimationExited?: () => void;
 };
 
 type TriggerRenderProps = {
@@ -117,6 +134,11 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             closeOnOutsideClick = true,
 
             modal = false,
+
+            enterDuration = 0,
+            exitDuration = 100,
+            onAnimationEntered,
+            onAnimationExited,
         },
         ref,
     ) => {
@@ -168,6 +190,11 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 closeOnOutsideClick,
 
                 modal,
+
+                enterDuration,
+                exitDuration,
+                onAnimationEntered,
+                onAnimationExited,
             }),
             [
                 opened,
@@ -183,6 +210,10 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 closeOnEscape,
                 closeOnOutsideClick,
                 modal,
+                enterDuration,
+                exitDuration,
+                onAnimationEntered,
+                onAnimationExited,
             ],
         );
 
@@ -324,12 +355,20 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             panelId,
 
             closeOnEscape,
+
+            enterDuration,
+            exitDuration,
+            onAnimationEntered,
+            onAnimationExited,
         } = usePopoverContext();
 
         // ── Presence ──────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
             present: opened,
-            exitDuration: 200,
+            enterDuration: enterDuration,
+            exitDuration: exitDuration,
+            onEntered: onAnimationEntered,
+            onExited: onAnimationExited,
 
             // onExited: () => {
             //     requestAnimationFrame(() => {
@@ -345,14 +384,14 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
             closeOnEscape,
 
-            onEscape: () => {
-                setOpened(false);
-
-                // (refs.reference.current as HTMLElement | null)?.focus();
-                // requestAnimationFrame(() => {
-                //     (refs.reference.current as HTMLElement | null)?.focus();
-                // });
-            },
+            // onEscape: () => {
+            //     setOpened(false);
+            //
+            //     // (refs.reference.current as HTMLElement | null)?.focus();
+            //     // requestAnimationFrame(() => {
+            //     //     (refs.reference.current as HTMLElement | null)?.focus();
+            //     // });
+            // },
         });
 
         // ── Unmount after exit animation ─────────────────────────────────

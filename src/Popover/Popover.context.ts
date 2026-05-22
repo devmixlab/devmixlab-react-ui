@@ -27,6 +27,11 @@ type PopoverContextValue = {
     closeOnOutsideClick: boolean;
 
     modal: boolean;
+
+    enterDuration: number;
+    exitDuration: number;
+    onAnimationEntered?: () => void;
+    onAnimationExited?: () => void;
 };
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);
