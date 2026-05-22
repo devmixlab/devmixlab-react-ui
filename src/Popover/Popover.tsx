@@ -96,7 +96,6 @@ type PopoverTriggerProps = {
 type PopoverPanelProps = {
     children: React.ReactNode;
     className?: string;
-    size?: PopoverPanelSize;
 
     /**
      * Makes panel width match trigger width.
@@ -358,7 +357,10 @@ PopoverTrigger.displayName = 'PopoverTrigger';
 // ---------------------------------------------------------------------------
 
 const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
-    ({ children, className, size = 'auto', matchTriggerWidth = false, ...rest }, ref) => {
+    (
+        { children, className, matchTriggerWidth = false, shadow = 'lg', rounded = 'md', ...rest },
+        ref,
+    ) => {
         const {
             role,
             modal,
@@ -403,11 +405,10 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                             } as CSSProperties
                         }
                         className={[prefix('__panel'), className].filter(Boolean).join(' ')}
-                        shadow="lg"
-                        rounded="md"
+                        shadow={shadow}
+                        rounded={rounded}
                         {...getFloatingProps()}
                         data-animation-state={animationState}
-                        data-size={size}
                         data-match-trigger-width={matchTriggerWidth || undefined}
                         {...rest}
                     >

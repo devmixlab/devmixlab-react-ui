@@ -7,41 +7,6 @@
 $p: cfg.$prefix;
 $popover-prefix: #{$p}--popover;
 
-$sizes: (
-    auto: (
-        width: max-content,
-        max-width: calc(100vw - 1rem),
-    ),
-
-    xs: (
-        width: 12rem,
-    ),
-
-    sm: (
-        width: 16rem,
-    ),
-
-    md: (
-        width: 20rem,
-    ),
-
-    lg: (
-        width: 24rem,
-    ),
-
-    xl: (
-        width: 32rem,
-    ),
-
-    '2xl': (
-        width: 40rem,
-    ),
-
-    '3xl': (
-        width: 48rem,
-    ),
-);
-
 .#{$popover-prefix} {
     --transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
@@ -103,7 +68,7 @@ $sizes: (
         //    32rem,
         //    calc(100vw - 1rem)
         //);
-        max-width: calc(100vw - 1rem);
+        //max-width: calc(100vw - 1rem);
 
         outline: none;
 
@@ -160,16 +125,6 @@ $sizes: (
         &[data-align='viewport'] {
             left: 50% !important;
             transform: translateX(-50%);
-        }
-
-        //max-width: calc(100vw - 1rem);
-
-        @each $name, $styles in $sizes {
-            &[data-size='#{$name}'] {
-                @each $property, $value in $styles {
-                    #{$property}: $value;
-                }
-            }
         }
 
         &[data-match-trigger-width] {
