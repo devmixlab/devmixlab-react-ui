@@ -106,7 +106,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         // ── Presence ─────────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
             present: opened,
-            duration: animationDuration,
+            enterDuration: 100,
+            exitDuration: animationDuration,
             onEntered: onAnimationEntered,
             onExited: onAnimationExited,
         });

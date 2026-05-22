@@ -220,9 +220,22 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
 
         // Transition is always present so it fires in both directions.
-        transition:
-            opacity $animation-duration $animation-easing,
-            transform $animation-duration $animation-easing;
+        //transition:
+        //    opacity $animation-duration $animation-easing,
+        //    transform $animation-duration $animation-easing;
+
+        &[data-animation-state='entering'],
+        &[data-animation-state='entered'] {
+            transition:
+                opacity 180ms $animation-easing,
+                transform 180ms $animation-easing;
+        }
+
+        &[data-animation-state='exiting'] {
+            transition:
+                opacity 120ms $animation-easing,
+                transform 120ms $animation-easing;
+        }
 
         // Initial / exit state
         //&[data-animation-state='entering'],

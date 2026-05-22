@@ -329,7 +329,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         // ── Presence ──────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
             present: opened,
-            duration: 200,
+            exitDuration: 200,
 
             // onExited: () => {
             //     requestAnimationFrame(() => {
