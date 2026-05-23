@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { DropdownOptionProps, DropdownOptionData, OnReadyCallbackProps } from './Dropdown';
 import { FocusableListResult } from '../../hooks/useFocusableList';
+import { GroupContextValue } from './Group.context';
 
 // import { useFloatingLayer } from '../hooks';
 // import { PresenceState } from '../hooks/usePresence';
@@ -17,6 +18,7 @@ type DropdownContextValue = {
     focusByTypeahead: (key: string) => void;
 
     isOptionShown: (option: DropdownOptionData) => boolean;
+    isGroupShown: (group: GroupContextValue) => boolean;
 
     disabled: boolean;
     invalid: boolean;

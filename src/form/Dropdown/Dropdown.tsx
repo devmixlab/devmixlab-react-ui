@@ -186,6 +186,10 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             return isInFiltered;
         };
 
+        const isGroupShown = (group: GroupContextValue) => {
+            return filteredOptions.some((option) => option.group?.id === group.id);
+        };
+
         // ------------------------------------------------------------------
         // Focusable list (keyboard nav + focus tracking)
         // ------------------------------------------------------------------
@@ -268,6 +272,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
+                isGroupShown,
                 disabled,
                 invalid,
                 optionPressed,
@@ -295,6 +300,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
+                isGroupShown,
                 disabled,
                 invalid,
                 optionPressed,
@@ -591,12 +597,25 @@ type DropdownGroupProps = {
 
 const DropdownGroup = forwardRef<HTMLDivElement, DropdownGroupProps>(
     ({ children, className, label, ...rest }, ref) => {
-        // const ctx = useDropdownContext();
+        const { isGroupShown } = useDropdownContext();
 
         const id = useStableId('-group');
+        const group = useMemo(() => ({ id, label }), [id, label]);
+
+        const mountedRef = useRef(false);
+
+        useEffect(() => {
+            mountedRef.current = true;
+        }, []);
+
+        const shown = !mountedRef.current || isGroupShown(group);
+
+        if (!shown) {
+            return null;
+        }
 
         return (
-            <GroupContext.Provider value={{ id, label }}>
+            <GroupContext.Provider value={group}>
                 <Box ref={ref} className={clsx(prefix('__group'), className)} {...rest}>
                     {children}
                 </Box>
@@ -658,7 +677,7 @@ export type DropdownOptionProps = {
 const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
     ({ id, value, label, disabled, children, className, ...rest }, ref) => {
         // const finalId = id ?? useStableId('dropdown-option');
-        const optionId = value;
+        const optionId = id ?? value;
 
         const [pressed, setPressed] = useState<boolean>(false);
 
