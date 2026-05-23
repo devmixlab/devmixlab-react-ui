@@ -164,7 +164,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         // ------------------------------------------------------------------
 
         const filteredOptions = useMemo(() => {
-            if (!isSearchable || !search.trim()) return options;
+            if (!search.trim()) return options;
 
             const normalized = search.toLowerCase().trim();
             return options.filter((option) =>
@@ -176,6 +176,11 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             () => options.find((option) => option.value === selectedValue),
             [options, selectedValue],
         );
+
+        const isOptionShown = (option: DropdownOptionData) => {
+            const isInFiltered = filteredOptions.some((o) => o.id == option.id);
+            return isInFiltered;
+        };
 
         // ------------------------------------------------------------------
         // Floating (positioning + dismiss)
@@ -224,12 +229,12 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             itemRefs: optionRefs,
         } = focusableList;
 
-        useEffect(() => {
-            if (!opened) {
-                setFocuses(null);
-                if (isSearchable && search.length > 0) setSearch('');
-            }
-        }, [opened]);
+        // useEffect(() => {
+        //     if (!opened) {
+        //         setFocuses(null);
+        //         if (isSearchable && search.length > 0) setSearch('');
+        //     }
+        // }, [opened]);
 
         useEffect(() => {
             if (optionFocused == null) return;
@@ -334,6 +339,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 triggerRef,
                 handleSelect,
                 focusByTypeahead,
+                isOptionShown,
                 disabled,
                 invalid,
                 optionPressed,
@@ -358,6 +364,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 triggerRef,
                 handleSelect,
                 focusByTypeahead,
+                isOptionShown,
                 disabled,
                 invalid,
                 optionPressed,
@@ -492,11 +499,6 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
                         if (e.key === 'ArrowDown') {
                             e.preventDefault();
                             focusFirst();
-                        } else if (e.key === 'Escape') {
-                            setOpened(false);
-                            // focusTrigger();
-                            setFocuses(null);
-                            setOptionPressed(null);
                         }
                     }}
                 />
@@ -617,7 +619,8 @@ export type DropdownOptionProps = {
 
 const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
     ({ id, value, label, disabled, children, className, ...rest }, ref) => {
-        const finalId = id ?? useStableId('dropdown-option');
+        // const finalId = id ?? useStableId('dropdown-option');
+        const optionId = value;
 
         const [pressed, setPressed] = useState<boolean>(false);
 
@@ -632,7 +635,9 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
             isSearchable,
             searchInputRef,
             setOpened,
+            isOptionShown,
             // triggerRef,
+            options,
         } = useDropdownContext();
 
         const group = useGroupContext();
@@ -654,18 +659,20 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
         const selected = value === selectedValue;
         const finalDisabled = ctxDisabled || disabled;
 
-        useEffect(() => {
-            registerOption({
-                id: finalId,
-                value,
-                label,
-                disabled: finalDisabled,
-                children,
-                group: group ?? undefined,
-            });
+        const option = {
+            id: optionId,
+            value,
+            label,
+            disabled: finalDisabled,
+            children,
+            group: group ?? undefined,
+        };
 
-            // return () => unregisterOption(finalId);
-        }, [finalId, value, label, finalDisabled, children, group]);
+        useEffect(() => {
+            registerOption(option);
+
+            // return () => unregisterOption(optionId);
+        }, [optionId, value, label, finalDisabled, children, group]);
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
             const key = e.key;
@@ -677,14 +684,19 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
 
             if (key === 'ArrowDown') {
                 e.preventDefault();
-                if (isSearchable && finalId === lastFocusableId) {
+                if (isSearchable && optionId === lastFocusableId) {
                     searchInputRef.current?.focus();
                     return;
                 }
                 focusNext();
             } else if (key === 'ArrowUp') {
+                console.log('go Up');
+                console.log('isSearchable: ' + isSearchable);
+                console.log('firstFocusableId: ' + firstFocusableId);
+                console.log('optionId: ' + optionId);
+                console.log(options);
                 e.preventDefault();
-                if (isSearchable && finalId === firstFocusableId) {
+                if (isSearchable && optionId === firstFocusableId) {
                     searchInputRef.current?.focus();
                     return;
                 }
@@ -700,18 +712,22 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 // if (focusedId == null) return;
                 // handleSelect(filteredOptions[optionFocused].value);
                 handleSelect(value);
-            } else if (key === 'Escape') {
-                setOpened(false);
-
-                // focusTrigger();
-                setFocuses(null);
-                setPressed(false);
             }
+            // else if (key === 'Escape') {
+            //     // setOpened(false);
+            //     // focusTrigger();
+            //     // setFocuses(null);
+            //     // setPressed(false);
+            // }
         };
+
+        if (!isOptionShown(option)) {
+            return;
+        }
 
         return (
             <Box
-                ref={setRef(finalId) as React.Ref<HTMLDivElement>}
+                ref={setRef(optionId) as React.Ref<HTMLDivElement>}
                 tabIndex={finalDisabled ? -1 : 0}
                 className={prefix('__option-wrapper')}
                 onClick={() => {
@@ -720,8 +736,10 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 }}
                 onFocus={(e) => {
                     if (finalDisabled) return;
-                    setFocusedVisibleId(e.currentTarget.matches(':focus-visible') ? finalId : null);
-                    setFocusedId(finalId);
+                    setFocusedVisibleId(
+                        e.currentTarget.matches(':focus-visible') ? optionId : null,
+                    );
+                    setFocusedId(optionId);
                 }}
                 onBlur={() => {
                     setFocusedId(null);
@@ -742,13 +760,13 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 onMouseUp={() => setPressed(false)}
                 onMouseLeave={() => setPressed(false)}
                 role="option"
-                id={finalId}
+                id={optionId}
                 aria-selected={selected || undefined}
                 aria-disabled={finalDisabled || undefined}
             >
                 <Box
                     className={prefix('__option')}
-                    data-pseudo-focused={focusedVisibleId === finalId ? true : undefined}
+                    data-pseudo-focused={focusedVisibleId === optionId ? true : undefined}
                     data-pseudo-active={pressed || undefined}
                     data-selected={selected || undefined}
                     data-disabled={finalDisabled}

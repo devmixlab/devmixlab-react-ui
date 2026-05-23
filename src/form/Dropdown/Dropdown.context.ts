@@ -16,6 +16,8 @@ type DropdownContextValue = {
 
     focusByTypeahead: (key: string) => void;
 
+    isOptionShown: (option: DropdownOptionData) => boolean;
+
     disabled: boolean;
     invalid: boolean;
 
