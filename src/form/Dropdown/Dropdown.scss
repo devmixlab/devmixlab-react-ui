@@ -6,45 +6,61 @@
 
 $p: cfg.$prefix;
 $dropdown-prefix: #{$p}--dropdown;
+$content-prefix: #{$dropdown-prefix}__content;
 
 $sizes: (
     sm: (
         optionHeight: 28px,
         optionPaddingX: 10px,
 
-        menuPaddingY: 4px,
+        contentPaddingY: 4px,
 
         searchPaddingX: 6px,
         searchPaddingY: 6px,
+
+        groupLabelPaddingY: 6px,
+        groupLabelStickyPaddingY: 8px,
     ),
 
     md: (
         optionHeight: 36px,
         optionPaddingX: 14px,
 
-        menuPaddingY: 6px,
+        contentPaddingY: 6px,
 
         searchPaddingX: 8px,
         searchPaddingY: 8px,
+
+        groupLabelPaddingY: 7px,
+        groupLabelStickyPaddingY: 9px,
     ),
 
     lg: (
         optionHeight: 42px,
         optionPaddingX: 18px,
 
-        menuPaddingY: 8px,
+        contentPaddingY: 8px,
 
         searchPaddingX: 10px,
         searchPaddingY: 10px,
+
+        groupLabelPaddingY: 8px,
+        groupLabelStickyPaddingY: 10px,
     ),
 );
 
 .#{$dropdown-prefix} {
 
+
+
+}
+
+.#{$content-prefix} {
+
     --option-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
-    --menu-bg: #{functions.intent-color('gray', 200)};
-    --menu-border: #{functions.intent-color('zinc', 300)};
+    --content-bg: #{functions.intent-color('gray', 200)};
+    --content-border: #{functions.intent-color('zinc', 300)};
 
     --option-bg: transparent;
 
@@ -64,8 +80,8 @@ $sizes: (
     --option-outline-focus: #{functions.intent-color('zinc', 400)};
 
     @include cfg.dark {
-        --menu-bg: #{functions.intent-color('zinc', 900)};
-        --menu-border: #{functions.intent-color('zinc', 800)};
+        --content-bg: #{functions.intent-color('zinc', 900)};
+        --content-border: #{functions.intent-color('zinc', 800)};
 
         --option-bg-hover: #{functions.intent-color('zinc', 800)};
         --option-bg-focus: #{functions.intent-color('zinc', 750)};
@@ -85,54 +101,38 @@ $sizes: (
         &[data-size='#{$size}'] {
             --option-height: #{map.get($value, optionHeight)};
             --option-padding-x: #{map.get($value, optionPaddingX)};
-            --menu-padding-y: #{map.get($value, menuPaddingY)};
+            --content-padding-y: #{map.get($value, contentPaddingY)};
 
             --search-padding-x: #{map.get($value, searchPaddingX)};
             --search-padding-y: #{map.get($value, searchPaddingY)};
+
+            --group-label-padding-y: #{map.get($value, groupLabelPaddingY)};
+            --group-label-sticky-padding-y: #{map.get($value, groupLabelStickyPaddingY)};
         }
     }
 
-    .#{$dropdown-prefix}__trigger {
-        display: inline-flex;
+    min-width: max-content;
 
-        &:focus,
-        &:focus-visible {
-            outline: none;
-            box-shadow: none;
-        }
+    //z-index: 1000;
+
+    padding-top: var(--content-padding-y);
+    padding-bottom: var(--content-padding-y);
+
+    background-color: var(--content-bg);
+    border: 1px solid var(--content-border);
+
+    //isolation: isolate;
+    //backdrop-filter: blur(12px);
+
+    .#{$dropdown-prefix}__search-wrapper {
+        padding: calc(var(--search-padding-y) - var(--content-padding-y)) var(--search-padding-x) var(--search-padding-y);
     }
 
-    .#{$dropdown-prefix}__chevron {
-        flex-shrink: 0;
+    .#{$dropdown-prefix}__search-results {
 
-        opacity: 0.8;
-
-        transition:
-            transform var(--option-transition),
-            opacity var(--option-transition);
-
-        &[data-opened] {
-            transform: rotate(180deg);
-            opacity: 1;
-        }
     }
 
-    .#{$dropdown-prefix}__menu {
-        min-width: max-content;
-
-        z-index: 1000;
-
-        padding-top: var(--menu-padding-y);
-        padding-bottom: var(--menu-padding-y);
-
-        background-color: var(--menu-bg);
-        border: 1px solid var(--menu-border);
-
-        isolation: isolate;
-        backdrop-filter: blur(12px);
-    }
-
-    .#{$dropdown-prefix}__menu-wrapper {
+    .#{$dropdown-prefix}__list {
         min-width: max-content;
         max-height: calc(
             var(--option-height) *
@@ -146,16 +146,53 @@ $sizes: (
         scrollbar-width: thin;
     }
 
-    .#{$dropdown-prefix}__search-wrapper {
-        padding: calc(var(--search-padding-y) - var(--menu-padding-y)) var(--search-padding-x) var(--search-padding-y);
+    .#{$dropdown-prefix}__group {
+        display: flex;
+        flex-direction: column;
+
+        padding-top: 4px;
+
+        &:not(:first-child) {
+            margin-top: 4px;
+            border-top: 1px solid var(--content-border);
+        }
     }
 
-    .#{$dropdown-prefix}__search-results {
+    .#{$dropdown-prefix}__group-label {
+        padding: var(--group-label-padding-y) var(--option-padding-x);
 
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1;
+
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+
+        color: var(--option-text-disabled);
+
+        user-select: none;
+        pointer-events: none;
+
+        box-sizing: border-box;
     }
 
-    &__option {
-        @include mixins.reset-button;
+    .#{$dropdown-prefix}__group-label[data-sticky='true'] {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+
+        padding-top: var(--group-label-sticky-padding-y);
+        padding-bottom: var(--group-label-sticky-padding-y);
+
+        background-color: rgb(from var(--content-bg) r g b / 0.85);
+
+        backdrop-filter: blur(8px);
+
+        border-bottom: 1px solid var(--content-border);
+
+        isolation: isolate;
     }
 
     .#{$dropdown-prefix}__option-wrapper {
@@ -179,6 +216,8 @@ $sizes: (
         user-select: none;
 
         &:not([data-disabled]) {
+            cursor: pointer;
+
             &:hover {
                 background: var(--option-bg-hover);
             }
@@ -216,4 +255,5 @@ $sizes: (
             opacity: 0.5;
         }
     }
+
 }

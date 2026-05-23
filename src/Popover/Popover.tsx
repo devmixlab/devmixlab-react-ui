@@ -33,6 +33,7 @@ export type PopoverRole = 'dialog' | 'menu' | 'listbox';
 
 type PopoverProps = {
     children: React.ReactNode;
+    className?: string;
 
     tree?: boolean;
     role?: PopoverRole;
@@ -143,6 +144,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
     (
         {
             children,
+            className,
 
             tree = false,
             role = 'dialog',
@@ -256,7 +258,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         const content = (
             <FloatingNode id={nodeId}>
                 <PopoverContext.Provider value={value}>
-                    <Box ref={ref} className={prefix()}>
+                    <Box ref={ref} className={clsx(prefix(), className)}>
                         {children}
                     </Box>
                 </PopoverContext.Provider>
@@ -314,7 +316,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 ref={combinedRef}
                 id={triggerId}
                 {...getReferenceProps()}
-                className={prefix('__trigger')}
+                className={clsx(prefix('__trigger'), className)}
                 onClick={() => {
                     if (disabled) return;
                     setOpened(!opened);
@@ -357,7 +359,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                         disabled={disabled}
                         pseudoFocused={triggerFocusedVisible}
                         pseudoActive={pressed}
-                        className={clsx(prefix('__trigger-button'), className)}
+                        className={prefix('__trigger-button')}
                         active={opened}
                         endIcon={
                             chevron && (

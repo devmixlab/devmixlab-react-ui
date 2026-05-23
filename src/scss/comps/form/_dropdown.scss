@@ -43,8 +43,8 @@ $sizes: (
 
     --option-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
-    --menu-bg: #{functions.intent-color('gray', 200)};
-    --menu-border: #{functions.intent-color('zinc', 300)};
+    --content-bg: #{functions.intent-color('gray', 200)};
+    --content-border: #{functions.intent-color('zinc', 300)};
 
     --option-bg: transparent;
 
@@ -64,8 +64,8 @@ $sizes: (
     --option-outline-focus: #{functions.intent-color('zinc', 400)};
 
     @include cfg.dark {
-        --menu-bg: #{functions.intent-color('zinc', 900)};
-        --menu-border: #{functions.intent-color('zinc', 800)};
+        --content-bg: #{functions.intent-color('zinc', 900)};
+        --content-border: #{functions.intent-color('zinc', 800)};
 
         --option-bg-hover: #{functions.intent-color('zinc', 800)};
         --option-bg-focus: #{functions.intent-color('zinc', 750)};
@@ -125,8 +125,8 @@ $sizes: (
         padding-top: var(--menu-padding-y);
         padding-bottom: var(--menu-padding-y);
 
-        background-color: var(--menu-bg);
-        border: 1px solid var(--menu-border);
+        background-color: var(--content-bg);
+        border: 1px solid var(--content-border);
 
         isolation: isolate;
         backdrop-filter: blur(12px);

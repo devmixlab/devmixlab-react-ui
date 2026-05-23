@@ -42,6 +42,8 @@ type DropdownContextValue = {
     unregisterOption: (id: string) => void;
 
     runAfterReady: (callback: () => void) => void;
+
+    stickyGroupLabels: boolean;
 };
 
 const DropdownContext = createContext<DropdownContextValue | null>(null);

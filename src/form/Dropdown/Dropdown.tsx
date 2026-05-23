@@ -61,6 +61,8 @@ export type DropdownProps = {
     invalid?: boolean;
 
     triggerRender?: (props: TriggerRenderProps) => React.ReactNode;
+
+    stickyGroupLabels?: boolean;
 } & PopoverProps;
 
 type DropdownComponent = React.ForwardRefExoticComponent<
@@ -111,6 +113,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             // size = 'md',
 
             triggerRender,
+
+            stickyGroupLabels = false,
 
             ...rest
         },
@@ -282,6 +286,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 registerOption,
                 unregisterOption,
                 runAfterReady,
+                stickyGroupLabels,
             }),
             [
                 opened,
@@ -307,6 +312,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 registerOption,
                 unregisterOption,
                 runAfterReady,
+                stickyGroupLabels,
             ],
         );
 
@@ -317,6 +323,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         return (
             <DropdownContext.Provider value={ctxValue}>
                 <Popover
+                    className={prefix()}
                     open={opened}
                     onOpenChange={(state) => {
                         onOpenChange?.(state);
@@ -348,12 +355,8 @@ type DropdownTriggerProps = {
 } & PopoverTriggerProps;
 
 const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
-    (
-        { children, className, placeholder = 'Select option', chevron = false, render, ...rest },
-        ref,
-    ) => {
+    ({ placeholder = 'Select option', render, ...rest }, ref) => {
         const {
-            options,
             selectedOption,
             isSearchable,
             focusableList,
@@ -364,20 +367,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             focusByTypeahead,
         } = useDropdownContext();
 
-        const {
-            setRef,
-            setFocusedVisibleId,
-            setFocusedId,
-            focusedVisibleId,
-            focusNext,
-            focusFirst,
-            focusLast,
-            focusById,
-            lastFocusableId,
-            firstFocusableId,
-            focusedId,
-            setFocuses,
-        } = focusableList;
+        const { focusFirst, focusLast, focusById } = focusableList;
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
             const key = e.key;
@@ -434,9 +424,20 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
         };
 
         return render ? (
-            <Popover.Trigger {...rest} onKeyDown={handleKeyDown} render={render} />
+            <Popover.Trigger
+                ref={ref}
+                {...rest}
+                className={prefix('__trigger')}
+                onKeyDown={handleKeyDown}
+                render={render}
+            />
         ) : (
-            <Popover.Trigger {...rest} onKeyDown={handleKeyDown} chevron={chevron}>
+            <Popover.Trigger
+                ref={ref}
+                {...rest}
+                className={prefix('__trigger')}
+                onKeyDown={handleKeyDown}
+            >
                 {selectedOption?.children ?? (
                     <Box as="span" opacity={0.8}>
                         {placeholder}
@@ -455,11 +456,17 @@ Dropdown.Trigger = DropdownTrigger;
 // DropdownContent
 // ---------------------------------------------------------------------------
 
-type DropdownContentProps = {} & PopoverPanelProps;
+type DropdownContentProps = {
+    size?: 'sm' | 'md' | 'lg';
+} & PopoverPanelProps;
 
 const DropdownContent = forwardRef<HTMLElement, DropdownContentProps>(
-    ({ children, ...rest }, ref) => {
-        return <Popover.Panel {...rest}>{children}</Popover.Panel>;
+    ({ children, className, size = 'md', ...rest }, ref) => {
+        return (
+            <Popover.Panel className={prefix('__content')} {...rest} data-size={size}>
+                {children}
+            </Popover.Panel>
+        );
     },
 );
 
@@ -609,12 +616,22 @@ Dropdown.Group = DropdownGroup;
 export type DropdownLabelProps = {
     children: React.ReactNode;
     className: string;
+    sticky?: boolean;
 } & BoxProps;
 
 const DropdownLabel = forwardRef<HTMLDivElement, DropdownLabelProps>(
-    ({ children, className, ...rest }, ref) => {
+    ({ children, className, sticky, ...rest }, ref) => {
+        const { stickyGroupLabels } = useDropdownContext();
+
+        const resolvedSticky = sticky ?? stickyGroupLabels;
+
         return (
-            <Box ref={ref} className={clsx(prefix('__group-label'), className)} {...rest}>
+            <Box
+                ref={ref}
+                className={clsx(prefix('__group-label'), className)}
+                {...rest}
+                data-sticky={resolvedSticky}
+            >
                 {children}
             </Box>
         );
