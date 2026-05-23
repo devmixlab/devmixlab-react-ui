@@ -1,15 +1,11 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import type { Placement } from '@floating-ui/react';
 import { Box, BoxProps } from '../../Box/Box';
-import { Button, type ButtonImplProps } from '../../Button/Button';
 import { useFormFieldContext } from '../FormField/formField.context';
-import { mergeRefs } from '../../utils/mergeRefs';
 import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';
 import { SearchInput, SearchInputProps } from '../SearchInput/SearchInput';
 import { Text } from '../../Text/Text';
-import { ChevronDown as ChevronDownIcon } from '../../Icon';
-import { useFloatingLayer, useFocusableList, useTypeahead } from '../../hooks';
+import { useFocusableList, useTypeahead } from '../../hooks';
 import {
     Popover,
     TriggerRenderProps,
@@ -17,11 +13,9 @@ import {
     PopoverProps,
     PopoverTriggerProps,
 } from '../../Popover';
-import { type PopoverContextValue, usePopoverContext } from '../../Popover/Popover.context';
 import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
-import { FocusableListResult } from '../../hooks/useFocusableList';
 
 // ---------------------------------------------------------------------------
 // Types
