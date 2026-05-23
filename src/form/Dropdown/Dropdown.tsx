@@ -265,14 +265,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const triggerRef = useRef<HTMLElement>(null);
 
         // ------------------------------------------------------------------
-        // Focus helper
-        // ------------------------------------------------------------------
-
-        // const focusTrigger = () => {
-        //     (refs.reference.current as HTMLDivElement | null)?.focus();
-        // };
-
-        // ------------------------------------------------------------------
         // Handlers
         // ------------------------------------------------------------------
 
@@ -487,7 +479,7 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
             return () => setIsSearchable(false);
         }, [setIsSearchable]);
 
-        const { focusFirst, setFocuses } = focusableList;
+        const { focusFirst, setFocuses, focusLast } = focusableList;
 
         return (
             <Box className={prefix('__search-wrapper')}>
@@ -502,6 +494,12 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
                         if (e.key === 'ArrowDown') {
                             e.preventDefault();
                             focusFirst();
+                        } else if (e.key === 'Home') {
+                            e.preventDefault();
+                            focusFirst();
+                        } else if (e.key === 'End') {
+                            e.preventDefault();
+                            focusLast();
                         } else if (e.key === 'Escape') {
                             e.preventDefault();
                             e.stopPropagation();
