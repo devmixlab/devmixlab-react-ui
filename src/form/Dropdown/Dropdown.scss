@@ -1,0 +1,219 @@
+@use '../../scss/functions' as functions;
+@use '../../scss/mixins' as mixins;
+
+@use '../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$dropdown-prefix: #{$p}--dropdown;
+
+$sizes: (
+    sm: (
+        optionHeight: 28px,
+        optionPaddingX: 10px,
+
+        menuPaddingY: 4px,
+
+        searchPaddingX: 6px,
+        searchPaddingY: 6px,
+    ),
+
+    md: (
+        optionHeight: 36px,
+        optionPaddingX: 14px,
+
+        menuPaddingY: 6px,
+
+        searchPaddingX: 8px,
+        searchPaddingY: 8px,
+    ),
+
+    lg: (
+        optionHeight: 42px,
+        optionPaddingX: 18px,
+
+        menuPaddingY: 8px,
+
+        searchPaddingX: 10px,
+        searchPaddingY: 10px,
+    ),
+);
+
+.#{$dropdown-prefix} {
+
+    --option-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+
+    --menu-bg: #{functions.intent-color('gray', 200)};
+    --menu-border: #{functions.intent-color('zinc', 300)};
+
+    --option-bg: transparent;
+
+    --option-bg-hover: #{functions.intent-color('zinc', 100)};
+    --option-bg-focus: #{functions.intent-color('zinc', 150)};
+    --option-bg-active: #{functions.intent-color('zinc', 200)};
+
+    --option-bg-selected: #{functions.intent-color('primary', 100)};
+    --option-bg-selected-focus: #{functions.intent-color('primary', 150)};
+    --option-bg-selected-active: #{functions.intent-color('primary', 200)};
+
+    --option-text: inherit;
+    --option-text-focus: inherit;
+    --option-text-selected: #{functions.intent-color('primary', 800)};
+    --option-text-disabled: #{functions.intent-color('zinc', 500)};
+
+    --option-outline-focus: #{functions.intent-color('zinc', 400)};
+
+    @include cfg.dark {
+        --menu-bg: #{functions.intent-color('zinc', 900)};
+        --menu-border: #{functions.intent-color('zinc', 800)};
+
+        --option-bg-hover: #{functions.intent-color('zinc', 800)};
+        --option-bg-focus: #{functions.intent-color('zinc', 750)};
+        --option-bg-active: #{functions.intent-color('zinc', 700)};
+
+        --option-bg-selected: #{functions.intent-color('primary', 900)};
+        --option-bg-selected-focus: #{functions.intent-color('primary', 800)};
+        --option-bg-selected-active: #{functions.intent-color('primary', 700)};
+
+        --option-text-selected: #{functions.intent-color('primary', 200)};
+        --option-text-disabled: #{functions.intent-color('zinc', 500)};
+
+        --option-outline-focus: #{functions.intent-color('zinc', 600)};
+    }
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            --option-height: #{map.get($value, optionHeight)};
+            --option-padding-x: #{map.get($value, optionPaddingX)};
+            --menu-padding-y: #{map.get($value, menuPaddingY)};
+
+            --search-padding-x: #{map.get($value, searchPaddingX)};
+            --search-padding-y: #{map.get($value, searchPaddingY)};
+        }
+    }
+
+    .#{$dropdown-prefix}__trigger {
+        display: inline-flex;
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    .#{$dropdown-prefix}__chevron {
+        flex-shrink: 0;
+
+        opacity: 0.8;
+
+        transition:
+            transform var(--option-transition),
+            opacity var(--option-transition);
+
+        &[data-opened] {
+            transform: rotate(180deg);
+            opacity: 1;
+        }
+    }
+
+    .#{$dropdown-prefix}__menu {
+        min-width: max-content;
+
+        z-index: 1000;
+
+        padding-top: var(--menu-padding-y);
+        padding-bottom: var(--menu-padding-y);
+
+        background-color: var(--menu-bg);
+        border: 1px solid var(--menu-border);
+
+        isolation: isolate;
+        backdrop-filter: blur(12px);
+    }
+
+    .#{$dropdown-prefix}__menu-wrapper {
+        min-width: max-content;
+        max-height: calc(
+            var(--option-height) *
+            var(--visible-options)
+        );
+
+        display: flex;
+        flex-direction: column;
+
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .#{$dropdown-prefix}__search-wrapper {
+        padding: calc(var(--search-padding-y) - var(--menu-padding-y)) var(--search-padding-x) var(--search-padding-y);
+    }
+
+    .#{$dropdown-prefix}__search-results {
+
+    }
+
+    &__option {
+        @include mixins.reset-button;
+    }
+
+    .#{$dropdown-prefix}__option-wrapper {
+        &:focus,
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    .#{$dropdown-prefix}__option {
+        background-color: var(--option-bg);
+        height: var(--option-height);
+        padding: 0 var(--option-padding-x);
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        color: var(--option-text);
+        transition: background-color var(--option-transition),
+        color var(--option-transition);
+        user-select: none;
+
+        &:not([data-disabled]) {
+            &:hover {
+                background: var(--option-bg-hover);
+            }
+
+            &[data-pseudo-focused] {
+                background: var(--option-bg-focus);
+                color: var(--option-text-focus);
+
+                box-shadow: inset 0 0 0 1px var(--option-outline-focus);
+            }
+
+            &[data-pseudo-active] {
+                background: var(--option-bg-active);
+            }
+
+            &[data-selected] {
+                background: var(--option-bg-selected);
+                color: var(--option-text-selected);
+                font-weight: 500;
+
+                &[data-pseudo-active] {
+                    background: var(--option-bg-selected-active);
+                }
+            }
+
+            &[data-selected][data-pseudo-focused] {
+                background: var(--option-bg-selected-focus);
+            }
+        }
+
+        &[data-disabled] {
+            color: var(--option-text-disabled);
+            cursor: default;
+
+            opacity: 0.5;
+        }
+    }
+}

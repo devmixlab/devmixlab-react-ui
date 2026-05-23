@@ -189,35 +189,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         };
 
         // ------------------------------------------------------------------
-        // Floating (positioning + dismiss)
-        // ------------------------------------------------------------------
-
-        // const { refs, floatingStyles, getReferenceProps, getFloatingProps } = useFloatingLayer(
-        //     opened,
-        //     setOpened,
-        //     placement,
-        // );
-
-        // const combinedRef = mergeRefs(refs.setReference, ref);
-
-        // ------------------------------------------------------------------
         // Focusable list (keyboard nav + focus tracking)
         // ------------------------------------------------------------------
-
-        // const {
-        //     focused: optionFocused,
-        //     focusedVisible: optionFocusedVisible,
-        //     setFocused: setOptionFocused,
-        //     setFocusedVisible: setOptionFocusedVisible,
-        //     setFocuses,
-        //     focusFirst,
-        //     focusLast,
-        //     focusNext,
-        //     setRef: setOptionRef,
-        //     firstFocusableIndex,
-        //     lastFocusableIndex,
-        //     itemRefs: optionRefs,
-        // } = useFocusableList(filteredOptions);
 
         const focusableList = useFocusableList(filteredOptions);
         const {
@@ -234,13 +207,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             lastFocusableId,
             itemRefs: optionRefs,
         } = focusableList;
-
-        // useEffect(() => {
-        //     if (!opened) {
-        //         setFocuses(null);
-        //         if (isSearchable && search.length > 0) setSearch('');
-        //     }
-        // }, [opened]);
 
         useEffect(() => {
             if (optionFocused == null) return;
@@ -450,6 +416,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             setOpened,
             opened,
             runAfterReady,
+            focusByTypeahead,
         } = useDropdownContext();
 
         const {
@@ -469,6 +436,11 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
             const key = e.key;
+
+            if (key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                focusByTypeahead(key);
+                return;
+            }
 
             if (key === 'ArrowUp') {
                 e.preventDefault();
