@@ -21,10 +21,16 @@ import { type PopoverContextValue, usePopoverContext } from '../../Popover/Popov
 import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
+import { FocusableListResult } from '../../hooks/useFocusableList';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+export type OnReadyCallbackProps = {
+    isSearchable: boolean;
+    searchInputRef: React.RefObject<HTMLInputElement>;
+};
 
 export type DropdownRole = 'menu' | 'listbox';
 
@@ -261,12 +267,27 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         // Refs
         // ------------------------------------------------------------------
 
+        const readyCallbacksRef = useRef<Array<() => void>>([]);
         const searchInputRef = useRef<HTMLInputElement>(null);
         const triggerRef = useRef<HTMLElement>(null);
 
         // ------------------------------------------------------------------
         // Handlers
         // ------------------------------------------------------------------
+
+        const runAfterReady = useCallback((callback: () => void) => {
+            readyCallbacksRef.current.push(callback);
+        }, []);
+
+        const flushReadyCallbacks = useCallback(() => {
+            const callbacks = readyCallbacksRef.current;
+
+            readyCallbacksRef.current = [];
+
+            callbacks.forEach((callback) => {
+                callback();
+            });
+        }, []);
 
         const handleSelect = (nextValue: string) => {
             if (!isControlled) setInternalValue(nextValue);
@@ -349,6 +370,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 filteredOptions,
                 registerOption,
                 unregisterOption,
+                runAfterReady,
             }),
             [
                 opened,
@@ -373,6 +395,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 filteredOptions,
                 registerOption,
                 unregisterOption,
+                runAfterReady,
             ],
         );
 
@@ -391,6 +414,9 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     {...rest}
                     onUnmount={() => {
                         if (search.length > 0) setSearch('');
+                    }}
+                    onReady={() => {
+                        flushReadyCallbacks();
                     }}
                 >
                     {children}
@@ -423,6 +449,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             searchInputRef,
             setOpened,
             opened,
+            runAfterReady,
         } = useDropdownContext();
 
         const {
@@ -433,6 +460,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             focusNext,
             focusFirst,
             focusLast,
+            focusById,
             lastFocusableId,
             firstFocusableId,
             focusedId,
@@ -467,21 +495,24 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
                     focusFirst();
                 }
             } else if (key === 'Enter' || key === ' ') {
-                if (isSearchable) {
-                    searchInputRef.current?.focus();
-                    return;
-                }
+                runAfterReady(() => {
+                    if (opened) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpened(false);
+                        return;
+                    }
 
-                console.log(selectedOption);
-                if (selectedOption) {
-                } else {
-                    console.log('enter');
-                    console.log(options);
-                    focusFirst(true);
-                    // requestAnimationFrame(() => {
-                    //     focusFirst();
-                    // });
-                }
+                    if (searchInputRef.current) {
+                        searchInputRef.current?.focus();
+                    } else {
+                        if (selectedOption) {
+                            focusById(selectedOption.id);
+                        } else {
+                            focusFirst();
+                        }
+                    }
+                });
             }
         };
 
@@ -763,11 +794,6 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 }
                 focusNext();
             } else if (key === 'ArrowUp') {
-                console.log('go Up');
-                console.log('isSearchable: ' + isSearchable);
-                console.log('firstFocusableId: ' + firstFocusableId);
-                console.log('optionId: ' + optionId);
-                console.log(options);
                 e.preventDefault();
                 if (isSearchable && optionId === firstFocusableId) {
                     searchInputRef.current?.focus();
@@ -782,16 +808,11 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 focusLast();
             } else if (key === 'Enter' || key === ' ') {
                 setPressed(true);
-                // if (focusedId == null) return;
-                // handleSelect(filteredOptions[optionFocused].value);
                 handleSelect(value);
             } else if (key === 'Escape') {
                 e.preventDefault();
                 e.stopPropagation();
                 setOpened(false);
-                // focusTrigger();
-                // setFocuses(null);
-                // setPressed(false);
             }
         };
 

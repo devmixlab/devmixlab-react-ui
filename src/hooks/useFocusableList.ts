@@ -20,6 +20,8 @@ export type FocusableListResult = {
     focusFirst: (pending?: boolean) => void;
     focusLast: (pending?: boolean) => void;
 
+    focusById: (id: string, pending?: boolean) => void;
+
     focusNext: (direction?: 1 | -1) => void;
 
     setRef: (id: string) => (node: HTMLElement | null) => void;
@@ -110,6 +112,20 @@ export function useFocusableList<T extends FocusableItem>(items: T[]): Focusable
         [enabledItems, focusItem],
     );
 
+    const focusById = useCallback(
+        (id: string, pending = false) => {
+            const success = focusItem(id);
+
+            if (!success && pending) {
+                pendingFocusRef.current = {
+                    type: 'id',
+                    id,
+                };
+            }
+        },
+        [focusItem],
+    );
+
     const focusNext = useCallback(
         (direction: 1 | -1 = 1) => {
             if (!enabledItems.length) return;
@@ -151,6 +167,7 @@ export function useFocusableList<T extends FocusableItem>(items: T[]): Focusable
 
         focusFirst,
         focusLast,
+        focusById,
         focusNext,
 
         setRef,

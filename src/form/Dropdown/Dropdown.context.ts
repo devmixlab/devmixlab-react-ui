@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { DropdownOptionProps, DropdownOptionData } from './Dropdown';
+import { DropdownOptionProps, DropdownOptionData, OnReadyCallbackProps } from './Dropdown';
 import { FocusableListResult } from '../../hooks/useFocusableList';
 
 // import { useFloatingLayer } from '../hooks';
@@ -40,6 +40,8 @@ type DropdownContextValue = {
 
     registerOption: (option: DropdownOptionData) => void;
     unregisterOption: (id: string) => void;
+
+    runAfterReady: (callback: () => void) => void;
 };
 
 const DropdownContext = createContext<DropdownContextValue | null>(null);

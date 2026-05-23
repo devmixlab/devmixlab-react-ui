@@ -406,19 +406,6 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             onReady,
         } = usePopoverContext();
 
-        // ── Unmount after exit animation ─────────────────────────────────
-        if (!isMounted) {
-            return null;
-        }
-
-        // useLayoutEffect(() => {
-        //     if (!refs.floating.current) return;
-        //
-        //     queueMicrotask(() => {
-        //         onReady?.();
-        //     });
-        // }, [isMounted, refs.floating, onReady]);
-
         const handleFloatingRef = useCallback(
             (node: HTMLDivElement | null) => {
                 refs.setFloating(node);
@@ -431,6 +418,19 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             },
             [refs, onReady],
         );
+
+        // ── Unmount after exit animation ─────────────────────────────────
+        if (!isMounted) {
+            return null;
+        }
+
+        // useLayoutEffect(() => {
+        //     if (!refs.floating.current) return;
+        //
+        //     queueMicrotask(() => {
+        //         onReady?.();
+        //     });
+        // }, [isMounted, refs.floating, onReady]);
 
         return (
             <FloatingPortal>
