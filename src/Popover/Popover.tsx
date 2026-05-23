@@ -1,4 +1,11 @@
-import React, { CSSProperties, forwardRef, useMemo, useState } from 'react';
+import React, {
+    CSSProperties,
+    forwardRef,
+    useMemo,
+    useState,
+    useLayoutEffect,
+    useCallback,
+} from 'react';
 import {
     FloatingTree,
     FloatingPortal,
@@ -80,6 +87,7 @@ type PopoverProps = {
 
     onMount?: () => void;
     onUnmount?: () => void;
+    onReady?: () => void;
 };
 
 type TriggerRenderProps = {
@@ -160,6 +168,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 
             onMount,
             onUnmount,
+            onReady,
         },
         ref,
     ) => {
@@ -223,6 +232,8 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 
                 isMounted,
                 animationState,
+
+                onReady,
             }),
             [
                 opened,
@@ -238,6 +249,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
                 modal,
                 isMounted,
                 animationState,
+                onReady,
             ],
         );
 
@@ -390,12 +402,35 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
             isMounted,
             animationState,
+
+            onReady,
         } = usePopoverContext();
 
         // ── Unmount after exit animation ─────────────────────────────────
         if (!isMounted) {
             return null;
         }
+
+        // useLayoutEffect(() => {
+        //     if (!refs.floating.current) return;
+        //
+        //     queueMicrotask(() => {
+        //         onReady?.();
+        //     });
+        // }, [isMounted, refs.floating, onReady]);
+
+        const handleFloatingRef = useCallback(
+            (node: HTMLDivElement | null) => {
+                refs.setFloating(node);
+
+                if (!node) return;
+
+                queueMicrotask(() => {
+                    onReady?.();
+                });
+            },
+            [refs, onReady],
+        );
 
         return (
             <FloatingPortal>
@@ -406,7 +441,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                     // returnFocus={modal}
                 >
                     <Box
-                        ref={mergeRefs(refs.setFloating, ref)}
+                        // ref={mergeRefs(refs.setFloating, ref)}
+                        ref={mergeRefs(handleFloatingRef, ref)}
                         id={panelId}
                         role={role}
                         tabIndex={-1}

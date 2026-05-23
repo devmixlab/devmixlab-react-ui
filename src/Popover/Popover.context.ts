@@ -27,6 +27,8 @@ type PopoverContextValue = {
 
     isMounted: boolean;
     animationState: PresenceState;
+
+    onReady?: () => void;
 };
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);
