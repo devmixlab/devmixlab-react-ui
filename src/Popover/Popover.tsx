@@ -77,6 +77,9 @@ type PopoverProps = {
     onAnimationEntered?: () => void;
     /** Called when the modal has fully exited (animation complete, just before unmount). */
     onAnimationExited?: () => void;
+
+    onMount?: () => void;
+    onUnmount?: () => void;
 };
 
 type TriggerRenderProps = {
@@ -148,6 +151,9 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             exitDuration = 200,
             onAnimationEntered,
             onAnimationExited,
+
+            onMount,
+            onUnmount,
         },
         ref,
     ) => {
@@ -164,6 +170,8 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
             exitDuration,
             onEntered: onAnimationEntered,
             onExited: onAnimationExited,
+            onMount,
+            onUnmount,
         });
 
         const setOpened = (next: boolean) => {

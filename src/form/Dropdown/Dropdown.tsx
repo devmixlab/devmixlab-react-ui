@@ -397,6 +397,9 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                         setOpened(state);
                     }}
                     {...rest}
+                    onUnmount={() => {
+                        if (search.length > 0) setSearch('');
+                    }}
                 >
                     {children}
                 </Popover>
