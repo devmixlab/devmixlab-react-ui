@@ -189,16 +189,16 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const focusableList = useFocusableList(filteredOptions);
         const {
             focusedId: optionFocused,
-            focusedVisibleId: optionFocusedVisible,
-            setFocusedId: setOptionFocused,
-            setFocusedVisibleId: setOptionFocusedVisible,
+            // focusedVisibleId: optionFocusedVisible,
+            // setFocusedId: setOptionFocused,
+            // setFocusedVisibleId: setOptionFocusedVisible,
             setFocuses,
-            focusFirst,
-            focusLast,
-            focusNext,
-            setRef: setOptionRef,
-            firstFocusableId,
-            lastFocusableId,
+            // focusFirst,
+            // focusLast,
+            // focusNext,
+            // setRef: setOptionRef,
+            // firstFocusableId,
+            // lastFocusableId,
             itemRefs: optionRefs,
         } = focusableList;
 
@@ -210,13 +210,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         // ------------------------------------------------------------------
         // Typeahead
         // ------------------------------------------------------------------
-
-        // const getFilteredItems = () => filteredOptions;
-
-        // const focusByTypeahead = useTypeahead(
-        //     (index) => optionRefs.current[index]?.focus(),
-        //     getFilteredItems,
-        // );
 
         const focusByTypeahead = useTypeahead(
             (id) => optionRefs.current.get(id)?.focus(),
@@ -253,50 +246,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             if (!isControlled) setInternalValue(nextValue);
             onChange?.(nextValue);
             setOpened(false);
-            // focusTrigger();
             setFocuses(null);
-            // setOptionPressed(null);
         };
-
-        // const handleKeyDown = (e: React.KeyboardEvent) => {
-        //     const key = e.key;
-        //
-        //     if (key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        //         focusByTypeahead(key);
-        //         return;
-        //     }
-        //
-        //     if (key === 'Enter' || key === ' ') {
-        //         e.preventDefault();
-        //         setPressed(true);
-        //         setOpened((prev) => !prev);
-        //     } else if (key === 'ArrowDown') {
-        //         e.preventDefault();
-        //         if (!opened) {
-        //             setOpened(true);
-        //             return;
-        //         }
-        //         focusNext();
-        //     } else if (key === 'ArrowUp') {
-        //         e.preventDefault();
-        //         if (!opened) {
-        //             setOpened(true);
-        //             return;
-        //         }
-        //         focusNext(-1);
-        //     } else if (key === 'Home') {
-        //         e.preventDefault();
-        //         focusFirst();
-        //     } else if (key === 'End') {
-        //         e.preventDefault();
-        //         focusLast();
-        //     } else if (key === 'Escape') {
-        //         setOpened(false);
-        //         // focusTrigger();
-        //         setFocuses(null);
-        //         setOptionPressed(null);
-        //     }
-        // };
 
         // ------------------------------------------------------------------
         // Context
