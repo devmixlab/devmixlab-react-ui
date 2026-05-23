@@ -415,13 +415,81 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
         { children, className, placeholder = 'Select option', chevron = false, render, ...rest },
         ref,
     ) => {
-        const ctx = useDropdownContext();
+        const {
+            options,
+            selectedOption,
+            isSearchable,
+            focusableList,
+            searchInputRef,
+            setOpened,
+            opened,
+        } = useDropdownContext();
+
+        const {
+            setRef,
+            setFocusedVisibleId,
+            setFocusedId,
+            focusedVisibleId,
+            focusNext,
+            focusFirst,
+            focusLast,
+            lastFocusableId,
+            firstFocusableId,
+            focusedId,
+            setFocuses,
+        } = focusableList;
+
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+            const key = e.key;
+
+            if (key === 'ArrowUp') {
+                e.preventDefault();
+                if (!opened) {
+                    setOpened(true);
+                    return;
+                }
+
+                if (isSearchable) {
+                    searchInputRef.current?.focus();
+                } else {
+                    focusLast();
+                }
+            } else if (key === 'ArrowDown') {
+                e.preventDefault();
+                if (!opened) {
+                    setOpened(true);
+                    return;
+                }
+
+                if (isSearchable) {
+                    searchInputRef.current?.focus();
+                } else {
+                    focusFirst();
+                }
+            } else if (key === 'Enter' || key === ' ') {
+                if (isSearchable) {
+                    searchInputRef.current?.focus();
+                    return;
+                }
+
+                console.log(selectedOption);
+                if (selectedOption) {
+                } else {
+                    console.log('enter');
+                    console.log(options);
+                    focusFirst(true);
+                    // requestAnimationFrame(() => {
+                    //     focusFirst();
+                    // });
+                }
+            }
+        };
 
         return render ? (
-            <Popover.Trigger render={render} />
+            <Popover.Trigger {...rest} onKeyDown={handleKeyDown} render={render} />
         ) : (
-            <Popover.Trigger chevron={chevron}>
-                {ctx.selectedOption?.children ?? (
+            <Popover.Trigger {...rest} onKeyDown={handleKeyDown} chevron={chevron}>
+                {selectedOption?.children ?? (
                     <Box as="span" opacity={0.8}>
                         {placeholder}
                     </Box>
@@ -488,7 +556,7 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
                     ref={searchInputRef}
                     value={search}
                     onValueChange={setSearch}
-                    autoFocus
+                    // autoFocus
                     placeholder={placeholder}
                     onKeyDown={(e) => {
                         if (e.key === 'ArrowDown') {

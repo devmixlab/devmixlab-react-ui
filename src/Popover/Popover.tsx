@@ -89,7 +89,13 @@ type TriggerRenderProps = {
     pressed: boolean;
 };
 
-type PopoverTriggerProps = {
+// type PopoverTriggerProps = {
+//     className?: string;
+//     children?: React.ReactNode;
+//     chevron?: boolean;
+//     render?: (props: TriggerRenderProps) => React.ReactNode;
+// };
+type PopoverTriggerProps = React.HTMLAttributes<HTMLDivElement> & {
     className?: string;
     children?: React.ReactNode;
     chevron?: boolean;
@@ -292,6 +298,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
 
         return (
             <Box
+                {...rest}
                 ref={combinedRef}
                 id={triggerId}
                 {...getReferenceProps()}
@@ -309,6 +316,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 onKeyDown={(e) => {
                     if (disabled) return;
                     handleKeyDown(e);
+                    rest.onKeyDown?.(e);
                 }}
                 onKeyUp={(e: React.KeyboardEvent) => {
                     if (e.key === 'Enter' || e.key === ' ') setPressed(false);
@@ -338,7 +346,6 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                         pseudoFocused={triggerFocusedVisible}
                         pseudoActive={pressed}
                         className={clsx(prefix('__trigger-button'), className)}
-                        {...rest}
                         active={opened}
                         endIcon={
                             chevron && (
@@ -392,7 +399,12 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
         return (
             <FloatingPortal>
-                <FloatingFocusManager context={context} modal={modal}>
+                <FloatingFocusManager
+                    context={context}
+                    modal={modal}
+                    initialFocus={modal ? 0 : -1}
+                    // returnFocus={modal}
+                >
                     <Box
                         ref={mergeRefs(refs.setFloating, ref)}
                         id={panelId}
