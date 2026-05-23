@@ -88,7 +88,7 @@ type TriggerRenderProps = {
 
 type PopoverTriggerProps = {
     className?: string;
-    children: React.ReactElement;
+    children?: React.ReactNode;
     chevron?: boolean;
     render?: (props: TriggerRenderProps) => React.ReactNode;
 };
