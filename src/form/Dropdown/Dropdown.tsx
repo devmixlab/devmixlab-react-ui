@@ -342,6 +342,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     onReady={() => {
                         flushReadyCallbacks();
                     }}
+                    role="listbox"
                 >
                     {children}
                 </Popover>
