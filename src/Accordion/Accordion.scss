@@ -1,0 +1,225 @@
+@use '../scss/functions' as functions;
+@use '../scss/mixins' as mixins;
+
+@use '../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$accordion-prefix: #{$p}--accordion;
+
+.#{$accordion-prefix} {
+    // -------------------------------------------------------------------------
+    // Spacing
+    // -------------------------------------------------------------------------
+
+    --accordion-padding-y: 1rem;
+    --accordion-padding-x: 1.25rem;
+
+    --accordion-body-padding-y: var(--accordion-padding-y);
+    --accordion-body-padding-x: var(--accordion-padding-x);
+
+    --accordion-trigger-padding-y: var(--accordion-padding-y);
+    --accordion-trigger-padding-x: var(--accordion-padding-x);
+
+    // -------------------------------------------------------------------------
+    // Colors
+    // -------------------------------------------------------------------------
+
+    --accordion-color: #{functions.intent-color(gray, 900)};
+    --accordion-bg: transparent;
+
+    --accordion-border-color: #{functions.intent-color(gray, 300)};
+
+    --accordion-trigger-color: var(--accordion-color);
+    --accordion-trigger-bg: #{functions.intent-color(gray, 100)};
+    --accordion-trigger-hover-bg: #{functions.intent-color(gray, 200)};
+
+    --accordion-trigger-active-bg: #{functions.intent-color(primary, 200)};
+    --accordion-trigger-active-color: #{functions.intent-color(primary, 800)};
+
+    --accordion-content-bg: transparent;
+    --accordion-content-color: var(--accordion-color);
+
+    @include cfg.dark {
+        --accordion-color: #{functions.intent-color(gray, 100)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: #{functions.intent-color(gray, 800)};
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: #{functions.intent-color(gray, 900)};
+        --accordion-trigger-hover-bg: #{functions.intent-color(gray, 800)};
+
+        --accordion-trigger-active-bg: #{functions.intent-color(primary, 800)};
+        --accordion-trigger-active-color: #{functions.intent-color(primary, 0)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+    }
+
+    // -------------------------------------------------------------------------
+    // Borders / Radius
+    // -------------------------------------------------------------------------
+
+    --accordion-border-width: 1px;
+
+    // -------------------------------------------------------------------------
+    // Focus
+    // -------------------------------------------------------------------------
+
+    --accordion-ring: var(--#{$p}-accent-primary);
+
+    // -------------------------------------------------------------------------
+    // Motion
+    // -------------------------------------------------------------------------
+
+    --accordion-transition-duration: var(--#{$p}-duration-normal);
+    --accordion-transition-easing: var(--#{$p}-ease-standard);
+
+    --accordion-transition:
+        background-color var(--accordion-transition-duration)
+        var(--accordion-transition-easing),
+        color var(--accordion-transition-duration)
+        var(--accordion-transition-easing),
+        border-color var(--accordion-transition-duration)
+        var(--accordion-transition-easing),
+        transform var(--accordion-transition-duration)
+        var(--accordion-transition-easing);
+
+    // -------------------------------------------------------------------------
+    // Icon
+    // -------------------------------------------------------------------------
+
+    --accordion-icon-size: 1.2em;
+
+    --accordion-icon-color: var(--accordion-color);
+
+    --accordion-icon-active-color: var(--accordion-trigger-active-color);
+
+    --accordion-icon-transition:
+        transform var(--accordion-transition-duration)
+        var(--accordion-transition-easing),
+        opacity var(--accordion-transition-duration)
+        var(--accordion-transition-easing);
+
+    --accordion-icon-transform: rotate(-180deg);
+
+    // -------------------------------------------------------------------------
+    // Base
+    // -------------------------------------------------------------------------
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--accordion-bg);
+    color: var(--accordion-color);
+
+    border:
+        var(--accordion-border-width)
+        solid
+        var(--accordion-border-color);
+
+    overflow: hidden;
+}
+
+.#{$accordion-prefix}__item {
+    //border-radius: inherit;
+    border-bottom:
+        var(--accordion-border-width)
+        solid
+        var(--accordion-border-color);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &[data-state='open'] {
+        .#{$accordion-prefix}__trigger {
+            background-color: var(--accordion-trigger-active-bg);
+            color: var(--accordion-trigger-active-color);
+
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .#{$accordion-prefix}__chevron {
+            transform: var(--accordion-icon-transform);
+            opacity: 1;
+            color: var(--accordion-icon-active-color);
+        }
+    }
+}
+
+.#{$accordion-prefix}__item:first-child {
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+.#{$accordion-prefix}__item:last-child {
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+
+    overflow: hidden;
+}
+
+.#{$accordion-prefix}__trigger {
+    border-radius: inherit;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+
+    cursor: pointer;
+
+    background-color: var(--accordion-trigger-bg);
+    color: var(--accordion-trigger-color);
+
+    border: none;
+    outline: none;
+
+    text-align: left;
+
+    padding:
+        var(--accordion-trigger-padding-y)
+        var(--accordion-trigger-padding-x);
+
+    transition: var(--accordion-transition);
+
+    &:hover {
+        background-color: var(--accordion-trigger-hover-bg);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accordion-ring);
+        outline-offset: -2px;
+    }
+}
+
+.#{$accordion-prefix}__chevron {
+    flex-shrink: 0;
+
+    width: var(--accordion-icon-size);
+    height: var(--accordion-icon-size);
+    font-size: var(--accordion-icon-size);
+
+    color: var(--accordion-icon-color);
+
+    opacity: 0.8;
+
+    transition: var(--accordion-icon-transition);
+}
+
+.#{$accordion-prefix}__content {
+    overflow: hidden;
+
+    background-color: var(--accordion-content-bg);
+    color: var(--accordion-content-color);
+
+    padding:
+        var(--accordion-body-padding-y)
+        var(--accordion-body-padding-x);
+}

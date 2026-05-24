@@ -16,22 +16,35 @@ const prefix = (name = '') => classPrefix(`--collapse${name}`);
 // Types
 // -----------------------------------------------------------------------------
 
-type CollapseEffect = 'none' | 'height' | 'fade' | 'scale' | 'slide' | (string & {});
+type CollapseEffect = 'none' | 'height';
 
 export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentProps<
     C,
     {
+        /**
+         * Whether collapse is open.
+         */
         open?: boolean;
 
-        orientation?: 'vertical' | 'horizontal';
-
+        /**
+         * Transition duration (ms)
+         */
         enterDuration?: number;
         exitDuration?: number;
 
+        /**
+         * Transition easing.
+         */
         easing?: string;
 
+        /**
+         * Keep mounted after exit.
+         */
         keepMounted?: boolean;
 
+        /**
+         * Animation effect.
+         */
         effect?: CollapseEffect;
     }
 >;
@@ -44,7 +57,6 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
     (
         {
             open = false,
-            orientation = 'horizontal',
             enterDuration = 200,
             exitDuration = 200,
             easing = 'ease',
@@ -60,150 +72,132 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
 
         const prefersReducedMotion = useReducedMotion();
 
-        const shouldAnimate = effect !== 'none' && !prefersReducedMotion;
+        const shouldAnimate = effect === 'height' && !prefersReducedMotion;
 
         const { isMounted, state } = usePresence({
             present: open,
-            enterDuration,
-            exitDuration,
+            enterDuration: shouldAnimate ? enterDuration : 0,
+            exitDuration: shouldAnimate ? exitDuration : 0,
         });
 
-        const [size, setSize] = useState<number | 'auto'>(open ? 'auto' : 0);
+        // -----------------------------------------------------------------------------
+        // Height state
+        // -----------------------------------------------------------------------------
 
-        // ---------------------------------------------------------------------
-        // Measure
-        // ---------------------------------------------------------------------
+        const [height, setHeight] = useState<number | undefined>(open ? undefined : 0);
 
-        const measure = () => {
-            if (!innerRef.current) {
-                return 0;
-            }
+        const measure = () => innerRef.current?.scrollHeight ?? 0;
 
-            return orientation === 'horizontal'
-                ? innerRef.current.scrollWidth
-                : innerRef.current.scrollHeight;
-        };
-
-        // ---------------------------------------------------------------------
-        // Reduced motion
-        // ---------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
+        // Reduced motion / no animation
+        // -----------------------------------------------------------------------------
 
         useLayoutEffect(() => {
-            if (effect !== 'height') {
-                return;
-            }
-
             if (shouldAnimate) {
                 return;
             }
 
-            setSize(open ? 'auto' : 0);
-        }, [open, effect, shouldAnimate]);
+            setHeight(open ? undefined : 0);
+        }, [open, shouldAnimate]);
 
-        // ---------------------------------------------------------------------
-        // Height animation only
-        // ---------------------------------------------------------------------
-
-        useLayoutEffect(() => {
-            if (!shouldAnimate) {
-                return;
-            }
-
-            if (effect !== 'height' || !isMounted || !open) {
-                return;
-            }
-
-            const nextSize = measure();
-
-            requestAnimationFrame(() => {
-                setSize(nextSize);
-
-                // Width animations do not transition cleanly to `auto`.
-                // Keep measured width for horizontal collapse.
-                if (orientation === 'horizontal') {
-                    return;
-                }
-
-                const timeout = window.setTimeout(() => {
-                    setSize('auto');
-                }, enterDuration);
-
-                return () => {
-                    window.clearTimeout(timeout);
-                };
-            });
-
-            // requestAnimationFrame(() => {
-            //     setSize(nextSize);
-            //
-            //     const timeout = window.setTimeout(() => {
-            //         setSize('auto');
-            //     }, enterDuration);
-            //
-            //     return () => {
-            //         window.clearTimeout(timeout);
-            //     };
-            // });
-        }, [open, isMounted, enterDuration, effect, shouldAnimate, orientation]);
+        // -----------------------------------------------------------------------------
+        // Enter animation
+        // -----------------------------------------------------------------------------
 
         useLayoutEffect(() => {
             if (!shouldAnimate) {
                 return;
             }
 
-            if (effect !== 'height' || !isMounted || open) {
+            if (!isMounted || !open) {
                 return;
             }
 
-            const nextSize = measure();
+            const nextHeight = measure();
 
-            setSize(nextSize);
+            // Start collapsed.
+            setHeight(0);
 
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    setSize(0);
+                    setHeight(nextHeight);
                 });
             });
-        }, [open, isMounted, effect, shouldAnimate, orientation]);
 
-        // ---------------------------------------------------------------------
+            const timeout = window.setTimeout(() => {
+                setHeight(undefined);
+            }, enterDuration);
+
+            return () => {
+                window.clearTimeout(timeout);
+            };
+        }, [open, isMounted, enterDuration, shouldAnimate]);
+
+        // -----------------------------------------------------------------------------
+        // Exit animation
+        // -----------------------------------------------------------------------------
+
+        useLayoutEffect(() => {
+            if (!shouldAnimate) {
+                return;
+            }
+
+            if (!isMounted || open) {
+                return;
+            }
+
+            const nextHeight = measure();
+
+            setHeight(nextHeight);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setHeight(0);
+                });
+            });
+        }, [open, isMounted, shouldAnimate]);
+
+        // -----------------------------------------------------------------------------
         // Hidden
-        // ---------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
 
         if (!keepMounted && !isMounted) {
             return null;
         }
 
-        // ---------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
         // Render
-        // ---------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
 
         return (
             <Box
                 ref={ref}
                 className={clsx(prefix(), className)}
                 data-state={state}
-                data-animation-effect={effect}
-                data-orientation={orientation}
                 aria-hidden={state === 'exited'}
-                h={effect === 'height' && orientation === 'vertical' ? size : undefined}
-                w={effect === 'height' && orientation === 'horizontal' ? size : undefined}
-                {...rest}
                 inert={state === 'exited' ? true : undefined}
+                h={height}
+                {...rest}
                 style={
                     {
-                        '--collapse-enter-duration': `${!shouldAnimate ? 0 : enterDuration}ms`,
-                        '--collapse-exit-duration': `${!shouldAnimate ? 0 : exitDuration}ms`,
+                        '--collapse-enter-duration': `${shouldAnimate ? enterDuration : 0}ms`,
+                        '--collapse-exit-duration': `${shouldAnimate ? exitDuration : 0}ms`,
                         '--collapse-easing': easing,
                     } as CSSProperties
                 }
             >
-                <Box ref={innerRef}>{children}</Box>
+                <Box ref={innerRef} minH={0}>
+                    {children}
+                </Box>
             </Box>
         );
     },
 );
 
 Collapse.displayName = 'Collapse';
+
+// -----------------------------------------------------------------------------
+// Export
+// -----------------------------------------------------------------------------
 
 export { Collapse };

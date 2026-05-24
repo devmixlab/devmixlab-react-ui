@@ -1,213 +1,24 @@
-@use '../scss/functions' as functions;
-@use '../scss/mixins' as mixins;
-
 @use '../scss/config' as cfg;
-@use 'sass:map';
 
 $p: cfg.$prefix;
 $collapse-prefix: #{$p}--collapse;
 
 .#{$collapse-prefix} {
     overflow: hidden;
-    will-change: height, opacity, transform;
+    transition-property: height;
+    transition-timing-function: var(--collapse-easing, ease);
+}
+
+.#{$collapse-prefix}[data-state='entering'],
+.#{$collapse-prefix}[data-state='entered'] {
+    transition-duration: var(--collapse-enter-duration, 200ms);
+}
+
+.#{$collapse-prefix}[data-state='exiting'],
+.#{$collapse-prefix}[data-state='exited'] {
+    transition-duration: var(--collapse-exit-duration, 200ms);
 }
 
 .#{$collapse-prefix}[data-state='exited'] {
     pointer-events: none;
-}
-
-// -----------------------------------------------------------------------------
-// Height
-// -----------------------------------------------------------------------------
-
-.#{$collapse-prefix}[data-animation-effect='height'] {
-    overflow: hidden;
-}
-
-.#{$collapse-prefix}[data-animation-effect='height'][data-orientation='vertical'] {
-    transition-property: height;
-}
-
-.#{$collapse-prefix}[data-animation-effect='height'][data-orientation='horizontal'] {
-    transition-property: width;
-}
-
-.#{$collapse-prefix}[data-animation-effect='height'][data-state='entering'],
-.#{$collapse-prefix}[data-animation-effect='height'][data-state='entered'] {
-    transition-duration: var(--collapse-enter-duration, 200ms);
-    transition-timing-function: var(--collapse-easing, ease);
-}
-
-.#{$collapse-prefix}[data-animation-effect='height'][data-state='exiting'],
-.#{$collapse-prefix}[data-animation-effect='height'][data-state='exited'] {
-    transition-duration: var(--collapse-exit-duration, 200ms);
-    transition-timing-function: var(--collapse-easing, ease);
-}
-
-// -----------------------------------------------------------------------------
-// Fade
-// -----------------------------------------------------------------------------
-
-@keyframes #{$collapse-prefix}-fade-in {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes #{$collapse-prefix}-fade-out {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
-}
-
-.#{$collapse-prefix}[data-animation-effect='fade'][data-state='entering'] {
-    opacity: 0;
-    animation: #{$collapse-prefix}-fade-in
-    var(--collapse-enter-duration, 200ms)
-    var(--collapse-easing, ease)
-    forwards;
-}
-
-.#{$collapse-prefix}[data-animation-effect='fade'][data-state='entered'] {
-    opacity: 1;
-}
-
-.#{$collapse-prefix}[data-animation-effect='fade'][data-state='exiting'] {
-    opacity: 1;
-    animation: #{$collapse-prefix}-fade-out
-    var(--collapse-exit-duration, 200ms)
-    var(--collapse-easing, ease)
-    forwards;
-}
-
-.#{$collapse-prefix}[data-animation-effect='fade'][data-state='exited'] {
-    opacity: 0;
-}
-
-// -----------------------------------------------------------------------------
-// Scale
-// -----------------------------------------------------------------------------
-
-@keyframes #{$collapse-prefix}-scale-in {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes #{$collapse-prefix}-scale-out {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    to {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-}
-
-.#{$collapse-prefix}[data-animation-effect='scale'] {
-    transform-origin: top center;
-}
-
-.#{$collapse-prefix}[data-animation-effect='scale'][data-state='entering'] {
-    opacity: 0;
-    transform: scale(0.96);
-
-    animation: #{$collapse-prefix}-scale-in
-    var(--collapse-enter-duration, 200ms)
-    var(--collapse-easing, ease)
-    forwards;
-}
-
-.#{$collapse-prefix}[data-animation-effect='scale'][data-state='entered'] {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.#{$collapse-prefix}[data-animation-effect='scale'][data-state='exiting'] {
-    opacity: 1;
-    transform: scale(1);
-
-    animation: #{$collapse-prefix}-scale-out
-    var(--collapse-exit-duration, 200ms)
-    var(--collapse-easing, ease)
-    forwards;
-}
-
-.#{$collapse-prefix}[data-animation-effect='scale'][data-state='exited'] {
-    opacity: 0;
-    transform: scale(0.96);
-}
-
-// -----------------------------------------------------------------------------
-// Slide
-// -----------------------------------------------------------------------------
-
-@keyframes #{$collapse-prefix}-slide-in {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes #{$collapse-prefix}-slide-out {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    to {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-}
-
-.#{$collapse-prefix}[data-animation-effect='slide'][data-state='entering'] {
-    opacity: 0;
-    transform: translateY(-8px);
-
-    animation: #{$collapse-prefix}-slide-in
-    var(--collapse-enter-duration, 200ms)
-    var(--collapse-easing, ease)
-    forwards;
-}
-
-.#{$collapse-prefix}[data-animation-effect='slide'][data-state='entered'] {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.#{$collapse-prefix}[data-animation-effect='slide'][data-state='exiting'] {
-    opacity: 1;
-    transform: translateY(0);
-
-    animation: #{$collapse-prefix}-slide-out
-    var(--collapse-exit-duration, 200ms)
-    var(--collapse-easing, ease)
-    forwards;
-}
-
-.#{$collapse-prefix}[data-animation-effect='slide'][data-state='exited'] {
-    opacity: 0;
-    transform: translateY(-8px);
 }
