@@ -111,11 +111,12 @@ export type AccordionItemProps<C extends React.ElementType = 'div'> = BoxCompone
     C,
     {
         value: string;
+        disabled?: boolean;
     }
 >;
 
 const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
-    ({ value, children, className, ...rest }, ref) => {
+    ({ value, disabled = false, children, className, ...rest }, ref) => {
         const context = useAccordionContext();
 
         const triggerId = context.id + '-item-trigger';
@@ -128,6 +129,7 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
                 value={{
                     value,
                     open,
+                    disabled,
                     triggerId,
                     contentId,
                 }}
@@ -136,6 +138,7 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
                     ref={ref}
                     className={clsx(prefix('__item'), className)}
                     data-state={open ? 'open' : 'closed'}
+                    data-disabled={disabled ? '' : undefined}
                     {...rest}
                 >
                     {children}
@@ -160,16 +163,19 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
             <Box
                 as="button"
                 type="button"
+                tabIndex={item.disabled ? -1 : 0}
                 ref={ref}
                 id={item.triggerId}
                 className={clsx(prefix('__trigger'), className)}
                 aria-expanded={item.open}
                 aria-controls={item.contentId}
+                aria-disabled={item.disabled}
                 data-state={item.open ? 'open' : 'closed'}
+                data-disabled={item.disabled ? '' : undefined}
                 onClick={(event) => {
                     onClick?.(event);
 
-                    if (event.defaultPrevented) {
+                    if (event.defaultPrevented || item.disabled) {
                         return;
                     }
 

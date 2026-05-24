@@ -22,6 +22,7 @@ const useAccordionContext = () => {
 type AccordionItemContextValue = {
     value: string;
     open: boolean;
+    disabled: boolean;
     triggerId: string;
     contentId: string;
 };

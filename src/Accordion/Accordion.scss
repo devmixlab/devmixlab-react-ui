@@ -189,7 +189,7 @@ $accordion-prefix: #{$p}--accordion;
 
     transition: var(--accordion-transition);
 
-    &:hover {
+    &:not([data-disabled]):hover {
         background-color: var(--accordion-trigger-hover-bg);
     }
 
@@ -197,6 +197,14 @@ $accordion-prefix: #{$p}--accordion;
         outline: 2px solid var(--accordion-ring);
         outline-offset: -2px;
     }
+}
+
+.#{$accordion-prefix}__item[data-disabled] {
+    opacity: 0.6;
+}
+
+.#{$accordion-prefix}__trigger[data-disabled] {
+    cursor: not-allowed;
 }
 
 .#{$accordion-prefix}__chevron {
