@@ -189,11 +189,11 @@ $accordion-prefix: #{$p}--accordion;
 
     transition: var(--accordion-transition);
 
-    &:not([data-disabled]):hover {
+    &:not([data-disabled]):not([data-not-active]):hover {
         background-color: var(--accordion-trigger-hover-bg);
     }
 
-    &:focus-visible {
+    &:not([data-disabled]):focus-visible {
         outline: 2px solid var(--accordion-ring);
         outline-offset: -2px;
     }
@@ -205,6 +205,13 @@ $accordion-prefix: #{$p}--accordion;
 
 .#{$accordion-prefix}__trigger[data-disabled] {
     cursor: not-allowed;
+}
+
+.#{$accordion-prefix}__trigger[data-not-active] {
+    cursor: default;
+    .#{$accordion-prefix}__chevron {
+        opacity: 0.6;
+    }
 }
 
 .#{$accordion-prefix}__chevron {

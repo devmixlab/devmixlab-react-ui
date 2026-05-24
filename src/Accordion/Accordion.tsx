@@ -33,6 +33,7 @@ export type AccordionProps<C extends React.ElementType = 'div'> = BoxComponentPr
     C,
     {
         multiple?: boolean;
+        collapsible?: boolean;
         defaultValue?: string[];
         value?: string[];
         onValueChange?: (value: string[]) => void;
@@ -43,6 +44,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
     (
         {
             multiple = false,
+            collapsible = true,
             defaultValue = [],
             value: valueProp,
             onValueChange,
@@ -59,6 +61,12 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
 
         const value = valueProp ?? uncontrolledValue;
 
+        if (!multiple && !collapsible && !valueProp && defaultValue.length === 0) {
+            console.warn(
+                '[Accordion] `collapsible={false}` requires a `defaultValue` in uncontrolled mode.',
+            );
+        }
+
         const toggle = (itemValue: string) => {
             let nextValue: string[];
 
@@ -67,7 +75,13 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                     ? value.filter((v) => v !== itemValue)
                     : [...value, itemValue];
             } else {
-                nextValue = value.includes(itemValue) ? [] : [itemValue];
+                const isOpen = value.includes(itemValue);
+
+                if (isOpen) {
+                    nextValue = collapsible ? [] : value;
+                } else {
+                    nextValue = [itemValue];
+                }
             }
 
             if (!valueProp) {
@@ -82,9 +96,10 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 value,
                 toggle,
                 multiple,
+                collapsible,
                 id: stableId,
             }),
-            [value, multiple, stableId],
+            [value, multiple, stableId, collapsible],
         );
 
         return (
@@ -159,6 +174,12 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
         const accordion = useAccordionContext();
         const item = useAccordionItemContext();
 
+        const isNotClosable =
+            !accordion.multiple &&
+            !accordion.collapsible &&
+            item.open &&
+            accordion.value.length === 1;
+
         return (
             <Box
                 as="button"
@@ -172,6 +193,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                 aria-disabled={item.disabled}
                 data-state={item.open ? 'open' : 'closed'}
                 data-disabled={item.disabled ? '' : undefined}
+                data-not-active={isNotClosable ? '' : undefined}
                 onClick={(event) => {
                     onClick?.(event);
 

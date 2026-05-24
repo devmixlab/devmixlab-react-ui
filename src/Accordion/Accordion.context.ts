@@ -4,6 +4,7 @@ type AccordionContextValue = {
     value: string[];
     toggle: (value: string) => void;
     multiple: boolean;
+    collapsible?: boolean;
     id: string;
 };
 
