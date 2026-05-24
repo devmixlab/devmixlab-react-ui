@@ -93,9 +93,16 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             let nextValue: string[];
 
             if (multiple) {
-                nextValue = value.includes(itemValue)
-                    ? value.filter((v) => v !== itemValue)
-                    : [...value, itemValue];
+                const isOpen = value.includes(itemValue);
+
+                if (isOpen) {
+                    nextValue =
+                        !collapsible && value.length === 1
+                            ? value
+                            : value.filter((v) => v !== itemValue);
+                } else {
+                    nextValue = [...value, itemValue];
+                }
             } else {
                 const isOpen = value.includes(itemValue);
 
@@ -209,11 +216,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
         const accordion = useAccordionContext();
         const item = useAccordionItemContext();
 
-        const notClosable =
-            !accordion.multiple &&
-            !accordion.collapsible &&
-            item.open &&
-            accordion.value.length === 1;
+        const notClosable = !accordion.collapsible && item.open && accordion.value.length === 1;
 
         useEffect(() => {
             accordion.registerFocusable({
