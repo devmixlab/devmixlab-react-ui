@@ -23,6 +23,8 @@ export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentPro
     {
         open?: boolean;
 
+        orientation?: 'vertical' | 'horizontal';
+
         enterDuration?: number;
         exitDuration?: number;
 
@@ -42,11 +44,12 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
     (
         {
             open = false,
+            orientation = 'horizontal',
             enterDuration = 200,
             exitDuration = 200,
             easing = 'ease',
             keepMounted = false,
-            effect = 'fade',
+            effect = 'height',
             children,
             className,
             ...rest
@@ -65,7 +68,7 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
             exitDuration,
         });
 
-        const [height, setHeight] = useState<number | 'auto'>(open ? 'auto' : 0);
+        const [size, setSize] = useState<number | 'auto'>(open ? 'auto' : 0);
 
         // ---------------------------------------------------------------------
         // Measure
@@ -76,7 +79,9 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 return 0;
             }
 
-            return innerRef.current.scrollHeight;
+            return orientation === 'horizontal'
+                ? innerRef.current.scrollWidth
+                : innerRef.current.scrollHeight;
         };
 
         // ---------------------------------------------------------------------
@@ -92,7 +97,7 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 return;
             }
 
-            setHeight(open ? 'auto' : 0);
+            setSize(open ? 'auto' : 0);
         }, [open, effect, shouldAnimate]);
 
         // ---------------------------------------------------------------------
@@ -108,20 +113,38 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 return;
             }
 
-            const nextHeight = measure();
+            const nextSize = measure();
 
             requestAnimationFrame(() => {
-                setHeight(nextHeight);
+                setSize(nextSize);
+
+                // Width animations do not transition cleanly to `auto`.
+                // Keep measured width for horizontal collapse.
+                if (orientation === 'horizontal') {
+                    return;
+                }
 
                 const timeout = window.setTimeout(() => {
-                    setHeight('auto');
+                    setSize('auto');
                 }, enterDuration);
 
                 return () => {
                     window.clearTimeout(timeout);
                 };
             });
-        }, [open, isMounted, enterDuration, effect, shouldAnimate]);
+
+            // requestAnimationFrame(() => {
+            //     setSize(nextSize);
+            //
+            //     const timeout = window.setTimeout(() => {
+            //         setSize('auto');
+            //     }, enterDuration);
+            //
+            //     return () => {
+            //         window.clearTimeout(timeout);
+            //     };
+            // });
+        }, [open, isMounted, enterDuration, effect, shouldAnimate, orientation]);
 
         useLayoutEffect(() => {
             if (!shouldAnimate) {
@@ -132,16 +155,16 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 return;
             }
 
-            const nextHeight = measure();
+            const nextSize = measure();
 
-            setHeight(nextHeight);
+            setSize(nextSize);
 
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    setHeight(0);
+                    setSize(0);
                 });
             });
-        }, [open, isMounted, effect, shouldAnimate]);
+        }, [open, isMounted, effect, shouldAnimate, orientation]);
 
         // ---------------------------------------------------------------------
         // Hidden
@@ -161,8 +184,10 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 className={clsx(prefix(), className)}
                 data-state={state}
                 data-animation-effect={effect}
+                data-orientation={orientation}
                 aria-hidden={state === 'exited'}
-                h={effect === 'height' ? height : undefined}
+                h={effect === 'height' && orientation === 'vertical' ? size : undefined}
+                w={effect === 'height' && orientation === 'horizontal' ? size : undefined}
                 {...rest}
                 inert={state === 'exited' ? true : undefined}
                 style={

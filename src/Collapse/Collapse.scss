@@ -22,7 +22,14 @@ $collapse-prefix: #{$p}--collapse;
 
 .#{$collapse-prefix}[data-animation-effect='height'] {
     overflow: hidden;
+}
+
+.#{$collapse-prefix}[data-animation-effect='height'][data-orientation='vertical'] {
     transition-property: height;
+}
+
+.#{$collapse-prefix}[data-animation-effect='height'][data-orientation='horizontal'] {
+    transition-property: width;
 }
 
 .#{$collapse-prefix}[data-animation-effect='height'][data-state='entering'],
