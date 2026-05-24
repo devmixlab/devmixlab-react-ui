@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { CSSProperties, forwardRef, useLayoutEffect, useRef, useState } from 'react';
 
 import { clsx } from 'clsx';
 
@@ -16,6 +16,8 @@ const prefix = (name = '') => classPrefix(`--collapse${name}`);
 // Types
 // -----------------------------------------------------------------------------
 
+type CollapseEffect = 'height' | 'fade' | 'scale' | 'slide' | (string & {});
+
 export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentProps<
     C,
     {
@@ -27,12 +29,20 @@ export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentPro
         /**
          * Transition duration (ms)
          */
-        duration?: number;
+        enterDuration?: number;
+        exitDuration?: number;
+
+        /**
+         * Transition easing
+         */
+        easing?: string;
 
         /**
          * Keep mounted after exit
          */
         keepMounted?: boolean;
+
+        effect?: CollapseEffect;
     }
 >;
 
@@ -42,15 +52,25 @@ export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentPro
 
 const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
     (
-        { open = false, duration = 200, keepMounted = false, children, className, style, ...rest },
+        {
+            open = false,
+            enterDuration = 200,
+            exitDuration = 200,
+            easing = 'ease',
+            keepMounted = false,
+            effect = 'height',
+            children,
+            className,
+            ...rest
+        },
         ref,
     ) => {
         const innerRef = useRef<HTMLDivElement>(null);
 
         const { isMounted, state } = usePresence({
             present: open,
-            enterDuration: duration,
-            exitDuration: duration,
+            enterDuration,
+            exitDuration,
         });
 
         const [height, setHeight] = useState<number | 'auto'>(open ? 'auto' : 0);
@@ -68,46 +88,44 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
         };
 
         // ---------------------------------------------------------------------
-        // Enter
+        // Height animation only
         // ---------------------------------------------------------------------
 
         useLayoutEffect(() => {
-            if (!isMounted || !open) {
+            if (effect !== 'height' || !isMounted || !open) {
                 return;
             }
 
             const nextHeight = measure();
-
-            // start from 0
-            setHeight(0);
 
             requestAnimationFrame(() => {
                 setHeight(nextHeight);
 
-                window.setTimeout(() => {
+                const timeout = window.setTimeout(() => {
                     setHeight('auto');
-                }, duration);
+                }, enterDuration);
+
+                return () => {
+                    window.clearTimeout(timeout);
+                };
             });
-        }, [open, isMounted, duration]);
+        }, [open, isMounted, enterDuration, effect]);
 
-        // ---------------------------------------------------------------------
-        // Exit
-        // ---------------------------------------------------------------------
-
-        useEffect(() => {
-            if (!isMounted || open) {
+        useLayoutEffect(() => {
+            if (effect !== 'height' || !isMounted || open) {
                 return;
             }
 
             const nextHeight = measure();
 
-            // lock current height first
             setHeight(nextHeight);
 
             requestAnimationFrame(() => {
-                setHeight(0);
+                requestAnimationFrame(() => {
+                    setHeight(0);
+                });
             });
-        }, [open, isMounted]);
+        }, [open, isMounted, effect]);
 
         // ---------------------------------------------------------------------
         // Hidden
@@ -126,15 +144,18 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 ref={ref}
                 className={clsx(prefix(), className)}
                 data-state={state}
+                data-animation-effect={effect}
                 aria-hidden={state === 'exited'}
-                h={height}
-                style={{
-                    // overflow: 'hidden',
-                    // height,
-                    transition: `height ${duration}ms ease`,
-                    ...style,
-                }}
+                h={effect === 'height' ? height : undefined}
                 {...rest}
+                inert={state === 'exited' ? true : undefined}
+                style={
+                    {
+                        '--collapse-enter-duration': `${enterDuration}ms`,
+                        '--collapse-exit-duration': `${exitDuration}ms`,
+                        '--collapse-easing': easing,
+                    } as CSSProperties
+                }
             >
                 <Box ref={innerRef}>{children}</Box>
             </Box>
