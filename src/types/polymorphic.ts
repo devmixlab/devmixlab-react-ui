@@ -32,7 +32,7 @@ import React from 'react';
 /**
  * Polymorphic props with ref support
  */
-type PolymorphicProps<C extends React.ElementType, Props> = Props & {
+export type PolymorphicProps<C extends React.ElementType, Props> = Props & {
     as?: C;
 } & Omit<React.ComponentPropsWithRef<C>, keyof Props | 'as'>;
 

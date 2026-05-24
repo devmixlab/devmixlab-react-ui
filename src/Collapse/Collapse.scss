@@ -1,0 +1,12 @@
+@use '../scss/functions' as functions;
+@use '../scss/mixins' as mixins;
+
+@use '../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$collapse-prefix: #{$p}--collapse;
+
+.#{$collapse-prefix} {
+    overflow: hidden;
+}

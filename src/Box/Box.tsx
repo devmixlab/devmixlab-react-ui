@@ -7,7 +7,7 @@ import { hasKey, typedEntries } from '../utils/ts';
 import { useWindowWidthContext } from './WindowWidthProvider';
 import { useWindowWidth } from '../hooks/useWindowWidth';
 import { configLookup, type PropValue } from './core/config';
-import { createPolymorphic } from '../types/polymorphic';
+import { createPolymorphic, PolymorphicProps } from '../types/polymorphic';
 import { booleanClassMap } from './core/tokens';
 
 type Responsiveify<T> = {
@@ -20,6 +20,11 @@ export type Props = {
 } & Omit<DerivedProps, 'grow'>;
 
 export type BoxProps = Responsiveify<Props>;
+
+export type BoxComponentProps<C extends React.ElementType = 'div', Props = {}> = PolymorphicProps<
+    C,
+    Props & BoxProps
+>;
 
 type ImplProps = {
     children?: React.ReactNode;

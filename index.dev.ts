@@ -31,6 +31,7 @@ export { FormField } from './src/form/FormField';
 
 export { Modal } from './src/Modal/Modal';
 export { Popover } from './src/Popover';
+export { Collapse } from './src/Collapse/Collapse';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';
 
