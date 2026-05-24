@@ -3,7 +3,7 @@ import React, { CSSProperties, forwardRef, useLayoutEffect, useRef, useState } f
 import { clsx } from 'clsx';
 
 import { Box, BoxComponentProps } from '../Box/Box';
-import { usePresence } from '../hooks';
+import { usePresence, useReducedMotion } from '../hooks';
 import { classPrefix } from '../utils/classPrefix';
 
 // -----------------------------------------------------------------------------
@@ -16,30 +16,18 @@ const prefix = (name = '') => classPrefix(`--collapse${name}`);
 // Types
 // -----------------------------------------------------------------------------
 
-type CollapseEffect = 'height' | 'fade' | 'scale' | 'slide' | (string & {});
+type CollapseEffect = 'none' | 'height' | 'fade' | 'scale' | 'slide' | (string & {});
 
 export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentProps<
     C,
     {
-        /**
-         * Whether collapse is open
-         */
         open?: boolean;
 
-        /**
-         * Transition duration (ms)
-         */
         enterDuration?: number;
         exitDuration?: number;
 
-        /**
-         * Transition easing
-         */
         easing?: string;
 
-        /**
-         * Keep mounted after exit
-         */
         keepMounted?: boolean;
 
         effect?: CollapseEffect;
@@ -58,7 +46,7 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
             exitDuration = 200,
             easing = 'ease',
             keepMounted = false,
-            effect = 'height',
+            effect = 'fade',
             children,
             className,
             ...rest
@@ -66,6 +54,10 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
         ref,
     ) => {
         const innerRef = useRef<HTMLDivElement>(null);
+
+        const prefersReducedMotion = useReducedMotion();
+
+        const shouldAnimate = effect !== 'none' && !prefersReducedMotion;
 
         const { isMounted, state } = usePresence({
             present: open,
@@ -88,10 +80,30 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
         };
 
         // ---------------------------------------------------------------------
+        // Reduced motion
+        // ---------------------------------------------------------------------
+
+        useLayoutEffect(() => {
+            if (effect !== 'height') {
+                return;
+            }
+
+            if (shouldAnimate) {
+                return;
+            }
+
+            setHeight(open ? 'auto' : 0);
+        }, [open, effect, shouldAnimate]);
+
+        // ---------------------------------------------------------------------
         // Height animation only
         // ---------------------------------------------------------------------
 
         useLayoutEffect(() => {
+            if (!shouldAnimate) {
+                return;
+            }
+
             if (effect !== 'height' || !isMounted || !open) {
                 return;
             }
@@ -109,9 +121,13 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                     window.clearTimeout(timeout);
                 };
             });
-        }, [open, isMounted, enterDuration, effect]);
+        }, [open, isMounted, enterDuration, effect, shouldAnimate]);
 
         useLayoutEffect(() => {
+            if (!shouldAnimate) {
+                return;
+            }
+
             if (effect !== 'height' || !isMounted || open) {
                 return;
             }
@@ -125,7 +141,7 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                     setHeight(0);
                 });
             });
-        }, [open, isMounted, effect]);
+        }, [open, isMounted, effect, shouldAnimate]);
 
         // ---------------------------------------------------------------------
         // Hidden
@@ -151,8 +167,8 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 inert={state === 'exited' ? true : undefined}
                 style={
                     {
-                        '--collapse-enter-duration': `${enterDuration}ms`,
-                        '--collapse-exit-duration': `${exitDuration}ms`,
+                        '--collapse-enter-duration': `${!shouldAnimate ? 0 : enterDuration}ms`,
+                        '--collapse-exit-duration': `${!shouldAnimate ? 0 : exitDuration}ms`,
                         '--collapse-easing': easing,
                     } as CSSProperties
                 }
@@ -164,9 +180,5 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
 );
 
 Collapse.displayName = 'Collapse';
-
-// -----------------------------------------------------------------------------
-// Export
-// -----------------------------------------------------------------------------
 
 export { Collapse };
