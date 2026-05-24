@@ -1,4 +1,4 @@
-import React, { forwardRef, useId, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { clsx } from 'clsx';
 import { Box, BoxComponentProps } from '../Box/Box';
 import { Collapse, CollapseProps } from '../Collapse/Collapse';
@@ -13,6 +13,7 @@ import {
 } from './Accordion.context';
 import { useStableId } from '../utils/useStableId';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
+import { useFocusableList, FocusableItem } from '../hooks/useFocusableList';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -56,8 +57,29 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
         },
         ref,
     ) => {
-        const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
         const stableId = useStableId('accordion');
+
+        const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
+
+        const [focusableItems, setFocusableItems] = useState<FocusableItem[]>([]);
+
+        const registerFocusable = useCallback((item: FocusableItem) => {
+            setFocusableItems((prev) => {
+                const exists = prev.some((i) => i.id === item.id);
+
+                if (exists) {
+                    return prev.map((i) => (i.id === item.id ? item : i));
+                }
+
+                return [...prev, item];
+            });
+        }, []);
+
+        const unregisterFocusable = useCallback((id: string) => {
+            setFocusableItems((prev) => prev.filter((item) => item.id !== id));
+        }, []);
+
+        const focusable = useFocusableList(focusableItems);
 
         const value = valueProp ?? uncontrolledValue;
 
@@ -98,8 +120,19 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 multiple,
                 collapsible,
                 id: stableId,
+                focusable,
+                registerFocusable,
+                unregisterFocusable,
             }),
-            [value, multiple, stableId, collapsible],
+            [
+                value,
+                multiple,
+                collapsible,
+                stableId,
+                focusable,
+                registerFocusable,
+                unregisterFocusable,
+            ],
         );
 
         return (
@@ -131,11 +164,13 @@ export type AccordionItemProps<C extends React.ElementType = 'div'> = BoxCompone
 >;
 
 const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
-    ({ value, disabled = false, children, className, ...rest }, ref) => {
+    ({ value, id, disabled = false, children, className, ...rest }, ref) => {
         const context = useAccordionContext();
 
-        const triggerId = context.id + '-item-trigger';
-        const contentId = context.id + '-item-content';
+        const finalId = id ?? value;
+
+        const triggerId = `${context.id}-${finalId}-trigger`;
+        const contentId = `${context.id}-${finalId}-content`;
 
         const open = context.value.includes(value);
 
@@ -170,38 +205,93 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 export type AccordionTriggerProps<C extends React.ElementType = 'button'> = BoxComponentProps<C>;
 
 const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-    ({ children, className, onClick, ...rest }, ref) => {
+    ({ children, className, onClick, onKeyDown, onFocus, ...rest }, ref) => {
         const accordion = useAccordionContext();
         const item = useAccordionItemContext();
 
-        const isNotClosable =
+        const notClosable =
             !accordion.multiple &&
             !accordion.collapsible &&
             item.open &&
             accordion.value.length === 1;
+
+        useEffect(() => {
+            accordion.registerFocusable({
+                id: item.value,
+                disabled: item.disabled,
+            });
+
+            return () => {
+                accordion.unregisterFocusable(item.value);
+            };
+        }, [accordion.registerFocusable, accordion.unregisterFocusable, item.value, item.disabled]);
 
         return (
             <Box
                 as="button"
                 type="button"
                 tabIndex={item.disabled ? -1 : 0}
-                ref={ref}
+                // ref={ref}
+                ref={(node) => {
+                    accordion.focusable.setRef(item.value)(node);
+
+                    if (typeof ref === 'function') {
+                        ref(node);
+                    } else if (ref) {
+                        ref.current = node;
+                    }
+                }}
                 id={item.triggerId}
                 className={clsx(prefix('__trigger'), className)}
                 aria-expanded={item.open}
                 aria-controls={item.contentId}
-                aria-disabled={item.disabled}
+                aria-disabled={item.disabled || notClosable}
                 data-state={item.open ? 'open' : 'closed'}
                 data-disabled={item.disabled ? '' : undefined}
-                data-not-active={isNotClosable ? '' : undefined}
+                data-not-closable={notClosable ? '' : undefined}
                 onClick={(event) => {
                     onClick?.(event);
 
-                    if (event.defaultPrevented || item.disabled) {
+                    if (event.defaultPrevented || item.disabled || notClosable) {
                         return;
                     }
 
                     accordion.toggle(item.value);
+                }}
+                onFocus={(e) => {
+                    onFocus?.(e);
+                    accordion.focusable.setFocusedId(item.value);
+                }}
+                onKeyDown={(event) => {
+                    onKeyDown?.(event);
+
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+
+                    switch (event.key) {
+                        case 'ArrowDown':
+                        case 'PageDown':
+                            event.preventDefault();
+                            accordion.focusable.focusNext(1);
+                            break;
+
+                        case 'ArrowUp':
+                        case 'PageUp':
+                            event.preventDefault();
+                            accordion.focusable.focusNext(-1);
+                            break;
+
+                        case 'Home':
+                            event.preventDefault();
+                            accordion.focusable.focusFirst();
+                            break;
+
+                        case 'End':
+                            event.preventDefault();
+                            accordion.focusable.focusLast();
+                            break;
+                    }
                 }}
                 {...rest}
             >

@@ -189,7 +189,7 @@ $accordion-prefix: #{$p}--accordion;
 
     transition: var(--accordion-transition);
 
-    &:not([data-disabled]):not([data-not-active]):hover {
+    &:not([data-disabled]):not([data-not-closable]):hover {
         background-color: var(--accordion-trigger-hover-bg);
     }
 
@@ -207,7 +207,7 @@ $accordion-prefix: #{$p}--accordion;
     cursor: not-allowed;
 }
 
-.#{$accordion-prefix}__trigger[data-not-active] {
+.#{$accordion-prefix}__trigger[data-not-closable] {
     cursor: default;
     .#{$accordion-prefix}__chevron {
         opacity: 0.6;
