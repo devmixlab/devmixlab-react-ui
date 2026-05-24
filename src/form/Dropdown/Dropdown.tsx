@@ -58,6 +58,7 @@ export type DropdownProps = {
     defaultValue?: string;
     onChange?: (value: string) => void;
     placeholder?: React.ReactNode;
+
     invalid?: boolean;
 
     triggerRender?: (props: TriggerRenderProps) => React.ReactNode;
@@ -336,6 +337,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                         setOpened(state);
                     }}
                     {...rest}
+                    disabled={disabled}
                     onUnmount={() => {
                         if (search.length > 0) setSearch('');
                     }}
@@ -575,7 +577,7 @@ type DropdownListProps = {
 const DropdownList = forwardRef<HTMLDivElement, DropdownListProps>(
     ({ children, className, ...rest }, ref) => {
         return (
-            <Box ref={ref} className={clsx(prefix('__list'), className)} {...rest}>
+            <Box tabIndex={-1} ref={ref} className={clsx(prefix('__list'), className)} {...rest}>
                 {children}
             </Box>
         );
