@@ -50,6 +50,7 @@ type CarouselContextValue = {
 
     draggable: boolean;
     prefersReducedMotion: boolean;
+    dragThreshold: number;
 };
 
 const CarouselContext = createContext<CarouselContextValue | null>(null);
@@ -83,6 +84,7 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
 
         draggable?: boolean;
         disableMotion?: boolean;
+        dragThreshold?: number;
     }
 >;
 
@@ -112,6 +114,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             pauseOnFocus = true,
             draggable = true,
             disableMotion = false,
+            dragThreshold = 6,
             ...rest
         },
         ref,
@@ -310,6 +313,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
                 draggable,
                 prefersReducedMotion,
+                dragThreshold,
             }),
             [
                 scrollPrev,
@@ -325,6 +329,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 updatePageCount,
                 draggable,
                 prefersReducedMotion,
+                dragThreshold,
             ],
         );
 
@@ -393,6 +398,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
             pageCount,
             draggable,
             prefersReducedMotion,
+            dragThreshold,
         } = useCarouselContext();
 
         const dragStartedRef = useRef(false);
@@ -469,14 +475,14 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 const delta = clientX - startXRef.current;
 
                 if (!dragStartedRef.current) {
-                    if (Math.abs(delta) < 5) {
+                    if (Math.abs(delta) < dragThreshold) {
                         return;
                     }
 
                     dragStartedRef.current = true;
                 }
 
-                if (Math.abs(delta) > 5) {
+                if (Math.abs(delta) > dragThreshold) {
                     draggedRef.current = true;
                 }
 
@@ -496,7 +502,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                 lastTimeRef.current = now;
             },
-            [trackRef],
+            [trackRef, dragThreshold],
         );
 
         const endDrag = useCallback(() => {
