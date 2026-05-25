@@ -81,6 +81,7 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
 
         autoplay?: boolean;
         autoplayDelay?: number;
+        autoplaySpeed?: number;
         pauseOnHover?: boolean;
         pauseOnFocus?: boolean;
 
@@ -119,6 +120,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             autoplay = false,
             autoplayDelay = 3000,
+            autoplaySpeed = 600,
 
             pauseOnHover = true,
             pauseOnFocus = true,
@@ -213,12 +215,49 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
                 const target = getScrollAmount() * slidesPerScroll * index;
 
-                el.scrollTo({
-                    left: Math.min(target, maxScrollLeft),
-                    behavior: prefersReducedMotion ? 'auto' : 'smooth',
-                });
+                const finalTarget = Math.min(target, maxScrollLeft);
+
+                if (prefersReducedMotion || autoplaySpeed <= 0) {
+                    el.scrollTo({
+                        left: finalTarget,
+                        behavior: 'auto',
+                    });
+
+                    return;
+                }
+
+                const previousSnap = el.style.scrollSnapType;
+
+                el.style.scrollSnapType = 'none';
+
+                const start = el.scrollLeft;
+
+                const change = finalTarget - start;
+
+                const startTime = performance.now();
+
+                const animate = (time: number) => {
+                    const elapsed = time - startTime;
+
+                    const progress = Math.min(elapsed / autoplaySpeed, 1);
+
+                    const eased =
+                        progress < 0.5
+                            ? 2 * progress * progress
+                            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+                    el.scrollLeft = start + change * eased;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        el.style.scrollSnapType = previousSnap || 'x mandatory';
+                    }
+                };
+
+                requestAnimationFrame(animate);
             },
-            [getScrollAmount, slidesPerScroll, prefersReducedMotion],
+            [getScrollAmount, slidesPerScroll, prefersReducedMotion, autoplaySpeed],
         );
 
         const scrollToPage = useCallback(
@@ -481,8 +520,6 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                 velocityRef.current = 0;
 
-                el.style.scrollBehavior = 'auto';
-
                 el.style.scrollSnapType = 'none';
 
                 document.body.style.userSelect = 'none';
@@ -549,8 +586,6 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
             if (prefersReducedMotion) {
                 el.style.scrollSnapType = 'x mandatory';
 
-                el.style.scrollBehavior = 'auto';
-
                 return;
             }
 
@@ -559,8 +594,6 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                 if (Math.abs(velocityRef.current) < 0.02) {
                     el.style.scrollSnapType = 'x mandatory';
-
-                    el.style.scrollBehavior = 'smooth';
 
                     return;
                 }
