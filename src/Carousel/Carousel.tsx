@@ -40,6 +40,11 @@ type CarouselContextValue = {
     slidesPerView: number;
     slidesPerScroll: number;
     gap: number;
+
+    activeIndex: number;
+    pageCount: number;
+
+    scrollTo: (index: number) => void;
 };
 
 const CarouselContext = createContext<CarouselContextValue | null>(null);
@@ -73,6 +78,7 @@ type CarouselCompound = typeof CarouselRoot & {
     Item: typeof CarouselItem;
     Prev: typeof CarouselPrev;
     Next: typeof CarouselNext;
+    Indicators: typeof CarouselIndicators;
 };
 
 // -----------------------------------------------------------------------------
@@ -83,8 +89,21 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
     ({ children, className, gap = 4, slidesPerView = 1, slidesPerScroll = 1, ...rest }, ref) => {
         const trackRef = useRef<HTMLDivElement>(null);
 
+        const [activeIndex, setActiveIndex] = useState(0);
+        const [pageCount, setPageCount] = useState(0);
+
         const [canScrollPrev, setCanScrollPrev] = useState(false);
         const [canScrollNext, setCanScrollNext] = useState(true);
+
+        const getPageCount = useCallback(() => {
+            const el = trackRef.current;
+
+            if (!el) return 0;
+
+            const totalSlides = el.children.length;
+
+            return Math.max(1, Math.ceil(totalSlides / slidesPerScroll));
+        }, [slidesPerScroll]);
 
         const getScrollAmount = useCallback(() => {
             const el = trackRef.current;
@@ -96,15 +115,34 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             return (el.clientWidth - totalGap) / slidesPerView + gap * 4;
         }, [slidesPerView, gap]);
 
+        const scrollTo = useCallback(
+            (index: number) => {
+                const el = trackRef.current;
+
+                if (!el) return;
+
+                el.scrollTo({
+                    left: getScrollAmount() * slidesPerScroll * index,
+                    behavior: 'smooth',
+                });
+            },
+            [getScrollAmount, slidesPerScroll],
+        );
+
         const updateScrollState = useCallback(() => {
             const el = trackRef.current;
 
             if (!el) return;
 
+            setPageCount(getPageCount());
+
+            const currentIndex = Math.round(el.scrollLeft / (getScrollAmount() * slidesPerScroll));
+            setActiveIndex(currentIndex);
+
             setCanScrollPrev(el.scrollLeft > 0);
 
             setCanScrollNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-        }, []);
+        }, [getPageCount, getScrollAmount, slidesPerScroll]);
 
         const scrollPrev = useCallback(() => {
             const el = trackRef.current;
@@ -139,6 +177,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 slidesPerView,
                 slidesPerScroll,
                 gap,
+
+                activeIndex,
+                pageCount,
+                scrollTo,
             }),
             [
                 scrollPrev,
@@ -148,6 +190,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 slidesPerView,
                 slidesPerScroll,
                 gap,
+                activeIndex,
+                pageCount,
+                scrollTo,
             ],
         );
 
@@ -339,6 +384,49 @@ const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 );
 
 // -----------------------------------------------------------------------------
+// Indicators
+// -----------------------------------------------------------------------------
+
+type CarouselIndicatorsProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
+
+const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
+    ({ className, ...rest }, ref) => {
+        const { activeIndex, pageCount, scrollTo } = useCarouselContext();
+
+        return (
+            <Box
+                ref={ref}
+                className={clsx(prefix('__indicators'), className)}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                gap={2}
+                {...rest}
+            >
+                {Array.from({ length: pageCount }).map((_, index) => {
+                    const active = index === activeIndex;
+
+                    return (
+                        <Box
+                            key={index}
+                            as="button"
+                            type="button"
+                            className={clsx(
+                                prefix('__indicator'),
+                                active && prefix('__indicator-active'),
+                            )}
+                            aria-label={`Go to slide ${index + 1}`}
+                            aria-current={active}
+                            onClick={() => scrollTo(index)}
+                        />
+                    );
+                })}
+            </Box>
+        );
+    },
+);
+
+// -----------------------------------------------------------------------------
 // Internal scroll watcher
 // -----------------------------------------------------------------------------
 
@@ -377,3 +465,4 @@ Carousel.Track = CarouselTrack;
 Carousel.Item = CarouselItem;
 Carousel.Prev = CarouselPrev;
 Carousel.Next = CarouselNext;
+Carousel.Indicators = CarouselIndicators;
