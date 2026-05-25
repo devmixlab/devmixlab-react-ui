@@ -758,12 +758,16 @@ const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
             passive: true,
         });
 
-        window.addEventListener('resize', handleResize);
+        const observer = new ResizeObserver(() => {
+            handleResize();
+        });
+
+        observer.observe(el);
 
         return () => {
             el.removeEventListener('scroll', onScroll);
 
-            window.removeEventListener('resize', handleResize);
+            observer.disconnect();
 
             if (frameRef.current) {
                 cancelAnimationFrame(frameRef.current);
