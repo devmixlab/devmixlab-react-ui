@@ -79,6 +79,7 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
         autoplay?: boolean;
         autoplayDelay?: number;
         pauseOnHover?: boolean;
+        pauseOnFocus?: boolean;
 
         draggable?: boolean;
         disableMotion?: boolean;
@@ -108,6 +109,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             autoplay = false,
             autoplayDelay = 3000,
             pauseOnHover = true,
+            pauseOnFocus = true,
             draggable = true,
             disableMotion = false,
             ...rest
@@ -145,6 +147,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         const autoplayRef = useRef<number | null>(null);
 
         const hoveredRef = useRef(false);
+        const focusedRef = useRef(false);
 
         const [activeIndex, setActiveIndex] = useState(0);
 
@@ -185,7 +188,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             if (!el) return;
 
-            if (pauseOnHover && hoveredRef.current) {
+            if ((pauseOnHover && hoveredRef.current) || (pauseOnFocus && focusedRef.current)) {
                 return;
             }
 
@@ -338,6 +341,14 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                     }}
                     onMouseLeave={() => {
                         hoveredRef.current = false;
+                    }}
+                    onFocusCapture={() => {
+                        focusedRef.current = true;
+                    }}
+                    onBlurCapture={(event) => {
+                        if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                            focusedRef.current = false;
+                        }
                     }}
                     {...rest}
                 >
