@@ -745,6 +745,51 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
     ({ className, ...rest }, ref) => {
         const { activeIndex, pageCount, scrollTo } = useCarouselContext();
 
+        const indicatorRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+        const handleKeyDown = useCallback(
+            (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+                let nextIndex = index;
+
+                switch (event.key) {
+                    case 'ArrowRight': {
+                        nextIndex = (index + 1) % pageCount;
+
+                        break;
+                    }
+
+                    case 'ArrowLeft': {
+                        nextIndex = (index - 1 + pageCount) % pageCount;
+
+                        break;
+                    }
+
+                    case 'Home': {
+                        nextIndex = 0;
+
+                        break;
+                    }
+
+                    case 'End': {
+                        nextIndex = pageCount - 1;
+
+                        break;
+                    }
+
+                    default: {
+                        return;
+                    }
+                }
+
+                event.preventDefault();
+
+                scrollTo(nextIndex);
+
+                indicatorRefs.current[nextIndex]?.focus();
+            },
+            [pageCount, scrollTo],
+        );
+
         return (
             <Box
                 ref={ref}
@@ -753,6 +798,7 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
                 alignItems="center"
                 justifyContent="center"
                 gap={2}
+                role="tablist"
                 {...rest}
             >
                 {Array.from({ length: pageCount }).map((_, index) => {
@@ -761,8 +807,14 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
                     return (
                         <Box
                             key={index}
+                            ref={(node: HTMLButtonElement | null) => {
+                                indicatorRefs.current[index] = node;
+                            }}
                             as="button"
                             type="button"
+                            role="tab"
+                            tabIndex={active ? 0 : -1}
+                            aria-selected={active}
                             className={clsx(
                                 prefix('__indicator'),
                                 active && prefix('__indicator-active'),
@@ -770,6 +822,9 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
                             aria-label={`Go to page ${index + 1}`}
                             aria-current={active}
                             onClick={() => scrollTo(index)}
+                            onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>) => {
+                                handleKeyDown(event, index);
+                            }}
                         />
                     );
                 })}
