@@ -53,6 +53,9 @@ type CarouselContextValue = {
     dragThreshold: number;
 
     loop: boolean;
+
+    onDragStart?: () => void;
+    onDragEnd?: () => void;
 };
 
 const CarouselContext = createContext<CarouselContextValue | null>(null);
@@ -93,6 +96,17 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
         dragThreshold?: number;
 
         loop?: boolean;
+
+        onPageChange?: (index: number) => void;
+        onVisibilityChange?: (visibleIndexes: number[]) => void;
+        onSlideVisible?: (index: number) => void;
+        onSlideHidden?: (index: number) => void;
+        onReachStart?: () => void;
+        onReachEnd?: () => void;
+        onDragStart?: () => void;
+        onDragEnd?: () => void;
+        onAutoplayStart?: () => void;
+        onAutoplayStop?: () => void;
     }
 >;
 
@@ -135,6 +149,17 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             loop = false,
 
+            onPageChange,
+            onVisibilityChange,
+            onSlideVisible,
+            onSlideHidden,
+            onReachStart,
+            onReachEnd,
+            onDragStart,
+            onDragEnd,
+            onAutoplayStart,
+            onAutoplayStop,
+
             ...rest
         },
         ref,
@@ -164,6 +189,12 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 media.removeEventListener('change', update);
             };
         }, []);
+
+        const visibleIndexesRef = useRef<number[]>([]);
+        const reachedStartRef = useRef(false);
+        const reachedEndRef = useRef(false);
+        const autoplayRunningRef = useRef(false);
+        const previousPageRef = useRef(0);
 
         const trackRef = useRef<HTMLDivElement>(null);
 
@@ -315,7 +346,19 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         }, [pauseOnHover, pauseOnFocus, scrollToPage, activeIndex, autoplaySpeed]);
 
         React.useEffect(() => {
-            if (!autoplay) return;
+            if (!autoplay) {
+                if (autoplayRunningRef.current) {
+                    autoplayRunningRef.current = false;
+
+                    onAutoplayStop?.();
+                }
+
+                return;
+            }
+
+            autoplayRunningRef.current = true;
+
+            onAutoplayStart?.();
 
             autoplayRef.current = window.setInterval(() => {
                 autoplayNext();
@@ -325,8 +368,14 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 if (autoplayRef.current) {
                     clearInterval(autoplayRef.current);
                 }
+
+                if (autoplayRunningRef.current) {
+                    autoplayRunningRef.current = false;
+
+                    onAutoplayStop?.();
+                }
             };
-        }, [autoplay, autoplayDelay, autoplayNext]);
+        }, [autoplay, autoplayDelay, autoplayNext, onAutoplayStart, onAutoplayStop]);
 
         const updateScrollState = useCallback(() => {
             const el = trackRef.current;
@@ -344,10 +393,100 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             setActiveIndex(currentIndex);
 
-            setCanScrollPrev(loop || el.scrollLeft > 0);
+            if (previousPageRef.current !== currentIndex) {
+                previousPageRef.current = currentIndex;
 
-            setCanScrollNext(loop || el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-        }, [getScrollAmount, slidesPerScroll, pageCount, loop]);
+                onPageChange?.(currentIndex);
+            }
+
+            const atStart = el.scrollLeft <= 1;
+
+            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+
+            setCanScrollPrev(loop || !atStart);
+
+            setCanScrollNext(loop || !atEnd);
+
+            if (atStart && !reachedStartRef.current) {
+                reachedStartRef.current = true;
+
+                onReachStart?.();
+            }
+
+            if (!atStart) {
+                reachedStartRef.current = false;
+            }
+
+            if (atEnd && !reachedEndRef.current) {
+                reachedEndRef.current = true;
+
+                onReachEnd?.();
+            }
+
+            if (!atEnd) {
+                reachedEndRef.current = false;
+            }
+
+            const children = Array.from(el.children);
+
+            const nextVisibleIndexes: number[] = [];
+
+            children.forEach((child, index) => {
+                const slide = child as HTMLElement;
+
+                const left = slide.offsetLeft;
+
+                const right = left + slide.offsetWidth;
+
+                const viewportLeft = el.scrollLeft;
+
+                const viewportRight = viewportLeft + el.clientWidth;
+
+                const visible = right > viewportLeft && left < viewportRight;
+
+                if (visible) {
+                    nextVisibleIndexes.push(index);
+                }
+            });
+
+            const prevVisible = visibleIndexesRef.current;
+
+            const changed =
+                prevVisible.length !== nextVisibleIndexes.length ||
+                prevVisible.some((value, index) => value !== nextVisibleIndexes[index]);
+
+            if (changed) {
+                nextVisibleIndexes.forEach((index) => {
+                    if (!prevVisible.includes(index)) {
+                        onSlideVisible?.(index);
+                    }
+                });
+
+                prevVisible.forEach((index) => {
+                    if (!nextVisibleIndexes.includes(index)) {
+                        onSlideHidden?.(index);
+                    }
+                });
+
+                visibleIndexesRef.current = nextVisibleIndexes;
+
+                onVisibilityChange?.(nextVisibleIndexes);
+            }
+        }, [
+            getScrollAmount,
+            slidesPerScroll,
+            pageCount,
+            loop,
+
+            onPageChange,
+
+            onReachStart,
+            onReachEnd,
+
+            onSlideVisible,
+            onSlideHidden,
+            onVisibilityChange,
+        ]);
 
         const scrollPrev = useCallback(() => {
             scrollPrevPage();
@@ -386,6 +525,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 dragThreshold,
 
                 loop,
+
+                onDragStart,
+                onDragEnd,
             }),
             [
                 scrollPrev,
@@ -413,6 +555,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 dragThreshold,
 
                 loop,
+
+                onDragStart,
+                onDragEnd,
             ],
         );
 
@@ -487,7 +632,12 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
             activeIndex,
             loop,
+
+            onDragStart,
+            onDragEnd,
         } = useCarouselContext();
+
+        const dragEndedRef = useRef(false);
 
         const dragStartedRef = useRef(false);
 
@@ -525,6 +675,9 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                 stopMomentum();
 
+                dragEndedRef.current = false;
+                onDragStart?.();
+
                 dragStartedRef.current = false;
 
                 draggedRef.current = false;
@@ -549,7 +702,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                 document.body.style.cursor = 'grabbing';
             },
-            [trackRef, draggable, stopMomentum],
+            [trackRef, draggable, stopMomentum, onDragStart],
         );
 
         const moveDrag = useCallback(
@@ -607,6 +760,12 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
             if (prefersReducedMotion) {
                 el.style.scrollSnapType = 'x mandatory';
 
+                if (!dragEndedRef.current) {
+                    dragEndedRef.current = true;
+
+                    onDragEnd?.();
+                }
+
                 return;
             }
 
@@ -615,6 +774,12 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                 if (Math.abs(velocityRef.current) < 0.02) {
                     el.style.scrollSnapType = 'x mandatory';
+
+                    if (!dragEndedRef.current) {
+                        dragEndedRef.current = true;
+
+                        onDragEnd?.();
+                    }
 
                     return;
                 }
@@ -625,7 +790,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
             };
 
             momentum();
-        }, [trackRef, prefersReducedMotion]);
+        }, [trackRef, prefersReducedMotion, onDragEnd]);
 
         const handlePointerMove = useCallback(
             (event: PointerEvent) => {
@@ -742,6 +907,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                     }
                 }}
                 data-dragging={draggable && isDraggingRef.current ? true : undefined}
+                aria-label="Carousel track"
                 style={
                     {
                         '--carousel-gap': `${gap * 4}px`,
@@ -902,7 +1068,7 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
                 switch (event.key) {
                     case 'ArrowRight': {
                         if (loop) {
-                            nextIndex = (index + 1) % pageCount;
+                            nextIndex = pageCount === 0 ? 0 : (index + 1) % pageCount;
                         } else {
                             nextIndex = Math.min(index + 1, pageCount - 1);
                         }
