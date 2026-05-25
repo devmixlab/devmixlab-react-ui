@@ -86,14 +86,6 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         const [canScrollPrev, setCanScrollPrev] = useState(false);
         const [canScrollNext, setCanScrollNext] = useState(true);
 
-        // const getScrollAmount = useCallback(() => {
-        //     const el = trackRef.current;
-        //
-        //     if (!el) return 0;
-        //
-        //     return el.clientWidth / slidesPerView;
-        // }, [slidesPerView]);
-
         const getScrollAmount = useCallback(() => {
             const el = trackRef.current;
 
