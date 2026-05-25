@@ -182,6 +182,14 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
         const [canScrollNext, setCanScrollNext] = useState(true);
 
+        React.useEffect(() => {
+            return () => {
+                if (animationFrameRef.current) {
+                    cancelAnimationFrame(animationFrameRef.current);
+                }
+            };
+        }, []);
+
         const getPageCount = useCallback(() => {
             const el = trackRef.current;
 
@@ -666,7 +674,9 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                         event.preventDefault();
 
                         const nextIndex = loop
-                            ? (activeIndex + 1) % pageCount
+                            ? pageCount === 0
+                                ? 0
+                                : (activeIndex + 1) % pageCount
                             : Math.min(pageCount - 1, activeIndex + 1);
 
                         scrollTo(nextIndex, event.repeat ? 80 : undefined);
