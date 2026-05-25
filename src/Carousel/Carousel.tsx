@@ -71,6 +71,10 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
 
         slidesPerView?: number;
         slidesPerScroll?: number;
+
+        autoplay?: boolean;
+        autoplayDelay?: number;
+        pauseOnHover?: boolean;
     }
 >;
 
@@ -87,8 +91,23 @@ type CarouselCompound = typeof CarouselRoot & {
 // -----------------------------------------------------------------------------
 
 const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
-    ({ children, className, gap = 4, slidesPerView = 1, slidesPerScroll = 1, ...rest }, ref) => {
+    (
+        {
+            children,
+            className,
+            gap = 4,
+            slidesPerView = 1,
+            slidesPerScroll = 1,
+            autoplay = false,
+            autoplayDelay = 3000,
+            pauseOnHover = true,
+            ...rest
+        },
+        ref,
+    ) => {
         const trackRef = useRef<HTMLDivElement>(null);
+        const autoplayRef = useRef<number | null>(null);
+        const hoveredRef = useRef(false);
 
         const [activeIndex, setActiveIndex] = useState(0);
         const [pageCount, setPageCount] = useState(0);
@@ -121,6 +140,52 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             return (el.clientWidth - totalGap) / slidesPerView + gap * 4;
         }, [slidesPerView, gap]);
+
+        const autoplayNext = useCallback(() => {
+            const el = trackRef.current;
+
+            if (!el) return;
+
+            if (pauseOnHover && hoveredRef.current) {
+                return;
+            }
+
+            const maxScrollLeft = el.scrollWidth - el.clientWidth;
+
+            const scrollAmount = getScrollAmount() * slidesPerScroll;
+
+            const current = el.scrollLeft;
+
+            const next = current + scrollAmount;
+
+            if (current >= maxScrollLeft - 1) {
+                el.scrollTo({
+                    left: 0,
+                    behavior: 'smooth',
+                });
+
+                return;
+            }
+
+            el.scrollTo({
+                left: Math.min(next, maxScrollLeft),
+                behavior: 'smooth',
+            });
+        }, [getScrollAmount, slidesPerScroll, pauseOnHover]);
+
+        React.useEffect(() => {
+            if (!autoplay) return;
+
+            autoplayRef.current = window.setInterval(() => {
+                autoplayNext();
+            }, autoplayDelay);
+
+            return () => {
+                if (autoplayRef.current) {
+                    clearInterval(autoplayRef.current);
+                }
+            };
+        }, [autoplay, autoplayDelay, autoplayNext]);
 
         const scrollTo = useCallback(
             (index: number) => {
@@ -224,6 +289,12 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                     pos="relative"
                     role="region"
                     aria-roledescription="carousel"
+                    onMouseEnter={() => {
+                        hoveredRef.current = true;
+                    }}
+                    onMouseLeave={() => {
+                        hoveredRef.current = false;
+                    }}
                     {...rest}
                 >
                     {children}
