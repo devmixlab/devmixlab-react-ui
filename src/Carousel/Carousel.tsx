@@ -106,13 +106,17 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         ref,
     ) => {
         const trackRef = useRef<HTMLDivElement>(null);
+
         const autoplayRef = useRef<number | null>(null);
+
         const hoveredRef = useRef(false);
 
         const [activeIndex, setActiveIndex] = useState(0);
+
         const [pageCount, setPageCount] = useState(0);
 
         const [canScrollPrev, setCanScrollPrev] = useState(false);
+
         const [canScrollNext, setCanScrollNext] = useState(true);
 
         const getPageCount = useCallback(() => {
@@ -329,7 +333,11 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
     ({ children, className, ...rest }, ref) => {
         const { trackRef, gap, scrollPrev, scrollNext } = useCarouselContext();
 
+        const dragStartedRef = useRef(false);
+
         const isDraggingRef = useRef(false);
+
+        const draggedRef = useRef(false);
 
         const startXRef = useRef(0);
 
@@ -343,13 +351,13 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
         const momentumRef = useRef<number | null>(null);
 
-        const stopMomentum = () => {
+        const stopMomentum = useCallback(() => {
             if (momentumRef.current) {
                 cancelAnimationFrame(momentumRef.current);
 
                 momentumRef.current = null;
             }
-        };
+        }, []);
 
         const startDrag = useCallback(
             (clientX: number) => {
@@ -358,6 +366,10 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 if (!el) return;
 
                 stopMomentum();
+
+                dragStartedRef.current = false;
+
+                draggedRef.current = false;
 
                 isDraggingRef.current = true;
 
@@ -377,9 +389,11 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                 document.body.style.userSelect = 'none';
 
+                document.body.style.webkitUserSelect = 'none';
+
                 document.body.style.cursor = 'grabbing';
             },
-            [trackRef],
+            [trackRef, stopMomentum],
         );
 
         const moveDrag = useCallback(
@@ -389,6 +403,18 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 if (!el || !isDraggingRef.current) return;
 
                 const delta = clientX - startXRef.current;
+
+                if (!dragStartedRef.current) {
+                    if (Math.abs(delta) < 5) {
+                        return;
+                    }
+
+                    dragStartedRef.current = true;
+                }
+
+                if (Math.abs(delta) > 5) {
+                    draggedRef.current = true;
+                }
 
                 el.scrollLeft = scrollLeftRef.current - delta;
 
@@ -412,17 +438,17 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
         const endDrag = useCallback(() => {
             const el = trackRef.current;
 
-            if (!el) return;
+            if (!el || !isDraggingRef.current) return;
 
             isDraggingRef.current = false;
 
             document.body.style.userSelect = '';
 
+            document.body.style.webkitUserSelect = '';
+
             document.body.style.cursor = '';
 
             const momentum = () => {
-                if (!el) return;
-
                 velocityRef.current *= 0.95;
 
                 if (Math.abs(velocityRef.current) < 0.02) {
@@ -440,6 +466,31 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
             momentum();
         }, [trackRef]);
+
+        const handlePointerMove = useCallback(
+            (event: PointerEvent) => {
+                moveDrag(event.clientX);
+            },
+            [moveDrag],
+        );
+
+        const handlePointerUp = useCallback(() => {
+            window.removeEventListener('pointermove', handlePointerMove);
+
+            window.removeEventListener('pointerup', handlePointerUp);
+
+            endDrag();
+        }, [endDrag, handlePointerMove]);
+
+        React.useEffect(() => {
+            return () => {
+                stopMomentum();
+
+                window.removeEventListener('pointermove', handlePointerMove);
+
+                window.removeEventListener('pointerup', handlePointerUp);
+            };
+        }, [handlePointerMove, handlePointerUp, stopMomentum]);
 
         const handleKeyDown = useCallback(
             (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -504,26 +555,29 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 className={clsx(prefix('__track'), className)}
                 display="flex"
                 overflowX="auto"
+                overscrollBehaviorX="contain"
                 scrollSnapType="x mandatory"
+                touchAction="pan-y"
                 gap={gap}
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
-                onMouseDown={(e) => {
+                onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+
                     startDrag(e.clientX);
+
+                    window.addEventListener('pointermove', handlePointerMove);
+
+                    window.addEventListener('pointerup', handlePointerUp);
                 }}
-                onMouseMove={(e) => {
-                    moveDrag(e.clientX);
+                onClickCapture={(e) => {
+                    if (draggedRef.current) {
+                        e.preventDefault();
+
+                        e.stopPropagation();
+                    }
                 }}
-                onMouseUp={endDrag}
-                onMouseLeave={endDrag}
-                onTouchStart={(e) => {
-                    startDrag(e.touches[0].clientX);
-                }}
-                onTouchMove={(e) => {
-                    moveDrag(e.touches[0].clientX);
-                }}
-                onTouchEnd={endDrag}
-                cursor="grab"
+                data-dragging={isDraggingRef.current || undefined}
                 style={
                     {
                         '--carousel-gap': `${gap * 4}px`,
@@ -713,7 +767,11 @@ const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
 export const Carousel = CarouselRoot as CarouselCompound;
 
 Carousel.Track = CarouselTrack;
+
 Carousel.Item = CarouselItem;
+
 Carousel.Prev = CarouselPrev;
+
 Carousel.Next = CarouselNext;
+
 Carousel.Indicators = CarouselIndicators;

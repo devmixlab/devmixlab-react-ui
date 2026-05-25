@@ -34,6 +34,14 @@ $carousel-prefix: #{$p}--carousel;
         }
     }
 
+    .dru--carousel__track {
+        cursor: grab;
+    }
+
+    .dru--carousel__track[data-dragging] {
+        cursor: grabbing;
+    }
+
     .#{$carousel-prefix}__item {
         min-width: 0;
     }

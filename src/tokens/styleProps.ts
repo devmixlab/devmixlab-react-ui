@@ -189,6 +189,10 @@ export const styleProps = defineStyleProps([
     'overflow',
     'overflowX',
     'overflowY',
+    'scrollbarWidth',
+    'overscrollBehavior',
+    'overscrollBehaviorX',
+    'overscrollBehaviorY',
     'scrollBehavior',
     'scrollSnapType',
     'scrollSnapAlign',
@@ -198,6 +202,7 @@ export const styleProps = defineStyleProps([
     // 11. Interaction
     'cursor',
     'pointerEvents',
+    'touchAction',
     'visibility',
     'userSelect',
     'resize',
