@@ -102,8 +102,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             const totalSlides = el.children.length;
 
-            return Math.max(1, Math.ceil(totalSlides / slidesPerScroll));
-        }, [slidesPerScroll]);
+            const maxIndex = Math.max(0, totalSlides - slidesPerView);
+
+            return Math.floor(maxIndex / slidesPerScroll) + 1;
+        }, [slidesPerScroll, slidesPerView]);
 
         const getScrollAmount = useCallback(() => {
             const el = trackRef.current;
@@ -134,9 +136,17 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             if (!el) return;
 
-            setPageCount(getPageCount());
+            const nextPageCount = getPageCount();
 
-            const currentIndex = Math.round(el.scrollLeft / (getScrollAmount() * slidesPerScroll));
+            setPageCount(nextPageCount);
+
+            const scrollPerPage = getScrollAmount() * slidesPerScroll;
+
+            const currentIndex = Math.min(
+                nextPageCount - 1,
+                Math.round(el.scrollLeft / scrollPerPage),
+            );
+
             setActiveIndex(currentIndex);
 
             setCanScrollPrev(el.scrollLeft > 0);
