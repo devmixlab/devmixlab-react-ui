@@ -36,6 +36,10 @@ type CarouselContextValue = {
 
     canScrollPrev: boolean;
     canScrollNext: boolean;
+
+    slidesPerView: number;
+    slidesPerScroll: number;
+    gap: number;
 };
 
 const CarouselContext = createContext<CarouselContextValue | null>(null);
@@ -58,6 +62,9 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
     C,
     {
         gap?: number;
+
+        slidesPerView?: number;
+        slidesPerScroll?: number;
     }
 >;
 
@@ -73,11 +80,29 @@ type CarouselCompound = typeof CarouselRoot & {
 // -----------------------------------------------------------------------------
 
 const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
-    ({ children, className, ...rest }, ref) => {
+    ({ children, className, gap = 4, slidesPerView = 1, slidesPerScroll = 1, ...rest }, ref) => {
         const trackRef = useRef<HTMLDivElement>(null);
 
         const [canScrollPrev, setCanScrollPrev] = useState(false);
         const [canScrollNext, setCanScrollNext] = useState(true);
+
+        // const getScrollAmount = useCallback(() => {
+        //     const el = trackRef.current;
+        //
+        //     if (!el) return 0;
+        //
+        //     return el.clientWidth / slidesPerView;
+        // }, [slidesPerView]);
+
+        const getScrollAmount = useCallback(() => {
+            const el = trackRef.current;
+
+            if (!el) return 0;
+
+            const totalGap = (slidesPerView - 1) * gap * 4;
+
+            return (el.clientWidth - totalGap) / slidesPerView + gap * 4;
+        }, [slidesPerView, gap]);
 
         const updateScrollState = useCallback(() => {
             const el = trackRef.current;
@@ -95,10 +120,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             if (!el) return;
 
             el.scrollBy({
-                left: -el.clientWidth,
+                left: -(getScrollAmount() * slidesPerScroll),
                 behavior: 'smooth',
             });
-        }, []);
+        }, [getScrollAmount, slidesPerScroll]);
 
         const scrollNext = useCallback(() => {
             const el = trackRef.current;
@@ -106,10 +131,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             if (!el) return;
 
             el.scrollBy({
-                left: el.clientWidth,
+                left: getScrollAmount() * slidesPerScroll,
                 behavior: 'smooth',
             });
-        }, []);
+        }, [getScrollAmount, slidesPerScroll]);
 
         const value = useMemo(
             () => ({
@@ -118,8 +143,20 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 scrollNext,
                 canScrollPrev,
                 canScrollNext,
+
+                slidesPerView,
+                slidesPerScroll,
+                gap,
             }),
-            [scrollPrev, scrollNext, canScrollPrev, canScrollNext],
+            [
+                scrollPrev,
+                scrollNext,
+                canScrollPrev,
+                canScrollNext,
+                slidesPerView,
+                slidesPerScroll,
+                gap,
+            ],
         );
 
         return (
@@ -142,7 +179,7 @@ type CarouselTrackProps<C extends React.ElementType = 'div'> = BoxComponentProps
 
 const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
     ({ children, className, ...rest }, ref) => {
-        const { trackRef } = useCarouselContext();
+        const { trackRef, gap } = useCarouselContext();
 
         return (
             <Box
@@ -159,7 +196,13 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 display="flex"
                 overflowX="auto"
                 scrollSnapType="x mandatory"
-                gap={4}
+                gap={gap}
+                scrollBehavior="smooth"
+                style={
+                    {
+                        '--carousel-gap': `${gap * 4}px`,
+                    } as React.CSSProperties
+                }
                 {...rest}
             >
                 {children}
@@ -176,11 +219,15 @@ type CarouselItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<
 
 const CarouselItem = forwardRef<HTMLDivElement, CarouselItemProps>(
     ({ children, className, ...rest }, ref) => {
+        const { slidesPerView } = useCarouselContext();
+
         return (
             <Box
                 ref={ref}
                 className={clsx(prefix('__item'), className)}
-                flex="0 0 100%"
+                flex={`0 0 calc(
+                    (100% - (${slidesPerView} - 1) * var(--carousel-gap)) / ${slidesPerView}
+                )`}
                 scrollSnapAlign="start"
                 {...rest}
             >
@@ -197,12 +244,13 @@ const CarouselItem = forwardRef<HTMLDivElement, CarouselItemProps>(
 type CarouselButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<C>;
 
 const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
-    ({ children = 'Prev', ...rest }, ref) => {
+    ({ className, children = 'Prev', ...rest }, ref) => {
         const { scrollPrev, canScrollPrev } = useCarouselContext();
 
         return (
             <Box
                 as="button"
+                className={clsx(prefix('__control'), prefix('__control-prev'), className)}
                 ref={ref}
                 type="button"
                 onClick={scrollPrev}
@@ -221,12 +269,13 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 // -----------------------------------------------------------------------------
 
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
-    ({ children = 'Next', ...rest }, ref) => {
+    ({ className, children = 'Next', ...rest }, ref) => {
         const { scrollNext, canScrollNext } = useCarouselContext();
 
         return (
             <Box
                 as="button"
+                className={clsx(prefix('__control'), prefix('__control-next'), className)}
                 ref={ref}
                 type="button"
                 onClick={scrollNext}

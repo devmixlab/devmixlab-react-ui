@@ -1,0 +1,52 @@
+@use '../scss/functions' as functions;
+@use '../scss/mixins' as mixins;
+
+@use '../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$carousel-prefix: #{$p}--carousel;
+
+.#{$carousel-prefix} {
+    position: relative;
+
+    .#{$carousel-prefix}__track {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        overscroll-behavior-x: contain;
+
+        cursor: grab;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    .#{$carousel-prefix}__item {
+        min-width: 0;
+    }
+
+    .#{$carousel-prefix}__control {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        &-prev {
+        }
+
+        &-next {
+        }
+    }
+}
