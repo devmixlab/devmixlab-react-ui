@@ -153,7 +153,14 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
         return (
             <CarouselContext.Provider value={value}>
-                <Box ref={ref} className={clsx(prefix(), className)} pos="relative" {...rest}>
+                <Box
+                    ref={ref}
+                    className={clsx(prefix(), className)}
+                    pos="relative"
+                    role="region"
+                    aria-roledescription="carousel"
+                    {...rest}
+                >
                     {children}
 
                     <ScrollWatcher onScroll={updateScrollState} />
@@ -171,7 +178,56 @@ type CarouselTrackProps<C extends React.ElementType = 'div'> = BoxComponentProps
 
 const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
     ({ children, className, ...rest }, ref) => {
-        const { trackRef, gap } = useCarouselContext();
+        const { trackRef, gap, scrollPrev, scrollNext } = useCarouselContext();
+
+        const handleKeyDown = useCallback(
+            (event: React.KeyboardEvent<HTMLDivElement>) => {
+                switch (event.key) {
+                    case 'ArrowLeft': {
+                        event.preventDefault();
+
+                        scrollPrev();
+
+                        break;
+                    }
+
+                    case 'ArrowRight': {
+                        event.preventDefault();
+
+                        scrollNext();
+
+                        break;
+                    }
+
+                    case 'Home': {
+                        event.preventDefault();
+
+                        trackRef.current?.scrollTo({
+                            left: 0,
+                            behavior: 'smooth',
+                        });
+
+                        break;
+                    }
+
+                    case 'End': {
+                        const el = trackRef.current;
+
+                        if (!el) return;
+
+                        event.preventDefault();
+
+                        el.scrollTo({
+                            left: el.scrollWidth,
+                            behavior: 'smooth',
+                        });
+
+                        break;
+                    }
+                }
+            },
+            [scrollPrev, scrollNext, trackRef],
+        );
 
         return (
             <Box
@@ -189,7 +245,8 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 overflowX="auto"
                 scrollSnapType="x mandatory"
                 gap={gap}
-                scrollBehavior="smooth"
+                tabIndex={0}
+                onKeyDown={handleKeyDown}
                 style={
                     {
                         '--carousel-gap': `${gap * 4}px`,
