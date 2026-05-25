@@ -1,0 +1,281 @@
+// -----------------------------------------------------------------------------
+// Carousel.tsx
+// V1 — scroll snap carousel
+// -----------------------------------------------------------------------------
+
+import React, {
+    createContext,
+    forwardRef,
+    useCallback,
+    useContext,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+
+import { clsx } from 'clsx';
+
+import { Box, BoxComponentProps } from '../Box/Box';
+import { classPrefix } from '../utils/classPrefix';
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+const prefix = (name = '') => classPrefix(`--carousel${name}`);
+
+// -----------------------------------------------------------------------------
+// Context
+// -----------------------------------------------------------------------------
+
+type CarouselContextValue = {
+    trackRef: React.MutableRefObject<HTMLDivElement | null>;
+
+    scrollPrev: () => void;
+    scrollNext: () => void;
+
+    canScrollPrev: boolean;
+    canScrollNext: boolean;
+};
+
+const CarouselContext = createContext<CarouselContextValue | null>(null);
+
+const useCarouselContext = () => {
+    const ctx = useContext(CarouselContext);
+
+    if (!ctx) {
+        throw new Error('Carousel components must be used inside <Carousel>');
+    }
+
+    return ctx;
+};
+
+// -----------------------------------------------------------------------------
+// Types
+// -----------------------------------------------------------------------------
+
+export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentProps<
+    C,
+    {
+        gap?: number;
+    }
+>;
+
+type CarouselCompound = typeof CarouselRoot & {
+    Track: typeof CarouselTrack;
+    Item: typeof CarouselItem;
+    Prev: typeof CarouselPrev;
+    Next: typeof CarouselNext;
+};
+
+// -----------------------------------------------------------------------------
+// Root
+// -----------------------------------------------------------------------------
+
+const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
+    ({ children, className, ...rest }, ref) => {
+        const trackRef = useRef<HTMLDivElement>(null);
+
+        const [canScrollPrev, setCanScrollPrev] = useState(false);
+        const [canScrollNext, setCanScrollNext] = useState(true);
+
+        const updateScrollState = useCallback(() => {
+            const el = trackRef.current;
+
+            if (!el) return;
+
+            setCanScrollPrev(el.scrollLeft > 0);
+
+            setCanScrollNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+        }, []);
+
+        const scrollPrev = useCallback(() => {
+            const el = trackRef.current;
+
+            if (!el) return;
+
+            el.scrollBy({
+                left: -el.clientWidth,
+                behavior: 'smooth',
+            });
+        }, []);
+
+        const scrollNext = useCallback(() => {
+            const el = trackRef.current;
+
+            if (!el) return;
+
+            el.scrollBy({
+                left: el.clientWidth,
+                behavior: 'smooth',
+            });
+        }, []);
+
+        const value = useMemo(
+            () => ({
+                trackRef,
+                scrollPrev,
+                scrollNext,
+                canScrollPrev,
+                canScrollNext,
+            }),
+            [scrollPrev, scrollNext, canScrollPrev, canScrollNext],
+        );
+
+        return (
+            <CarouselContext.Provider value={value}>
+                <Box ref={ref} className={clsx(prefix(), className)} pos="relative" {...rest}>
+                    {children}
+
+                    <ScrollWatcher onScroll={updateScrollState} />
+                </Box>
+            </CarouselContext.Provider>
+        );
+    },
+);
+
+// -----------------------------------------------------------------------------
+// Track
+// -----------------------------------------------------------------------------
+
+type CarouselTrackProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
+
+const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
+    ({ children, className, ...rest }, ref) => {
+        const { trackRef } = useCarouselContext();
+
+        return (
+            <Box
+                ref={(node: HTMLDivElement | null) => {
+                    trackRef.current = node;
+
+                    if (typeof ref === 'function') {
+                        ref(node);
+                    } else if (ref) {
+                        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+                    }
+                }}
+                className={clsx(prefix('__track'), className)}
+                display="flex"
+                overflowX="auto"
+                scrollSnapType="x mandatory"
+                gap={4}
+                {...rest}
+            >
+                {children}
+            </Box>
+        );
+    },
+);
+
+// -----------------------------------------------------------------------------
+// Item
+// -----------------------------------------------------------------------------
+
+type CarouselItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
+
+const CarouselItem = forwardRef<HTMLDivElement, CarouselItemProps>(
+    ({ children, className, ...rest }, ref) => {
+        return (
+            <Box
+                ref={ref}
+                className={clsx(prefix('__item'), className)}
+                flex="0 0 100%"
+                scrollSnapAlign="start"
+                {...rest}
+            >
+                {children}
+            </Box>
+        );
+    },
+);
+
+// -----------------------------------------------------------------------------
+// Prev
+// -----------------------------------------------------------------------------
+
+type CarouselButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<C>;
+
+const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
+    ({ children = 'Prev', ...rest }, ref) => {
+        const { scrollPrev, canScrollPrev } = useCarouselContext();
+
+        return (
+            <Box
+                as="button"
+                ref={ref}
+                type="button"
+                onClick={scrollPrev}
+                disabled={!canScrollPrev}
+                aria-label="Previous slide"
+                {...rest}
+            >
+                {children}
+            </Box>
+        );
+    },
+);
+
+// -----------------------------------------------------------------------------
+// Next
+// -----------------------------------------------------------------------------
+
+const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
+    ({ children = 'Next', ...rest }, ref) => {
+        const { scrollNext, canScrollNext } = useCarouselContext();
+
+        return (
+            <Box
+                as="button"
+                ref={ref}
+                type="button"
+                onClick={scrollNext}
+                disabled={!canScrollNext}
+                aria-label="Next slide"
+                {...rest}
+            >
+                {children}
+            </Box>
+        );
+    },
+);
+
+// -----------------------------------------------------------------------------
+// Internal scroll watcher
+// -----------------------------------------------------------------------------
+
+const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
+    const { trackRef } = useCarouselContext();
+
+    React.useEffect(() => {
+        const el = trackRef.current;
+
+        if (!el) return;
+
+        onScroll();
+
+        el.addEventListener('scroll', onScroll, {
+            passive: true,
+        });
+
+        window.addEventListener('resize', onScroll);
+
+        return () => {
+            el.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', onScroll);
+        };
+    }, [trackRef, onScroll]);
+
+    return null;
+};
+
+// -----------------------------------------------------------------------------
+// Compound
+// -----------------------------------------------------------------------------
+
+export const Carousel = CarouselRoot as CarouselCompound;
+
+Carousel.Track = CarouselTrack;
+Carousel.Item = CarouselItem;
+Carousel.Prev = CarouselPrev;
+Carousel.Next = CarouselNext;

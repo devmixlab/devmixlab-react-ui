@@ -33,6 +33,7 @@ export { Modal } from './src/Modal/Modal';
 export { Popover } from './src/Popover';
 export { Collapse } from './src/Collapse/Collapse';
 export { Accordion } from './src/Accordion/Accordion';
+export { Carousel } from './src/Carousel/Carousel';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';
 

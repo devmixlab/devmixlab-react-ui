@@ -190,6 +190,7 @@ export const styleProps = defineStyleProps([
     'overflowY',
     'scrollBehavior',
     'scrollSnapType',
+    'scrollSnapAlign',
     'scrollMargin',
     'scrollPadding',
 
