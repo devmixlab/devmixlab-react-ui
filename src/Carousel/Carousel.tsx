@@ -329,6 +329,118 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
     ({ children, className, ...rest }, ref) => {
         const { trackRef, gap, scrollPrev, scrollNext } = useCarouselContext();
 
+        const isDraggingRef = useRef(false);
+
+        const startXRef = useRef(0);
+
+        const scrollLeftRef = useRef(0);
+
+        const velocityRef = useRef(0);
+
+        const lastXRef = useRef(0);
+
+        const lastTimeRef = useRef(0);
+
+        const momentumRef = useRef<number | null>(null);
+
+        const stopMomentum = () => {
+            if (momentumRef.current) {
+                cancelAnimationFrame(momentumRef.current);
+
+                momentumRef.current = null;
+            }
+        };
+
+        const startDrag = useCallback(
+            (clientX: number) => {
+                const el = trackRef.current;
+
+                if (!el) return;
+
+                stopMomentum();
+
+                isDraggingRef.current = true;
+
+                startXRef.current = clientX;
+
+                scrollLeftRef.current = el.scrollLeft;
+
+                lastXRef.current = clientX;
+
+                lastTimeRef.current = performance.now();
+
+                velocityRef.current = 0;
+
+                el.style.scrollBehavior = 'auto';
+
+                el.style.scrollSnapType = 'none';
+
+                document.body.style.userSelect = 'none';
+
+                document.body.style.cursor = 'grabbing';
+            },
+            [trackRef],
+        );
+
+        const moveDrag = useCallback(
+            (clientX: number) => {
+                const el = trackRef.current;
+
+                if (!el || !isDraggingRef.current) return;
+
+                const delta = clientX - startXRef.current;
+
+                el.scrollLeft = scrollLeftRef.current - delta;
+
+                const now = performance.now();
+
+                const dx = clientX - lastXRef.current;
+
+                const dt = now - lastTimeRef.current;
+
+                if (dt > 0) {
+                    velocityRef.current = dx / dt;
+                }
+
+                lastXRef.current = clientX;
+
+                lastTimeRef.current = now;
+            },
+            [trackRef],
+        );
+
+        const endDrag = useCallback(() => {
+            const el = trackRef.current;
+
+            if (!el) return;
+
+            isDraggingRef.current = false;
+
+            document.body.style.userSelect = '';
+
+            document.body.style.cursor = '';
+
+            const momentum = () => {
+                if (!el) return;
+
+                velocityRef.current *= 0.95;
+
+                if (Math.abs(velocityRef.current) < 0.02) {
+                    el.style.scrollSnapType = 'x mandatory';
+
+                    el.style.scrollBehavior = 'smooth';
+
+                    return;
+                }
+
+                el.scrollLeft -= velocityRef.current * 20;
+
+                momentumRef.current = requestAnimationFrame(momentum);
+            };
+
+            momentum();
+        }, [trackRef]);
+
         const handleKeyDown = useCallback(
             (event: React.KeyboardEvent<HTMLDivElement>) => {
                 switch (event.key) {
@@ -396,6 +508,22 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 gap={gap}
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
+                onMouseDown={(e) => {
+                    startDrag(e.clientX);
+                }}
+                onMouseMove={(e) => {
+                    moveDrag(e.clientX);
+                }}
+                onMouseUp={endDrag}
+                onMouseLeave={endDrag}
+                onTouchStart={(e) => {
+                    startDrag(e.touches[0].clientX);
+                }}
+                onTouchMove={(e) => {
+                    moveDrag(e.touches[0].clientX);
+                }}
+                onTouchEnd={endDrag}
+                cursor="grab"
                 style={
                     {
                         '--carousel-gap': `${gap * 4}px`,
