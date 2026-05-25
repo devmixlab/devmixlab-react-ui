@@ -123,8 +123,12 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
                 if (!el) return;
 
+                const maxScrollLeft = el.scrollWidth - el.clientWidth;
+
+                const target = getScrollAmount() * slidesPerScroll * index;
+
                 el.scrollTo({
-                    left: getScrollAmount() * slidesPerScroll * index,
+                    left: Math.min(target, maxScrollLeft),
                     behavior: 'smooth',
                 });
             },
@@ -142,10 +146,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             const scrollPerPage = getScrollAmount() * slidesPerScroll;
 
-            const currentIndex = Math.min(
-                nextPageCount - 1,
-                Math.round(el.scrollLeft / scrollPerPage),
-            );
+            const currentIndex =
+                scrollPerPage === 0
+                    ? 0
+                    : Math.min(nextPageCount - 1, Math.round(el.scrollLeft / scrollPerPage));
 
             setActiveIndex(currentIndex);
 
@@ -425,7 +429,7 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
                                 prefix('__indicator'),
                                 active && prefix('__indicator-active'),
                             )}
-                            aria-label={`Go to slide ${index + 1}`}
+                            aria-label={`Go to page ${index + 1}`}
                             aria-current={active}
                             onClick={() => scrollTo(index)}
                         />
