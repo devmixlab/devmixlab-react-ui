@@ -382,8 +382,18 @@ type CarouselTrackProps<C extends React.ElementType = 'div'> = BoxComponentProps
 
 const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
     ({ children, className, ...rest }, ref) => {
-        const { trackRef, gap, scrollPrev, scrollNext, draggable, prefersReducedMotion } =
-            useCarouselContext();
+        const {
+            trackRef,
+            gap,
+            scrollPrev,
+            scrollNext,
+            scrollTo,
+            canScrollPrev,
+            canScrollNext,
+            pageCount,
+            draggable,
+            prefersReducedMotion,
+        } = useCarouselContext();
 
         const dragStartedRef = useRef(false);
 
@@ -556,9 +566,19 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
         const handleKeyDown = useCallback(
             (event: React.KeyboardEvent<HTMLDivElement>) => {
+                const el = trackRef.current;
+
+                if (!el) return;
+
                 switch (event.key) {
                     case 'ArrowLeft': {
                         event.preventDefault();
+
+                        if (!canScrollPrev) {
+                            scrollTo(pageCount - 1);
+
+                            return;
+                        }
 
                         scrollPrev();
 
@@ -568,6 +588,12 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                     case 'ArrowRight': {
                         event.preventDefault();
 
+                        if (!canScrollNext) {
+                            scrollTo(0);
+
+                            return;
+                        }
+
                         scrollNext();
 
                         break;
@@ -576,31 +602,21 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                     case 'Home': {
                         event.preventDefault();
 
-                        trackRef.current?.scrollTo({
-                            left: 0,
-                            behavior: prefersReducedMotion ? 'auto' : 'smooth',
-                        });
+                        scrollTo(0);
 
                         break;
                     }
 
                     case 'End': {
-                        const el = trackRef.current;
-
-                        if (!el) return;
-
                         event.preventDefault();
 
-                        el.scrollTo({
-                            left: el.scrollWidth,
-                            behavior: prefersReducedMotion ? 'auto' : 'smooth',
-                        });
+                        scrollTo(pageCount - 1);
 
                         break;
                     }
                 }
             },
-            [scrollPrev, scrollNext, trackRef, prefersReducedMotion],
+            [trackRef, canScrollPrev, canScrollNext, scrollPrev, scrollNext, scrollTo, pageCount],
         );
 
         return (
