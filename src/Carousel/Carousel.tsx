@@ -475,9 +475,6 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
             gap,
 
-            scrollPrev,
-            scrollNext,
-
             scrollTo,
 
             pageCount,
@@ -792,7 +789,7 @@ type CarouselButtonProps<C extends React.ElementType = 'button'> = BoxComponentP
 
 const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Prev', ...rest }, ref) => {
-        const { scrollPrev, canScrollPrev } = useCarouselContext();
+        const { scrollPrev, canScrollPrev, scrollNext, scrollTo, pageCount } = useCarouselContext();
 
         return (
             <Box
@@ -801,6 +798,31 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
                 ref={ref}
                 type="button"
                 onClick={scrollPrev}
+                onKeyDown={(event) => {
+                    if (event.key === 'ArrowRight') {
+                        event.preventDefault();
+
+                        scrollNext();
+                    }
+
+                    if (event.key === 'ArrowLeft') {
+                        event.preventDefault();
+
+                        scrollPrev();
+                    }
+
+                    if (event.key === 'Home') {
+                        event.preventDefault();
+
+                        scrollTo(0);
+                    }
+
+                    if (event.key === 'End') {
+                        event.preventDefault();
+
+                        scrollTo(pageCount - 1);
+                    }
+                }}
                 disabled={!canScrollPrev}
                 aria-label="Previous slide"
                 {...rest}
@@ -817,7 +839,7 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Next', ...rest }, ref) => {
-        const { scrollNext, canScrollNext } = useCarouselContext();
+        const { scrollNext, canScrollNext, scrollPrev, scrollTo, pageCount } = useCarouselContext();
 
         return (
             <Box
@@ -826,6 +848,31 @@ const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
                 ref={ref}
                 type="button"
                 onClick={scrollNext}
+                onKeyDown={(event) => {
+                    if (event.key === 'ArrowRight') {
+                        event.preventDefault();
+
+                        scrollNext();
+                    }
+
+                    if (event.key === 'ArrowLeft') {
+                        event.preventDefault();
+
+                        scrollPrev();
+                    }
+
+                    if (event.key === 'Home') {
+                        event.preventDefault();
+
+                        scrollTo(0);
+                    }
+
+                    if (event.key === 'End') {
+                        event.preventDefault();
+
+                        scrollTo(pageCount - 1);
+                    }
+                }}
                 disabled={!canScrollNext}
                 aria-label="Next slide"
                 {...rest}
