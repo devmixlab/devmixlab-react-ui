@@ -11,6 +11,7 @@ import React, {
     useMemo,
     useRef,
     useState,
+    useEffect,
 } from 'react';
 
 import { clsx } from 'clsx';
@@ -48,6 +49,7 @@ type CarouselContextValue = {
     updatePageCount: () => void;
 
     draggable: boolean;
+    prefersReducedMotion: boolean;
 };
 
 const CarouselContext = createContext<CarouselContextValue | null>(null);
@@ -79,6 +81,7 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
         pauseOnHover?: boolean;
 
         draggable?: boolean;
+        disableMotion?: boolean;
     }
 >;
 
@@ -106,10 +109,37 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             autoplayDelay = 3000,
             pauseOnHover = true,
             draggable = true,
+            disableMotion = false,
             ...rest
         },
         ref,
     ) => {
+        // const [reducedMotion, setReducedMotion] = useState(false);
+        const [reducedMotion, setReducedMotion] = useState(() => {
+            if (typeof window === 'undefined') {
+                return false;
+            }
+
+            return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        });
+        const prefersReducedMotion = reducedMotion || disableMotion;
+
+        useEffect(() => {
+            const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+            const update = () => {
+                setReducedMotion(media.matches);
+            };
+
+            update();
+
+            media.addEventListener('change', update);
+
+            return () => {
+                media.removeEventListener('change', update);
+            };
+        }, []);
+
         const trackRef = useRef<HTMLDivElement>(null);
 
         const autoplayRef = useRef<number | null>(null);
@@ -170,7 +200,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             if (current >= maxScrollLeft - 1) {
                 el.scrollTo({
                     left: 0,
-                    behavior: 'smooth',
+                    behavior: prefersReducedMotion ? 'auto' : 'smooth',
                 });
 
                 return;
@@ -178,9 +208,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             el.scrollTo({
                 left: Math.min(next, maxScrollLeft),
-                behavior: 'smooth',
+                behavior: prefersReducedMotion ? 'auto' : 'smooth',
             });
-        }, [getScrollAmount, slidesPerScroll, pauseOnHover]);
+        }, [getScrollAmount, slidesPerScroll, pauseOnHover, prefersReducedMotion]);
 
         React.useEffect(() => {
             if (!autoplay) return;
@@ -208,10 +238,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
                 el.scrollTo({
                     left: Math.min(target, maxScrollLeft),
-                    behavior: 'smooth',
+                    behavior: prefersReducedMotion ? 'auto' : 'smooth',
                 });
             },
-            [getScrollAmount, slidesPerScroll],
+            [getScrollAmount, slidesPerScroll, prefersReducedMotion],
         );
 
         const updateScrollState = useCallback(() => {
@@ -242,9 +272,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             el.scrollBy({
                 left: -(getScrollAmount() * slidesPerScroll),
-                behavior: 'smooth',
+                behavior: prefersReducedMotion ? 'auto' : 'smooth',
             });
-        }, [getScrollAmount, slidesPerScroll]);
+        }, [getScrollAmount, slidesPerScroll, prefersReducedMotion]);
 
         const scrollNext = useCallback(() => {
             const el = trackRef.current;
@@ -253,9 +283,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             el.scrollBy({
                 left: getScrollAmount() * slidesPerScroll,
-                behavior: 'smooth',
+                behavior: prefersReducedMotion ? 'auto' : 'smooth',
             });
-        }, [getScrollAmount, slidesPerScroll]);
+        }, [getScrollAmount, slidesPerScroll, prefersReducedMotion]);
 
         const value = useMemo(
             () => ({
@@ -276,6 +306,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 updatePageCount,
 
                 draggable,
+                prefersReducedMotion,
             }),
             [
                 scrollPrev,
@@ -290,6 +321,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 scrollTo,
                 updatePageCount,
                 draggable,
+                prefersReducedMotion,
             ],
         );
 
@@ -339,7 +371,8 @@ type CarouselTrackProps<C extends React.ElementType = 'div'> = BoxComponentProps
 
 const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
     ({ children, className, ...rest }, ref) => {
-        const { trackRef, gap, scrollPrev, scrollNext, draggable } = useCarouselContext();
+        const { trackRef, gap, scrollPrev, scrollNext, draggable, prefersReducedMotion } =
+            useCarouselContext();
 
         const dragStartedRef = useRef(false);
 
@@ -458,6 +491,14 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
             document.body.style.cursor = '';
 
+            if (prefersReducedMotion) {
+                el.style.scrollSnapType = 'x mandatory';
+
+                el.style.scrollBehavior = 'auto';
+
+                return;
+            }
+
             const momentum = () => {
                 velocityRef.current *= 0.95;
 
@@ -475,7 +516,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
             };
 
             momentum();
-        }, [trackRef]);
+        }, [trackRef, prefersReducedMotion]);
 
         const handlePointerMove = useCallback(
             (event: PointerEvent) => {
@@ -526,7 +567,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                         trackRef.current?.scrollTo({
                             left: 0,
-                            behavior: 'smooth',
+                            behavior: prefersReducedMotion ? 'auto' : 'smooth',
                         });
 
                         break;
@@ -541,14 +582,14 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
 
                         el.scrollTo({
                             left: el.scrollWidth,
-                            behavior: 'smooth',
+                            behavior: prefersReducedMotion ? 'auto' : 'smooth',
                         });
 
                         break;
                     }
                 }
             },
-            [scrollPrev, scrollNext, trackRef],
+            [scrollPrev, scrollNext, trackRef, prefersReducedMotion],
         );
 
         return (
