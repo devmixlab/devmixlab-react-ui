@@ -174,6 +174,7 @@ export const styleProps = defineStyleProps([
     'opacity',
     'boxShadow',
     'transform',
+    'clipPath',
     'transformOrigin',
     'transition',
     'transitionProperty',

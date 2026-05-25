@@ -299,6 +299,19 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 >
                     {children}
 
+                    <Box
+                        position="absolute"
+                        width="1px"
+                        height="1px"
+                        overflow="hidden"
+                        clipPath="inset(50%)"
+                        whiteSpace="nowrap"
+                        aria-live="polite"
+                        aria-atomic="true"
+                    >
+                        Page {activeIndex + 1} of {pageCount}
+                    </Box>
+
                     <ScrollWatcher onScroll={updateScrollState} />
                 </Box>
             </CarouselContext.Provider>
