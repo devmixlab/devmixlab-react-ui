@@ -451,12 +451,20 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
 // -----------------------------------------------------------------------------
 
 const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
+    const frameRef = useRef<number | null>(null);
+
     const { trackRef, updatePageCount } = useCarouselContext();
 
     const handleResize = useCallback(() => {
         updatePageCount();
 
-        requestAnimationFrame(onScroll);
+        if (frameRef.current) {
+            cancelAnimationFrame(frameRef.current);
+        }
+
+        frameRef.current = requestAnimationFrame(() => {
+            onScroll();
+        });
     }, [updatePageCount, onScroll]);
 
     React.useEffect(() => {
@@ -474,7 +482,12 @@ const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
 
         return () => {
             el.removeEventListener('scroll', onScroll);
+
             window.removeEventListener('resize', handleResize);
+
+            if (frameRef.current) {
+                cancelAnimationFrame(frameRef.current);
+            }
         };
     }, [trackRef, handleResize, onScroll]);
 
