@@ -45,6 +45,7 @@ type CarouselContextValue = {
     pageCount: number;
 
     scrollTo: (index: number) => void;
+    updatePageCount: () => void;
 };
 
 const CarouselContext = createContext<CarouselContextValue | null>(null);
@@ -107,6 +108,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             return Math.floor(maxIndex / slidesPerScroll) + 1;
         }, [slidesPerScroll, slidesPerView]);
 
+        const updatePageCount = useCallback(() => {
+            setPageCount(getPageCount());
+        }, [getPageCount]);
+
         const getScrollAmount = useCallback(() => {
             const el = trackRef.current;
 
@@ -140,23 +145,21 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             if (!el) return;
 
-            const nextPageCount = getPageCount();
-
-            setPageCount(nextPageCount);
-
             const scrollPerPage = getScrollAmount() * slidesPerScroll;
+
+            const safePageCount = Math.max(1, pageCount);
 
             const currentIndex =
                 scrollPerPage === 0
                     ? 0
-                    : Math.min(nextPageCount - 1, Math.round(el.scrollLeft / scrollPerPage));
+                    : Math.min(safePageCount - 1, Math.round(el.scrollLeft / scrollPerPage));
 
             setActiveIndex(currentIndex);
 
             setCanScrollPrev(el.scrollLeft > 0);
 
             setCanScrollNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-        }, [getPageCount, getScrollAmount, slidesPerScroll]);
+        }, [getScrollAmount, slidesPerScroll, pageCount]);
 
         const scrollPrev = useCallback(() => {
             const el = trackRef.current;
@@ -195,6 +198,8 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 activeIndex,
                 pageCount,
                 scrollTo,
+
+                updatePageCount,
             }),
             [
                 scrollPrev,
@@ -207,6 +212,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 activeIndex,
                 pageCount,
                 scrollTo,
+                updatePageCount,
             ],
         );
 
@@ -445,26 +451,32 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
 // -----------------------------------------------------------------------------
 
 const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
-    const { trackRef } = useCarouselContext();
+    const { trackRef, updatePageCount } = useCarouselContext();
+
+    const handleResize = useCallback(() => {
+        updatePageCount();
+
+        requestAnimationFrame(onScroll);
+    }, [updatePageCount, onScroll]);
 
     React.useEffect(() => {
         const el = trackRef.current;
 
         if (!el) return;
 
-        onScroll();
+        handleResize();
 
         el.addEventListener('scroll', onScroll, {
             passive: true,
         });
 
-        window.addEventListener('resize', onScroll);
+        window.addEventListener('resize', handleResize);
 
         return () => {
             el.removeEventListener('scroll', onScroll);
-            window.removeEventListener('resize', onScroll);
+            window.removeEventListener('resize', handleResize);
         };
-    }, [trackRef, onScroll]);
+    }, [trackRef, handleResize, onScroll]);
 
     return null;
 };
