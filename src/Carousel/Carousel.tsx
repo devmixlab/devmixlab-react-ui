@@ -37,6 +37,7 @@ const prefix = (name = '') => classPrefix(`--carousel${name}`);
 
 type CarouselContextValue = {
     trackRef: React.MutableRefObject<HTMLDivElement | null>;
+    activeIndexRef: React.MutableRefObject<number>;
 
     carouselDrag: UseCarouselDragReturn;
 
@@ -442,6 +443,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             () => ({
                 carouselDrag,
                 trackRef,
+                activeIndexRef,
                 scrollPrev,
                 scrollNext,
                 canScrollPrev,
@@ -461,6 +463,8 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 onDragEnd,
             }),
             [
+                trackRef,
+                activeIndexRef,
                 carouselDrag,
                 scrollPrev,
                 scrollNext,
