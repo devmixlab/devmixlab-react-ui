@@ -1005,7 +1005,8 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Next', ...rest }, ref) => {
-        const { scrollNext, canScrollNext, scrollPrev, scrollTo, pageCount } = useCarouselContext();
+        const { scrollNext, canScrollNext, scrollPrev, scrollTo, pageCount, loop, activeIndex } =
+            useCarouselContext();
 
         return (
             <Box
@@ -1018,13 +1019,23 @@ const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
                     if (event.key === 'ArrowRight') {
                         event.preventDefault();
 
-                        scrollNext();
+                        const nextIndex = loop
+                            ? pageCount === 0
+                                ? 0
+                                : (activeIndex + 1) % pageCount
+                            : Math.min(pageCount - 1, activeIndex + 1);
+
+                        scrollTo(nextIndex, event.repeat ? 80 : undefined);
                     }
 
                     if (event.key === 'ArrowLeft') {
                         event.preventDefault();
 
-                        scrollPrev();
+                        const nextIndex = loop
+                            ? (activeIndex - 1 + pageCount) % pageCount
+                            : Math.max(0, pageCount === 0 ? 0 : activeIndex - 1);
+
+                        scrollTo(nextIndex, event.repeat ? 80 : undefined);
                     }
 
                     if (event.key === 'Home') {
