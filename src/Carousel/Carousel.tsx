@@ -383,7 +383,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                     ? 0
                     : Math.min(safePageCount - 1, Math.round(el.scrollLeft / scrollPerPage));
 
-            setActiveIndex(currentIndex);
+            if (activeIndexRef.current !== currentIndex) {
+                setActiveIndex(currentIndex);
+            }
 
             if (previousPageRef.current !== currentIndex) {
                 previousPageRef.current = currentIndex;
