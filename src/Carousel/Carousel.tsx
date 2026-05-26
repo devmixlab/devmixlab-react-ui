@@ -374,8 +374,12 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             }
 
             scrollStopTimeoutRef.current = setTimeout(() => {
+                if (carouselDrag.isPointerDownRef.current || carouselDrag.isMomentumRef.current) {
+                    return;
+                }
+
                 syncingControlledScrollRef.current = false;
-                console.log('scrolling stoped');
+
                 if (isControlled) onActiveIndexChange?.(activeIndexRef.current);
             }, 100);
 
