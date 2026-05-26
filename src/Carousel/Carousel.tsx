@@ -13,6 +13,7 @@ import React, {
     useMemo,
     useRef,
     useState,
+    useImperativeHandle,
 } from 'react';
 
 import { clsx } from 'clsx';
@@ -83,6 +84,10 @@ const useCarouselContext = () => {
 // Types
 // -----------------------------------------------------------------------------
 
+export type CarouselHandle = {
+    sync: () => void;
+};
+
 export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentProps<
     C,
     {
@@ -135,7 +140,7 @@ type CarouselCompound = typeof CarouselRoot & {
 // Root
 // -----------------------------------------------------------------------------
 
-const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
+const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
     (
         {
             children,
@@ -336,6 +341,14 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             [getScrollAmount, slidesPerScroll, prefersReducedMotion, goToSpeed],
         );
 
+        const sync = useCallback(() => {
+            if (!isControlled) return;
+
+            carouselDrag.stopMomentum();
+
+            scrollTo(controlledIndex);
+        }, [isControlled, carouselDrag, scrollTo, controlledIndex]);
+
         const scrollToPage = useCallback(
             (index: number, speed = goToSpeed) => {
                 const safePageCount = Math.max(1, pageCount);
@@ -492,10 +505,17 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             ],
         );
 
+        useImperativeHandle(
+            ref,
+            () => ({
+                sync,
+            }),
+            [sync],
+        );
+
         return (
             <CarouselContext.Provider value={value}>
                 <Box
-                    ref={ref}
                     className={clsx(prefix(), className)}
                     pos="relative"
                     role="region"
