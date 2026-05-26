@@ -75,8 +75,17 @@ export function useCarouselDrag({
             momentumRef.current = null;
         }
 
+        velocityRef.current = 0;
+
         isMomentumRef.current = false;
-    }, []);
+        isPointerDownRef.current = false;
+
+        const el = trackRef.current;
+
+        if (el) {
+            el.style.scrollSnapType = 'x mandatory';
+        }
+    }, [trackRef]);
 
     const startDrag = useCallback(
         (clientX: number) => {

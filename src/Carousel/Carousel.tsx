@@ -241,7 +241,6 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
         useEffect(() => {
             if (!isControlled) return;
-            carouselDrag.stopMomentum();
             scrollTo(controlledIndex);
         }, [controlledIndex, isControlled]);
 
@@ -279,6 +278,8 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             (index: number, speed = goToSpeed) => {
                 const el = trackRef.current;
                 if (!el) return;
+
+                carouselDrag.stopMomentum();
 
                 syncingControlledScrollRef.current = true;
 
