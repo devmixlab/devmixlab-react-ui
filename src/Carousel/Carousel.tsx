@@ -241,8 +241,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
         useEffect(() => {
             if (!isControlled) return;
+            carouselDrag.stopMomentum();
             scrollTo(controlledIndex);
-        }, [controlledIndex]);
+        }, [controlledIndex, isControlled]);
 
         useEffect(() => {
             return () => {
