@@ -341,13 +341,48 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             [getScrollAmount, slidesPerScroll, prefersReducedMotion, goToSpeed, carouselDrag],
         );
 
+        // const sync = useCallback(() => {
+        //     if (!isControlled) return;
+        //
+        //     carouselDrag.stopMomentum();
+        //
+        //     scrollTo(controlledIndex);
+        // }, [isControlled, carouselDrag, scrollTo, controlledIndex]);
+
         const sync = useCallback(() => {
             if (!isControlled) return;
+
+            const el = trackRef.current;
+            if (!el) return;
+
+            const scrollPerPage = getScrollAmount() * slidesPerScroll;
+
+            const currentVisualIndex =
+                scrollPerPage === 0
+                    ? 0
+                    : Math.min(
+                          Math.max(pageCount - 1, 0),
+                          Math.round(el.scrollLeft / scrollPerPage),
+                      );
+
+            // already visually synced
+            if (currentVisualIndex === controlledIndex) {
+                return;
+            }
 
             carouselDrag.stopMomentum();
 
             scrollTo(controlledIndex);
-        }, [isControlled, carouselDrag, scrollTo, controlledIndex]);
+        }, [
+            isControlled,
+            controlledIndex,
+            carouselDrag,
+            scrollTo,
+            trackRef,
+            getScrollAmount,
+            slidesPerScroll,
+            pageCount,
+        ]);
 
         const scrollToPage = useCallback(
             (index: number, speed = goToSpeed) => {
