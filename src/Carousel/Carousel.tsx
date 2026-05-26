@@ -338,7 +338,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
 
                 animationFrameRef.current = requestAnimationFrame(animate);
             },
-            [getScrollAmount, slidesPerScroll, prefersReducedMotion, goToSpeed],
+            [getScrollAmount, slidesPerScroll, prefersReducedMotion, goToSpeed, carouselDrag],
         );
 
         const sync = useCallback(() => {
