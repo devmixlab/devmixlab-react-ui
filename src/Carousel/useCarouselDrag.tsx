@@ -41,6 +41,8 @@ export type UseCarouselDragReturn = {
 
     /** Stop any running momentum animation. */
     stopMomentum: () => void;
+
+    isOverscrollingRef: React.MutableRefObject<boolean>;
 };
 
 export function useCarouselDrag({
@@ -52,6 +54,8 @@ export function useCarouselDrag({
     onDragEnd,
 }: UseCarouselDragOptions): UseCarouselDragReturn {
     const draggedRef = useRef(false);
+
+    const isOverscrollingRef = useRef(false);
 
     const isPointerDownRef = useRef(false);
     const isMomentumRef = useRef(false);
@@ -66,6 +70,8 @@ export function useCarouselDrag({
     const lastTimeRef = useRef(0);
 
     const velocityRef = useRef(0);
+
+    const overscrollRef = useRef(0);
 
     const momentumRef = useRef<number | null>(null);
 
@@ -83,8 +89,12 @@ export function useCarouselDrag({
         const el = trackRef.current;
 
         if (el) {
+            el.style.transition = '';
+            el.style.transform = '';
             el.style.scrollSnapType = 'x mandatory';
         }
+
+        overscrollRef.current = 0;
     }, [trackRef]);
 
     const startDrag = useCallback(
@@ -111,6 +121,7 @@ export function useCarouselDrag({
             velocityRef.current = 0;
 
             el.style.scrollSnapType = 'none';
+            el.style.transition = '';
 
             document.body.style.userSelect = 'none';
 
@@ -149,7 +160,28 @@ export function useCarouselDrag({
                 draggedRef.current = true;
             }
 
-            el.scrollLeft = scrollLeftRef.current - delta;
+            const nextScroll = scrollLeftRef.current - delta;
+
+            const maxScroll = el.scrollWidth - el.clientWidth;
+
+            if (nextScroll < 0) {
+                overscrollRef.current = nextScroll * 0.35;
+                isOverscrollingRef.current = true;
+
+                el.scrollLeft = 0;
+            } else if (nextScroll > maxScroll) {
+                overscrollRef.current = (nextScroll - maxScroll) * 0.35;
+                isOverscrollingRef.current = true;
+
+                el.scrollLeft = maxScroll;
+            } else {
+                overscrollRef.current = 0;
+                isOverscrollingRef.current = false;
+
+                el.scrollLeft = nextScroll;
+            }
+
+            el.style.transform = `translateX(${-overscrollRef.current}px)`;
 
             const now = performance.now();
 
@@ -188,6 +220,19 @@ export function useCarouselDrag({
         const finish = () => {
             isMomentumRef.current = false;
 
+            el.style.transition = 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)';
+            el.style.transform = 'translateX(0px)';
+
+            window.setTimeout(() => {
+                overscrollRef.current = 0;
+                isOverscrollingRef.current = false;
+
+                el.style.transition = '';
+                el.style.transform = '';
+
+                el.dispatchEvent(new Event('scroll'));
+            }, 220);
+
             el.style.scrollSnapType = 'x mandatory';
 
             if (!dragEndedRef.current) {
@@ -198,6 +243,12 @@ export function useCarouselDrag({
         };
 
         if (prefersReducedMotion) {
+            finish();
+            return;
+        }
+
+        // immediate bounce-back when overscrolling edges
+        if (overscrollRef.current !== 0) {
             finish();
             return;
         }
@@ -218,7 +269,7 @@ export function useCarouselDrag({
         };
 
         momentum();
-    }, [trackRef, prefersReducedMotion]);
+    }, [trackRef, prefersReducedMotion, onDragEnd]);
 
     return {
         startDrag,
@@ -228,5 +279,6 @@ export function useCarouselDrag({
         isPointerDownRef,
         isMomentumRef,
         stopMomentum,
+        isOverscrollingRef,
     };
 }

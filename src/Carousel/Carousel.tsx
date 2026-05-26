@@ -433,6 +433,9 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
 
             const scrollPerPage = getScrollAmount() * slidesPerScroll;
             const safePageCount = Math.max(1, pageCount);
+            if (carouselDrag.isOverscrollingRef.current) {
+                return;
+            }
             const currentIndex =
                 scrollPerPage === 0
                     ? 0
