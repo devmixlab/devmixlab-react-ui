@@ -41,6 +41,7 @@ type CarouselContextValue = {
     activeIndexRef: React.MutableRefObject<number>;
 
     carouselDrag: UseCarouselDragReturn;
+    stopAnimation: () => void;
 
     scrollPrev: () => void;
     scrollNext: () => void;
@@ -283,6 +284,19 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             return (el.clientWidth - totalGap) / slidesPerView + gap * 4;
         }, [slidesPerView, gap]);
 
+        const stopAnimation = useCallback(() => {
+            const el = trackRef.current;
+
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+                animationFrameRef.current = null;
+            }
+
+            if (el) {
+                el.style.scrollSnapType = 'x mandatory';
+            }
+        }, []);
+
         // ── Imperative scroll ────────────────────────────────────────────────
         const scrollTo = useCallback(
             (index: number, speed = goToSpeed) => {
@@ -504,6 +518,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
         const value = useMemo<CarouselContextValue>(
             () => ({
                 carouselDrag,
+                stopAnimation,
                 trackRef,
                 activeIndexRef,
                 scrollPrev,
@@ -528,6 +543,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 trackRef,
                 activeIndexRef,
                 carouselDrag,
+                stopAnimation,
                 scrollPrev,
                 scrollNext,
                 canScrollPrev,
@@ -623,6 +639,7 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
             onDragStart,
             onDragEnd,
             carouselDrag,
+            stopAnimation,
         } = useCarouselContext();
 
         // ── useCarouselDrag ──────────────────────────────────────────────────
@@ -677,8 +694,12 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 onPointerDown={
                     draggable
                         ? (e) => {
+                              stopAnimation();
+
                               e.currentTarget.setPointerCapture(e.pointerId);
+
                               startDrag(e.clientX);
+
                               window.addEventListener('pointermove', handlePointerMove);
                               window.addEventListener('pointerup', handlePointerUp);
                           }
