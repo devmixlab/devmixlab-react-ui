@@ -20,7 +20,7 @@ import { clsx } from 'clsx';
 import { Box, BoxComponentProps } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
 
-import { useCarouselDrag } from './useCarouselDrag';
+import { useCarouselDrag, UseCarouselDragReturn } from './useCarouselDrag';
 import { useCarouselAutoplay } from './useCarouselAutoplay';
 import { useCarouselKeyboard } from './useCarouselKeyboard';
 import { useCarouselVisibility } from './useCarouselVisibility';
@@ -37,6 +37,8 @@ const prefix = (name = '') => classPrefix(`--carousel${name}`);
 
 type CarouselContextValue = {
     trackRef: React.MutableRefObject<HTMLDivElement | null>;
+
+    carouselDrag: UseCarouselDragReturn;
 
     scrollPrev: () => void;
     scrollNext: () => void;
@@ -83,6 +85,10 @@ const useCarouselContext = () => {
 export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentProps<
     C,
     {
+        activeIndex?: number;
+        defaultActiveIndex?: number;
+        onActiveIndexChange?: (index: number) => void;
+
         gap?: number;
 
         slidesPerView?: number;
@@ -133,6 +139,10 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         {
             children,
             className,
+
+            activeIndex: controlledIndex,
+            defaultActiveIndex = 0,
+            onActiveIndexChange,
 
             gap = 4,
 
@@ -193,17 +203,63 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         const previousPageRef = useRef(0);
         const reachedStartRef = useRef(false);
         const reachedEndRef = useRef(false);
+        const scrollStopTimeoutRef = useRef<number | null>(null);
 
-        const [activeIndex, setActiveIndex] = useState(0);
+        // ── useCarouselDrag ──────────────────────────────────────────────────
+        const carouselDrag = useCarouselDrag({
+            trackRef,
+            draggable,
+            dragThreshold,
+            prefersReducedMotion,
+            onDragStart,
+            onDragEnd,
+        });
+
+        const isControlled = controlledIndex !== undefined;
+
+        const activeIndexRef = useRef(controlledIndex ?? defaultActiveIndex);
+        const syncingControlledScrollRef = useRef(false);
+
+        const [activeIndex, setActiveIndex] = useState(controlledIndex ?? defaultActiveIndex);
         const [pageCount, setPageCount] = useState(0);
         const [canScrollPrev, setCanScrollPrev] = useState(false);
         const [canScrollNext, setCanScrollNext] = useState(true);
+
+        useEffect(() => {
+            const index = controlledIndex ?? defaultActiveIndex;
+            scrollTo(index, 0);
+        }, []);
+
+        useEffect(() => {
+            return () => {
+                if (scrollStopTimeoutRef.current != null) {
+                    clearTimeout(scrollStopTimeoutRef.current);
+                }
+            };
+        }, []);
+
+        useEffect(() => {
+            if (!isControlled) return;
+            scrollTo(controlledIndex);
+        }, [controlledIndex]);
 
         useEffect(() => {
             return () => {
                 if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
             };
         }, []);
+
+        useEffect(() => {
+            activeIndexRef.current = activeIndex;
+            if (
+                carouselDrag.isPointerDownRef.current ||
+                carouselDrag.isMomentumRef.current ||
+                syncingControlledScrollRef.current
+            ) {
+                return;
+            }
+            if (isControlled) onActiveIndexChange?.(activeIndex);
+        }, [activeIndex]);
 
         // ── Page geometry ────────────────────────────────────────────────────
         const getPageCount = useCallback(() => {
@@ -229,6 +285,8 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             (index: number, speed = goToSpeed) => {
                 const el = trackRef.current;
                 if (!el) return;
+
+                syncingControlledScrollRef.current = true;
 
                 const maxScrollLeft = el.scrollWidth - el.clientWidth;
                 const target = getScrollAmount() * slidesPerScroll * index;
@@ -308,6 +366,16 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
             const el = trackRef.current;
             if (!el) return;
 
+            if (scrollStopTimeoutRef.current != null) {
+                clearTimeout(scrollStopTimeoutRef.current);
+            }
+
+            scrollStopTimeoutRef.current = setTimeout(() => {
+                syncingControlledScrollRef.current = false;
+                console.log('scrolling stoped');
+                if (isControlled) onActiveIndexChange?.(activeIndexRef.current);
+            }, 100);
+
             const scrollPerPage = getScrollAmount() * slidesPerScroll;
             const safePageCount = Math.max(1, pageCount);
             const currentIndex =
@@ -370,6 +438,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         // ── Context value ────────────────────────────────────────────────────
         const value = useMemo<CarouselContextValue>(
             () => ({
+                carouselDrag,
                 trackRef,
                 scrollPrev,
                 scrollNext,
@@ -390,6 +459,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 onDragEnd,
             }),
             [
+                carouselDrag,
                 scrollPrev,
                 scrollNext,
                 canScrollPrev,
@@ -477,17 +547,11 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
             loop,
             onDragStart,
             onDragEnd,
+            carouselDrag,
         } = useCarouselContext();
 
         // ── useCarouselDrag ──────────────────────────────────────────────────
-        const { startDrag, moveDrag, endDrag, draggedRef, stopMomentum } = useCarouselDrag({
-            trackRef,
-            draggable,
-            dragThreshold,
-            prefersReducedMotion,
-            onDragStart,
-            onDragEnd,
-        });
+        const { startDrag, moveDrag, endDrag, draggedRef, stopMomentum } = carouselDrag;
 
         const handlePointerMove = useCallback(
             (event: PointerEvent) => moveDrag(event.clientX),
