@@ -1,6 +1,7 @@
 // -----------------------------------------------------------------------------
 // Carousel.tsx
-// V2 — loop support + consistent navigation
+// V3 — refactored with useCarouselDrag / useCarouselAutoplay /
+//       useCarouselKeyboard / useCarouselVisibility
 // -----------------------------------------------------------------------------
 
 import React, {
@@ -8,16 +9,21 @@ import React, {
     forwardRef,
     useCallback,
     useContext,
+    useEffect,
     useMemo,
     useRef,
     useState,
-    useEffect,
 } from 'react';
 
 import { clsx } from 'clsx';
 
 import { Box, BoxComponentProps } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
+
+import { useCarouselDrag } from './useCarouselDrag';
+import { useCarouselAutoplay } from './useCarouselAutoplay';
+import { useCarouselKeyboard } from './useCarouselKeyboard';
+import { useCarouselVisibility } from './useCarouselVisibility';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -164,72 +170,46 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         },
         ref,
     ) => {
-        const [reducedMotion, setReducedMotion] = useState(() => {
-            if (typeof window === 'undefined') {
-                return false;
-            }
-
-            return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        });
-
-        const prefersReducedMotion = reducedMotion || disableMotion;
+        // ── Motion preference ────────────────────────────────────────────────
+        const [reducedMotion, setReducedMotion] = useState(() =>
+            typeof window !== 'undefined'
+                ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                : false,
+        );
 
         useEffect(() => {
             const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-            const update = () => {
-                setReducedMotion(media.matches);
-            };
-
+            const update = () => setReducedMotion(media.matches);
             update();
-
             media.addEventListener('change', update);
-
-            return () => {
-                media.removeEventListener('change', update);
-            };
+            return () => media.removeEventListener('change', update);
         }, []);
 
-        const visibleIndexesRef = useRef<number[]>([]);
+        const prefersReducedMotion = reducedMotion || disableMotion;
+
+        // ── Core refs / state ────────────────────────────────────────────────
+        const trackRef = useRef<HTMLDivElement>(null);
+        const animationFrameRef = useRef<number | null>(null);
+        const previousPageRef = useRef(0);
         const reachedStartRef = useRef(false);
         const reachedEndRef = useRef(false);
-        const autoplayRunningRef = useRef(false);
-        const previousPageRef = useRef(0);
-
-        const trackRef = useRef<HTMLDivElement>(null);
-
-        const autoplayRef = useRef<number | null>(null);
-        const animationFrameRef = useRef<number | null>(null);
-
-        const hoveredRef = useRef(false);
-
-        const focusedRef = useRef(false);
 
         const [activeIndex, setActiveIndex] = useState(0);
-
         const [pageCount, setPageCount] = useState(0);
-
         const [canScrollPrev, setCanScrollPrev] = useState(false);
-
         const [canScrollNext, setCanScrollNext] = useState(true);
 
-        React.useEffect(() => {
+        useEffect(() => {
             return () => {
-                if (animationFrameRef.current) {
-                    cancelAnimationFrame(animationFrameRef.current);
-                }
+                if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
             };
         }, []);
 
+        // ── Page geometry ────────────────────────────────────────────────────
         const getPageCount = useCallback(() => {
             const el = trackRef.current;
-
             if (!el) return 0;
-
-            const totalSlides = el.children.length;
-
-            const maxIndex = Math.max(0, totalSlides - slidesPerView);
-
+            const maxIndex = Math.max(0, el.children.length - slidesPerView);
             return Math.floor(maxIndex / slidesPerScroll) + 1;
         }, [slidesPerScroll, slidesPerView]);
 
@@ -239,58 +219,42 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
         const getScrollAmount = useCallback(() => {
             const el = trackRef.current;
-
             if (!el) return 0;
-
             const totalGap = (slidesPerView - 1) * gap * 4;
-
             return (el.clientWidth - totalGap) / slidesPerView + gap * 4;
         }, [slidesPerView, gap]);
 
+        // ── Imperative scroll ────────────────────────────────────────────────
         const scrollTo = useCallback(
             (index: number, speed = goToSpeed) => {
                 const el = trackRef.current;
-
                 if (!el) return;
 
                 const maxScrollLeft = el.scrollWidth - el.clientWidth;
-
                 const target = getScrollAmount() * slidesPerScroll * index;
-
                 const finalTarget = Math.min(target, maxScrollLeft);
 
                 if (prefersReducedMotion || speed <= 0) {
-                    el.scrollTo({
-                        left: finalTarget,
-                        behavior: 'auto',
-                    });
-
+                    el.scrollTo({ left: finalTarget, behavior: 'auto' });
                     return;
                 }
 
                 if (animationFrameRef.current) {
                     cancelAnimationFrame(animationFrameRef.current);
-
                     animationFrameRef.current = null;
-
                     el.style.scrollSnapType = 'x mandatory';
                 }
 
                 const previousSnap = el.style.scrollSnapType;
-
                 el.style.scrollSnapType = 'none';
 
                 const start = el.scrollLeft;
-
                 const change = finalTarget - start;
-
                 const startTime = performance.now();
 
                 const animate = (time: number) => {
                     const elapsed = time - startTime;
-
                     const progress = Math.min(elapsed / speed, 1);
-
                     const eased =
                         progress < 0.5
                             ? 2 * progress * progress
@@ -302,7 +266,6 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                         animationFrameRef.current = requestAnimationFrame(animate);
                     } else {
                         animationFrameRef.current = null;
-
                         el.style.scrollSnapType = previousSnap || 'x mandatory';
                     }
                 };
@@ -315,77 +278,38 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         const scrollToPage = useCallback(
             (index: number, speed = goToSpeed) => {
                 const safePageCount = Math.max(1, pageCount);
-
-                let targetIndex = index;
-
-                if (loop) {
-                    targetIndex = ((index % safePageCount) + safePageCount) % safePageCount;
-                } else {
-                    targetIndex = Math.max(0, Math.min(index, safePageCount - 1));
-                }
-
+                const targetIndex = loop
+                    ? ((index % safePageCount) + safePageCount) % safePageCount
+                    : Math.max(0, Math.min(index, safePageCount - 1));
                 scrollTo(targetIndex, speed);
             },
             [loop, pageCount, scrollTo, goToSpeed],
         );
 
-        const scrollNextPage = useCallback(() => {
-            scrollToPage(activeIndex + 1);
-        }, [activeIndex, scrollToPage]);
+        const scrollPrev = useCallback(
+            () => scrollToPage(activeIndex - 1),
+            [activeIndex, scrollToPage],
+        );
+        const scrollNext = useCallback(
+            () => scrollToPage(activeIndex + 1),
+            [activeIndex, scrollToPage],
+        );
 
-        const scrollPrevPage = useCallback(() => {
-            scrollToPage(activeIndex - 1);
-        }, [activeIndex, scrollToPage]);
+        // ── useCarouselVisibility ────────────────────────────────────────────
+        const { updateVisibility } = useCarouselVisibility({
+            trackRef,
+            onVisibilityChange,
+            onSlideVisible,
+            onSlideHidden,
+        });
 
-        const autoplayNext = useCallback(() => {
-            if ((pauseOnHover && hoveredRef.current) || (pauseOnFocus && focusedRef.current)) {
-                return;
-            }
-
-            scrollToPage(activeIndex + 1, autoplaySpeed);
-        }, [pauseOnHover, pauseOnFocus, scrollToPage, activeIndex, autoplaySpeed]);
-
-        React.useEffect(() => {
-            if (!autoplay) {
-                if (autoplayRunningRef.current) {
-                    autoplayRunningRef.current = false;
-
-                    onAutoplayStop?.();
-                }
-
-                return;
-            }
-
-            autoplayRunningRef.current = true;
-
-            onAutoplayStart?.();
-
-            autoplayRef.current = window.setInterval(() => {
-                autoplayNext();
-            }, autoplayDelay);
-
-            return () => {
-                if (autoplayRef.current) {
-                    clearInterval(autoplayRef.current);
-                }
-
-                if (autoplayRunningRef.current) {
-                    autoplayRunningRef.current = false;
-
-                    onAutoplayStop?.();
-                }
-            };
-        }, [autoplay, autoplayDelay, autoplayNext, onAutoplayStart, onAutoplayStop]);
-
+        // ── Scroll state sync ────────────────────────────────────────────────
         const updateScrollState = useCallback(() => {
             const el = trackRef.current;
-
             if (!el) return;
 
             const scrollPerPage = getScrollAmount() * slidesPerScroll;
-
             const safePageCount = Math.max(1, pageCount);
-
             const currentIndex =
                 scrollPerPage === 0
                     ? 0
@@ -395,167 +319,92 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
             if (previousPageRef.current !== currentIndex) {
                 previousPageRef.current = currentIndex;
-
                 onPageChange?.(currentIndex);
             }
 
             const atStart = el.scrollLeft <= 1;
-
             const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
 
             setCanScrollPrev(loop || !atStart);
-
             setCanScrollNext(loop || !atEnd);
 
             if (atStart && !reachedStartRef.current) {
                 reachedStartRef.current = true;
-
                 onReachStart?.();
             }
-
-            if (!atStart) {
-                reachedStartRef.current = false;
-            }
+            if (!atStart) reachedStartRef.current = false;
 
             if (atEnd && !reachedEndRef.current) {
                 reachedEndRef.current = true;
-
                 onReachEnd?.();
             }
+            if (!atEnd) reachedEndRef.current = false;
 
-            if (!atEnd) {
-                reachedEndRef.current = false;
-            }
-
-            const children = Array.from(el.children);
-
-            const nextVisibleIndexes: number[] = [];
-
-            children.forEach((child, index) => {
-                const slide = child as HTMLElement;
-
-                const left = slide.offsetLeft;
-
-                const right = left + slide.offsetWidth;
-
-                const viewportLeft = el.scrollLeft;
-
-                const viewportRight = viewportLeft + el.clientWidth;
-
-                const visible = right > viewportLeft && left < viewportRight;
-
-                if (visible) {
-                    nextVisibleIndexes.push(index);
-                }
-            });
-
-            const prevVisible = visibleIndexesRef.current;
-
-            const changed =
-                prevVisible.length !== nextVisibleIndexes.length ||
-                prevVisible.some((value, index) => value !== nextVisibleIndexes[index]);
-
-            if (changed) {
-                nextVisibleIndexes.forEach((index) => {
-                    if (!prevVisible.includes(index)) {
-                        onSlideVisible?.(index);
-                    }
-                });
-
-                prevVisible.forEach((index) => {
-                    if (!nextVisibleIndexes.includes(index)) {
-                        onSlideHidden?.(index);
-                    }
-                });
-
-                visibleIndexesRef.current = nextVisibleIndexes;
-
-                onVisibilityChange?.(nextVisibleIndexes);
-            }
+            updateVisibility();
         }, [
             getScrollAmount,
             slidesPerScroll,
             pageCount,
             loop,
-
             onPageChange,
-
             onReachStart,
             onReachEnd,
-
-            onSlideVisible,
-            onSlideHidden,
-            onVisibilityChange,
+            updateVisibility,
         ]);
 
-        const scrollPrev = useCallback(() => {
-            scrollPrevPage();
-        }, [scrollPrevPage]);
+        // ── useCarouselAutoplay ──────────────────────────────────────────────
+        const { hoveredRef, focusedRef } = useCarouselAutoplay({
+            autoplay,
+            activeIndex,
+            pageCount,
+            autoplayDelay,
+            autoplaySpeed,
+            pauseOnHover,
+            pauseOnFocus,
+            loop,
+            scrollToPage,
+            onAutoplayStart,
+            onAutoplayStop,
+        });
 
-        const scrollNext = useCallback(() => {
-            scrollNextPage();
-        }, [scrollNextPage]);
-
-        const value = useMemo(
+        // ── Context value ────────────────────────────────────────────────────
+        const value = useMemo<CarouselContextValue>(
             () => ({
                 trackRef,
-
                 scrollPrev,
                 scrollNext,
-
                 canScrollPrev,
                 canScrollNext,
-
                 slidesPerView,
                 slidesPerScroll,
-
                 gap,
-
                 activeIndex,
                 pageCount,
-
                 scrollTo,
-
                 updatePageCount,
-
                 draggable,
-
                 prefersReducedMotion,
-
                 dragThreshold,
-
                 loop,
-
                 onDragStart,
                 onDragEnd,
             }),
             [
                 scrollPrev,
                 scrollNext,
-
                 canScrollPrev,
                 canScrollNext,
-
                 slidesPerView,
                 slidesPerScroll,
-
                 gap,
-
                 activeIndex,
                 pageCount,
-
                 scrollTo,
-
                 updatePageCount,
-
                 draggable,
-
                 prefersReducedMotion,
-
                 dragThreshold,
-
                 loop,
-
                 onDragStart,
                 onDragEnd,
             ],
@@ -587,6 +436,7 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                 >
                     {children}
 
+                    {/* Accessible live region */}
                     <Box
                         position="absolute"
                         width="1px"
@@ -617,260 +467,59 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
     ({ children, className, ...rest }, ref) => {
         const {
             trackRef,
-
             gap,
-
             scrollTo,
-
             pageCount,
-
             draggable,
-
             prefersReducedMotion,
-
             dragThreshold,
-
             activeIndex,
             loop,
-
             onDragStart,
             onDragEnd,
         } = useCarouselContext();
 
-        const dragEndedRef = useRef(false);
-
-        const dragStartedRef = useRef(false);
-
-        const isDraggingRef = useRef(false);
-
-        const draggedRef = useRef(false);
-
-        const startXRef = useRef(0);
-
-        const scrollLeftRef = useRef(0);
-
-        const velocityRef = useRef(0);
-
-        const lastXRef = useRef(0);
-
-        const lastTimeRef = useRef(0);
-
-        const momentumRef = useRef<number | null>(null);
-
-        const stopMomentum = useCallback(() => {
-            if (momentumRef.current) {
-                cancelAnimationFrame(momentumRef.current);
-
-                momentumRef.current = null;
-            }
-        }, []);
-
-        const startDrag = useCallback(
-            (clientX: number) => {
-                const el = trackRef.current;
-
-                if (!draggable) return;
-
-                if (!el) return;
-
-                stopMomentum();
-
-                dragEndedRef.current = false;
-                onDragStart?.();
-
-                dragStartedRef.current = false;
-
-                draggedRef.current = false;
-
-                isDraggingRef.current = true;
-
-                startXRef.current = clientX;
-
-                scrollLeftRef.current = el.scrollLeft;
-
-                lastXRef.current = clientX;
-
-                lastTimeRef.current = performance.now();
-
-                velocityRef.current = 0;
-
-                el.style.scrollSnapType = 'none';
-
-                document.body.style.userSelect = 'none';
-
-                document.body.style.webkitUserSelect = 'none';
-
-                document.body.style.cursor = 'grabbing';
-            },
-            [trackRef, draggable, stopMomentum, onDragStart],
-        );
-
-        const moveDrag = useCallback(
-            (clientX: number) => {
-                const el = trackRef.current;
-
-                if (!el || !isDraggingRef.current) return;
-
-                const delta = clientX - startXRef.current;
-
-                if (!dragStartedRef.current) {
-                    if (Math.abs(delta) < dragThreshold) {
-                        return;
-                    }
-
-                    dragStartedRef.current = true;
-                }
-
-                if (Math.abs(delta) > dragThreshold) {
-                    draggedRef.current = true;
-                }
-
-                el.scrollLeft = scrollLeftRef.current - delta;
-
-                const now = performance.now();
-
-                const dx = clientX - lastXRef.current;
-
-                const dt = now - lastTimeRef.current;
-
-                if (dt > 0) {
-                    velocityRef.current = dx / dt;
-                }
-
-                lastXRef.current = clientX;
-
-                lastTimeRef.current = now;
-            },
-            [trackRef, dragThreshold],
-        );
-
-        const endDrag = useCallback(() => {
-            const el = trackRef.current;
-
-            if (!el || !isDraggingRef.current) return;
-
-            isDraggingRef.current = false;
-
-            document.body.style.userSelect = '';
-
-            document.body.style.webkitUserSelect = '';
-
-            document.body.style.cursor = '';
-
-            if (prefersReducedMotion) {
-                el.style.scrollSnapType = 'x mandatory';
-
-                if (!dragEndedRef.current) {
-                    dragEndedRef.current = true;
-
-                    onDragEnd?.();
-                }
-
-                return;
-            }
-
-            const momentum = () => {
-                velocityRef.current *= 0.95;
-
-                if (Math.abs(velocityRef.current) < 0.02) {
-                    el.style.scrollSnapType = 'x mandatory';
-
-                    if (!dragEndedRef.current) {
-                        dragEndedRef.current = true;
-
-                        onDragEnd?.();
-                    }
-
-                    return;
-                }
-
-                el.scrollLeft -= velocityRef.current * 20;
-
-                momentumRef.current = requestAnimationFrame(momentum);
-            };
-
-            momentum();
-        }, [trackRef, prefersReducedMotion, onDragEnd]);
+        // ── useCarouselDrag ──────────────────────────────────────────────────
+        const { startDrag, moveDrag, endDrag, draggedRef, stopMomentum } = useCarouselDrag({
+            trackRef,
+            draggable,
+            dragThreshold,
+            prefersReducedMotion,
+            onDragStart,
+            onDragEnd,
+        });
 
         const handlePointerMove = useCallback(
-            (event: PointerEvent) => {
-                moveDrag(event.clientX);
-            },
+            (event: PointerEvent) => moveDrag(event.clientX),
             [moveDrag],
         );
 
         const handlePointerUp = useCallback(() => {
             window.removeEventListener('pointermove', handlePointerMove);
-
             window.removeEventListener('pointerup', handlePointerUp);
-
             endDrag();
         }, [endDrag, handlePointerMove]);
 
-        React.useEffect(() => {
+        useEffect(() => {
             return () => {
                 stopMomentum();
-
                 window.removeEventListener('pointermove', handlePointerMove);
-
                 window.removeEventListener('pointerup', handlePointerUp);
             };
         }, [handlePointerMove, handlePointerUp, stopMomentum]);
 
-        const handleKeyDown = useCallback(
-            (event: React.KeyboardEvent<HTMLDivElement>) => {
-                switch (event.key) {
-                    case 'ArrowLeft': {
-                        event.preventDefault();
-
-                        const nextIndex = loop
-                            ? (activeIndex - 1 + pageCount) % pageCount
-                            : Math.max(0, pageCount === 0 ? 0 : activeIndex - 1);
-
-                        scrollTo(nextIndex, event.repeat ? 80 : undefined);
-
-                        break;
-                    }
-
-                    case 'ArrowRight': {
-                        event.preventDefault();
-
-                        const nextIndex = loop
-                            ? pageCount === 0
-                                ? 0
-                                : (activeIndex + 1) % pageCount
-                            : Math.min(pageCount - 1, activeIndex + 1);
-
-                        scrollTo(nextIndex, event.repeat ? 80 : undefined);
-
-                        break;
-                    }
-
-                    case 'Home': {
-                        event.preventDefault();
-
-                        scrollTo(0);
-
-                        break;
-                    }
-
-                    case 'End': {
-                        event.preventDefault();
-
-                        scrollTo(pageCount - 1);
-
-                        break;
-                    }
-                }
-            },
-            [scrollTo, pageCount, activeIndex, loop],
-        );
+        // ── useCarouselKeyboard ──────────────────────────────────────────────
+        const { handleKeyDown } = useCarouselKeyboard({
+            activeIndex,
+            pageCount,
+            loop,
+            scrollTo,
+        });
 
         return (
             <Box
                 ref={(node: HTMLDivElement | null) => {
                     trackRef.current = node;
-
                     if (typeof ref === 'function') {
                         ref(node);
                     } else if (ref) {
@@ -890,11 +539,8 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                     draggable
                         ? (e) => {
                               e.currentTarget.setPointerCapture(e.pointerId);
-
                               startDrag(e.clientX);
-
                               window.addEventListener('pointermove', handlePointerMove);
-
                               window.addEventListener('pointerup', handlePointerUp);
                           }
                         : undefined
@@ -902,11 +548,9 @@ const CarouselTrack = forwardRef<HTMLDivElement, CarouselTrackProps>(
                 onClickCapture={(e) => {
                     if (draggedRef.current) {
                         e.preventDefault();
-
                         e.stopPropagation();
                     }
                 }}
-                data-dragging={draggable && isDraggingRef.current ? true : undefined}
                 aria-label="Carousel track"
                 style={
                     {
@@ -955,40 +599,24 @@ type CarouselButtonProps<C extends React.ElementType = 'button'> = BoxComponentP
 
 const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Prev', ...rest }, ref) => {
-        const { scrollPrev, canScrollPrev, scrollNext, scrollTo, pageCount } = useCarouselContext();
+        const { scrollPrev, canScrollPrev, scrollNext, scrollTo, pageCount, activeIndex, loop } =
+            useCarouselContext();
+
+        const { handleKeyDown } = useCarouselKeyboard({
+            activeIndex,
+            pageCount,
+            loop,
+            scrollTo,
+        });
 
         return (
             <Box
                 as="button"
-                className={clsx(prefix('__control'), prefix('__control-prev'), className)}
                 ref={ref}
+                className={clsx(prefix('__control'), prefix('__control-prev'), className)}
                 type="button"
                 onClick={scrollPrev}
-                onKeyDown={(event) => {
-                    if (event.key === 'ArrowRight') {
-                        event.preventDefault();
-
-                        scrollNext();
-                    }
-
-                    if (event.key === 'ArrowLeft') {
-                        event.preventDefault();
-
-                        scrollPrev();
-                    }
-
-                    if (event.key === 'Home') {
-                        event.preventDefault();
-
-                        scrollTo(0);
-                    }
-
-                    if (event.key === 'End') {
-                        event.preventDefault();
-
-                        scrollTo(pageCount - 1);
-                    }
-                }}
+                onKeyDown={handleKeyDown}
                 disabled={!canScrollPrev}
                 aria-label="Previous slide"
                 {...rest}
@@ -1005,51 +633,24 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Next', ...rest }, ref) => {
-        const { scrollNext, canScrollNext, scrollPrev, scrollTo, pageCount, loop, activeIndex } =
+        const { scrollNext, canScrollNext, scrollTo, pageCount, activeIndex, loop } =
             useCarouselContext();
+
+        const { handleKeyDown } = useCarouselKeyboard({
+            activeIndex,
+            pageCount,
+            loop,
+            scrollTo,
+        });
 
         return (
             <Box
                 as="button"
-                className={clsx(prefix('__control'), prefix('__control-next'), className)}
                 ref={ref}
+                className={clsx(prefix('__control'), prefix('__control-next'), className)}
                 type="button"
                 onClick={scrollNext}
-                onKeyDown={(event) => {
-                    if (event.key === 'ArrowRight') {
-                        event.preventDefault();
-
-                        const nextIndex = loop
-                            ? pageCount === 0
-                                ? 0
-                                : (activeIndex + 1) % pageCount
-                            : Math.min(pageCount - 1, activeIndex + 1);
-
-                        scrollTo(nextIndex, event.repeat ? 80 : undefined);
-                    }
-
-                    if (event.key === 'ArrowLeft') {
-                        event.preventDefault();
-
-                        const nextIndex = loop
-                            ? (activeIndex - 1 + pageCount) % pageCount
-                            : Math.max(0, pageCount === 0 ? 0 : activeIndex - 1);
-
-                        scrollTo(nextIndex, event.repeat ? 80 : undefined);
-                    }
-
-                    if (event.key === 'Home') {
-                        event.preventDefault();
-
-                        scrollTo(0);
-                    }
-
-                    if (event.key === 'End') {
-                        event.preventDefault();
-
-                        scrollTo(pageCount - 1);
-                    }
-                }}
+                onKeyDown={handleKeyDown}
                 disabled={!canScrollNext}
                 aria-label="Next slide"
                 {...rest}
@@ -1072,52 +673,37 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
 
         const indicatorRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
-        const handleKeyDown = useCallback(
-            (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+        // Re-use keyboard hook per indicator via an inline adapter; each
+        // button delegates to the shared scrollTo + indicator focus.
+        const makeIndicatorKeyDown = useCallback(
+            (index: number) => (event: React.KeyboardEvent<HTMLButtonElement>) => {
                 let nextIndex = index;
 
                 switch (event.key) {
-                    case 'ArrowRight': {
-                        if (loop) {
-                            nextIndex = pageCount === 0 ? 0 : (index + 1) % pageCount;
-                        } else {
-                            nextIndex = Math.min(index + 1, pageCount - 1);
-                        }
-
+                    case 'ArrowRight':
+                        nextIndex = loop
+                            ? pageCount === 0
+                                ? 0
+                                : (index + 1) % pageCount
+                            : Math.min(index + 1, pageCount - 1);
                         break;
-                    }
-
-                    case 'ArrowLeft': {
-                        if (loop) {
-                            nextIndex = (index - 1 + pageCount) % pageCount;
-                        } else {
-                            nextIndex = Math.max(index - 1, 0);
-                        }
-
+                    case 'ArrowLeft':
+                        nextIndex = loop
+                            ? (index - 1 + pageCount) % pageCount
+                            : Math.max(index - 1, 0);
                         break;
-                    }
-
-                    case 'Home': {
+                    case 'Home':
                         nextIndex = 0;
-
                         break;
-                    }
-
-                    case 'End': {
+                    case 'End':
                         nextIndex = pageCount - 1;
-
                         break;
-                    }
-
-                    default: {
+                    default:
                         return;
-                    }
                 }
 
                 event.preventDefault();
-
                 scrollTo(nextIndex);
-
                 indicatorRefs.current[nextIndex]?.focus();
             },
             [loop, pageCount, scrollTo],
@@ -1148,16 +734,14 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
                             role="tab"
                             tabIndex={active ? 0 : -1}
                             aria-selected={active}
+                            aria-current={active}
+                            aria-label={`Go to page ${index + 1}`}
                             className={clsx(
                                 prefix('__indicator'),
                                 active && prefix('__indicator-active'),
                             )}
-                            aria-label={`Go to page ${index + 1}`}
-                            aria-current={active}
                             onClick={() => scrollTo(index)}
-                            onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>) => {
-                                handleKeyDown(event, index);
-                            }}
+                            onKeyDown={makeIndicatorKeyDown(index)}
                         />
                     );
                 })}
@@ -1172,46 +756,33 @@ const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsProps>(
 
 const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
     const frameRef = useRef<number | null>(null);
-
     const { trackRef, updatePageCount } = useCarouselContext();
 
     const handleResize = useCallback(() => {
         updatePageCount();
 
-        if (frameRef.current) {
-            cancelAnimationFrame(frameRef.current);
-        }
+        if (frameRef.current) cancelAnimationFrame(frameRef.current);
 
         frameRef.current = requestAnimationFrame(() => {
             onScroll();
         });
     }, [updatePageCount, onScroll]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const el = trackRef.current;
-
         if (!el) return;
 
         handleResize();
 
-        el.addEventListener('scroll', onScroll, {
-            passive: true,
-        });
+        el.addEventListener('scroll', onScroll, { passive: true });
 
-        const observer = new ResizeObserver(() => {
-            handleResize();
-        });
-
+        const observer = new ResizeObserver(handleResize);
         observer.observe(el);
 
         return () => {
             el.removeEventListener('scroll', onScroll);
-
             observer.disconnect();
-
-            if (frameRef.current) {
-                cancelAnimationFrame(frameRef.current);
-            }
+            if (frameRef.current) cancelAnimationFrame(frameRef.current);
         };
     }, [trackRef, handleResize, onScroll]);
 
@@ -1219,17 +790,13 @@ const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
 };
 
 // -----------------------------------------------------------------------------
-// Compound
+// Compound export
 // -----------------------------------------------------------------------------
 
 export const Carousel = CarouselRoot as CarouselCompound;
 
 Carousel.Track = CarouselTrack;
-
 Carousel.Item = CarouselItem;
-
 Carousel.Prev = CarouselPrev;
-
 Carousel.Next = CarouselNext;
-
 Carousel.Indicators = CarouselIndicators;
