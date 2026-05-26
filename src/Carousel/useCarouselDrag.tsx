@@ -15,6 +15,8 @@ export type UseCarouselDragOptions = {
 
     onDragStart?: () => void;
     onDragEnd?: () => void;
+
+    overscroll?: boolean;
 };
 
 export type UseCarouselDragReturn = {
@@ -50,6 +52,7 @@ export function useCarouselDrag({
     draggable = true,
     dragThreshold = 6,
     prefersReducedMotion = false,
+    overscroll = true,
     onDragStart,
     onDragEnd,
 }: UseCarouselDragOptions): UseCarouselDragReturn {
@@ -164,24 +167,33 @@ export function useCarouselDrag({
 
             const maxScroll = el.scrollWidth - el.clientWidth;
 
-            if (nextScroll < 0) {
-                overscrollRef.current = nextScroll * 0.35;
-                isOverscrollingRef.current = true;
-
-                el.scrollLeft = 0;
-            } else if (nextScroll > maxScroll) {
-                overscrollRef.current = (nextScroll - maxScroll) * 0.35;
-                isOverscrollingRef.current = true;
-
-                el.scrollLeft = maxScroll;
-            } else {
+            if (!overscroll) {
                 overscrollRef.current = 0;
                 isOverscrollingRef.current = false;
 
-                el.scrollLeft = nextScroll;
-            }
+                el.style.transform = '';
 
-            el.style.transform = `translateX(${-overscrollRef.current}px)`;
+                el.scrollLeft = Math.max(0, Math.min(nextScroll, maxScroll));
+            } else {
+                if (nextScroll < 0) {
+                    overscrollRef.current = nextScroll * 0.35;
+                    isOverscrollingRef.current = true;
+
+                    el.scrollLeft = 0;
+                } else if (nextScroll > maxScroll) {
+                    overscrollRef.current = (nextScroll - maxScroll) * 0.35;
+                    isOverscrollingRef.current = true;
+
+                    el.scrollLeft = maxScroll;
+                } else {
+                    overscrollRef.current = 0;
+                    isOverscrollingRef.current = false;
+
+                    el.scrollLeft = nextScroll;
+                }
+
+                el.style.transform = `translateX(${-overscrollRef.current}px)`;
+            }
 
             const now = performance.now();
 
@@ -195,7 +207,7 @@ export function useCarouselDrag({
             lastXRef.current = clientX;
             lastTimeRef.current = now;
         },
-        [trackRef, dragThreshold],
+        [trackRef, dragThreshold, overscroll],
     );
 
     const endDrag = useCallback(() => {
@@ -248,7 +260,7 @@ export function useCarouselDrag({
         }
 
         // immediate bounce-back when overscrolling edges
-        if (overscrollRef.current !== 0) {
+        if (overscroll && overscrollRef.current !== 0) {
             finish();
             return;
         }
@@ -269,7 +281,7 @@ export function useCarouselDrag({
         };
 
         momentum();
-    }, [trackRef, prefersReducedMotion, onDragEnd]);
+    }, [trackRef, prefersReducedMotion, onDragEnd, overscroll]);
 
     return {
         startDrag,

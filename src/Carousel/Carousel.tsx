@@ -95,6 +95,8 @@ export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentPro
         defaultActiveIndex?: number;
         onActiveIndexChange?: (index: number) => void;
 
+        overscroll?: boolean;
+
         gap?: number;
 
         slidesPerView?: number;
@@ -149,6 +151,8 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             activeIndex: controlledIndex,
             defaultActiveIndex = 0,
             onActiveIndexChange,
+
+            overscroll = true,
 
             gap = 4,
 
@@ -219,6 +223,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             prefersReducedMotion,
             onDragStart,
             onDragEnd,
+            overscroll,
         });
 
         const isControlled = controlledIndex !== undefined;
