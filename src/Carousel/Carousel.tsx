@@ -251,14 +251,6 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
         useEffect(() => {
             activeIndexRef.current = activeIndex;
-            if (
-                carouselDrag.isPointerDownRef.current ||
-                carouselDrag.isMomentumRef.current ||
-                syncingControlledScrollRef.current
-            ) {
-                return;
-            }
-            if (isControlled) onActiveIndexChange?.(activeIndex);
         }, [activeIndex]);
 
         // ── Page geometry ────────────────────────────────────────────────────
@@ -294,6 +286,11 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
 
                 if (prefersReducedMotion || speed <= 0) {
                     el.scrollTo({ left: finalTarget, behavior: 'auto' });
+
+                    requestAnimationFrame(() => {
+                        syncingControlledScrollRef.current = false;
+                    });
+
                     return;
                 }
 
@@ -324,6 +321,9 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
                         animationFrameRef.current = requestAnimationFrame(animate);
                     } else {
                         animationFrameRef.current = null;
+
+                        syncingControlledScrollRef.current = false;
+
                         el.style.scrollSnapType = previousSnap || 'x mandatory';
                     }
                 };
