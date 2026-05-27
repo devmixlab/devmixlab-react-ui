@@ -69,6 +69,12 @@ $navbar-prefix: #{$p}--navbar;
             background-color: var(--navbar-item-active-bg, rgba(0,0,0,0.06));
             color: var(--navbar-item-active-color, inherit);
         }
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+            border: none;
+        }
     }
 
     .#{$navbar-prefix}__toggle{

@@ -19,7 +19,7 @@ import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
 import { useFloatingLayer, usePresence } from '../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
-import { Button } from '../Button/Button';
+import { Button, ButtonProps } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { clsx } from 'clsx';
 
@@ -109,6 +109,7 @@ type PopoverTriggerProps = React.HTMLAttributes<HTMLDivElement> & {
     children?: React.ReactNode;
     chevron?: boolean;
     render?: (props: TriggerRenderProps) => React.ReactNode;
+    btnProps?: ButtonProps;
 };
 
 type PopoverPanelProps = {
@@ -276,7 +277,7 @@ const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 Popover.displayName = 'Popover';
 
 const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
-    ({ children, className, chevron = false, render, ...rest }, ref) => {
+    ({ children, className, chevron = false, render, btnProps, ...rest }, ref) => {
         const {
             opened,
             setOpened,
@@ -354,6 +355,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                     })
                 ) : (
                     <Button
+                        {...btnProps}
                         type="button"
                         tabIndex={-1}
                         disabled={disabled}

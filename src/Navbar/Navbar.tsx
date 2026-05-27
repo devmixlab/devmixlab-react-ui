@@ -4,6 +4,8 @@ import { clsx } from 'clsx';
 
 import { Box, BoxComponentProps } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
+import { Button } from '../Button/Button';
+import { ChevronDown as ChevronDownIcon } from '../Icon';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -31,10 +33,19 @@ export type NavbarContentProps<C extends React.ElementType = 'div'> = BoxCompone
 
 export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
 
-export type NavbarItemProps<C extends React.ElementType = 'button'> = BoxComponentProps<
+type NavbarItemRenderProps = {
+    disabled: boolean;
+    active: boolean;
+    focusedVisible: boolean;
+    pressed: boolean;
+};
+
+export type NavbarItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<
     C,
     {
         active?: boolean;
+        disabled?: boolean;
+        render?: (props: NavbarItemRenderProps) => React.ReactNode;
     }
 >;
 
@@ -162,21 +173,66 @@ const NavbarItems = forwardRef<HTMLDivElement, NavbarItemsProps>(
 // Item
 // -----------------------------------------------------------------------------
 
-const NavbarItem = forwardRef<HTMLButtonElement, NavbarItemProps>(
-    ({ children, className, active = false, ...rest }, ref) => {
+// type TriggerRenderProps = {
+//     disabled: boolean;
+//     active: boolean;
+//     focusedVisible: boolean;
+//     pressed: boolean;
+// };
+
+// type NavbarItemProps = React.HTMLAttributes<HTMLDivElement> & {
+//     className?: string;
+//     children?: React.ReactNode;
+//     chevron?: boolean;
+//     render?: (props: TriggerRenderProps) => React.ReactNode;
+// };
+
+const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
+    ({ children, className, active = false, disabled = false, render, ...rest }, ref) => {
+        const [focusedVisible, setFocusedVisible] = useState(false);
+        const [pressed, setPressed] = useState(false);
+
         return (
             <Box
-                as="button"
+                tabIndex={disabled ? -1 : 0}
                 ref={ref}
                 className={clsx(prefix('__item'), className)}
-                type="button"
-                px={3}
-                rounded="md"
+                onFocus={(e) => {
+                    if (disabled) return;
+                    setFocusedVisible(e.currentTarget.matches(':focus-visible'));
+                }}
+                onBlur={() => setFocusedVisible(false)}
+                onMouseDown={() => {
+                    if (disabled) return;
+                    setPressed(true);
+                }}
+                onMouseUp={() => setPressed(false)}
+                onMouseLeave={() => setPressed(false)}
                 aria-current={active ? 'page' : undefined}
                 data-active={active || undefined}
                 {...rest}
             >
-                {children}
+                {render ? (
+                    render({
+                        disabled,
+                        active,
+                        focusedVisible,
+                        pressed,
+                    })
+                ) : (
+                    <Button
+                        type="button"
+                        tabIndex={-1}
+                        variant="base"
+                        intent="secondary"
+                        disabled={disabled}
+                        pseudoFocused={focusedVisible}
+                        pseudoActive={pressed}
+                        active={active}
+                    >
+                        {children}
+                    </Button>
+                )}
             </Box>
         );
     },
