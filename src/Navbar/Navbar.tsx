@@ -359,7 +359,7 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
 // -----------------------------------------------------------------------------
 
 const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
-    ({ children, className, collapseProps, ...rest }, ref) => {
+    ({ children, className, collapseProps, focusTrap = false, ...rest }, ref) => {
         const { mobileOpen, collapsed, mobileId, setMobileOpen } = useNavbarContext();
 
         const [trapActive, setTrapActive] = useState(false);
@@ -367,18 +367,22 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         const containerRef = useRef<HTMLDivElement | null>(null);
 
         useFocusTrap({
-            active: collapsed && trapActive,
+            active: focusTrap && collapsed && trapActive,
             containerRef,
             onEscape: () => {
                 setMobileOpen(false);
             },
         });
 
+        useEffect(() => {
+            if (!mobileOpen) {
+                setTrapActive(false);
+            }
+        }, [mobileOpen]);
+
         if (!collapsed) {
             return null;
         }
-
-        // unmountOnExit;
 
         return (
             <Collapse
