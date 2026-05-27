@@ -287,6 +287,8 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
         const stopAnimation = useCallback(() => {
             const el = trackRef.current;
 
+            syncingControlledScrollRef.current = false;
+
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
                 animationFrameRef.current = null;
