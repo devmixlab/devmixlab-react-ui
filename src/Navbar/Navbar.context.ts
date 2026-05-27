@@ -10,6 +10,7 @@ type NavbarContextValue = {
     unregisterItem: (id: string) => void;
 
     collapsed: boolean;
+    closeOnSelect: boolean;
 };
 
 const NavbarContext = React.createContext<NavbarContextValue | null>(null);

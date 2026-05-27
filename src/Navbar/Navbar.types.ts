@@ -12,6 +12,7 @@ export type NavbarProps<C extends React.ElementType = 'nav'> = BoxComponentProps
         elevated?: boolean;
         centered?: boolean;
         collapseBreakpoint?: Breakpoint;
+        closeOnSelect?: boolean;
     }
 >;
 

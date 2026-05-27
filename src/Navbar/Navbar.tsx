@@ -53,6 +53,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
             elevated = false,
             centered = false,
             collapseBreakpoint = 'md',
+            closeOnSelect = true,
             ...rest
         },
         ref,
@@ -70,6 +71,24 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                 setMobileOpen(false);
             }
         }, [collapsed]);
+
+        useEffect(() => {
+            if (!mobileOpen) {
+                return;
+            }
+
+            const handleKeyDown = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') {
+                    setMobileOpen(false);
+                }
+            };
+
+            window.addEventListener('keydown', handleKeyDown);
+
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown);
+            };
+        }, [mobileOpen]);
 
         const focusableList = useFocusableList(items);
 
@@ -98,6 +117,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                     registerItem,
                     unregisterItem,
                     collapsed,
+                    closeOnSelect,
                 }}
             >
                 <Box
@@ -186,10 +206,17 @@ const NavbarItems = forwardRef<HTMLDivElement, NavbarItemsProps>(
 // -----------------------------------------------------------------------------
 
 const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
-    ({ children, className, active = false, disabled = false, render, ...rest }, ref) => {
+    ({ children, className, active = false, disabled = false, render, onClick, ...rest }, ref) => {
         const [pressed, setPressed] = useState(false);
 
-        const { focusableList, registerItem, unregisterItem } = useNavbarContext();
+        const {
+            focusableList,
+            registerItem,
+            unregisterItem,
+            closeOnSelect,
+            collapsed,
+            setMobileOpen,
+        } = useNavbarContext();
 
         const id = useStableId();
 
@@ -248,6 +275,13 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 tabIndex={disabled ? -1 : 0}
                 ref={ref}
                 className={clsx(prefix('__item'), className)}
+                onClick={(e) => {
+                    onClick?.(e);
+
+                    if (collapsed && closeOnSelect && !disabled) {
+                        setMobileOpen(false);
+                    }
+                }}
                 onKeyDown={(e) => {
                     if (disabled) return;
                     handleKeyDown(e);
