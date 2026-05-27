@@ -19,6 +19,8 @@ import {
     NavbarMobileProps,
 } from './Navbar.types';
 import { useStableId } from '../utils/useStableId';
+import { breakpointOrder, useBreakpoint } from '../utils/responsive';
+import { Collapse } from '../Collapse/Collapse';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -48,12 +50,18 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
             bordered = true,
             elevated = false,
             centered = false,
+            collapseBreakpoint = 'md',
             ...rest
         },
         ref,
     ) => {
         const [mobileOpen, setMobileOpen] = useState(false);
         const [items, setItems] = useState<FocusableItem[]>([]);
+
+        const { breakpoint } = useBreakpoint();
+        const collapsed =
+            collapseBreakpoint != null &&
+            breakpointOrder.indexOf(breakpoint) < breakpointOrder.indexOf(collapseBreakpoint);
 
         const focusableList = useFocusableList(items);
 
@@ -81,6 +89,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                     focusableList,
                     registerItem,
                     unregisterItem,
+                    collapsed,
                 }}
             >
                 <Box
@@ -90,6 +99,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                     data-sticky={sticky || undefined}
                     data-bordered={bordered || undefined}
                     data-elevated={elevated || undefined}
+                    data-collapsed={collapsed}
                     {...rest}
                 >
                     <Box className={prefix('__inner')} data-centered={centered || undefined}>
@@ -135,6 +145,12 @@ const NavbarContent = forwardRef<HTMLDivElement, NavbarContentProps>(
 
 const NavbarItems = forwardRef<HTMLDivElement, NavbarItemsProps>(
     ({ children, className, ...rest }, ref) => {
+        const { collapsed } = useNavbarContext();
+
+        if (collapsed) {
+            return null;
+        }
+
         return (
             <Box ref={ref} className={clsx(prefix('__items'), className)} gap={2} {...rest}>
                 {children}
@@ -269,7 +285,11 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
 const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
     ({ children, className, ...rest }, ref) => {
-        const { mobileOpen, setMobileOpen } = useNavbarContext();
+        const { mobileOpen, setMobileOpen, collapsed } = useNavbarContext();
+
+        if (!collapsed) {
+            return null;
+        }
 
         return (
             <Box
@@ -296,9 +316,9 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
 
 const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
     ({ children, className, ...rest }, ref) => {
-        const { mobileOpen } = useNavbarContext();
+        const { mobileOpen, collapsed } = useNavbarContext();
 
-        if (!mobileOpen) {
+        if (!collapsed || !mobileOpen) {
             return null;
         }
 

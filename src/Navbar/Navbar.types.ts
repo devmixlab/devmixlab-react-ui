@@ -1,5 +1,6 @@
 import React from 'react';
 import { BoxComponentProps } from '../Box/Box';
+import { Breakpoint } from '../utils/responsive';
 
 export type Variant = 'base' | 'subtle' | 'solid' | 'outlined' | 'transparent';
 
@@ -10,6 +11,7 @@ export type NavbarProps<C extends React.ElementType = 'nav'> = BoxComponentProps
         bordered?: boolean;
         elevated?: boolean;
         centered?: boolean;
+        collapseBreakpoint?: Breakpoint;
     }
 >;
 

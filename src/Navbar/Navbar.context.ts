@@ -8,6 +8,8 @@ type NavbarContextValue = {
     focusableList: FocusableListResult;
     registerItem: (item: FocusableItem) => void;
     unregisterItem: (id: string) => void;
+
+    collapsed: boolean;
 };
 
 const NavbarContext = React.createContext<NavbarContextValue | null>(null);
