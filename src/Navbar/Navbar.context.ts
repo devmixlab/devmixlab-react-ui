@@ -5,6 +5,8 @@ type NavbarContextValue = {
     mobileOpen: boolean;
     setMobileOpen: React.Dispatch<React.SetStateAction<boolean>>;
 
+    mobileId: string;
+
     focusableList: FocusableListResult;
     registerItem: (item: FocusableItem) => void;
     unregisterItem: (id: string) => void;

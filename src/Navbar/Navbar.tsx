@@ -61,6 +61,8 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         const [mobileOpen, setMobileOpen] = useState(false);
         const [items, setItems] = useState<FocusableItem[]>([]);
 
+        const mobileId = useStableId();
+
         const { breakpoint } = useBreakpoint();
         const collapsed =
             collapseBreakpoint != null &&
@@ -113,6 +115,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                 value={{
                     mobileOpen,
                     setMobileOpen,
+                    mobileId,
                     focusableList,
                     registerItem,
                     unregisterItem,
@@ -341,7 +344,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
 const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
     ({ children, className, ...rest }, ref) => {
-        const { mobileOpen, setMobileOpen, collapsed } = useNavbarContext();
+        const { mobileOpen, setMobileOpen, collapsed, mobileId } = useNavbarContext();
 
         if (!collapsed) {
             return null;
@@ -356,6 +359,7 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
                 borderRadius="md"
                 aria-expanded={mobileOpen}
                 aria-label="Toggle navigation"
+                aria-controls={mobileId}
                 onClick={() => setMobileOpen((prev) => !prev)}
                 data-mobile-opened={mobileOpen}
                 {...rest}
@@ -371,8 +375,8 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
 // -----------------------------------------------------------------------------
 
 const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
-    ({ children, className, ...rest }, ref) => {
-        const { mobileOpen, collapsed } = useNavbarContext();
+    ({ children, className, collapseProps, ...rest }, ref) => {
+        const { mobileOpen, collapsed, mobileId } = useNavbarContext();
 
         if (!collapsed) {
             return null;
@@ -381,9 +385,10 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         // unmountOnExit;
 
         return (
-            <Collapse open={mobileOpen}>
+            <Collapse {...collapseProps} open={mobileOpen}>
                 <Box
                     ref={ref}
+                    id={mobileId}
                     className={clsx(prefix('__mobile'), className)}
                     gap={2}
                     padding={4}

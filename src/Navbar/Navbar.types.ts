@@ -1,6 +1,7 @@
 import React from 'react';
 import { BoxComponentProps } from '../Box/Box';
 import { Breakpoint } from '../utils/responsive';
+import { CollapseProps } from '../Collapse/Collapse';
 
 export type Variant = 'base' | 'subtle' | 'solid' | 'outlined' | 'transparent';
 
@@ -43,4 +44,9 @@ export type NavbarItemProps<C extends React.ElementType = 'div'> = BoxComponentP
 
 export type NavbarToggleProps<C extends React.ElementType = 'button'> = BoxComponentProps<C>;
 
-export type NavbarMobileProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
+export type NavbarMobileProps<C extends React.ElementType = 'div'> = BoxComponentProps<
+    C,
+    {
+        collapseProps: Omit<CollapseProps, 'open'>;
+    }
+>;
