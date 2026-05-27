@@ -500,6 +500,9 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             onReachStart,
             onReachEnd,
             updateVisibility,
+            carouselDrag,
+            isControlled,
+            onActiveIndexChange,
         ]);
 
         // ── useCarouselAutoplay ──────────────────────────────────────────────
