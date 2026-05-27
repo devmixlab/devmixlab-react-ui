@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useRef, useCallback, useEffect } from 'react';
 
 import { clsx } from 'clsx';
 
@@ -6,73 +6,24 @@ import { Box, BoxComponentProps } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
 import { Button } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
+import { NavbarContext, useNavbarContext, NavbarContextValue } from './Navbar.context';
+import {
+    NavbarProps,
+    NavbarBrandProps,
+    NavbarContentProps,
+    NavbarItemsProps,
+    NavbarItemRenderProps,
+    NavbarItemProps,
+    NavbarToggleProps,
+    NavbarMobileProps,
+} from './Navbar.types';
+import { useStableId } from '../utils/useStableId';
 
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
 
 const prefix = (name = '') => classPrefix(`--navbar${name}`);
-
-// -----------------------------------------------------------------------------
-// Types
-// -----------------------------------------------------------------------------
-
-export type NavbarProps<C extends React.ElementType = 'nav'> = BoxComponentProps<
-    C,
-    {
-        sticky?: boolean;
-        bordered?: boolean;
-        elevated?: boolean;
-        centered?: boolean;
-    }
->;
-
-export type NavbarBrandProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
-
-export type NavbarContentProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
-
-export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
-
-type NavbarItemRenderProps = {
-    disabled: boolean;
-    active: boolean;
-    focusedVisible: boolean;
-    pressed: boolean;
-};
-
-export type NavbarItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
-    {
-        active?: boolean;
-        disabled?: boolean;
-        render?: (props: NavbarItemRenderProps) => React.ReactNode;
-    }
->;
-
-export type NavbarToggleProps<C extends React.ElementType = 'button'> = BoxComponentProps<C>;
-
-export type NavbarMobileProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
-
-// -----------------------------------------------------------------------------
-// Context
-// -----------------------------------------------------------------------------
-
-type NavbarContextValue = {
-    mobileOpen: boolean;
-    setMobileOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const NavbarContext = React.createContext<NavbarContextValue | null>(null);
-
-const useNavbarContext = () => {
-    const ctx = React.useContext(NavbarContext);
-
-    if (!ctx) {
-        throw new Error('Navbar components must be used inside <Navbar>');
-    }
-
-    return ctx;
-};
 
 // -----------------------------------------------------------------------------
 // Root
@@ -102,11 +53,24 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
     ) => {
         const [mobileOpen, setMobileOpen] = useState(false);
 
+        const itemRefs = useRef<Map<string, HTMLElement | null>>(new Map());
+
+        const registerItem = useCallback((id: string, node: HTMLElement | null) => {
+            itemRefs.current.set(id, node);
+        }, []);
+
+        const unregisterItem = useCallback((id: string) => {
+            itemRefs.current.delete(id);
+        }, []);
+
         return (
             <NavbarContext.Provider
                 value={{
                     mobileOpen,
                     setMobileOpen,
+                    itemRefs,
+                    registerItem,
+                    unregisterItem,
                 }}
             >
                 <Box
@@ -173,30 +137,77 @@ const NavbarItems = forwardRef<HTMLDivElement, NavbarItemsProps>(
 // Item
 // -----------------------------------------------------------------------------
 
-// type TriggerRenderProps = {
-//     disabled: boolean;
-//     active: boolean;
-//     focusedVisible: boolean;
-//     pressed: boolean;
-// };
-
-// type NavbarItemProps = React.HTMLAttributes<HTMLDivElement> & {
-//     className?: string;
-//     children?: React.ReactNode;
-//     chevron?: boolean;
-//     render?: (props: TriggerRenderProps) => React.ReactNode;
-// };
-
 const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
     ({ children, className, active = false, disabled = false, render, ...rest }, ref) => {
         const [focusedVisible, setFocusedVisible] = useState(false);
         const [pressed, setPressed] = useState(false);
+
+        const { registerItem, unregisterItem, itemRefs } = useNavbarContext();
+
+        const id = useStableId();
+
+        const handleKeyDown = (e: React.KeyboardEvent) => {
+            const items = Array.from(itemRefs.current.entries()).filter(([, node]) => node);
+
+            const currentIndex = items.findIndex(([itemId]) => itemId === id);
+
+            if (currentIndex === -1) return;
+
+            switch (e.key) {
+                case 'ArrowRight': {
+                    e.preventDefault();
+
+                    const next = items[currentIndex + 1] ?? items[0];
+
+                    next?.[1]?.focus();
+
+                    break;
+                }
+
+                case 'ArrowLeft': {
+                    e.preventDefault();
+
+                    const prev = items[currentIndex - 1] ?? items[items.length - 1];
+
+                    prev?.[1]?.focus();
+
+                    break;
+                }
+
+                case 'Home': {
+                    e.preventDefault();
+
+                    items[0]?.[1]?.focus();
+
+                    break;
+                }
+
+                case 'End': {
+                    e.preventDefault();
+
+                    items[items.length - 1]?.[1]?.focus();
+
+                    break;
+                }
+            }
+        };
+
+        useEffect(() => {
+            return () => {
+                unregisterItem(id);
+            };
+        }, [id, unregisterItem]);
 
         return (
             <Box
                 tabIndex={disabled ? -1 : 0}
                 ref={ref}
                 className={clsx(prefix('__item'), className)}
+                onKeyDown={(e) => {
+                    if (disabled) return;
+                    handleKeyDown(e);
+                    rest.onKeyDown?.(e);
+                }}
                 onFocus={(e) => {
                     if (disabled) return;
                     setFocusedVisible(e.currentTarget.matches(':focus-visible'));
@@ -218,9 +229,15 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                         active,
                         focusedVisible,
                         pressed,
+                        register: (el) => {
+                            registerItem(id, el);
+                        },
                     })
                 ) : (
                     <Button
+                        ref={(node) => {
+                            registerItem(id, node);
+                        }}
                         type="button"
                         tabIndex={-1}
                         variant="base"
