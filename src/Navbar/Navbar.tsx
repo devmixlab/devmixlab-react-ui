@@ -38,6 +38,8 @@ import {
     usePointerOutside,
 } from '../hooks';
 
+import { Card } from '../Card';
+
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
@@ -227,6 +229,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
         const {
             focusedId,
+            focusedVisibleId,
             focusNext,
             focusFirst,
             focusLast,
@@ -320,7 +323,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                         pressed,
                         register: setRef(id),
                     })
-                ) : (
+                ) : !insideMobile ? (
                     <Button
                         ref={setRef(id)}
                         type="button"
@@ -328,9 +331,26 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                         variant="base"
                         intent="secondary"
                         disabled={disabled}
-                        pseudoFocused={focusedId === id}
+                        pseudoFocused={focusedVisibleId === id}
                         pseudoActive={pressed}
                         active={active}
+                    >
+                        {children}
+                    </Button>
+                ) : (
+                    <Button
+                        ref={setRef(id)}
+                        w="full"
+                        justify="start"
+                        type="button"
+                        tabIndex={-1}
+                        variant="ghost"
+                        intent="secondary"
+                        disabled={disabled}
+                        pseudoFocused={focusedVisibleId === id}
+                        pseudoActive={pressed}
+                        active={active}
+                        rounded="none"
                     >
                         {children}
                     </Button>
@@ -445,7 +465,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
                         id={mobileId}
                         className={clsx(prefix('__mobile'), className)}
                         gap={2}
-                        padding={4}
+                        // padding={4}
                         {...rest}
                     >
                         {children}

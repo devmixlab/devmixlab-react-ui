@@ -1,34 +1,61 @@
 import React, { useEffect, useState, forwardRef, useMemo } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box/Box';
+import { Box, BoxComponentProps, type BoxProps } from '../Box/Box';
 import { createPolymorphic } from '../types/polymorphic';
 import { LoadingPosition, Size, Intent, Variant } from './button.tokens';
 import { isLongNumber, prefix } from './button.helpers';
 import { DefaultSpinner } from '../Spinner/DefaultSpinner';
+import { NavbarItemRenderProps } from '../Navbar/Navbar.types';
 
 // export type ButtonProps = React.ButtonHTMLAttributes<HTMLElement> & {
-export type ButtonProps = {
-    className?: string;
-    children?: React.ReactNode;
-    intent?: Intent;
-    variant?: Variant;
-    size?: Size;
-    number?: number; // to format value as tabular-nums
-    disabled?: boolean;
-    pseudoFocused?: boolean;
-    pseudoActive?: boolean;
-    active?: boolean; // selected / current (pagination, tabs)
-    noInteraction?: boolean; // removes hover/active interaction styles
-    // fullWidth?: boolean;
-    rounded?: BoxProps['rounded'];
-    iconOnly?: boolean;
-    startIcon?: React.ReactNode;
-    endIcon?: React.ReactNode;
-    loading?: boolean;
-    loadingPosition?: LoadingPosition;
-    spinnerDelay?: number;
-    loadingComponent?: React.ReactNode;
-};
+// export type ButtonProps = {
+//     className?: string;
+//     children?: React.ReactNode;
+//     intent?: Intent;
+//     variant?: Variant;
+//     size?: Size;
+//     number?: number; // to format value as tabular-nums
+//     disabled?: boolean;
+//     pseudoFocused?: boolean;
+//     pseudoActive?: boolean;
+//     active?: boolean; // selected / current (pagination, tabs)
+//     noInteraction?: boolean; // removes hover/active interaction styles
+//     // fullWidth?: boolean;
+//     rounded?: BoxProps['rounded'];
+//     iconOnly?: boolean;
+//     startIcon?: React.ReactNode;
+//     endIcon?: React.ReactNode;
+//     loading?: boolean;
+//     loadingPosition?: LoadingPosition;
+//     spinnerDelay?: number;
+//     loadingComponent?: React.ReactNode;
+// };
+
+export type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
+    C,
+    {
+        className?: string;
+        children?: React.ReactNode;
+        intent?: Intent;
+        variant?: Variant;
+        size?: Size;
+        number?: number; // to format value as tabular-nums
+        disabled?: boolean;
+        pseudoFocused?: boolean;
+        pseudoActive?: boolean;
+        active?: boolean; // selected / current (pagination, tabs)
+        noInteraction?: boolean; // removes hover/active interaction styles
+        // fullWidth?: boolean;
+        rounded?: BoxProps['rounded'];
+        iconOnly?: boolean;
+        startIcon?: React.ReactNode;
+        endIcon?: React.ReactNode;
+        loading?: boolean;
+        loadingPosition?: LoadingPosition;
+        spinnerDelay?: number;
+        loadingComponent?: React.ReactNode;
+    }
+>;
 
 export type ButtonImplProps = ButtonProps & {
     as?: React.ElementType;
