@@ -7,6 +7,7 @@ import { classPrefix } from '../utils/classPrefix';
 import { Button } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { NavbarContext, useNavbarContext, NavbarContextValue } from './Navbar.context';
+import { FocusableItem, useFocusableList } from '../hooks/useFocusableList';
 import {
     NavbarProps,
     NavbarBrandProps,
@@ -52,15 +53,24 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         ref,
     ) => {
         const [mobileOpen, setMobileOpen] = useState(false);
+        const [items, setItems] = useState<FocusableItem[]>([]);
 
-        const itemRefs = useRef<Map<string, HTMLElement | null>>(new Map());
+        const focusableList = useFocusableList(items);
 
-        const registerItem = useCallback((id: string, node: HTMLElement | null) => {
-            itemRefs.current.set(id, node);
+        const registerItem = useCallback((item: FocusableItem) => {
+            setItems((prev) => {
+                const exists = prev.some((x) => x.id === item.id);
+
+                if (exists) {
+                    return prev.map((x) => (x.id === item.id ? item : x));
+                }
+
+                return [...prev, item];
+            });
         }, []);
 
         const unregisterItem = useCallback((id: string) => {
-            itemRefs.current.delete(id);
+            setItems((prev) => prev.filter((item) => item.id !== id));
         }, []);
 
         return (
@@ -68,7 +78,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                 value={{
                     mobileOpen,
                     setMobileOpen,
-                    itemRefs,
+                    focusableList,
                     registerItem,
                     unregisterItem,
                 }}
@@ -139,66 +149,61 @@ const NavbarItems = forwardRef<HTMLDivElement, NavbarItemsProps>(
 
 const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
     ({ children, className, active = false, disabled = false, render, ...rest }, ref) => {
-        const [focusedVisible, setFocusedVisible] = useState(false);
         const [pressed, setPressed] = useState(false);
 
-        const { registerItem, unregisterItem, itemRefs } = useNavbarContext();
+        const { focusableList, registerItem, unregisterItem } = useNavbarContext();
 
         const id = useStableId();
 
+        const {
+            focusedId,
+            focusNext,
+            focusFirst,
+            focusLast,
+            focusById,
+            setFocusedId,
+            setFocusedVisibleId,
+            setRef,
+        } = focusableList;
+
+        useEffect(() => {
+            registerItem({
+                id,
+                disabled,
+            });
+
+            return () => {
+                unregisterItem(id);
+            };
+        }, [id, disabled, registerItem, unregisterItem]);
+
         const handleKeyDown = (e: React.KeyboardEvent) => {
-            const items = Array.from(itemRefs.current.entries()).filter(
-                (entry): entry is [string, HTMLElement] => Boolean(entry[1]),
-            );
-
-            const currentIndex = items.findIndex(([itemId]) => itemId === id);
-
-            if (currentIndex === -1) return;
-
             switch (e.key) {
                 case 'ArrowRight': {
                     e.preventDefault();
-
-                    const next = items[currentIndex + 1] ?? items[0];
-
-                    next?.[1].focus();
-
+                    focusNext(1);
                     break;
                 }
 
                 case 'ArrowLeft': {
                     e.preventDefault();
-
-                    const prev = items[currentIndex - 1] ?? items[items.length - 1];
-
-                    prev?.[1].focus();
-
+                    focusNext(-1);
                     break;
                 }
 
                 case 'Home': {
                     e.preventDefault();
-
-                    items[0]?.[1].focus();
-
+                    focusFirst();
                     break;
                 }
 
                 case 'End': {
                     e.preventDefault();
-
-                    items[items.length - 1]?.[1].focus();
-
+                    focusLast();
                     break;
                 }
             }
         };
-
-        useEffect(() => {
-            return () => {
-                unregisterItem(id);
-            };
-        }, [id, unregisterItem]);
 
         return (
             <Box
@@ -212,9 +217,14 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 }}
                 onFocus={(e) => {
                     if (disabled) return;
-                    setFocusedVisible(e.currentTarget.matches(':focus-visible'));
+
+                    setFocusedId(id);
+                    setFocusedVisibleId(e.currentTarget.matches(':focus-visible') ? id : null);
                 }}
-                onBlur={() => setFocusedVisible(false)}
+                onBlur={() => {
+                    setFocusedId(null);
+                    setFocusedVisibleId(null);
+                }}
                 onMouseDown={() => {
                     if (disabled) return;
                     setPressed(true);
@@ -229,23 +239,19 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                     render({
                         disabled,
                         active,
-                        focusedVisible,
+                        focusedVisible: focusedId === id,
                         pressed,
-                        register: (el) => {
-                            registerItem(id, el);
-                        },
+                        register: setRef(id),
                     })
                 ) : (
                     <Button
-                        ref={(node) => {
-                            registerItem(id, node);
-                        }}
+                        ref={setRef(id)}
                         type="button"
                         tabIndex={-1}
                         variant="base"
                         intent="secondary"
                         disabled={disabled}
-                        pseudoFocused={focusedVisible}
+                        pseudoFocused={focusedId === id}
                         pseudoActive={pressed}
                         active={active}
                     >

@@ -1,13 +1,12 @@
 import React from 'react';
+import { FocusableItem, FocusableListResult } from '../hooks/useFocusableList';
 
 type NavbarContextValue = {
     mobileOpen: boolean;
     setMobileOpen: React.Dispatch<React.SetStateAction<boolean>>;
 
-    itemRefs: React.MutableRefObject<Map<string, HTMLElement | null>>;
-
-    registerItem: (id: string, node: HTMLElement | null) => void;
-
+    focusableList: FocusableListResult;
+    registerItem: (item: FocusableItem) => void;
     unregisterItem: (id: string) => void;
 };
 

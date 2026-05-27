@@ -1,6 +1,8 @@
 import React from 'react';
 import { BoxComponentProps } from '../Box/Box';
 
+export type Variant = 'base' | 'subtle' | 'solid' | 'outlined' | 'transparent';
+
 export type NavbarProps<C extends React.ElementType = 'nav'> = BoxComponentProps<
     C,
     {
