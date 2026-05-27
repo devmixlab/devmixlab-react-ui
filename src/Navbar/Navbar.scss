@@ -6,6 +6,7 @@
 
 $p: cfg.$prefix;
 $navbar-prefix: #{$p}--navbar;
+$collapse-prefix: #{$p}--collapse;
 
 .#{$navbar-prefix} {
 
@@ -15,59 +16,85 @@ $navbar-prefix: #{$p}--navbar;
         left: 0;
         z-index: 100;
         width: 100%;
-        //background-color: red;
     }
 
     &[data-bordered] {
-        border-bottom: 1px solid var(--navbar-border, rgba(0,0,0,0.08));
+        border-bottom: 1px solid var(
+            --navbar-border,
+            rgba(0,0,0,0.08)
+        );
     }
 
     &[data-elevated] {
         box-shadow: 0 6px 24px rgba(0,0,0,0.08);
     }
 
-    .#{$navbar-prefix}__inner{
+    .#{$navbar-prefix}__inner {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .#{$navbar-prefix}__header {
         display: flex;
         align-items: center;
         justify-content: space-between;
+
         min-height: 64px;
+
         padding-inline: 4px;
         padding-block: 4px;
 
-        &[data-centered] {
-            justify-content: center;
-        }
+        gap: 8px;
     }
 
-    .#{$navbar-prefix}__brand{
+    .#{$navbar-prefix}__brand {
         display: flex;
         align-items: center;
         flex-shrink: 0;
         font-weight: 600;
     }
 
-    .#{$navbar-prefix}__content{
+    .#{$navbar-prefix}__content {
         display: flex;
         align-items: center;
         justify-content: space-between;
+
         flex: 1;
+        min-width: 0;
+
+        gap: 8px;
     }
 
-    .#{$navbar-prefix}__items{
+    .#{$navbar-prefix}__items {
         display: flex;
         align-items: center;
+
+        min-width: 0;
+
+        gap: 4px;
     }
 
-    .#{$navbar-prefix}__item{
+    .#{$navbar-prefix}__item {
         display: flex;
         align-items: center;
         justify-content: center;
+
         min-height: 40px;
+
         cursor: pointer;
+
         transition: background 120ms ease;
+
         &[data-active] {
-            background-color: var(--navbar-item-active-bg, rgba(0,0,0,0.06));
-            color: var(--navbar-item-active-color, inherit);
+            background-color: var(
+                --navbar-item-active-bg,
+                rgba(0,0,0,0.06)
+            );
+
+            color: var(
+                --navbar-item-active-color,
+                inherit
+            );
         }
 
         &:focus-visible {
@@ -77,18 +104,43 @@ $navbar-prefix: #{$p}--navbar;
         }
     }
 
-    .#{$navbar-prefix}__toggle{
+    .#{$navbar-prefix}__toggle {
         display: flex;
         align-items: center;
         justify-content: center;
+
+        flex-shrink: 0;
+
         width: 40px;
         height: 40px;
+
         cursor: pointer;
     }
 
-    .#{$navbar-prefix}__mobile{
+    .#{$navbar-prefix}__mobile {
         display: flex;
         flex-direction: column;
-        border-top: 1px solid var(--navbar-border, rgba(0,0,0,0.08));
+
+        width: 100%;
+
+        border-top: 1px solid var(
+            --navbar-border,
+            rgba(0,0,0,0.08)
+        );
+
+        padding-top: 8px;
+        padding-bottom: 8px;
+
+        gap: 4px;
+
+        .#{$navbar-prefix}__item {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+    .#{$collapse-prefix} {
+        overflow: hidden;
+        width: 100%;
     }
 }

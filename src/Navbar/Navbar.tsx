@@ -17,6 +17,7 @@ import {
     NavbarItemProps,
     NavbarToggleProps,
     NavbarMobileProps,
+    NavbarHeaderProps,
 } from './Navbar.types';
 import { useStableId } from '../utils/useStableId';
 import { breakpointOrder, useBreakpoint } from '../utils/responsive';
@@ -34,6 +35,7 @@ const prefix = (name = '') => classPrefix(`--navbar${name}`);
 
 type NavbarCompound = typeof NavbarRoot & {
     Brand: typeof NavbarBrand;
+    Header: typeof NavbarHeader;
     Content: typeof NavbarContent;
     Items: typeof NavbarItems;
     Item: typeof NavbarItem;
@@ -62,6 +64,12 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         const collapsed =
             collapseBreakpoint != null &&
             breakpointOrder.indexOf(breakpoint) < breakpointOrder.indexOf(collapseBreakpoint);
+
+        useEffect(() => {
+            if (!collapsed) {
+                setMobileOpen(false);
+            }
+        }, [collapsed]);
 
         const focusableList = useFocusableList(items);
 
@@ -119,6 +127,20 @@ const NavbarBrand = forwardRef<HTMLDivElement, NavbarBrandProps>(
     ({ children, className, ...rest }, ref) => {
         return (
             <Box ref={ref} className={clsx(prefix('__brand'), className)} fontSize="lg" {...rest}>
+                {children}
+            </Box>
+        );
+    },
+);
+
+// -----------------------------------------------------------------------------
+// Header
+// -----------------------------------------------------------------------------
+
+const NavbarHeader = forwardRef<HTMLDivElement, NavbarHeaderProps>(
+    ({ children, className, ...rest }, ref) => {
+        return (
+            <Box ref={ref} className={clsx(prefix('__header'), className)} {...rest}>
                 {children}
             </Box>
         );
@@ -318,20 +340,24 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
     ({ children, className, ...rest }, ref) => {
         const { mobileOpen, collapsed } = useNavbarContext();
 
-        if (!collapsed || !mobileOpen) {
+        if (!collapsed) {
             return null;
         }
 
+        // unmountOnExit;
+
         return (
-            <Box
-                ref={ref}
-                className={clsx(prefix('__mobile'), className)}
-                gap={2}
-                padding={4}
-                {...rest}
-            >
-                {children}
-            </Box>
+            <Collapse open={mobileOpen}>
+                <Box
+                    ref={ref}
+                    className={clsx(prefix('__mobile'), className)}
+                    gap={2}
+                    padding={4}
+                    {...rest}
+                >
+                    {children}
+                </Box>
+            </Collapse>
         );
     },
 );
@@ -343,6 +369,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
 export const Navbar = NavbarRoot as NavbarCompound;
 
 Navbar.Brand = NavbarBrand;
+Navbar.Header = NavbarHeader;
 Navbar.Content = NavbarContent;
 Navbar.Items = NavbarItems;
 Navbar.Item = NavbarItem;

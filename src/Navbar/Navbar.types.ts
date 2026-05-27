@@ -17,6 +17,8 @@ export type NavbarProps<C extends React.ElementType = 'nav'> = BoxComponentProps
 
 export type NavbarBrandProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
 
+export type NavbarHeaderProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
+
 export type NavbarContentProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
 
 export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
