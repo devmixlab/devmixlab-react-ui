@@ -454,13 +454,14 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
 
             const scrollPerPage = getScrollAmount() * slidesPerScroll;
             const safePageCount = Math.max(1, pageCount);
-            if (carouselDrag.isOverscrollingRef.current) {
-                return;
+            let currentIndex = activeIndexRef.current;
+
+            if (!carouselDrag.isOverscrollingRef.current) {
+                currentIndex =
+                    scrollPerPage === 0
+                        ? 0
+                        : Math.min(safePageCount - 1, Math.round(el.scrollLeft / scrollPerPage));
             }
-            const currentIndex =
-                scrollPerPage === 0
-                    ? 0
-                    : Math.min(safePageCount - 1, Math.round(el.scrollLeft / scrollPerPage));
 
             if (activeIndexRef.current !== currentIndex) {
                 setActiveIndex(currentIndex);
