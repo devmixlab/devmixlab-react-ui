@@ -386,8 +386,8 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 scrollPerPage === 0
                     ? 0
                     : Math.min(
+                          Math.max(0, Math.round(el.scrollLeft / scrollPerPage)),
                           Math.max(pageCount - 1, 0),
-                          Math.round(el.scrollLeft / scrollPerPage),
                       );
 
             // already visually synced
