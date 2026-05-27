@@ -22,6 +22,8 @@ import {
 import { useStableId } from '../utils/useStableId';
 import { breakpointOrder, useBreakpoint } from '../utils/responsive';
 import { Collapse } from '../Collapse/Collapse';
+import { mergeRefs } from '../utils/mergeRefs';
+import { useFocusTrap } from '../hooks';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -73,24 +75,6 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                 setMobileOpen(false);
             }
         }, [collapsed]);
-
-        useEffect(() => {
-            if (!mobileOpen) {
-                return;
-            }
-
-            const handleKeyDown = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') {
-                    setMobileOpen(false);
-                }
-            };
-
-            window.addEventListener('keydown', handleKeyDown);
-
-            return () => {
-                window.removeEventListener('keydown', handleKeyDown);
-            };
-        }, [mobileOpen]);
 
         const focusableList = useFocusableList(items);
 
@@ -376,7 +360,17 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
 
 const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
     ({ children, className, collapseProps, ...rest }, ref) => {
-        const { mobileOpen, collapsed, mobileId } = useNavbarContext();
+        const { mobileOpen, collapsed, mobileId, setMobileOpen } = useNavbarContext();
+
+        const containerRef = useRef<HTMLDivElement | null>(null);
+
+        useFocusTrap({
+            active: collapsed && mobileOpen,
+            containerRef,
+            onEscape: () => {
+                setMobileOpen(false);
+            },
+        });
 
         if (!collapsed) {
             return null;
@@ -385,9 +379,9 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         // unmountOnExit;
 
         return (
-            <Collapse {...collapseProps} open={mobileOpen}>
+            <Collapse {...collapseProps} keepMounted open={mobileOpen}>
                 <Box
-                    ref={ref}
+                    ref={mergeRefs(ref, containerRef)}
                     id={mobileId}
                     className={clsx(prefix('__mobile'), className)}
                     gap={2}
