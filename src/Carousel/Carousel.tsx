@@ -230,6 +230,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
         const isControlled = controlledIndex !== undefined;
 
         const activeIndexRef = useRef(controlledIndex ?? defaultActiveIndex);
+        const emittedIndexRef = useRef(controlledIndex ?? defaultActiveIndex);
         const syncingControlledScrollRef = useRef(false);
 
         const [activeIndex, setActiveIndex] = useState(controlledIndex ?? defaultActiveIndex);
@@ -453,7 +454,11 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
 
                 syncingControlledScrollRef.current = false;
 
-                if (isControlled) onActiveIndexChange?.(activeIndexRef.current);
+                if (isControlled && emittedIndexRef.current !== activeIndexRef.current) {
+                    emittedIndexRef.current = activeIndexRef.current;
+
+                    onActiveIndexChange?.(activeIndexRef.current);
+                }
             }, 100);
 
             const scrollPerPage = getScrollAmount() * slidesPerScroll;
