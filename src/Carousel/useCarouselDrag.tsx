@@ -73,6 +73,8 @@ export function useCarouselDrag({
     const lastTimeRef = useRef(0);
 
     const velocityRef = useRef(0);
+    const lastMoveTimeRef = useRef(0);
+    const lastMoveXRef = useRef(0);
 
     const overscrollRef = useRef(0);
 
@@ -267,15 +269,25 @@ export function useCarouselDrag({
 
         isMomentumRef.current = true;
 
+        const MIN_FLICK_VELOCITY = 0.32;
+
+        if (
+            Math.abs(velocityRef.current) > 0.08 &&
+            Math.abs(velocityRef.current) < MIN_FLICK_VELOCITY
+        ) {
+            velocityRef.current =
+                velocityRef.current > 0 ? MIN_FLICK_VELOCITY : -MIN_FLICK_VELOCITY;
+        }
+
         const momentum = () => {
-            velocityRef.current *= 0.95;
+            velocityRef.current *= 0.965;
 
             if (Math.abs(velocityRef.current) < 0.02) {
                 finish();
                 return;
             }
 
-            el.scrollLeft -= velocityRef.current * 20;
+            el.scrollLeft -= velocityRef.current * 18;
 
             momentumRef.current = requestAnimationFrame(momentum);
         };

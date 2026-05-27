@@ -469,7 +469,10 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 currentIndex =
                     scrollPerPage === 0
                         ? 0
-                        : Math.min(safePageCount - 1, Math.round(el.scrollLeft / scrollPerPage));
+                        : Math.min(
+                              safePageCount - 1,
+                              Math.max(0, Math.round(el.scrollLeft / scrollPerPage)),
+                          );
             }
 
             if (activeIndexRef.current !== currentIndex) {
