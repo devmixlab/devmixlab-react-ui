@@ -11,6 +11,8 @@ export { Button } from './src/Button/Button';
 export { Group as ButtonGroup } from './src/Button/Group';
 export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 
+export { ResponsiveProvider } from './src/utils/responsive';
+
 // Form
 export { TextInput } from './src/form/TextInput/TextInput';
 export { PasswordInput } from './src/form/PasswordInput/PasswordInput';

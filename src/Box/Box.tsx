@@ -1,14 +1,13 @@
 import React, { forwardRef } from 'react';
 import { DerivedProps, DerivedBox } from './core/DerivedBox';
 import clsx from 'clsx';
-import { getActiveBreakpoint, type Responsive, resolveResponsive } from './core/helpers';
 import { classPrefix } from '../utils/classPrefix';
 import { hasKey, typedEntries } from '../utils/ts';
-import { useWindowWidthContext } from './WindowWidthProvider';
-import { useWindowWidth } from '../hooks/useWindowWidth';
 import { configLookup, type PropValue } from './core/config';
 import { createPolymorphic, PolymorphicProps } from '../types/polymorphic';
 import { booleanClassMap } from './core/tokens';
+
+import { type Responsive, resolveResponsive, useBreakpoint } from '../utils/responsive';
 
 type Responsiveify<T> = {
     [K in keyof T]?: Responsive<T[K]>;
@@ -32,10 +31,7 @@ type ImplProps = {
 } & Record<string, unknown>;
 
 const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
-    const widthFromContext = useWindowWidthContext();
-    const windowWidth =
-        widthFromContext && widthFromContext > 0 ? widthFromContext : useWindowWidth();
-    const bp = getActiveBreakpoint(windowWidth);
+    const { breakpoint } = useBreakpoint();
 
     const booleanKeys = new Set(Object.keys(booleanClassMap));
     const restProps = rest;
@@ -88,7 +84,7 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         // prevent leaking boolean utility props
         // if (booleanKeys.has(key)) return;
 
-        const resolved = resolveResponsive(value, bp);
+        const resolved = resolveResponsive(value, breakpoint);
 
         if (resolved == null) return;
 
