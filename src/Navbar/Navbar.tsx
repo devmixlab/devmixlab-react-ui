@@ -362,10 +362,12 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
     ({ children, className, collapseProps, ...rest }, ref) => {
         const { mobileOpen, collapsed, mobileId, setMobileOpen } = useNavbarContext();
 
+        const [trapActive, setTrapActive] = useState(false);
+
         const containerRef = useRef<HTMLDivElement | null>(null);
 
         useFocusTrap({
-            active: collapsed && mobileOpen,
+            active: collapsed && trapActive,
             containerRef,
             onEscape: () => {
                 setMobileOpen(false);
@@ -379,7 +381,18 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         // unmountOnExit;
 
         return (
-            <Collapse {...collapseProps} keepMounted open={mobileOpen}>
+            <Collapse
+                {...collapseProps}
+                open={mobileOpen}
+                onEntered={() => {
+                    setTrapActive(true);
+                    collapseProps?.onEntered?.();
+                }}
+                onExited={() => {
+                    setTrapActive(false);
+                    collapseProps?.onExited?.();
+                }}
+            >
                 <Box
                     ref={mergeRefs(ref, containerRef)}
                     id={mobileId}

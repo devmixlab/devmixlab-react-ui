@@ -46,6 +46,11 @@ export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentPro
          * Animation effect.
          */
         effect?: CollapseEffect;
+
+        onMount?: () => void;
+        onUnmount?: () => void;
+        onEntered?: () => void;
+        onExited?: () => void;
     }
 >;
 
@@ -62,6 +67,12 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
             easing = 'ease',
             keepMounted = false,
             effect = 'height',
+
+            onMount,
+            onUnmount,
+            onEntered,
+            onExited,
+
             children,
             className,
             ...rest
@@ -78,6 +89,10 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
             present: open,
             enterDuration: shouldAnimate ? enterDuration : 0,
             exitDuration: shouldAnimate ? exitDuration : 0,
+            onMount,
+            onUnmount,
+            onEntered,
+            onExited,
         });
 
         // -----------------------------------------------------------------------------
