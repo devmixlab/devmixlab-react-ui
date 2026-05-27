@@ -237,11 +237,13 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
         const [canScrollPrev, setCanScrollPrev] = useState(false);
         const [canScrollNext, setCanScrollNext] = useState(true);
 
+        // Runs only on mount once
         useEffect(() => {
             const index = controlledIndex ?? defaultActiveIndex;
             scrollTo(index, 0);
         }, []);
 
+        // clear timeout on unmount
         useEffect(() => {
             return () => {
                 if (scrollStopTimeoutRef.current != null) {
@@ -250,11 +252,13 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             };
         }, []);
 
+        // sync controlled mode controlledIndex with carousel
         useEffect(() => {
             if (!isControlled) return;
             scrollTo(controlledIndex);
         }, [controlledIndex, isControlled]);
 
+        // clear animation on unmount
         useEffect(() => {
             return () => {
                 if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
