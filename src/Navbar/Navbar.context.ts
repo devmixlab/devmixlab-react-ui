@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { FocusableItem, FocusableListResult } from '../hooks/useFocusableList';
+
+// -----------------------------------------------------------------------------
+// NavbarContext
+// -----------------------------------------------------------------------------
 
 type NavbarContextValue = {
     mobileOpen: boolean;
     setMobileOpen: React.Dispatch<React.SetStateAction<boolean>>;
+
+    rootRef: React.MutableRefObject<HTMLDivElement | null>;
 
     mobileId: string;
 
@@ -15,10 +21,10 @@ type NavbarContextValue = {
     closeOnSelect: boolean;
 };
 
-const NavbarContext = React.createContext<NavbarContextValue | null>(null);
+const NavbarContext = createContext<NavbarContextValue | null>(null);
 
 const useNavbarContext = () => {
-    const ctx = React.useContext(NavbarContext);
+    const ctx = useContext(NavbarContext);
 
     if (!ctx) {
         throw new Error('Navbar components must be used inside <Navbar>');
@@ -28,5 +34,23 @@ const useNavbarContext = () => {
 };
 
 export { NavbarContext, useNavbarContext };
-
 export type { NavbarContextValue };
+
+// -----------------------------------------------------------------------------
+// NavbarMobileContext
+// -----------------------------------------------------------------------------
+
+type NavbarMobileContextValue = {
+    insideMobile: boolean;
+};
+
+const NavbarMobileContext = createContext<NavbarMobileContextValue>({
+    insideMobile: false,
+});
+
+const useNavbarMobileContext = () => {
+    return useContext(NavbarMobileContext);
+};
+
+export { NavbarMobileContext, useNavbarMobileContext };
+export type { NavbarMobileContextValue };

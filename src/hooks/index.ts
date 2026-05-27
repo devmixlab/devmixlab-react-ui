@@ -5,3 +5,7 @@ export { usePresence } from './usePresence';
 export { useReducedMotion } from './useReducedMotion';
 export { useTypeahead } from './useTypeahead';
 export { useWindowWidth } from './useWindowWidth';
+export { useRestoreFocus } from './useRestoreFocus';
+export { useEscapeKey } from './useEscapeKey';
+export { useFocusOutside } from './useFocusOutside';
+export { usePointerOutside } from './usePointerOutside';
