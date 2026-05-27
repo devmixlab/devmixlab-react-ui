@@ -147,7 +147,9 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
         const id = useStableId();
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
-            const items = Array.from(itemRefs.current.entries()).filter(([, node]) => node);
+            const items = Array.from(itemRefs.current.entries()).filter(
+                (entry): entry is [string, HTMLElement] => Boolean(entry[1]),
+            );
 
             const currentIndex = items.findIndex(([itemId]) => itemId === id);
 
@@ -159,7 +161,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
                     const next = items[currentIndex + 1] ?? items[0];
 
-                    next?.[1]?.focus();
+                    next?.[1].focus();
 
                     break;
                 }
@@ -169,7 +171,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
                     const prev = items[currentIndex - 1] ?? items[items.length - 1];
 
-                    prev?.[1]?.focus();
+                    prev?.[1].focus();
 
                     break;
                 }
@@ -177,7 +179,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 case 'Home': {
                     e.preventDefault();
 
-                    items[0]?.[1]?.focus();
+                    items[0]?.[1].focus();
 
                     break;
                 }
@@ -185,7 +187,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 case 'End': {
                     e.preventDefault();
 
-                    items[items.length - 1]?.[1]?.focus();
+                    items[items.length - 1]?.[1].focus();
 
                     break;
                 }
