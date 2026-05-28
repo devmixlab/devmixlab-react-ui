@@ -143,12 +143,6 @@ $accordion-prefix: #{$p}--accordion;
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         }
-
-        .#{$accordion-prefix}__chevron {
-            transform: var(--accordion-icon-transform);
-            opacity: 1;
-            color: var(--accordion-icon-active-color);
-        }
     }
 }
 
@@ -226,6 +220,12 @@ $accordion-prefix: #{$p}--accordion;
     opacity: 0.8;
 
     transition: var(--accordion-icon-transition);
+
+    &[data-state='open'] {
+        transform: var(--accordion-icon-transform);
+        opacity: 1;
+        color: var(--accordion-icon-active-color);
+    }
 }
 
 .#{$accordion-prefix}__content {
