@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useRef, useCallback, useEffect } from 'react';
+import React, { forwardRef, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 
 import { clsx } from 'clsx';
 
@@ -85,6 +85,16 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         const [mobileOpen, setMobileOpen] = useState(false);
         const [items, setItems] = useState<FocusableItem[]>([]);
 
+        const nestedLayersRef = useRef(new Set<HTMLElement>());
+
+        const registerNestedLayer = useCallback((node: HTMLElement) => {
+            nestedLayersRef.current.add(node);
+        }, []);
+
+        const unregisterNestedLayer = useCallback((node: HTMLElement) => {
+            nestedLayersRef.current.delete(node);
+        }, []);
+
         const rootRef = useRef<HTMLDivElement | null>(null);
         const toggleRef = useRef<HTMLButtonElement | null>(null);
 
@@ -137,6 +147,10 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                     closeOnEscape,
                     closeOnFocusOutside,
                     closeOnPointerOutside,
+
+                    nestedLayersRef,
+                    registerNestedLayer,
+                    unregisterNestedLayer,
                 }}
             >
                 {collapsed && mobileOpen && backdrop && closeOnPointerOutside && (
@@ -245,6 +259,8 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
             closeOnSelect,
             collapsed,
             setMobileOpen,
+            registerNestedLayer,
+            unregisterNestedLayer,
         } = useNavbarContext();
 
         const id = useStableId();
@@ -300,6 +316,24 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
             }
         };
 
+        const createNestedLayerRef = useCallback(() => {
+            let current: HTMLElement | null = null;
+
+            return (node: HTMLElement | null) => {
+                if (current) {
+                    unregisterNestedLayer(current);
+                }
+
+                if (node) {
+                    registerNestedLayer(node);
+                }
+
+                current = node;
+            };
+        }, [registerNestedLayer, unregisterNestedLayer]);
+
+        const nestedLayerRef = useMemo(() => createNestedLayerRef(), [createNestedLayerRef]);
+
         return (
             <Box
                 tabIndex={disabled ? -1 : 0}
@@ -343,7 +377,8 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                         active,
                         focusedVisible: focusedId === id,
                         pressed,
-                        register: setRef(id),
+                        focusableRef: setRef(id),
+                        nestedLayerRef,
                     })
                 ) : !insideMobile ? (
                     <Button
@@ -440,6 +475,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
             closeOnEscape,
             closeOnFocusOutside,
             closeOnPointerOutside,
+            nestedLayersRef,
         } = useNavbarContext();
 
         const [trapActive, setTrapActive] = useState(false);
@@ -447,10 +483,20 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         const containerRef = useRef<HTMLDivElement | null>(null);
 
         usePointerOutside({
-            active: mobileOpen && closeOnPointerOutside,
+            active: mobileOpen && closeOnPointerOutside && false,
             containerRef: rootRef,
             excludeRefs: [toggleRef],
-            onPointerOutside: () => {
+            onPointerOutside: (event) => {
+                const target = event.target as Node;
+
+                const isInsideNestedLayer = nestedLayersRef.current?.size
+                    ? [...nestedLayersRef.current].some((node) => node.contains(target))
+                    : false;
+
+                if (isInsideNestedLayer) {
+                    return;
+                }
+
                 setMobileOpen(false);
             },
         });
@@ -476,7 +522,17 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         useFocusOutside({
             active: mobileOpen && !focusTrap && closeOnFocusOutside,
             containerRef,
-            onOutsideFocus: () => {
+            onOutsideFocus: (event) => {
+                const target = event.target as Node;
+
+                const isInsideNestedLayer = nestedLayersRef.current?.size
+                    ? [...nestedLayersRef.current].some((node) => node.contains(target))
+                    : false;
+
+                if (isInsideNestedLayer) {
+                    return;
+                }
+
                 setMobileOpen(false);
             },
         });

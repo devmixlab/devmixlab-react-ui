@@ -25,6 +25,10 @@ type NavbarContextValue = {
     closeOnEscape: boolean;
     closeOnFocusOutside: boolean;
     closeOnPointerOutside: boolean;
+
+    registerNestedLayer: (node: HTMLElement) => void;
+    unregisterNestedLayer: (node: HTMLElement) => void;
+    nestedLayersRef: React.RefObject<Set<HTMLElement>>;
 };
 
 const NavbarContext = createContext<NavbarContextValue | null>(null);

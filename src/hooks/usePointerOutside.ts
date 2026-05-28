@@ -4,7 +4,7 @@ type UsePointerOutsideOptions = {
     active: boolean;
     containerRef: RefObject<HTMLElement | null>;
     excludeRefs?: RefObject<HTMLElement | null>[];
-    onPointerOutside: () => void;
+    onPointerOutside: (e: PointerEvent) => void;
 };
 
 export const usePointerOutside = ({
@@ -32,7 +32,7 @@ export const usePointerOutside = ({
             const isInsideExcluded = excludeRefs.some((ref) => ref.current?.contains(target));
 
             if (!isInsideContainer && !isInsideExcluded) {
-                onPointerOutside();
+                onPointerOutside(e);
             }
         };
 

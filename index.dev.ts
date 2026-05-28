@@ -36,7 +36,9 @@ export { Popover } from './src/Popover';
 export { Collapse } from './src/Collapse/Collapse';
 export { Accordion } from './src/Accordion/Accordion';
 export { Carousel } from './src/Carousel/Carousel';
+
 export { Navbar } from './src/Navbar/Navbar';
+export { useNavbarMobileContext } from './src/Navbar/Navbar.context';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';
 

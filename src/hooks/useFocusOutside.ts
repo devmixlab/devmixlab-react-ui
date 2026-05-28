@@ -3,7 +3,7 @@ import { RefObject, useEffect } from 'react';
 type UseFocusOutsideOptions = {
     active: boolean;
     containerRef: RefObject<HTMLElement | null>;
-    onOutsideFocus: () => void;
+    onOutsideFocus: (event: FocusEvent) => void;
 };
 
 export const useFocusOutside = ({
@@ -18,11 +18,11 @@ export const useFocusOutside = ({
 
         if (!container) return;
 
-        const handleFocusIn = () => {
-            const activeElement = document.activeElement;
+        const handleFocusIn = (event: FocusEvent) => {
+            const target = event.target;
 
-            if (activeElement instanceof HTMLElement && !container.contains(activeElement)) {
-                onOutsideFocus();
+            if (target instanceof HTMLElement && !container.contains(target)) {
+                onOutsideFocus(event);
             }
         };
 

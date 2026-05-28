@@ -31,12 +31,48 @@ export type NavbarContentProps<C extends React.ElementType = 'div'> = BoxCompone
 
 export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
 
-export type NavbarItemRenderProps = {
+// export type NavbarItemRenderProps = {
+//     disabled: boolean;
+//     active: boolean;
+//     focusedVisible: boolean;
+//     pressed: boolean;
+//     register: (node: HTMLElement | null) => void;
+//     registerNestedLayer: (node: HTMLElement) => void;
+// };
+
+type NavbarItemRenderProps = {
+    /**
+     * Whether the item interaction is disabled.
+     */
     disabled: boolean;
+
+    /**
+     * Whether the item represents the current active route/state.
+     */
     active: boolean;
+
+    /**
+     * Whether the item currently has keyboard-visible focus.
+     */
     focusedVisible: boolean;
+
+    /**
+     * Whether the item is currently being pressed/clicked.
+     */
     pressed: boolean;
-    register: (node: HTMLElement | null) => void;
+
+    /**
+     * Ref callback used to register the trigger element
+     * into the navbar roving focus / keyboard navigation system.
+     */
+    focusableRef: (node: HTMLElement | null) => void;
+
+    /**
+     * Ref callback used to register portaled overlays
+     * (popover panels, dropdown menus, submenus, etc.)
+     * as logically inside the navbar interaction tree.
+     */
+    nestedLayerRef: (node: HTMLElement | null) => void;
 };
 
 export type NavbarItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<
