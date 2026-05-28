@@ -84,6 +84,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
     ) => {
         const [mobileOpen, setMobileOpen] = useState(false);
         const [items, setItems] = useState<FocusableItem[]>([]);
+        const [mobileItems, setMobileItems] = useState<FocusableItem[]>([]);
 
         const nestedLayersRef = useRef(new Set<HTMLElement>());
 
@@ -112,6 +113,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         }, [collapsed]);
 
         const focusableList = useFocusableList(items);
+        const focusableMobileList = useFocusableList(mobileItems);
 
         const registerItem = useCallback((item: FocusableItem) => {
             setItems((prev) => {
@@ -136,6 +138,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                     setMobileOpen,
                     mobileId,
                     focusableList,
+                    focusableMobileList,
                     registerItem,
                     unregisterItem,
                     collapsed,
@@ -254,6 +257,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
         const {
             focusableList,
+            focusableMobileList,
             registerItem,
             unregisterItem,
             closeOnSelect,
@@ -265,6 +269,8 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
         const id = useStableId();
 
+        const currentFocusableList = insideMobile ? focusableMobileList : focusableList;
+
         const {
             focusedId,
             focusedVisibleId,
@@ -275,7 +281,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
             setFocusedId,
             setFocusedVisibleId,
             setRef,
-        } = focusableList;
+        } = currentFocusableList;
 
         useEffect(() => {
             registerItem({

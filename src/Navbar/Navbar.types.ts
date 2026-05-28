@@ -40,7 +40,7 @@ export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponent
 //     registerNestedLayer: (node: HTMLElement) => void;
 // };
 
-type NavbarItemRenderProps = {
+export type NavbarItemRenderProps = {
     /**
      * Whether the item interaction is disabled.
      */

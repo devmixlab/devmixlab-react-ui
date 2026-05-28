@@ -15,6 +15,7 @@ type NavbarContextValue = {
     mobileId: string;
 
     focusableList: FocusableListResult;
+    focusableMobileList: FocusableListResult;
     registerItem: (item: FocusableItem) => void;
     unregisterItem: (id: string) => void;
 
