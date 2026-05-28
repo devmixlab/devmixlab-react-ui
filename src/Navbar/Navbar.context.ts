@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { FocusableItem, FocusableListResult } from '../hooks/useFocusableList';
+import { FocusScope } from './Navbar.types';
 
 // -----------------------------------------------------------------------------
 // NavbarContext
@@ -16,8 +17,8 @@ type NavbarContextValue = {
 
     focusableList: FocusableListResult;
     focusableMobileList: FocusableListResult;
-    registerItem: (item: FocusableItem) => void;
-    unregisterItem: (id: string) => void;
+    registerItem: (item: FocusableItem, scope: FocusScope) => void;
+    unregisterItem: (id: string, scope: FocusScope) => void;
 
     collapsed: boolean;
     closeOnSelect: boolean;

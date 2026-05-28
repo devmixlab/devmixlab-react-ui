@@ -40,6 +40,8 @@ export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponent
 //     registerNestedLayer: (node: HTMLElement) => void;
 // };
 
+export type FocusScope = 'desktop' | 'mobile';
+
 export type NavbarItemRenderProps = {
     /**
      * Whether the item interaction is disabled.

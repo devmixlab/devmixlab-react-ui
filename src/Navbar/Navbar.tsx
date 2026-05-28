@@ -25,6 +25,7 @@ import {
     NavbarToggleProps,
     NavbarMobileProps,
     NavbarHeaderProps,
+    FocusScope,
 } from './Navbar.types';
 import { useStableId } from '../utils/useStableId';
 import { breakpointOrder, useBreakpoint } from '../utils/responsive';
@@ -115,8 +116,10 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         const focusableList = useFocusableList(items);
         const focusableMobileList = useFocusableList(mobileItems);
 
-        const registerItem = useCallback((item: FocusableItem) => {
-            setItems((prev) => {
+        const registerItem = useCallback((item: FocusableItem, scope: FocusScope) => {
+            const setter = scope === 'mobile' ? setMobileItems : setItems;
+
+            setter((prev) => {
                 const exists = prev.some((x) => x.id === item.id);
 
                 if (exists) {
@@ -127,8 +130,9 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
             });
         }, []);
 
-        const unregisterItem = useCallback((id: string) => {
-            setItems((prev) => prev.filter((item) => item.id !== id));
+        const unregisterItem = useCallback((id: string, scope: FocusScope) => {
+            const setter = scope === 'mobile' ? setMobileItems : setItems;
+            setter((prev) => prev.filter((item) => item.id !== id));
         }, []);
 
         return (
@@ -284,13 +288,16 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
         } = currentFocusableList;
 
         useEffect(() => {
-            registerItem({
-                id,
-                disabled,
-            });
+            registerItem(
+                {
+                    id,
+                    disabled,
+                },
+                insideMobile ? 'mobile' : 'desktop',
+            );
 
             return () => {
-                unregisterItem(id);
+                unregisterItem(id, insideMobile ? 'mobile' : 'desktop');
             };
         }, [id, disabled, registerItem, unregisterItem]);
 
@@ -355,6 +362,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 onKeyDown={(e) => {
                     if (disabled) return;
                     handleKeyDown(e);
+                    console.log('handleKeyDown');
                     rest.onKeyDown?.(e);
                 }}
                 onFocus={(e) => {
@@ -381,7 +389,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                     render({
                         disabled,
                         active,
-                        focusedVisible: focusedId === id,
+                        focusedVisible: focusedVisibleId === id,
                         pressed,
                         focusableRef: setRef(id),
                         nestedLayerRef,
