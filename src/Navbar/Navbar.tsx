@@ -600,19 +600,33 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
 
         useFocusOutside({
             active: mobileOpen && !focusTrap && closeOnFocusOutside,
+
             containerRef,
+
             onOutsideFocus: (event) => {
-                const target = event.target as Node;
+                requestAnimationFrame(() => {
+                    const activeElement = document.activeElement;
 
-                const isInsideNestedLayer = nestedLayersRef.current?.size
-                    ? [...nestedLayersRef.current].some((node) => node.contains(target))
-                    : false;
+                    if (!(activeElement instanceof HTMLElement)) {
+                        return;
+                    }
 
-                if (isInsideNestedLayer) {
-                    return;
-                }
+                    const isInsideContainer = containerRef.current?.contains(activeElement);
 
-                setMobileOpen(false);
+                    if (isInsideContainer) {
+                        return;
+                    }
+
+                    const isInsideNestedLayer = nestedLayersRef.current?.size
+                        ? [...nestedLayersRef.current].some((node) => node.contains(activeElement))
+                        : false;
+
+                    if (isInsideNestedLayer) {
+                        return;
+                    }
+
+                    setMobileOpen(false);
+                });
             },
         });
 
