@@ -301,31 +301,35 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
             };
         }, [id, disabled, registerItem, unregisterItem]);
 
+        const isVertical = insideMobile;
+
+        const nextKeys = isVertical ? ['ArrowDown'] : ['ArrowRight'];
+
+        const prevKeys = isVertical ? ['ArrowUp'] : ['ArrowLeft'];
+
         const handleKeyDown = (e: React.KeyboardEvent) => {
+            if (nextKeys.includes(e.key)) {
+                e.preventDefault();
+                focusNext(1);
+                return;
+            }
+
+            if (prevKeys.includes(e.key)) {
+                e.preventDefault();
+                focusNext(-1);
+                return;
+            }
+
             switch (e.key) {
-                case 'ArrowRight': {
-                    e.preventDefault();
-                    focusNext(1);
-                    break;
-                }
-
-                case 'ArrowLeft': {
-                    e.preventDefault();
-                    focusNext(-1);
-                    break;
-                }
-
-                case 'Home': {
+                case 'Home':
                     e.preventDefault();
                     focusFirst();
                     break;
-                }
 
-                case 'End': {
+                case 'End':
                     e.preventDefault();
                     focusLast();
                     break;
-                }
             }
         };
 
