@@ -397,7 +397,19 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
 // -----------------------------------------------------------------------------
 
 const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
-    ({ children, className, collapseProps, focusTrap = false, ...rest }, ref) => {
+    (
+        {
+            children,
+            className,
+            collapseProps,
+            focusTrap = false,
+            closeOnEscape = true,
+            closeOnFocusOutside = true,
+            closeOnPointerOutside = true,
+            ...rest
+        },
+        ref,
+    ) => {
         const { mobileOpen, collapsed, mobileId, setMobileOpen, rootRef } = useNavbarContext();
 
         const [trapActive, setTrapActive] = useState(false);
@@ -405,7 +417,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         const containerRef = useRef<HTMLDivElement | null>(null);
 
         usePointerOutside({
-            active: mobileOpen,
+            active: mobileOpen && closeOnPointerOutside,
             containerRef: rootRef,
             onPointerOutside: () => {
                 setMobileOpen(false);
@@ -418,8 +430,8 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         });
 
         useEscapeKey({
-            active: mobileOpen,
-            containerRef,
+            active: mobileOpen && closeOnEscape,
+            containerRef: rootRef,
             onEscape: () => {
                 setMobileOpen(false);
             },
@@ -431,7 +443,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         });
 
         useFocusOutside({
-            active: mobileOpen && !focusTrap,
+            active: mobileOpen && !focusTrap && closeOnFocusOutside,
             containerRef,
             onOutsideFocus: () => {
                 setMobileOpen(false);

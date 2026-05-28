@@ -49,5 +49,8 @@ export type NavbarMobileProps<C extends React.ElementType = 'div'> = BoxComponen
     {
         collapseProps: Omit<CollapseProps, 'open'>;
         focusTrap?: boolean;
+        closeOnEscape?: boolean;
+        closeOnFocusOutside?: boolean;
+        closeOnPointerOutside?: boolean;
     }
 >;
