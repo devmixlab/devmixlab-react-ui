@@ -170,6 +170,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                 )}
                 <Box
                     as="nav"
+                    tabIndex={-1}
                     ref={mergeRefs(rootRef, ref)}
                     className={clsx(prefix(), className)}
                     data-sticky={sticky || undefined}
@@ -601,7 +602,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         useFocusOutside({
             active: mobileOpen && !focusTrap && closeOnFocusOutside,
 
-            containerRef,
+            containerRef: rootRef,
 
             onOutsideFocus: (event) => {
                 requestAnimationFrame(() => {
@@ -630,21 +631,21 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
             },
         });
 
-        useEffect(() => {
-            if (!mobileOpen || !closeOnEscape) return;
-
-            const handleKeyDown = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') {
-                    setMobileOpen(false);
-                }
-            };
-
-            window.addEventListener('keydown', handleKeyDown);
-
-            return () => {
-                window.removeEventListener('keydown', handleKeyDown);
-            };
-        }, [mobileOpen, closeOnEscape]);
+        // useEffect(() => {
+        //     if (!mobileOpen || !closeOnEscape) return;
+        //
+        //     const handleKeyDown = (e: KeyboardEvent) => {
+        //         if (e.key === 'Escape') {
+        //             setMobileOpen(false);
+        //         }
+        //     };
+        //
+        //     window.addEventListener('keydown', handleKeyDown);
+        //
+        //     return () => {
+        //         window.removeEventListener('keydown', handleKeyDown);
+        //     };
+        // }, [mobileOpen, closeOnEscape]);
 
         if (!collapsed) {
             return null;

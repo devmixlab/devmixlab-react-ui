@@ -15,8 +15,12 @@ export const useEscapeKey = ({ active, containerRef, onEscape }: UseEscapeKeyOpt
         if (!container) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.defaultPrevented) {
+                return;
+            }
+
             if (e.key === 'Escape') {
-                e.stopPropagation();
+                e.preventDefault();
                 onEscape();
             }
         };
