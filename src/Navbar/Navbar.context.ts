@@ -10,6 +10,7 @@ type NavbarContextValue = {
     setMobileOpen: React.Dispatch<React.SetStateAction<boolean>>;
 
     rootRef: React.MutableRefObject<HTMLDivElement | null>;
+    toggleRef: React.MutableRefObject<HTMLButtonElement | null>;
 
     mobileId: string;
 
@@ -19,6 +20,11 @@ type NavbarContextValue = {
 
     collapsed: boolean;
     closeOnSelect: boolean;
+
+    focusTrap: boolean;
+    closeOnEscape: boolean;
+    closeOnFocusOutside: boolean;
+    closeOnPointerOutside: boolean;
 };
 
 const NavbarContext = createContext<NavbarContextValue | null>(null);

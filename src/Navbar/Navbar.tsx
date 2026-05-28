@@ -71,6 +71,13 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
             centered = false,
             collapseBreakpoint = 'md',
             closeOnSelect = true,
+            backdrop = true,
+
+            focusTrap = false,
+            closeOnEscape = true,
+            closeOnFocusOutside = true,
+            closeOnPointerOutside = true,
+
             ...rest
         },
         ref,
@@ -79,6 +86,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         const [items, setItems] = useState<FocusableItem[]>([]);
 
         const rootRef = useRef<HTMLDivElement | null>(null);
+        const toggleRef = useRef<HTMLButtonElement | null>(null);
 
         const mobileId = useStableId();
 
@@ -123,8 +131,22 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                     collapsed,
                     closeOnSelect,
                     rootRef,
+                    toggleRef,
+
+                    focusTrap,
+                    closeOnEscape,
+                    closeOnFocusOutside,
+                    closeOnPointerOutside,
                 }}
             >
+                {collapsed && mobileOpen && backdrop && closeOnPointerOutside && (
+                    <Box
+                        className={prefix('__backdrop')}
+                        onPointerDown={() => {
+                            setMobileOpen(false);
+                        }}
+                    />
+                )}
                 <Box
                     as="nav"
                     ref={mergeRefs(rootRef, ref)}
@@ -366,7 +388,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
 const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
     ({ children, className, ...rest }, ref) => {
-        const { mobileOpen, setMobileOpen, collapsed, mobileId } = useNavbarContext();
+        const { mobileOpen, setMobileOpen, collapsed, mobileId, toggleRef } = useNavbarContext();
 
         if (!collapsed) {
             return null;
@@ -375,14 +397,14 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
         return (
             <Box
                 as="button"
-                ref={ref}
+                ref={mergeRefs(toggleRef, ref)}
                 className={clsx(prefix('__toggle'), className)}
                 type="button"
                 borderRadius="md"
                 aria-expanded={mobileOpen}
                 aria-label="Toggle navigation"
                 aria-controls={mobileId}
-                onClick={() => setMobileOpen((prev) => !prev)}
+                onPointerDown={() => setMobileOpen((prev) => !prev)}
                 data-mobile-opened={mobileOpen}
                 {...rest}
             >
@@ -402,15 +424,23 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
             children,
             className,
             collapseProps,
-            focusTrap = false,
-            closeOnEscape = true,
-            closeOnFocusOutside = true,
-            closeOnPointerOutside = true,
+
             ...rest
         },
         ref,
     ) => {
-        const { mobileOpen, collapsed, mobileId, setMobileOpen, rootRef } = useNavbarContext();
+        const {
+            mobileOpen,
+            collapsed,
+            mobileId,
+            setMobileOpen,
+            rootRef,
+            toggleRef,
+            focusTrap,
+            closeOnEscape,
+            closeOnFocusOutside,
+            closeOnPointerOutside,
+        } = useNavbarContext();
 
         const [trapActive, setTrapActive] = useState(false);
 
@@ -419,6 +449,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
         usePointerOutside({
             active: mobileOpen && closeOnPointerOutside,
             containerRef: rootRef,
+            excludeRefs: [toggleRef],
             onPointerOutside: () => {
                 setMobileOpen(false);
             },
@@ -449,6 +480,22 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
                 setMobileOpen(false);
             },
         });
+
+        useEffect(() => {
+            if (!mobileOpen || !closeOnEscape) return;
+
+            const handleKeyDown = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') {
+                    setMobileOpen(false);
+                }
+            };
+
+            window.addEventListener('keydown', handleKeyDown);
+
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown);
+            };
+        }, [mobileOpen, closeOnEscape]);
 
         if (!collapsed) {
             return null;

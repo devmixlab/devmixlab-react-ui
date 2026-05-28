@@ -14,6 +14,12 @@ export type NavbarProps<C extends React.ElementType = 'nav'> = BoxComponentProps
         centered?: boolean;
         collapseBreakpoint?: Breakpoint;
         closeOnSelect?: boolean;
+        backdrop?: boolean;
+
+        focusTrap?: boolean;
+        closeOnEscape?: boolean;
+        closeOnFocusOutside?: boolean;
+        closeOnPointerOutside?: boolean;
     }
 >;
 
