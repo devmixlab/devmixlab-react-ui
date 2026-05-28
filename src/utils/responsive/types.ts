@@ -12,3 +12,7 @@ export type ResponsiveObject<T> = {
 };
 
 export type Responsive<T> = T | ResponsiveObject<T>;
+
+export type Responsiveify<T> = {
+    [K in keyof T]?: Responsive<T[K]>;
+};

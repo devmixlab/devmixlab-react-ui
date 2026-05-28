@@ -19,3 +19,4 @@ export { Archive } from './Archive';
 export { Audio } from './Audio';
 export { Video } from './Video';
 export { File } from './File';
+export { Burger } from './Burger';

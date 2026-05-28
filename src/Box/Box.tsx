@@ -9,7 +9,7 @@ import { booleanClassMap } from './core/tokens';
 
 import { type Responsive, resolveResponsive, useBreakpoint } from '../utils/responsive';
 
-type Responsiveify<T> = {
+export type Responsiveify<T> = {
     [K in keyof T]?: Responsive<T[K]>;
 };
 

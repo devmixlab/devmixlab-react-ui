@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 
 import { Box, BoxComponentProps } from '../Box/Box';
 import { classPrefix } from '../utils/classPrefix';
-import { Button } from '../Button/Button';
+import { Button, ButtonProps } from '../Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import {
     NavbarContext,
@@ -38,6 +38,8 @@ import {
     useFocusOutside,
     usePointerOutside,
 } from '../hooks';
+
+import { Burger as BurgerIcon } from '../Icon';
 
 import { Card } from '../Card';
 
@@ -457,7 +459,7 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
         }
 
         return (
-            <Box
+            <Button
                 as="button"
                 onKeyDown={(e) => {
                     if ((e.key === 'Enter' || e.key === ' ') && !mobileOpen) {
@@ -512,10 +514,12 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
                         }
                     }
                 }}
+                iconOnly
+                intent="secondary"
+                active={mobileOpen}
                 ref={mergeRefs(toggleRef, ref)}
                 className={clsx(prefix('__toggle'), className)}
                 type="button"
-                borderRadius="md"
                 aria-expanded={mobileOpen}
                 aria-label="Toggle navigation"
                 aria-controls={mobileId}
@@ -523,8 +527,8 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
                 data-mobile-opened={mobileOpen}
                 {...rest}
             >
-                {children ?? '☰'}
-            </Box>
+                {children ?? <BurgerIcon />}
+            </Button>
         );
     },
 );

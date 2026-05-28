@@ -123,6 +123,13 @@ $collapse-prefix: #{$p}--collapse;
         height: 40px;
 
         cursor: pointer;
+
+        //background-color: gray;
+        //
+        //svg {
+        //    width: 30px;
+        //    height: 30px;
+        //}
     }
 
     .#{$navbar-prefix}__mobile {
