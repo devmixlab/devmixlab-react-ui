@@ -441,7 +441,15 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
 const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
     ({ children, className, ...rest }, ref) => {
-        const { mobileOpen, setMobileOpen, collapsed, mobileId, toggleRef } = useNavbarContext();
+        const {
+            mobileOpen,
+            setMobileOpen,
+            collapsed,
+            mobileId,
+            toggleRef,
+            focusableMobileList,
+            focusTrap,
+        } = useNavbarContext();
 
         if (!collapsed) {
             return null;
@@ -450,6 +458,59 @@ const NavbarToggle = forwardRef<HTMLButtonElement, NavbarToggleProps>(
         return (
             <Box
                 as="button"
+                onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !mobileOpen) {
+                        e.preventDefault();
+
+                        setMobileOpen(true);
+
+                        if (focusTrap) {
+                            requestAnimationFrame(() => {
+                                focusableMobileList.focusFirst(true);
+                            });
+                        }
+
+                        return;
+                    }
+
+                    if (!mobileOpen) {
+                        return;
+                    }
+
+                    switch (e.key) {
+                        case 'ArrowDown': {
+                            e.preventDefault();
+
+                            focusableMobileList.focusFirst(true);
+
+                            break;
+                        }
+
+                        case 'ArrowUp': {
+                            e.preventDefault();
+
+                            focusableMobileList.focusLast(true);
+
+                            break;
+                        }
+
+                        case 'Home': {
+                            e.preventDefault();
+
+                            focusableMobileList.focusFirst(true);
+
+                            break;
+                        }
+
+                        case 'End': {
+                            e.preventDefault();
+
+                            focusableMobileList.focusLast(true);
+
+                            break;
+                        }
+                    }
+                }}
                 ref={mergeRefs(toggleRef, ref)}
                 className={clsx(prefix('__toggle'), className)}
                 type="button"
