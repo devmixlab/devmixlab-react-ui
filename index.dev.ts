@@ -37,6 +37,9 @@ export { Collapse } from './src/Collapse/Collapse';
 export { Accordion } from './src/Accordion/Accordion';
 export { Carousel } from './src/Carousel/Carousel';
 
+export { Container } from './src/Container/Container';
+export { ContainerProvider } from './src/Container/ContainerProvider';
+
 export { Navbar } from './src/Navbar/Navbar';
 export { useNavbarMobileContext } from './src/Navbar/Navbar.context';
 

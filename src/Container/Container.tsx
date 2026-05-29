@@ -1,30 +1,23 @@
 import React, { forwardRef } from 'react';
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps, Responsiveify } from '../Box/Box';
+import { Box, BoxComponentProps } from '../Box/Box';
 
 import { classPrefix } from '../utils/classPrefix';
-import { Breakpoint, breakpoints, resolveResponsive, useBreakpoint } from '../utils/responsive';
+
+import {
+    Breakpoint,
+    breakpoints,
+    resolveResponsive,
+    useBreakpoint,
+    Responsiveify,
+} from '../utils/responsive';
+
+import { useContainerContext } from './Container.context';
 
 const prefix = (name = '') => classPrefix(`--container${name}`);
 
 export type ContainerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
-
-// export type ContainerProps = BoxComponentProps<
-//     'div',
-//     {
-//         /**
-//          * Controls the maximum width
-//          * of the container.
-//          */
-//         size?: ContainerSize;
-//
-//         /**
-//          * Centers the container horizontally.
-//          */
-//         centered?: boolean;
-//     }
-// >;
 
 type ContainerOwnProps = Responsiveify<{
     /**
@@ -54,23 +47,32 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
     (
         {
             className,
-            size: containerSize = 'lg',
+
+            size: containerSize,
+
+            centered: containerCentered,
+
             px = 'md',
-            centered: containerCentered = true,
-            style,
+
             ...rest
         },
         ref,
     ) => {
         const { breakpoint } = useBreakpoint();
 
-        const size = resolveResponsive(containerSize, breakpoint);
-        const centered = resolveResponsive(containerCentered, breakpoint);
+        const context = useContainerContext();
+
+        const resolvedSize = resolveResponsive(containerSize ?? context.size ?? 'lg', breakpoint);
+
+        const resolvedCentered = resolveResponsive(
+            containerCentered ?? context.centered ?? true,
+            breakpoint,
+        );
 
         const maxWidth =
-            size === 'full'
-                ? undefined
-                : `${breakpoints[containerSizeMap[size as Exclude<ContainerSize, 'full'>]]}px`;
+            resolvedSize && resolvedSize !== 'full'
+                ? `${breakpoints[containerSizeMap[resolvedSize]]}px`
+                : undefined;
 
         return (
             <Box
@@ -78,12 +80,11 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
                 w="full"
                 px={px}
                 className={clsx(prefix(), className)}
-                style={{
-                    maxWidth,
-                    marginInline: centered ? 'auto' : undefined,
-                    ...style,
-                }}
+                maxW={maxWidth}
+                marginInline={resolvedCentered ? 'auto' : undefined}
                 {...rest}
+                data-size={resolvedSize}
+                data-centered={resolvedCentered}
             />
         );
     },
