@@ -91,9 +91,14 @@ type PopoverProps = {
     onReady?: () => void;
 };
 
+export type TriggerProps = Omit<React.HTMLAttributes<HTMLElement>, 'ref'> & {
+    ref?: React.Ref<HTMLElement>;
+};
+
 type TriggerRenderProps = {
     disabled: boolean;
     opened: boolean;
+    triggerProps: TriggerProps;
     // focusedVisible: boolean;
     // pressed: boolean;
 };
@@ -104,7 +109,7 @@ type TriggerRenderProps = {
 //     chevron?: boolean;
 //     render?: (props: TriggerRenderProps) => React.ReactNode;
 // };
-type PopoverTriggerProps = React.HTMLAttributes<HTMLDivElement> & {
+type PopoverTriggerProps = React.HTMLAttributes<HTMLElement> & {
     className?: string;
     children?: React.ReactNode;
     chevron?: boolean;
@@ -294,92 +299,72 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
 
         const combinedRef = mergeRefs(refs.setReference, ref);
 
-        // ------------------------------------------------------------------
-        // Trigger press state
-        // ------------------------------------------------------------------
-
-        // const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
-        // const [pressed, setPressed] = useState(false);
-
         const handleKeyDown = (e: React.KeyboardEvent) => {
-            const key = e.key;
-
-            if (key === 'Enter' || key === ' ') {
+            if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                // setPressed(true);
                 setOpened(!opened);
             }
         };
 
-        return (
-            <Box
-                {...rest}
-                ref={combinedRef}
-                id={triggerId}
-                {...getReferenceProps()}
-                className={clsx(prefix('__trigger'), className)}
-                onClick={() => {
-                    if (disabled) return;
+        const triggerProps = {
+            ...rest,
+            ...getReferenceProps(),
+
+            ref: combinedRef,
+            id: triggerId,
+
+            onClick: () => {
+                if (!disabled) {
                     setOpened(!opened);
-                }}
-                // tabIndex={disabled ? -1 : 0}
-                // onFocus={(e) => {
-                //     if (disabled) return;
-                //     setTriggerFocusedVisible(e.currentTarget.matches(':focus-visible'));
-                // }}
-                // onBlur={() => setTriggerFocusedVisible(false)}
-                onKeyDown={(e) => {
-                    if (disabled) return;
+                }
+            },
+
+            onKeyDown: (e: React.KeyboardEvent) => {
+                if (!disabled) {
                     handleKeyDown(e);
-                    rest.onKeyDown?.(e);
-                }}
-                // onKeyUp={(e: React.KeyboardEvent) => {
-                //     if (e.key === 'Enter' || e.key === ' ') setPressed(false);
-                // }}
-                // onMouseDown={() => {
-                //     if (disabled) return;
-                //     setPressed(true);
-                // }}
-                // onMouseUp={() => setPressed(false)}
-                // onMouseLeave={() => setPressed(false)}
-                aria-expanded={opened}
-                aria-controls={opened ? panelId : undefined}
-                aria-haspopup={role}
+                }
+
+                rest.onKeyDown?.(e as React.KeyboardEvent<HTMLElement>);
+            },
+
+            'aria-expanded': opened,
+            'aria-controls': opened ? panelId : undefined,
+            'aria-haspopup': role,
+        };
+
+        if (render) {
+            return render({
+                disabled: !!disabled,
+                opened,
+                triggerProps,
+            });
+        }
+
+        return (
+            <Button
+                {...triggerProps}
+                type="button"
+                disabled={disabled}
+                className={clsx(prefix('__trigger-button'), className)}
+                active={opened}
+                {...btnProps}
+                endIcon={
+                    chevron && (
+                        <ChevronDownIcon
+                            className={prefix('__chevron')}
+                            data-opened={opened || undefined}
+                            aria-hidden
+                        />
+                    )
+                }
             >
-                {render ? (
-                    render({
-                        disabled: !!disabled,
-                        opened,
-                        // focusedVisible: triggerFocusedVisible,
-                        // pressed,
-                    })
-                ) : (
-                    <Button
-                        type="button"
-                        // tabIndex={-1}
-                        disabled={disabled}
-                        // pseudoFocused={triggerFocusedVisible}
-                        // pseudoActive={pressed}
-                        className={prefix('__trigger-button')}
-                        active={opened}
-                        {...btnProps}
-                        endIcon={
-                            chevron && (
-                                <ChevronDownIcon
-                                    className={prefix('__chevron')}
-                                    data-opened={opened || undefined}
-                                    aria-hidden
-                                />
-                            )
-                        }
-                    >
-                        {children}
-                    </Button>
-                )}
-            </Box>
+                {children}
+            </Button>
         );
     },
 );
+
+PopoverTrigger.displayName = 'PopoverTrigger';
 
 PopoverTrigger.displayName = 'PopoverTrigger';
 
