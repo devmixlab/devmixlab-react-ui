@@ -94,8 +94,8 @@ type PopoverProps = {
 type TriggerRenderProps = {
     disabled: boolean;
     opened: boolean;
-    focusedVisible: boolean;
-    pressed: boolean;
+    // focusedVisible: boolean;
+    // pressed: boolean;
 };
 
 // type PopoverTriggerProps = {
@@ -298,15 +298,15 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
         // Trigger press state
         // ------------------------------------------------------------------
 
-        const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
-        const [pressed, setPressed] = useState(false);
+        // const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
+        // const [pressed, setPressed] = useState(false);
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
             const key = e.key;
 
             if (key === 'Enter' || key === ' ') {
                 e.preventDefault();
-                setPressed(true);
+                // setPressed(true);
                 setOpened(!opened);
             }
         };
@@ -322,26 +322,26 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                     if (disabled) return;
                     setOpened(!opened);
                 }}
-                tabIndex={disabled ? -1 : 0}
-                onFocus={(e) => {
-                    if (disabled) return;
-                    setTriggerFocusedVisible(e.currentTarget.matches(':focus-visible'));
-                }}
-                onBlur={() => setTriggerFocusedVisible(false)}
+                // tabIndex={disabled ? -1 : 0}
+                // onFocus={(e) => {
+                //     if (disabled) return;
+                //     setTriggerFocusedVisible(e.currentTarget.matches(':focus-visible'));
+                // }}
+                // onBlur={() => setTriggerFocusedVisible(false)}
                 onKeyDown={(e) => {
                     if (disabled) return;
                     handleKeyDown(e);
                     rest.onKeyDown?.(e);
                 }}
-                onKeyUp={(e: React.KeyboardEvent) => {
-                    if (e.key === 'Enter' || e.key === ' ') setPressed(false);
-                }}
-                onMouseDown={() => {
-                    if (disabled) return;
-                    setPressed(true);
-                }}
-                onMouseUp={() => setPressed(false)}
-                onMouseLeave={() => setPressed(false)}
+                // onKeyUp={(e: React.KeyboardEvent) => {
+                //     if (e.key === 'Enter' || e.key === ' ') setPressed(false);
+                // }}
+                // onMouseDown={() => {
+                //     if (disabled) return;
+                //     setPressed(true);
+                // }}
+                // onMouseUp={() => setPressed(false)}
+                // onMouseLeave={() => setPressed(false)}
                 aria-expanded={opened}
                 aria-controls={opened ? panelId : undefined}
                 aria-haspopup={role}
@@ -350,16 +350,16 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                     render({
                         disabled: !!disabled,
                         opened,
-                        focusedVisible: triggerFocusedVisible,
-                        pressed,
+                        // focusedVisible: triggerFocusedVisible,
+                        // pressed,
                     })
                 ) : (
                     <Button
                         type="button"
-                        tabIndex={-1}
+                        // tabIndex={-1}
                         disabled={disabled}
-                        pseudoFocused={triggerFocusedVisible}
-                        pseudoActive={pressed}
+                        // pseudoFocused={triggerFocusedVisible}
+                        // pseudoActive={pressed}
                         className={prefix('__trigger-button')}
                         active={opened}
                         {...btnProps}
