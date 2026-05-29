@@ -30,6 +30,7 @@ export type FocusableListResult = {
     lastFocusableId: string | null;
 
     itemRefs: React.MutableRefObject<Map<string, HTMLElement | null>>;
+    isFocusableElement: (node: Node | null) => boolean;
 };
 
 export function useFocusableList<T extends FocusableItem>(items: T[]): FocusableListResult {
@@ -46,6 +47,20 @@ export function useFocusableList<T extends FocusableItem>(items: T[]): Focusable
     const setFocuses = useCallback((id: string | null, visibleId?: string | null) => {
         setFocusedId(id);
         setFocusedVisibleId(visibleId ?? id);
+    }, []);
+
+    const isFocusableElement = useCallback((node: Node | null) => {
+        if (!(node instanceof HTMLElement)) {
+            return false;
+        }
+
+        for (const ref of itemRefs.current.values()) {
+            if (ref === node) {
+                return true;
+            }
+        }
+
+        return false;
     }, []);
 
     const focusItem = useCallback((id: string | null) => {
@@ -176,5 +191,6 @@ export function useFocusableList<T extends FocusableItem>(items: T[]): Focusable
         lastFocusableId,
 
         itemRefs,
+        isFocusableElement,
     };
 }

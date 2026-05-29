@@ -288,6 +288,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
             setFocusedId,
             setFocusedVisibleId,
             setRef,
+            isFocusableElement,
         } = currentFocusableList;
 
         useEffect(() => {
@@ -366,6 +367,15 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 }}
                 onKeyDown={(e) => {
                     if (disabled) return;
+
+                    const target = e.target;
+
+                    if (!(target instanceof Node)) {
+                        return;
+                    }
+                    if (!isFocusableElement(target)) {
+                        return;
+                    }
                     handleKeyDown(e);
                     console.log('handleKeyDown');
                     rest.onKeyDown?.(e);

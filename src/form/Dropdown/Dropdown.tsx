@@ -64,6 +64,8 @@ export type DropdownProps = {
     triggerRender?: (props: TriggerRenderProps) => React.ReactNode;
 
     stickyGroupLabels?: boolean;
+
+    openOnArrowKeys?: boolean;
 } & PopoverProps;
 
 type DropdownComponent = React.ForwardRefExoticComponent<
@@ -116,6 +118,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             triggerRender,
 
             stickyGroupLabels = false,
+
+            openOnArrowKeys = true,
 
             ...rest
         },
@@ -293,6 +297,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 unregisterOption,
                 runAfterReady,
                 stickyGroupLabels,
+                openOnArrowKeys,
             }),
             [
                 opened,
@@ -320,6 +325,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 unregisterOption,
                 runAfterReady,
                 stickyGroupLabels,
+                openOnArrowKeys,
             ],
         );
 
@@ -374,6 +380,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             opened,
             runAfterReady,
             focusByTypeahead,
+            openOnArrowKeys,
         } = useDropdownContext();
 
         const { focusFirst, focusLast, focusById } = focusableList;
@@ -386,7 +393,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
                 return;
             }
 
-            if (key === 'ArrowUp') {
+            if (key === 'ArrowUp' && openOnArrowKeys) {
                 e.preventDefault();
                 if (!opened) {
                     setOpened(true);
@@ -398,7 +405,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
                 } else {
                     focusLast();
                 }
-            } else if (key === 'ArrowDown') {
+            } else if (key === 'ArrowDown' && openOnArrowKeys) {
                 e.preventDefault();
                 if (!opened) {
                     setOpened(true);
@@ -469,10 +476,10 @@ type DropdownContentProps = {
     size?: 'sm' | 'md' | 'lg';
 } & PopoverPanelProps;
 
-const DropdownContent = forwardRef<HTMLElement, DropdownContentProps>(
+const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
     ({ children, className, size = 'md', ...rest }, ref) => {
         return (
-            <Popover.Panel className={prefix('__content')} {...rest} data-size={size}>
+            <Popover.Panel ref={ref} className={prefix('__content')} {...rest} data-size={size}>
                 {children}
             </Popover.Panel>
         );

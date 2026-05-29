@@ -46,6 +46,7 @@ type DropdownContextValue = {
     runAfterReady: (callback: () => void) => void;
 
     stickyGroupLabels: boolean;
+    openOnArrowKeys: boolean;
 };
 
 const DropdownContext = createContext<DropdownContextValue | null>(null);
