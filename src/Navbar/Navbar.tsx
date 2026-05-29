@@ -340,19 +340,17 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
             let current: HTMLElement | null = null;
 
             return (node: HTMLElement | null) => {
-                if (current) {
+                if (current && current !== node) {
                     unregisterNestedLayer(current);
                 }
 
-                if (node) {
+                if (node && current !== node) {
                     registerNestedLayer(node);
                 }
 
                 current = node;
             };
         }, [registerNestedLayer, unregisterNestedLayer]);
-
-        const nestedLayerRef = useMemo(() => createNestedLayerRef(), [createNestedLayerRef]);
 
         return (
             <Box
@@ -399,7 +397,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                         focusedVisible: focusedVisibleId === id,
                         pressed,
                         focusableRef: setRef(id),
-                        nestedLayerRef,
+                        createNestedLayerRef,
                     })
                 ) : !insideMobile ? (
                     <Button

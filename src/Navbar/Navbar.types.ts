@@ -32,15 +32,6 @@ export type NavbarContentProps<C extends React.ElementType = 'div'> = BoxCompone
 
 export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponentProps<C>;
 
-// export type NavbarItemRenderProps = {
-//     disabled: boolean;
-//     active: boolean;
-//     focusedVisible: boolean;
-//     pressed: boolean;
-//     register: (node: HTMLElement | null) => void;
-//     registerNestedLayer: (node: HTMLElement) => void;
-// };
-
 export type FocusScope = 'desktop' | 'mobile';
 
 export type NavbarItemRenderProps = {
@@ -71,11 +62,26 @@ export type NavbarItemRenderProps = {
     focusableRef: (node: HTMLElement | null) => void;
 
     /**
-     * Ref callback used to register portaled overlays
-     * (popover panels, dropdown menus, submenus, etc.)
-     * as logically inside the navbar interaction tree.
+     * Creates a ref callback that registers a floating layer
+     * (popover, dropdown, menu, etc.) as part of the navbar.
+     *
+     * Use a separate ref instance for each floating layer:
+     *
+     * ```tsx
+     * const panelRef = createNestedLayerRef();
+     * const nestedPanelRef = createNestedLayerRef();
+     *
+     * <Popover.Panel ref={panelRef}>
+     *     <Popover.Panel ref={nestedPanelRef} />
+     * </Popover.Panel>
+     * ```
+     *
+     * Registered layers are treated as part of the navbar when
+     * handling focus-outside and pointer-outside interactions,
+     * preventing the mobile menu from closing while interacting
+     * with nested floating content.
      */
-    nestedLayerRef: (node: HTMLElement | null) => void;
+    createNestedLayerRef: () => (node: HTMLElement | null) => void;
 };
 
 export type NavbarItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<
