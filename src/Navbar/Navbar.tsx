@@ -356,7 +356,7 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
         return (
             <Box
                 tabIndex={disabled ? -1 : 0}
-                ref={ref}
+                ref={setRef(id)}
                 className={clsx(prefix('__item'), className)}
                 onClick={(e) => {
                     onClick?.(e);
@@ -367,6 +367,9 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 }}
                 onKeyDown={(e) => {
                     if (disabled) return;
+
+                    // console.log('target', e.target);
+                    // console.log('isFocusable', isFocusableElement(e.target));
 
                     const target = e.target;
 
@@ -383,10 +386,14 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                 onFocus={(e) => {
                     if (disabled) return;
 
+                    console.log('focus', id);
+
                     setFocusedId(id);
                     setFocusedVisibleId(e.currentTarget.matches(':focus-visible') ? id : null);
                 }}
                 onBlur={() => {
+                    console.log('blur', id);
+
                     setFocusedId(null);
                     setFocusedVisibleId(null);
                 }}
@@ -411,7 +418,6 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                     })
                 ) : !insideMobile ? (
                     <Button
-                        ref={setRef(id)}
                         type="button"
                         tabIndex={-1}
                         variant="base"
@@ -425,7 +431,6 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
                     </Button>
                 ) : (
                     <Button
-                        ref={setRef(id)}
                         w="full"
                         justify="start"
                         type="button"

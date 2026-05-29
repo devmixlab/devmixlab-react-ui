@@ -355,7 +355,6 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                     })
                 ) : (
                     <Button
-                        {...btnProps}
                         type="button"
                         tabIndex={-1}
                         disabled={disabled}
@@ -363,6 +362,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                         pseudoActive={pressed}
                         className={prefix('__trigger-button')}
                         active={opened}
+                        {...btnProps}
                         endIcon={
                             chevron && (
                                 <ChevronDownIcon
