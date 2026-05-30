@@ -34,6 +34,17 @@ export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponent
 
 export type FocusScope = 'desktop' | 'mobile';
 
+export type NavbarItemElementProps<T extends HTMLElement = HTMLElement> = {
+    ref?: React.Ref<T>;
+
+    onClick?: React.MouseEventHandler<T>;
+    onKeyDown?: React.KeyboardEventHandler<T>;
+    onFocus?: React.FocusEventHandler<T>;
+
+    'aria-current'?: 'page';
+    'data-active'?: boolean;
+};
+
 export type NavbarItemRenderProps = {
     /**
      * Whether the item interaction is disabled.
@@ -45,21 +56,25 @@ export type NavbarItemRenderProps = {
      */
     active: boolean;
 
+    itemProps: NavbarItemElementProps;
+
+    className: string;
+
     /**
      * Whether the item currently has keyboard-visible focus.
      */
-    focusedVisible: boolean;
+    // focusedVisible: boolean;
 
     /**
      * Whether the item is currently being pressed/clicked.
      */
-    pressed: boolean;
+    // pressed: boolean;
 
     /**
      * Ref callback used to register the trigger element
      * into the navbar roving focus / keyboard navigation system.
      */
-    focusableRef: (node: HTMLElement | null) => void;
+    // focusableRef: (node: HTMLElement | null) => void;
 
     /**
      * Creates a ref callback that registers a floating layer
@@ -84,14 +99,19 @@ export type NavbarItemRenderProps = {
     createNestedLayerRef: () => (node: HTMLElement | null) => void;
 };
 
-export type NavbarItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
-    {
-        active?: boolean;
-        disabled?: boolean;
-        render?: (props: NavbarItemRenderProps) => React.ReactNode;
-    }
->;
+// export type NavbarItemProps<C extends React.ElementType = 'button'> = BoxComponentProps<
+//     C,
+//     {
+//         active?: boolean;
+//         disabled?: boolean;
+//         render?: (props: NavbarItemRenderProps) => React.ReactNode;
+//     }
+// >;
+
+export type NavbarItemProps = {
+    active?: boolean;
+    render?: (props: NavbarItemRenderProps) => React.ReactNode;
+} & ButtonProps;
 
 export type NavbarToggleProps<C extends React.ElementType = 'button'> = BoxComponentProps<
     C,

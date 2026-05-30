@@ -104,12 +104,12 @@ $collapse-prefix: #{$p}--collapse;
             );
         }
 
-        &:focus,
-        &:focus-visible {
-            outline: none;
-            box-shadow: none;
-            border: none;
-        }
+        //&:focus,
+        //&:focus-visible {
+        //    outline: none;
+        //    box-shadow: none;
+        //    border: none;
+        //}
     }
 
     .#{$navbar-prefix}__toggle {

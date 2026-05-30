@@ -26,6 +26,7 @@ import {
     NavbarMobileProps,
     NavbarHeaderProps,
     FocusScope,
+    NavbarItemElementProps,
 } from './Navbar.types';
 import { useStableId } from '../utils/useStableId';
 import { breakpointOrder, useBreakpoint } from '../utils/responsive';
@@ -256,10 +257,21 @@ const NavbarItems = forwardRef<HTMLDivElement, NavbarItemsProps>(
 // Item
 // -----------------------------------------------------------------------------
 
-const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
-    ({ children, className, active = false, disabled = false, render, onClick, ...rest }, ref) => {
-        const [pressed, setPressed] = useState(false);
-
+const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
+    (
+        {
+            children,
+            className,
+            active = false,
+            disabled = false,
+            render,
+            onClick,
+            onKeyDown,
+            onFocus,
+            ...rest
+        },
+        ref,
+    ) => {
         const { insideMobile } = useNavbarMobileContext();
 
         const {
@@ -278,18 +290,8 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
 
         const currentFocusableList = insideMobile ? focusableMobileList : focusableList;
 
-        const {
-            focusedId,
-            focusedVisibleId,
-            focusNext,
-            focusFirst,
-            focusLast,
-            focusById,
-            setFocusedId,
-            setFocusedVisibleId,
-            setRef,
-            isFocusableElement,
-        } = currentFocusableList;
+        const { focusNext, focusFirst, focusLast, setFocusedId, setRef, isFocusableElement } =
+            currentFocusableList;
 
         useEffect(() => {
             registerItem(
@@ -353,100 +355,81 @@ const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
             };
         }, [registerNestedLayer, unregisterNestedLayer]);
 
+        const itemClassName = clsx(prefix('__item'), className);
+
+        const itemProps = {
+            ref: mergeRefs(ref, setRef(id)),
+
+            onClick: (e: React.MouseEvent<HTMLElement>) => {
+                onClick?.(e as any);
+
+                if (collapsed && closeOnSelect && !disabled) {
+                    setMobileOpen(false);
+                }
+            },
+
+            onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+                if (disabled) {
+                    return;
+                }
+
+                const target = e.target;
+
+                if (!(target instanceof Node)) {
+                    return;
+                }
+
+                if (!isFocusableElement(target)) {
+                    return;
+                }
+
+                handleKeyDown(e);
+
+                onKeyDown?.(e as React.KeyboardEvent<HTMLButtonElement>);
+            },
+
+            onFocus: (e: React.FocusEvent<HTMLElement>) => {
+                if (disabled) {
+                    return;
+                }
+
+                setFocusedId(id);
+
+                onFocus?.(e as React.FocusEvent<HTMLButtonElement>);
+            },
+
+            'aria-current': active ? ('page' as const) : undefined,
+
+            'data-active': active || undefined,
+        };
+
+        if (render) {
+            return render({
+                disabled,
+                active,
+                itemProps,
+                className: itemClassName,
+
+                createNestedLayerRef,
+            });
+        }
+
         return (
-            <Box
-                tabIndex={disabled ? -1 : 0}
-                ref={setRef(id)}
-                className={clsx(prefix('__item'), className)}
-                onClick={(e) => {
-                    onClick?.(e);
-
-                    if (collapsed && closeOnSelect && !disabled) {
-                        setMobileOpen(false);
-                    }
-                }}
-                onKeyDown={(e) => {
-                    if (disabled) return;
-
-                    // console.log('target', e.target);
-                    // console.log('isFocusable', isFocusableElement(e.target));
-
-                    const target = e.target;
-
-                    if (!(target instanceof Node)) {
-                        return;
-                    }
-                    if (!isFocusableElement(target)) {
-                        return;
-                    }
-                    handleKeyDown(e);
-                    console.log('handleKeyDown');
-                    rest.onKeyDown?.(e);
-                }}
-                onFocus={(e) => {
-                    if (disabled) return;
-
-                    console.log('focus', id);
-
-                    setFocusedId(id);
-                    setFocusedVisibleId(e.currentTarget.matches(':focus-visible') ? id : null);
-                }}
-                onBlur={() => {
-                    console.log('blur', id);
-
-                    setFocusedId(null);
-                    setFocusedVisibleId(null);
-                }}
-                onMouseDown={() => {
-                    if (disabled) return;
-                    setPressed(true);
-                }}
-                onMouseUp={() => setPressed(false)}
-                onMouseLeave={() => setPressed(false)}
-                aria-current={active ? 'page' : undefined}
-                data-active={active || undefined}
+            <Button
                 {...rest}
+                {...itemProps}
+                className={itemClassName}
+                type="button"
+                variant={insideMobile ? 'ghost' : 'base'}
+                intent="secondary"
+                disabled={disabled}
+                active={active}
+                w={insideMobile ? 'full' : undefined}
+                justify={insideMobile ? 'start' : undefined}
+                rounded={insideMobile ? 'none' : undefined}
             >
-                {render ? (
-                    render({
-                        disabled,
-                        active,
-                        focusedVisible: focusedVisibleId === id,
-                        pressed,
-                        focusableRef: setRef(id),
-                        createNestedLayerRef,
-                    })
-                ) : !insideMobile ? (
-                    <Button
-                        type="button"
-                        tabIndex={-1}
-                        variant="base"
-                        intent="secondary"
-                        disabled={disabled}
-                        pseudoFocused={focusedVisibleId === id}
-                        pseudoActive={pressed}
-                        active={active}
-                    >
-                        {children}
-                    </Button>
-                ) : (
-                    <Button
-                        w="full"
-                        justify="start"
-                        type="button"
-                        tabIndex={-1}
-                        variant="ghost"
-                        intent="secondary"
-                        disabled={disabled}
-                        pseudoFocused={focusedVisibleId === id}
-                        pseudoActive={pressed}
-                        active={active}
-                        rounded="none"
-                    >
-                        {children}
-                    </Button>
-                )}
-            </Box>
+                {children}
+            </Button>
         );
     },
 );
