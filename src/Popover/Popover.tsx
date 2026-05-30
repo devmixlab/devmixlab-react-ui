@@ -91,15 +91,22 @@ type PopoverProps = {
     onReady?: () => void;
 };
 
-export type TriggerProps = Omit<React.HTMLAttributes<HTMLElement>, 'ref'> & {
-    ref?: React.Ref<HTMLElement>;
+// export type TriggerProps = Omit<React.HTMLAttributes<HTMLElement>, 'ref'> & {
+//     ref?: React.Ref<HTMLElement>;
+// };
+
+export type PopoverTriggerElementProps<T extends HTMLElement = HTMLElement> = Omit<
+    React.HTMLAttributes<T>,
+    'ref'
+> & {
+    ref?: React.Ref<T>;
 };
 
 type TriggerRenderProps = {
     disabled: boolean;
     opened: boolean;
-    className: string;
-    triggerProps: TriggerProps;
+    triggerClassName: string;
+    triggerProps: PopoverTriggerElementProps;
     // focusedVisible: boolean;
     // pressed: boolean;
 };
@@ -287,7 +294,10 @@ Popover.displayName = 'Popover';
 // ---------------------------------------------------------------------------
 
 const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
-    ({ children, className, chevron = false, render, btnProps, ...rest }, ref) => {
+    (
+        { children, className, chevron = false, render, btnProps, onClick, onKeyDown, ...rest },
+        ref,
+    ) => {
         const {
             opened,
             setOpened,
@@ -312,9 +322,10 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
         };
 
         const triggerProps = {
-            ...rest,
             ...getReferenceProps({
-                onClick: () => {
+                onClick: (e: React.MouseEvent<HTMLElement>) => {
+                    onClick?.(e);
+
                     if (!disabled) {
                         setOpened(!opened);
                     }
@@ -325,7 +336,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                         handleKeyDown(e);
                     }
 
-                    rest.onKeyDown?.(e as React.KeyboardEvent<HTMLElement>);
+                    onKeyDown?.(e as React.KeyboardEvent<HTMLElement>);
                 },
             }),
 
@@ -337,21 +348,22 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             'aria-haspopup': role,
         };
 
-        const cl = clsx(prefix('__trigger'), className);
+        const triggerClassName = clsx(prefix('__trigger'), className);
 
         if (render) {
             return render({
                 disabled: !!disabled,
                 opened,
-                className: cl,
+                triggerClassName,
                 triggerProps,
             });
         }
 
         return (
             <Button
+                {...rest}
                 {...triggerProps}
-                className={cl}
+                className={triggerClassName}
                 type="button"
                 disabled={disabled}
                 active={opened}

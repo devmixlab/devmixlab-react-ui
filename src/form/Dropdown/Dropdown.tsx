@@ -370,7 +370,7 @@ type DropdownTriggerProps = {
 } & PopoverTriggerProps;
 
 const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
-    ({ placeholder = 'Select option', render, ...rest }, ref) => {
+    ({ placeholder = 'Select option', render, onKeyDown, ...rest }, ref) => {
         const {
             selectedOption,
             isSearchable,
@@ -381,6 +381,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             runAfterReady,
             focusByTypeahead,
             openOnArrowKeys,
+            disabled,
         } = useDropdownContext();
 
         const { focusFirst, focusLast, focusById } = focusableList;
@@ -439,18 +440,24 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             }
         };
 
-        const cl = prefix('__trigger');
+        const triggerClassName = prefix('__trigger');
 
         const triggerProps = {
             ref,
-            onKeyDown: handleKeyDown,
             ...rest,
+            onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+                if (!disabled) {
+                    handleKeyDown(e);
+                }
+
+                onKeyDown?.(e);
+            },
         };
 
         return render ? (
-            <Popover.Trigger className={cl} {...triggerProps} render={render} />
+            <Popover.Trigger className={triggerClassName} {...triggerProps} render={render} />
         ) : (
-            <Popover.Trigger className={cl} {...triggerProps}>
+            <Popover.Trigger className={triggerClassName} {...triggerProps}>
                 {selectedOption?.children ?? (
                     <Box as="span" opacity={0.8}>
                         {placeholder}
