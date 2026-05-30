@@ -7,6 +7,17 @@
 $p: cfg.$prefix;
 $offcanvas-prefix: #{$p}--offcanvas;
 
+$widths: ( 2xs: 280px, xs: 320px, sm: 400px, md: 480px, lg: 640px, xl: 800px, 2xl: 960px, );
+$heights: (
+    2xs: 10vh,
+    xs: 15vh,
+    sm: 25vh,
+    md: 35vh,
+    lg: 50vh,
+    xl: 65vh,
+    2xl: 80vh,
+);
+
 .#{$offcanvas-prefix} {
 
     //--transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
@@ -32,16 +43,28 @@ $offcanvas-prefix: #{$p}--offcanvas;
         display: flex;
         flex-direction: column;
 
-        //transition-property: transform;
-        //transition-duration: var(--animation-enter-duration, --#{$p}-duration-slow);
-        //transition-behavior: var(--animation-easing, --#{$p}-ease-standard);
-
         background: var(--#{$p}-color-surface, white);
 
         box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
         0 4px 6px -4px rgb(0 0 0 / 0.1);
 
         outline: none;
+
+        &[data-orientation='horizontal']{
+            @each $size, $value in $widths {
+                &[data-size='#{$size}'] {
+                    width: #{$value};
+                }
+            }
+        }
+
+        &[data-orientation='vertical']{
+            @each $size, $value in $heights {
+                &[data-size='#{$size}'] {
+                    height: #{$value};
+                }
+            }
+        }
 
         /*
         * left placement

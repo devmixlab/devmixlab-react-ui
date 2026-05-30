@@ -3,7 +3,7 @@ import React, { forwardRef, useEffect, useRef, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 
-import { Box, BoxComponentProps } from '../Box/Box';
+import { Box, BoxComponentProps, BoxProps } from '../Box/Box';
 
 import { mergeRefs } from '../utils/mergeRefs';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -20,9 +20,11 @@ export type OffcanvasPlacement = 'left' | 'right' | 'top' | 'bottom';
 
 type OffcanvasEffect = 'scale' | 'slide' | 'none';
 
-export type OffcanvasSemanticSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+export const semanticSizes = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const;
 
-export type OffcanvasSize = OffcanvasSemanticSize | number;
+export type OffcanvasSemanticSize = (typeof semanticSizes)[number];
+
+export type OffcanvasSize = OffcanvasSemanticSize | BoxProps['size'];
 
 export type OffcanvasProps = {
     children?: React.ReactNode;
@@ -33,7 +35,7 @@ export type OffcanvasProps = {
 
     placement?: OffcanvasPlacement;
 
-    size?: number | string;
+    size?: OffcanvasSize;
 
     closeOnOverlayClick?: boolean;
 
@@ -48,7 +50,14 @@ export type OffcanvasProps = {
     enterAnimationEasing?: string;
     exitAnimationEasing?: string;
 
+    /** Called when the modal has fully entered (animation complete). */
+    onAnimationEntered?: () => void;
+    /** Called when the modal has fully exited (animation complete, just before unmount). */
+    onAnimationExited?: () => void;
+
     animationEffect?: OffcanvasEffect;
+
+    trapFocus?: boolean;
 };
 
 const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
@@ -58,7 +67,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             opened = false,
             onClose,
             placement = 'right',
-            size = 320,
+            size = 'xl',
             closeOnOverlayClick = true,
             closeOnEscape = true,
             portalContainer,
@@ -69,7 +78,12 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
             exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
 
+            onAnimationEntered,
+            onAnimationExited,
+
             animationEffect = 'slide',
+
+            trapFocus = false,
         },
         ref,
     ) => {
@@ -80,13 +94,12 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             present: opened,
             enterDuration: animationEffect == 'none' ? 0 : animationEnterDuration,
             exitDuration: animationEffect == 'none' ? 0 : animationExitDuration,
-            // exitDuration: animationDuration,
-            // onEntered: onAnimationEntered,
-            // onExited: onAnimationExited,
+            onEntered: onAnimationEntered,
+            onExited: onAnimationExited,
         });
 
         useFocusTrap({
-            active: opened,
+            active: isMounted && trapFocus,
             containerRef: panelRef,
             onEscape: closeOnEscape ? onClose : undefined,
         });
@@ -111,14 +124,14 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
 
         if (!isMounted) return null;
 
-        const panelStyle =
-            placement === 'left' || placement === 'right'
-                ? {
-                      width: size,
-                  }
-                : {
-                      height: size,
-                  };
+        const isVertical = placement === 'top' || placement === 'bottom';
+
+        const semanticSize = semanticSizes.includes(size as OffcanvasSemanticSize)
+            ? size
+            : undefined;
+
+        const panelWidth = !isVertical ? size : undefined;
+        const panelHeight = isVertical ? size : undefined;
 
         return createPortal(
             <div
@@ -145,13 +158,16 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
                 <Box
                     ref={mergeRefs(panelRef, ref)}
                     className={clsx(prefix('__panel'), className)}
-                    style={panelStyle}
+                    w={semanticSize == null ? panelWidth : undefined}
+                    h={semanticSize == null ? panelHeight : undefined}
                     role="dialog"
                     aria-modal="true"
                     tabIndex={-1}
                     data-animation-effect={animationEffect}
                     data-animation-state={animationState}
                     data-placement={placement}
+                    data-size={semanticSize}
+                    data-orientation={isVertical ? 'vertical' : 'horizontal'}
                 >
                     <Box display="flex" flexDirection="column" h="100%">
                         {children}
