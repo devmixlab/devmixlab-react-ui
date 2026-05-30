@@ -385,7 +385,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
 
         const { focusFirst, focusLast, focusById } = focusableList;
 
-        const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
             const key = e.key;
 
             if (key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -439,21 +439,18 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             }
         };
 
+        const cl = prefix('__trigger');
+
+        const triggerProps = {
+            ref,
+            onKeyDown: handleKeyDown,
+            ...rest,
+        };
+
         return render ? (
-            <Popover.Trigger
-                ref={ref}
-                {...rest}
-                className={prefix('__trigger')}
-                onKeyDown={handleKeyDown}
-                render={render}
-            />
+            <Popover.Trigger className={cl} {...triggerProps} render={render} />
         ) : (
-            <Popover.Trigger
-                ref={ref}
-                {...rest}
-                className={prefix('__trigger')}
-                onKeyDown={handleKeyDown}
-            >
+            <Popover.Trigger className={cl} {...triggerProps}>
                 {selectedOption?.children ?? (
                     <Box as="span" opacity={0.8}>
                         {placeholder}

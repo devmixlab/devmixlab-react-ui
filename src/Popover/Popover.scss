@@ -37,16 +37,6 @@ $popover-prefix: #{$p}--popover;
         }
     }
 
-    &__trigger {
-        display: inline-flex;
-
-        &:focus,
-        &:focus-visible {
-            outline: none;
-            box-shadow: none;
-        }
-    }
-
     &__panel {
         --panel-bg: #{functions.intent-color(gray, 200)};
         --panel-border: #{functions.intent-color(zinc, 300)};
