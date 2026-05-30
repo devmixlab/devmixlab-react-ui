@@ -40,6 +40,8 @@ export { Carousel } from './src/Carousel/Carousel';
 export { Container } from './src/Container/Container';
 export { ContainerProvider } from './src/Container/ContainerProvider';
 
+export { Offcanvas } from './src/Offcanvas/Offcanvas';
+
 export { Navbar } from './src/Navbar/Navbar';
 export { useNavbarMobileContext } from './src/Navbar/Navbar.context';
 

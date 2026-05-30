@@ -1,0 +1,124 @@
+@use '../scss/functions' as functions;
+@use '../scss/mixins' as mixins;
+
+@use '../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$offcanvas-prefix: #{$p}--offcanvas;
+
+.#{$offcanvas-prefix} {
+    position: fixed;
+    inset: 0;
+
+    //background-color: red;
+
+    z-index: var(--#{$p}-z-index, 2000);
+
+    &__overlay {
+        position: absolute;
+        inset: 0;
+
+        background: rgb(0 0 0 / 0.5);
+    }
+
+    &__panel {
+        position: absolute;
+
+        display: flex;
+        flex-direction: column;
+
+        background: var(--#{$p}-color-surface, white);
+
+        box-shadow:
+            0 10px 15px -3px rgb(0 0 0 / 0.1),
+            0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+        outline: none;
+
+        &[data-placement='left'] {
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        &[data-placement='right'] {
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        &[data-placement='top'] {
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        &[data-placement='bottom'] {
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+
+        padding: 1rem;
+
+        border-bottom: 1px solid var(--#{$p}-color-border);
+    }
+
+    &__header-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__close {
+        flex-shrink: 0;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 2rem;
+        height: 2rem;
+
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+
+        border-radius: 0.375rem;
+
+        &:hover {
+            background: rgb(0 0 0 / 0.05);
+        }
+
+        &:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+        }
+    }
+
+    &__body {
+        flex: 1;
+
+        overflow: auto;
+
+        padding: 1rem;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+
+        padding: 1rem;
+
+        border-top: 1px solid var(--#{$p}-color-border);
+    }
+}
