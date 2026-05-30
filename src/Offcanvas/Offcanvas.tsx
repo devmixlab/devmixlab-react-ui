@@ -20,6 +20,10 @@ export type OffcanvasPlacement = 'left' | 'right' | 'top' | 'bottom';
 
 type OffcanvasEffect = 'scale' | 'slide' | 'none';
 
+export type OffcanvasSemanticSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+export type OffcanvasSize = OffcanvasSemanticSize | number;
+
 export type OffcanvasProps = {
     children?: React.ReactNode;
 
