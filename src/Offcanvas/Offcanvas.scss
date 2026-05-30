@@ -8,6 +8,10 @@ $p: cfg.$prefix;
 $offcanvas-prefix: #{$p}--offcanvas;
 
 .#{$offcanvas-prefix} {
+
+    //--transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
+
+
     position: fixed;
     inset: 0;
 
@@ -28,37 +32,127 @@ $offcanvas-prefix: #{$p}--offcanvas;
         display: flex;
         flex-direction: column;
 
+        //transition-property: transform;
+        //transition-duration: var(--animation-enter-duration, --#{$p}-duration-slow);
+        //transition-behavior: var(--animation-easing, --#{$p}-ease-standard);
+
         background: var(--#{$p}-color-surface, white);
 
-        box-shadow:
-            0 10px 15px -3px rgb(0 0 0 / 0.1),
-            0 4px 6px -4px rgb(0 0 0 / 0.1);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
 
         outline: none;
 
+        /*
+        * left placement
+         */
         &[data-placement='left'] {
             top: 0;
             left: 0;
             bottom: 0;
         }
 
+        &[data-animation-effect='slide'] {
+            &[data-placement='left'][data-animation-state='entering'] {
+                animation: #{$offcanvas-prefix}--slide-enter-left var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+
+            &[data-placement='left'][data-animation-state='exiting'] {
+                animation: #{$offcanvas-prefix}--slide-exit-left var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+
+        &[data-animation-effect='scale'][data-placement='left'] {
+            transform-origin: top left;
+            &[data-animation-state='entering'] {
+                animation: #{$offcanvas-prefix}--scale-enter-left var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation: #{$offcanvas-prefix}--scale-exit-left var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+
+        /*
+        * right placement
+         */
         &[data-placement='right'] {
             top: 0;
             right: 0;
             bottom: 0;
         }
 
+        &[data-animation-effect='slide'] {
+            &[data-placement='right'][data-animation-state='entering'] {
+                animation: #{$offcanvas-prefix}--slide-enter-right var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+
+            &[data-placement='right'][data-animation-state='exiting'] {
+                animation: #{$offcanvas-prefix}--slide-exit-right var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+
+        &[data-animation-effect='scale'][data-placement='right'] {
+            transform-origin: top right;
+            &[data-animation-state='entering'] {
+                animation: #{$offcanvas-prefix}--scale-enter-right var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation: #{$offcanvas-prefix}--scale-exit-right var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+
+        /*
+        * top placement
+         */
         &[data-placement='top'] {
             top: 0;
             left: 0;
             right: 0;
         }
 
+        &[data-animation-effect='slide'][data-placement='top'] {
+            &[data-animation-state='entering'] {
+                animation: #{$offcanvas-prefix}--slide-enter-top var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation: #{$offcanvas-prefix}--slide-exit-top var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+
+        &[data-animation-effect='scale'][data-placement='top'] {
+            transform-origin: top center;
+            &[data-animation-state='entering'] {
+                animation: #{$offcanvas-prefix}--scale-enter-top var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation: #{$offcanvas-prefix}--scale-exit-top var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+
         &[data-placement='bottom'] {
+            transform: translateY(100%);
             right: 0;
             bottom: 0;
             left: 0;
         }
+
+        &[data-animation-state='entering'] {
+            transition-duration: var(--animation-enter-duration, --#{$p}-duration-slow);
+        }
+
+        &[data-animation-state='entering'] {
+            transition-duration: var(--animation-exit-duration, --#{$p}-duration-slow);
+        }
+    }
+
+    &__panel[data-animation-state='entering'],
+    &__panel[data-animation-state='entered'],
+    &__panel[data-animation-state='exiting'] {
+        will-change: transform;
     }
 
     &__header {
@@ -120,5 +214,173 @@ $offcanvas-prefix: #{$p}--offcanvas;
         padding: 1rem;
 
         border-top: 1px solid var(--#{$p}-color-border);
+    }
+}
+
+/*
+ * Slide left
+ */
+@keyframes #{$offcanvas-prefix}--slide-enter-left {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--slide-exit-left {
+    from {
+        transform: translateX(0%);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/*
+ * Slide right
+ */
+@keyframes #{$offcanvas-prefix}--slide-enter-right {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--slide-exit-right {
+    from {
+        transform: translateX(0%);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+/*
+ * Slide top
+ */
+@keyframes #{$offcanvas-prefix}--slide-enter-top {
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--slide-exit-top {
+    from {
+        transform: translateY(0%);
+    }
+
+    to {
+        transform: translateY(-100%);
+    }
+}
+
+/*
+ * scale left
+ */
+@keyframes #{$offcanvas-prefix}--scale-enter-left {
+    from {
+        transform: translateX(-100%) scale(0.1);
+    }
+
+    to {
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--scale-exit-left {
+    from {
+        transform: translateX(0%) scale(1);
+    }
+
+    to {
+        transform: translateX(-100%) scale(0.1);
+    }
+}
+
+/*
+ * scale right
+ */
+@keyframes #{$offcanvas-prefix}--scale-enter-right {
+    from {
+        transform: translateX(100%) scale(0.1);
+    }
+
+    to {
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--scale-exit-right {
+    from {
+        transform: translateX(0%) scale(1);
+    }
+
+    to {
+        transform: translateX(100%) scale(0.1);
+    }
+}
+
+/*
+ * scale top
+ */
+@keyframes #{$offcanvas-prefix}--scale-enter-top {
+    from {
+        transform: translateY(-100%) scale(0.1);
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--scale-exit-top {
+    from {
+        transform: translateY(0%) scale(1);
+    }
+
+    to {
+        transform: translateY(-100%) scale(0.1);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--enter-right {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--enter-top {
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--enter-bottom {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
     }
 }

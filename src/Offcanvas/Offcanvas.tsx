@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef, CSSProperties } from 'react';
 
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
@@ -7,6 +7,7 @@ import { Box, BoxComponentProps } from '../Box/Box';
 
 import { mergeRefs } from '../utils/mergeRefs';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { usePresence } from '../hooks/usePresence';
 import { useStableId } from '../utils/useStableId';
 
 import { Close as CloseIcon } from '../Icon';
@@ -16,6 +17,8 @@ import { classPrefix } from '../utils/classPrefix';
 const prefix = (name = '') => classPrefix(`--offcanvas${name}`);
 
 export type OffcanvasPlacement = 'left' | 'right' | 'top' | 'bottom';
+
+type OffcanvasEffect = 'scale' | 'slide' | 'none';
 
 export type OffcanvasProps = {
     children?: React.ReactNode;
@@ -35,6 +38,13 @@ export type OffcanvasProps = {
     portalContainer?: HTMLElement;
 
     className?: string;
+
+    animationEnterDuration?: number;
+    animationExitDuration?: number;
+    enterAnimationEasing?: string;
+    exitAnimationEasing?: string;
+
+    animationEffect?: OffcanvasEffect;
 };
 
 const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
@@ -43,16 +53,33 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             children,
             opened = false,
             onClose,
-            placement = 'left',
+            placement = 'right',
             size = 320,
             closeOnOverlayClick = true,
             closeOnEscape = true,
             portalContainer,
             className,
+
+            animationEnterDuration = 300,
+            animationExitDuration = 300,
+            enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+            exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+
+            animationEffect = 'slide',
         },
         ref,
     ) => {
         const panelRef = useRef<HTMLDivElement>(null);
+
+        // ── Presence ─────────────────────────────────────────────────────────
+        const { isMounted, state: animationState } = usePresence({
+            present: opened,
+            enterDuration: animationEffect == 'none' ? 0 : animationEnterDuration,
+            exitDuration: animationEffect == 'none' ? 0 : animationExitDuration,
+            // exitDuration: animationDuration,
+            // onEntered: onAnimationEntered,
+            // onExited: onAnimationExited,
+        });
 
         useFocusTrap({
             active: opened,
@@ -61,7 +88,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         });
 
         useEffect(() => {
-            if (!opened) {
+            if (!isMounted) {
                 return;
             }
 
@@ -72,11 +99,13 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             return () => {
                 document.body.style.overflow = previousOverflow;
             };
-        }, [opened]);
+        }, [isMounted]);
 
-        if (!opened) {
-            return null;
-        }
+        // if (!opened) {
+        //     return null;
+        // }
+
+        if (!isMounted) return null;
 
         const panelStyle =
             placement === 'left' || placement === 'right'
@@ -88,7 +117,18 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
                   };
 
         return createPortal(
-            <div className={prefix()}>
+            <div
+                className={prefix()}
+                data-animation-state={animationState}
+                style={
+                    {
+                        '--animation-enter-duration': animationEnterDuration + 'ms',
+                        '--animation-exit-duration': animationExitDuration + 'ms',
+                        '--animation-enter-easing': enterAnimationEasing,
+                        '--animation-exit-easing': exitAnimationEasing,
+                    } as CSSProperties
+                }
+            >
                 <div
                     className={prefix('__overlay')}
                     onClick={() => {
@@ -101,11 +141,13 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
                 <Box
                     ref={mergeRefs(panelRef, ref)}
                     className={clsx(prefix('__panel'), className)}
-                    data-placement={placement}
                     style={panelStyle}
                     role="dialog"
                     aria-modal="true"
                     tabIndex={-1}
+                    data-animation-effect={animationEffect}
+                    data-animation-state={animationState}
+                    data-placement={placement}
                 >
                     <Box display="flex" flexDirection="column" h="100%">
                         {children}
