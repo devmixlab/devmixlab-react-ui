@@ -20,8 +20,28 @@ $heights: (
 
 .#{$offcanvas-prefix} {
 
+    --close-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+
     //--transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
     --ring: var(--#{$p}-accent-primary);
+
+    --section-border-color: #{functions.intent-color(zinc, 200)};
+    --content-bg: #{functions.intent-color(zinc, 0)};
+    --dim-overlay-bg: rgb(0 0 0 / 0.25);
+    --blur-overlay-bg: rgb(0 0 0 / 0.15);
+    --glass-overlay-bg: rgb(255 255 255 / 0.04);
+    --close-color: #{functions.intent-color(zinc, 600)};
+    --close-bg-hover: #{functions.intent-color(zinc, 100)};
+
+    @include cfg.dark {
+        --section-border-color: #{functions.intent-color(zinc, 800)};
+        --content-bg: #{functions.intent-color(zinc, 900)};
+        --dim-overlay-bg: rgb(0 0 0 / 0.25);
+        --blur-overlay-bg: rgb(0 0 0 / 0.15);
+        --glass-overlay-bg: rgb(255 255 255 / 0.04);
+        --close-color: #{functions.intent-color(zinc, 400)};
+        --close-bg-hover: #{functions.intent-color(zinc, 800)};
+    }
 
 
     position: fixed;
@@ -36,17 +56,17 @@ $heights: (
         inset: 0;
 
         &[data-style='dim'] {
-            background: rgb(0 0 0 / 0.25);
+            background: var(--dim-overlay-bg);
         }
 
         &[data-style='blur'] {
-            background: rgb(0 0 0 / 0.15);
+            background: var(--blur-overlay-bg);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
 
         &[data-style='glass'] {
-            background: rgb(255 255 255 / 0.04);
+            background: var(--glass-overlay-bg);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
         }
@@ -58,7 +78,7 @@ $heights: (
         display: flex;
         flex-direction: column;
 
-        background: var(--#{$p}-color-surface, white);
+        background: var(--content-bg);
 
         box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
         0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -230,15 +250,25 @@ $heights: (
         will-change: transform;
     }
 
+    &__panel[data-separated='true'] {
+        .#{$offcanvas-prefix}__header {
+            border-bottom: 1px solid var(--section-border-color);
+        }
+
+        .#{$offcanvas-prefix}__footer {
+            border-top: 1px solid var(--section-border-color);
+        }
+    }
+
     &__header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.75rem;
+        //gap: 0.75rem;
 
-        padding: 1rem;
+        //padding: 1rem;
 
-        border-bottom: 1px solid var(--#{$p}-color-border);
+        //border-bottom: 1px solid var(--#{$p}-color-border);
     }
 
     &__header-content {
@@ -247,28 +277,47 @@ $heights: (
     }
 
     &__close {
-        flex-shrink: 0;
+        @include mixins.icon;
 
         display: inline-flex;
         align-items: center;
         justify-content: center;
 
-        width: 2rem;
-        height: 2rem;
+        flex-shrink: 0;
 
         border: 0;
+        border-radius: 3px;
+
         background: transparent;
+
+        color: var(--close-color);
+
         cursor: pointer;
 
-        border-radius: 0.375rem;
+        opacity: 0.72;
+
+        transition:
+            background-color var(--close-transition),
+            opacity var(--close-transition),
+            transform var(--close-transition);
 
         &:hover {
-            background: rgb(0 0 0 / 0.05);
+            opacity: 1;
+            background-color: var(--close-bg-hover);
+        }
+
+        &:active {
+            transform: scale(0.96);
+        }
+
+        &:focus {
+            outline: none;
         }
 
         &:focus-visible {
-            outline: 2px solid currentColor;
-            outline-offset: 2px;
+            opacity: 1;
+            background-color: var(--close-bg-hover);
+            box-shadow: 0 0 0 2px currentColor;
         }
     }
 
@@ -277,18 +326,18 @@ $heights: (
 
         overflow: auto;
 
-        padding: 1rem;
+        //padding: 1rem;
     }
 
     &__footer {
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 0.75rem;
+        //gap: 0.75rem;
+        //
+        //padding: 1rem;
 
-        padding: 1rem;
-
-        border-top: 1px solid var(--#{$p}-color-border);
+        //border-top: 1px solid var(--#{$p}-color-border);
     }
 }
 
