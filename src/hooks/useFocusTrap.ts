@@ -1,4 +1,6 @@
-import React, { useLayoutEffect, useRef, RefObject } from 'react';
+import React, { useLayoutEffect, useRef, RefObject, MutableRefObject } from 'react';
+
+import { NestedLayer } from '../hooks/useNestedLayers';
 
 const FOCUSABLE_SELECTORS = [
     'a[href]',
@@ -10,47 +12,13 @@ const FOCUSABLE_SELECTORS = [
 ].join(',');
 
 export type UseFocusTrapOptions = {
-    /**
-     * Whether the trap is active.
-     */
     active: boolean;
-
-    /**
-     * Trap boundary element.
-     */
     containerRef: RefObject<HTMLElement | null>;
-
-    /**
-     * Called when Escape is pressed.
-     */
+    nestedLayersRef?: MutableRefObject<Set<NestedLayer>>;
     onEscape?: () => void;
-
-    /**
-     * Whether this trap is currently the active/top-most one.
-     * Useful for nested dialogs/modals.
-     *
-     * @default () => true
-     */
     isActive?: () => boolean;
-
-    /**
-     * Enables Escape close handling.
-     *
-     * @default true
-     */
     closeOnEscape?: boolean;
-
-    /**
-     * Restores focus to the previously focused element
-     * when the trap deactivates.
-     *
-     * @default true
-     */
     restoreFocus?: boolean;
-
-    /**
-     * Element to focus on activation.
-     */
     initialFocus?: RefObject<HTMLElement | null>;
 };
 
@@ -60,17 +28,15 @@ const isVisible = (el: HTMLElement): boolean =>
 export function useFocusTrap({
     active,
     containerRef,
+    nestedLayersRef,
     onEscape,
     isActive = () => true,
     closeOnEscape = true,
     restoreFocus = true,
     initialFocus,
 }: UseFocusTrapOptions): void {
-    // Stable refs for latest callbacks.
     const onEscapeRef = useRef(onEscape);
     const isActiveRef = useRef(isActive);
-
-    // Element focused before trap activation.
     const previousFocusedRef = useRef<HTMLElement | null>(null);
 
     useLayoutEffect(() => {
@@ -82,29 +48,55 @@ export function useFocusTrap({
     });
 
     useLayoutEffect(() => {
-        if (!active) return;
+        if (!active) {
+            return;
+        }
 
         const container = containerRef.current;
-        if (!container) return;
+
+        if (!container) {
+            return;
+        }
 
         previousFocusedRef.current = document.activeElement as HTMLElement | null;
 
-        // Ensure container can receive fallback focus.
         if (!container.hasAttribute('tabindex')) {
             container.tabIndex = -1;
         }
 
+        const getContainers = (): HTMLElement[] => [
+            container,
+            ...(nestedLayersRef
+                ? [...nestedLayersRef.current]
+                      .filter((layer) => !layer.modal)
+                      .map((layer) => layer.node)
+                : []),
+        ];
+
+        const isInScope = (target: Node | null): boolean => {
+            if (!target) return false;
+            return getContainers().some((c) => c.contains(target));
+        };
+
+        const isInModalNestedLayer = (target: Node | null): boolean => {
+            if (!target || !nestedLayersRef) return false;
+            return [...nestedLayersRef.current]
+                .filter((layer) => layer.modal)
+                .some((layer) => layer.node.contains(target));
+        };
+
         const getFocusable = (): HTMLElement[] =>
-            Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)).filter(
-                (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1 && isVisible(el),
+            getContainers().flatMap((c) =>
+                Array.from(c.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)).filter(
+                    (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1 && isVisible(el),
+                ),
             );
 
-        // Initial focus.
         const focusable = getFocusable();
 
         const initial =
             initialFocus?.current &&
-            container.contains(initialFocus.current) &&
+            isInScope(initialFocus.current) &&
             !initialFocus.current.hasAttribute('disabled') &&
             isVisible(initialFocus.current)
                 ? initialFocus.current
@@ -119,7 +111,10 @@ export function useFocusTrap({
         const onKeyDown = (e: KeyboardEvent): void => {
             if (!isActiveRef.current()) return;
 
-            // Escape handling.
+            // If focus is inside a modal nested layer, let that layer
+            // handle all its own keyboard events — don't interfere
+            if (isInModalNestedLayer(document.activeElement)) return;
+
             if (e.key === 'Escape' && closeOnEscape) {
                 e.stopPropagation();
                 onEscapeRef.current?.();
@@ -140,24 +135,20 @@ export function useFocusTrap({
             const last = elements[elements.length - 1];
             const activeElement = document.activeElement as HTMLElement | null;
 
-            // Focus escaped trap.
-            if (!activeElement || !container.contains(activeElement)) {
+            if (!activeElement || !isInScope(activeElement)) {
                 e.preventDefault();
                 first.focus();
                 return;
             }
 
-            // Shift + Tab
             if (e.shiftKey) {
                 if (activeElement === first) {
                     e.preventDefault();
                     last.focus();
                 }
-
                 return;
             }
 
-            // Tab
             if (activeElement === last) {
                 e.preventDefault();
                 first.focus();
@@ -167,9 +158,15 @@ export function useFocusTrap({
         const onFocusIn = (e: FocusEvent): void => {
             if (!isActiveRef.current()) return;
 
-            const target = e.target as Node | null;
+            requestAnimationFrame(() => {
+                const target = (document.activeElement as Node | null) ?? (e.target as Node | null);
 
-            if (target && !container.contains(target)) {
+                // Don't reclaim focus from a modal nested layer —
+                // it owns its own focus scope
+                if (isInModalNestedLayer(target)) return;
+
+                if (isInScope(target)) return;
+
                 const elements = getFocusable();
 
                 if (elements.length) {
@@ -177,7 +174,7 @@ export function useFocusTrap({
                 } else {
                     container.focus();
                 }
-            }
+            });
         };
 
         window.addEventListener('keydown', onKeyDown);
@@ -195,8 +192,5 @@ export function useFocusTrap({
                 previousFocusedRef.current.focus();
             }
         };
-
-        // containerRef is stable.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [active]);
+    }, [active, containerRef, nestedLayersRef, closeOnEscape, restoreFocus, initialFocus]);
 }

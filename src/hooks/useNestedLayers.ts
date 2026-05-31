@@ -1,26 +1,49 @@
 import React, { useRef, useCallback } from 'react';
 
-export type NestedLayersHook = {
-    nestedLayersRef: React.MutableRefObject<Set<HTMLElement>>;
+export type NestedLayer = {
+    node: HTMLElement;
+    modal: boolean;
+};
 
-    registerNestedLayer: (node: HTMLElement) => void;
+type CreateNestedLayerRefOptions = {
+    modal?: boolean;
+};
+
+export type NestedLayersHook = {
+    nestedLayersRef: React.MutableRefObject<Set<NestedLayer>>;
+
+    registerNestedLayer: (node: HTMLElement, options?: CreateNestedLayerRefOptions) => void;
 
     unregisterNestedLayer: (node: HTMLElement) => void;
 
     isInsideNestedLayer: (target: Node | null) => boolean;
 
-    createNestedLayerRef: () => (node: HTMLElement | null) => void;
+    hasActiveModalLayer: () => boolean;
+
+    createNestedLayerRef: (
+        options?: CreateNestedLayerRefOptions,
+    ) => (node: HTMLElement | null) => void;
 };
 
 export function useNestedLayers(): NestedLayersHook {
-    const nestedLayersRef = useRef(new Set<HTMLElement>());
+    const nestedLayersRef = useRef(new Set<NestedLayer>());
 
-    const registerNestedLayer = useCallback((node: HTMLElement) => {
-        nestedLayersRef.current.add(node);
-    }, []);
+    const registerNestedLayer = useCallback(
+        (node: HTMLElement, { modal = false }: CreateNestedLayerRefOptions = {}) => {
+            nestedLayersRef.current.add({
+                node,
+                modal,
+            });
+        },
+        [],
+    );
 
     const unregisterNestedLayer = useCallback((node: HTMLElement) => {
-        nestedLayersRef.current.delete(node);
+        nestedLayersRef.current.forEach((layer) => {
+            if (layer.node === node) {
+                nestedLayersRef.current.delete(layer);
+            }
+        });
     }, []);
 
     const isInsideNestedLayer = useCallback((target: Node | null) => {
@@ -28,30 +51,40 @@ export function useNestedLayers(): NestedLayersHook {
             return false;
         }
 
-        return [...nestedLayersRef.current].some((node) => node.contains(target));
+        return [...nestedLayersRef.current].some((layer) => layer.node.contains(target));
     }, []);
 
-    const createNestedLayerRef = useCallback(() => {
-        let current: HTMLElement | null = null;
+    const hasActiveModalLayer = useCallback(() => {
+        return [...nestedLayersRef.current].some((layer) => layer.modal);
+    }, []);
 
-        return (node: HTMLElement | null) => {
-            if (current && current !== node) {
-                unregisterNestedLayer(current);
-            }
+    const createNestedLayerRef = useCallback(
+        ({ modal = false }: CreateNestedLayerRefOptions = {}) => {
+            let current: HTMLElement | null = null;
 
-            if (node && current !== node) {
-                registerNestedLayer(node);
-            }
+            return (node: HTMLElement | null) => {
+                if (current && current !== node) {
+                    unregisterNestedLayer(current);
+                }
 
-            current = node;
-        };
-    }, [registerNestedLayer, unregisterNestedLayer]);
+                if (node && current !== node) {
+                    registerNestedLayer(node, {
+                        modal,
+                    });
+                }
+
+                current = node;
+            };
+        },
+        [registerNestedLayer, unregisterNestedLayer],
+    );
 
     return {
         nestedLayersRef,
         registerNestedLayer,
         unregisterNestedLayer,
         isInsideNestedLayer,
+        hasActiveModalLayer,
         createNestedLayerRef,
     };
 }

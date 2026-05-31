@@ -110,11 +110,12 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
 
         const nestedLayers = useNestedLayers();
 
-        const { isInsideNestedLayer, createNestedLayerRef } = nestedLayers;
+        const { isInsideNestedLayer, createNestedLayerRef, nestedLayersRef } = nestedLayers;
 
         useFocusTrap({
             active: isMounted && modal,
             containerRef: panelRef,
+            nestedLayersRef,
             // onEscape: closeOnEscape ? onClose : undefined,
         });
 
