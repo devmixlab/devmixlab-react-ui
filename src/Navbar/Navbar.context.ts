@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { FocusableItem, FocusableListResult } from '../hooks/useFocusableList';
 import { FocusScope } from './Navbar.types';
+import { NestedLayersHook } from '../hooks/useNestedLayers';
 
 // -----------------------------------------------------------------------------
 // NavbarContext
@@ -28,9 +29,11 @@ type NavbarContextValue = {
     closeOnFocusOutside: boolean;
     closeOnPointerOutside: boolean;
 
-    registerNestedLayer: (node: HTMLElement) => void;
-    unregisterNestedLayer: (node: HTMLElement) => void;
-    nestedLayersRef: React.RefObject<Set<HTMLElement>>;
+    nestedLayers: NestedLayersHook;
+
+    // registerNestedLayer: (node: HTMLElement) => void;
+    // unregisterNestedLayer: (node: HTMLElement) => void;
+    // nestedLayersRef: React.RefObject<Set<HTMLElement>>;
 };
 
 const NavbarContext = createContext<NavbarContextValue | null>(null);

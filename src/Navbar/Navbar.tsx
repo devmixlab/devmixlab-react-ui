@@ -38,6 +38,7 @@ import {
     useEscapeKey,
     useFocusOutside,
     usePointerOutside,
+    useNestedLayers,
 } from '../hooks';
 
 import { Burger as BurgerIcon } from '../Icon';
@@ -90,15 +91,17 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
         const [items, setItems] = useState<FocusableItem[]>([]);
         const [mobileItems, setMobileItems] = useState<FocusableItem[]>([]);
 
-        const nestedLayersRef = useRef(new Set<HTMLElement>());
+        const nestedLayers = useNestedLayers();
 
-        const registerNestedLayer = useCallback((node: HTMLElement) => {
-            nestedLayersRef.current.add(node);
-        }, []);
-
-        const unregisterNestedLayer = useCallback((node: HTMLElement) => {
-            nestedLayersRef.current.delete(node);
-        }, []);
+        // const nestedLayersRef = useRef(new Set<HTMLElement>());
+        //
+        // const registerNestedLayer = useCallback((node: HTMLElement) => {
+        //     nestedLayersRef.current.add(node);
+        // }, []);
+        //
+        // const unregisterNestedLayer = useCallback((node: HTMLElement) => {
+        //     nestedLayersRef.current.delete(node);
+        // }, []);
 
         const rootRef = useRef<HTMLDivElement | null>(null);
         const toggleRef = useRef<HTMLButtonElement | null>(null);
@@ -158,9 +161,7 @@ const NavbarRoot = forwardRef<HTMLElement, NavbarProps>(
                     closeOnFocusOutside,
                     closeOnPointerOutside,
 
-                    nestedLayersRef,
-                    registerNestedLayer,
-                    unregisterNestedLayer,
+                    nestedLayers,
                 }}
             >
                 {collapsed && mobileOpen && backdrop && closeOnPointerOutside && (
@@ -282,9 +283,10 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
             closeOnSelect,
             collapsed,
             setMobileOpen,
-            registerNestedLayer,
-            unregisterNestedLayer,
+            nestedLayers,
         } = useNavbarContext();
+
+        const { createNestedLayerRef } = nestedLayers;
 
         const id = useStableId();
 
@@ -338,22 +340,6 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
                     break;
             }
         };
-
-        const createNestedLayerRef = useCallback(() => {
-            let current: HTMLElement | null = null;
-
-            return (node: HTMLElement | null) => {
-                if (current && current !== node) {
-                    unregisterNestedLayer(current);
-                }
-
-                if (node && current !== node) {
-                    registerNestedLayer(node);
-                }
-
-                current = node;
-            };
-        }, [registerNestedLayer, unregisterNestedLayer]);
 
         const itemClassName = clsx(prefix('__item'), className);
 
@@ -555,8 +541,10 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
             closeOnEscape,
             closeOnFocusOutside,
             closeOnPointerOutside,
-            nestedLayersRef,
+            nestedLayers,
         } = useNavbarContext();
+
+        const { isInsideNestedLayer } = nestedLayers;
 
         const [trapActive, setTrapActive] = useState(false);
 
@@ -569,11 +557,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
             onPointerOutside: (event) => {
                 const target = event.target as Node;
 
-                const isInsideNestedLayer = nestedLayersRef.current?.size
-                    ? [...nestedLayersRef.current].some((node) => node.contains(target))
-                    : false;
-
-                if (isInsideNestedLayer) {
+                if (isInsideNestedLayer(target)) {
                     return;
                 }
 
@@ -618,11 +602,7 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
                         return;
                     }
 
-                    const isInsideNestedLayer = nestedLayersRef.current?.size
-                        ? [...nestedLayersRef.current].some((node) => node.contains(activeElement))
-                        : false;
-
-                    if (isInsideNestedLayer) {
+                    if (isInsideNestedLayer(activeElement)) {
                         return;
                     }
 
@@ -630,22 +610,6 @@ const NavbarMobile = forwardRef<HTMLDivElement, NavbarMobileProps>(
                 });
             },
         });
-
-        // useEffect(() => {
-        //     if (!mobileOpen || !closeOnEscape) return;
-        //
-        //     const handleKeyDown = (e: KeyboardEvent) => {
-        //         if (e.key === 'Escape') {
-        //             setMobileOpen(false);
-        //         }
-        //     };
-        //
-        //     window.addEventListener('keydown', handleKeyDown);
-        //
-        //     return () => {
-        //         window.removeEventListener('keydown', handleKeyDown);
-        //     };
-        // }, [mobileOpen, closeOnEscape]);
 
         if (!collapsed) {
             return null;
