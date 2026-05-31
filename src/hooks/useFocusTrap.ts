@@ -1,7 +1,5 @@
 import React, { useLayoutEffect, useRef, RefObject, MutableRefObject } from 'react';
 
-import { NestedLayer } from '../hooks/useNestedLayers';
-
 const FOCUSABLE_SELECTORS = [
     'a[href]',
     'button:not([disabled])',
@@ -13,12 +11,19 @@ const FOCUSABLE_SELECTORS = [
 
 export type UseFocusTrapOptions = {
     active: boolean;
+
     containerRef: RefObject<HTMLElement | null>;
-    nestedLayersRef?: MutableRefObject<Set<NestedLayer>>;
+
+    nestedLayersRef?: MutableRefObject<Set<HTMLElement>>;
+
     onEscape?: () => void;
+
     isActive?: () => boolean;
+
     closeOnEscape?: boolean;
+
     restoreFocus?: boolean;
+
     initialFocus?: RefObject<HTMLElement | null>;
 };
 
@@ -37,6 +42,7 @@ export function useFocusTrap({
 }: UseFocusTrapOptions): void {
     const onEscapeRef = useRef(onEscape);
     const isActiveRef = useRef(isActive);
+
     const previousFocusedRef = useRef<HTMLElement | null>(null);
     const lastFocusedInScopeRef = useRef<HTMLElement | null>(null);
 
@@ -67,16 +73,15 @@ export function useFocusTrap({
 
         const getContainers = (): HTMLElement[] => [
             container,
-            ...(nestedLayersRef
-                ? [...nestedLayersRef.current]
-                      .filter((layer) => !layer.modal)
-                      .map((layer) => layer.node)
-                : []),
+            ...(nestedLayersRef ? [...nestedLayersRef.current] : []),
         ];
 
         const isInScope = (target: Node | null): boolean => {
-            if (!target) return false;
-            return getContainers().some((c) => c.contains(target));
+            if (!target) {
+                return false;
+            }
+
+            return getContainers().some((container) => container.contains(target));
         };
 
         const isInRootScope = (target: Node | null): boolean => {
@@ -93,16 +98,9 @@ export function useFocusTrap({
             }
         };
 
-        const isInModalNestedLayer = (target: Node | null): boolean => {
-            if (!target || !nestedLayersRef) return false;
-            return [...nestedLayersRef.current]
-                .filter((layer) => layer.modal)
-                .some((layer) => layer.node.contains(target));
-        };
-
         const getFocusable = (): HTMLElement[] =>
-            getContainers().flatMap((c) =>
-                Array.from(c.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)).filter(
+            getContainers().flatMap((container) =>
+                Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)).filter(
                     (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1 && isVisible(el),
                 ),
             );
@@ -126,11 +124,9 @@ export function useFocusTrap({
         }
 
         const onKeyDown = (e: KeyboardEvent): void => {
-            if (!isActiveRef.current()) return;
-
-            // If focus is inside a modal nested layer, let that layer
-            // handle all its own keyboard events — don't interfere
-            if (isInModalNestedLayer(document.activeElement)) return;
+            if (!isActiveRef.current()) {
+                return;
+            }
 
             if (e.key === 'Escape' && closeOnEscape) {
                 e.stopPropagation();
@@ -138,7 +134,9 @@ export function useFocusTrap({
                 return;
             }
 
-            if (e.key !== 'Tab') return;
+            if (e.key !== 'Tab') {
+                return;
+            }
 
             const elements = getFocusable();
 
@@ -150,28 +148,23 @@ export function useFocusTrap({
 
             const first = elements[0];
             const last = elements[elements.length - 1];
+
             const activeElement = document.activeElement as HTMLElement | null;
 
             if (!activeElement || !isInScope(activeElement)) {
-                // console.log('keydown active', document.activeElement);
-                // e.preventDefault();
-                // first.focus();
-                // return;
-                console.log('escaped');
                 return;
             }
 
             if (e.shiftKey) {
-                if (activeElement === first) {
+                if (activeElement === first && isInRootScope(activeElement)) {
                     e.preventDefault();
                     last.focus();
                 }
+
                 return;
             }
 
-            if (activeElement === last && isInRootScope(last)) {
-                console.log(isInScope(last));
-                console.log(last);
+            if (activeElement === last && isInRootScope(activeElement)) {
                 e.preventDefault();
                 first.focus();
             }
@@ -192,10 +185,6 @@ export function useFocusTrap({
             requestAnimationFrame(() => {
                 const activeElement = document.activeElement;
 
-                if (isInModalNestedLayer(activeElement)) {
-                    return;
-                }
-
                 if (isInScope(activeElement)) {
                     updateLastFocused(activeElement);
                     return;
@@ -213,10 +202,12 @@ export function useFocusTrap({
         };
 
         window.addEventListener('keydown', onKeyDown);
+
         document.addEventListener('focusin', onFocusIn);
 
         return () => {
             window.removeEventListener('keydown', onKeyDown);
+
             document.removeEventListener('focusin', onFocusIn);
 
             if (
