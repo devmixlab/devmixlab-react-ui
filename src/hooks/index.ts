@@ -12,3 +12,5 @@ export { usePointerOutside } from './usePointerOutside';
 export { useNestedLayers } from './useNestedLayers';
 export { useAutoFocus } from './useAutoFocus';
 export { useWindowBlur } from './useWindowBlur';
+export { useLastFocusableItemTab } from './useLastFocusableItemTab';
+export { useFocusBoundary } from './useFocusBoundary';

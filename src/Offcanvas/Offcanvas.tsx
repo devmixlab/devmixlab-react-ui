@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, CSSProperties } from 'react';
+import React, { forwardRef, useEffect, useRef, CSSProperties, useState } from 'react';
 
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
@@ -21,6 +21,8 @@ import {
     useAutoFocus,
     useRestoreFocus,
     useWindowBlur,
+    useLastFocusableItemTab,
+    useFocusBoundary,
 } from '../hooks';
 import { NestedLayersHook } from '../hooks/useNestedLayers';
 
@@ -29,6 +31,8 @@ const prefix = (name = '') => classPrefix(`--offcanvas${name}`);
 export type OffcanvasPlacement = 'left' | 'right' | 'top' | 'bottom';
 
 type OffcanvasEffect = 'scale' | 'slide' | 'none';
+
+type OverlayStyle = 'blur' | 'glass' | 'dim' | 'none';
 
 export const semanticSizes = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const;
 
@@ -67,6 +71,8 @@ export type OffcanvasProps = {
 
     animationEffect?: OffcanvasEffect;
 
+    overlayStyle?: OverlayStyle;
+
     modal?: boolean;
 };
 
@@ -93,11 +99,14 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
 
             animationEffect = 'slide',
 
+            overlayStyle = 'dim',
+
             modal = false,
         },
         ref,
     ) => {
         const panelRef = useRef<HTMLDivElement>(null);
+        const [restore, setRestore] = useState<'previous' | 'next'>('previous');
 
         // ── Presence ─────────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
@@ -110,7 +119,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
 
         const nestedLayers = useNestedLayers();
 
-        const { isInsideNestedLayer, createNestedLayerRef, nestedLayersRef } = nestedLayers;
+        const { nestedLayersRef } = nestedLayers;
 
         useFocusTrap({
             active: isMounted && modal,
@@ -119,37 +128,26 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             // onEscape: closeOnEscape ? onClose : undefined,
         });
 
-        useWindowBlur({
+        useFocusBoundary({
             active: isMounted && !modal,
-            onBlur: () => onClose?.(),
-        });
-
-        useFocusOutside({
-            active: isMounted && !modal,
-
             containerRef: panelRef,
 
-            onOutsideFocus: (event) => {
-                requestAnimationFrame(() => {
-                    const activeElement = document.activeElement;
+            onForwardBoundary: () => {
+                setRestore('next');
+                onClose?.();
+            },
 
-                    if (!(activeElement instanceof HTMLElement)) {
-                        return;
-                    }
+            onBackwardBoundary: () => {
+                setRestore('previous');
+                onClose?.();
+            },
+        });
 
-                    const isInsideContainer = panelRef.current?.contains(activeElement);
-
-                    if (isInsideContainer) {
-                        return;
-                    }
-
-                    if (isInsideNestedLayer(activeElement)) {
-                        return;
-                    }
-
-                    onClose?.();
-                });
-                // onClose?.();
+        useWindowBlur({
+            active: isMounted && !modal,
+            onBlur: () => {
+                setRestore('previous');
+                onClose?.();
             },
         });
 
@@ -160,9 +158,10 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         });
 
         useEscapeKey({
-            active: opened,
+            active: opened && closeOnEscape,
             containerRef: panelRef,
             onEscape: () => {
+                setRestore('previous');
                 onClose?.();
             },
         });
@@ -170,6 +169,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         useRestoreFocus({
             active: opened,
             containerRef: panelRef,
+            restoreMode: modal ? 'previous' : restore,
         });
 
         useEffect(() => {
@@ -185,10 +185,6 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
                 document.body.style.overflow = previousOverflow;
             };
         }, [isMounted]);
-
-        // if (!opened) {
-        //     return null;
-        // }
 
         if (!isMounted) return null;
 
@@ -222,6 +218,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
                                 onClose?.();
                             }
                         }}
+                        data-style={overlayStyle}
                     />
 
                     <Box
