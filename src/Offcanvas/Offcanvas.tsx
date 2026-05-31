@@ -13,6 +13,7 @@ import { useStableId } from '../utils/useStableId';
 import { Close as CloseIcon } from '../Icon';
 
 import { classPrefix } from '../utils/classPrefix';
+import { useFocusOutside } from '../hooks';
 
 const prefix = (name = '') => classPrefix(`--offcanvas${name}`);
 
@@ -101,7 +102,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         useFocusTrap({
             active: isMounted && trapFocus,
             containerRef: panelRef,
-            onEscape: closeOnEscape ? onClose : undefined,
+            // onEscape: closeOnEscape ? onClose : undefined,
         });
 
         useEffect(() => {
