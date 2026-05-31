@@ -13,7 +13,13 @@ import { useStableId } from '../utils/useStableId';
 import { Close as CloseIcon } from '../Icon';
 
 import { classPrefix } from '../utils/classPrefix';
-import { useFocusOutside } from '../hooks';
+import {
+    useEscapeKey,
+    useFocusOutside,
+    useNestedLayers,
+    useAutoFocus,
+    useRestoreFocus,
+} from '../hooks';
 
 const prefix = (name = '') => classPrefix(`--offcanvas${name}`);
 
@@ -58,7 +64,7 @@ export type OffcanvasProps = {
 
     animationEffect?: OffcanvasEffect;
 
-    trapFocus?: boolean;
+    modal?: boolean;
 };
 
 const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
@@ -84,7 +90,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
 
             animationEffect = 'slide',
 
-            trapFocus = false,
+            modal = false,
         },
         ref,
     ) => {
@@ -99,10 +105,62 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             onExited: onAnimationExited,
         });
 
+        const nestedLayers = useNestedLayers();
+
+        const { isInsideNestedLayer, createNestedLayerRef } = nestedLayers;
+
         useFocusTrap({
-            active: isMounted && trapFocus,
+            active: isMounted && modal,
             containerRef: panelRef,
             // onEscape: closeOnEscape ? onClose : undefined,
+        });
+
+        useFocusOutside({
+            active: isMounted && !modal,
+
+            containerRef: panelRef,
+
+            onOutsideFocus: (event) => {
+                requestAnimationFrame(() => {
+                    const activeElement = document.activeElement;
+
+                    if (!(activeElement instanceof HTMLElement)) {
+                        return;
+                    }
+
+                    const isInsideContainer = panelRef.current?.contains(activeElement);
+
+                    if (isInsideContainer) {
+                        return;
+                    }
+
+                    if (isInsideNestedLayer(activeElement)) {
+                        return;
+                    }
+
+                    onClose?.();
+                });
+                // onClose?.();
+            },
+        });
+
+        useAutoFocus({
+            active: !modal && isMounted,
+            containerRef: panelRef,
+            // initialFocusRef: inputRef,
+        });
+
+        useEscapeKey({
+            active: opened,
+            containerRef: panelRef,
+            onEscape: () => {
+                onClose?.();
+            },
+        });
+
+        useRestoreFocus({
+            active: opened,
+            containerRef: panelRef,
         });
 
         useEffect(() => {

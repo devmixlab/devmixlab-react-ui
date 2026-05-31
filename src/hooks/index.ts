@@ -10,3 +10,4 @@ export { useEscapeKey } from './useEscapeKey';
 export { useFocusOutside } from './useFocusOutside';
 export { usePointerOutside } from './usePointerOutside';
 export { useNestedLayers } from './useNestedLayers';
+export { useAutoFocus } from './useAutoFocus';
