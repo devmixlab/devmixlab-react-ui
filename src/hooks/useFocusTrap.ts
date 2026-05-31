@@ -38,6 +38,7 @@ export function useFocusTrap({
     const onEscapeRef = useRef(onEscape);
     const isActiveRef = useRef(isActive);
     const previousFocusedRef = useRef<HTMLElement | null>(null);
+    const lastFocusedInScopeRef = useRef<HTMLElement | null>(null);
 
     useLayoutEffect(() => {
         onEscapeRef.current = onEscape;
@@ -78,6 +79,20 @@ export function useFocusTrap({
             return getContainers().some((c) => c.contains(target));
         };
 
+        const isInRootScope = (target: Node | null): boolean => {
+            if (!target) {
+                return false;
+            }
+
+            return container.contains(target);
+        };
+
+        const updateLastFocused = (target: Node | null) => {
+            if (target instanceof HTMLElement && isInScope(target)) {
+                lastFocusedInScopeRef.current = target;
+            }
+        };
+
         const isInModalNestedLayer = (target: Node | null): boolean => {
             if (!target || !nestedLayersRef) return false;
             return [...nestedLayersRef.current]
@@ -104,8 +119,10 @@ export function useFocusTrap({
 
         if (initial) {
             initial.focus();
+            lastFocusedInScopeRef.current = initial;
         } else {
             container.focus();
+            lastFocusedInScopeRef.current = container;
         }
 
         const onKeyDown = (e: KeyboardEvent): void => {
@@ -136,8 +153,11 @@ export function useFocusTrap({
             const activeElement = document.activeElement as HTMLElement | null;
 
             if (!activeElement || !isInScope(activeElement)) {
-                e.preventDefault();
-                first.focus();
+                // console.log('keydown active', document.activeElement);
+                // e.preventDefault();
+                // first.focus();
+                // return;
+                console.log('escaped');
                 return;
             }
 
@@ -149,31 +169,46 @@ export function useFocusTrap({
                 return;
             }
 
-            if (activeElement === last) {
+            if (activeElement === last && isInRootScope(last)) {
+                console.log(isInScope(last));
+                console.log(last);
                 e.preventDefault();
                 first.focus();
             }
         };
 
         const onFocusIn = (e: FocusEvent): void => {
-            if (!isActiveRef.current()) return;
+            if (!isActiveRef.current()) {
+                return;
+            }
+
+            const target = e.target as Node | null;
+
+            if (isInScope(target)) {
+                updateLastFocused(target);
+                return;
+            }
 
             requestAnimationFrame(() => {
-                const target = (document.activeElement as Node | null) ?? (e.target as Node | null);
+                const activeElement = document.activeElement;
 
-                // Don't reclaim focus from a modal nested layer —
-                // it owns its own focus scope
-                if (isInModalNestedLayer(target)) return;
-
-                if (isInScope(target)) return;
-
-                const elements = getFocusable();
-
-                if (elements.length) {
-                    elements[0].focus();
-                } else {
-                    container.focus();
+                if (isInModalNestedLayer(activeElement)) {
+                    return;
                 }
+
+                if (isInScope(activeElement)) {
+                    updateLastFocused(activeElement);
+                    return;
+                }
+
+                const bodyFocused =
+                    activeElement === document.body || activeElement === document.documentElement;
+
+                if (!bodyFocused) {
+                    return;
+                }
+
+                lastFocusedInScopeRef.current?.focus();
             });
         };
 
