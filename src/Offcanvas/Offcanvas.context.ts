@@ -8,6 +8,7 @@ import { NestedLayersHook } from '../hooks/useNestedLayers';
 
 type OffcanvasContextValue = {
     nestedLayers: NestedLayersHook;
+    onClose?: () => void;
 };
 
 const OffcanvasContext = createContext<OffcanvasContextValue | undefined>(undefined);

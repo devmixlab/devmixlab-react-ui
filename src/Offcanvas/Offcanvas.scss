@@ -21,6 +21,7 @@ $heights: (
 .#{$offcanvas-prefix} {
 
     //--transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
+    --ring: var(--#{$p}-accent-primary);
 
 
     position: fixed;
@@ -49,6 +50,11 @@ $heights: (
         0 4px 6px -4px rgb(0 0 0 / 0.1);
 
         outline: none;
+
+        &:focus-visible {
+            outline: 2px solid var(--ring);
+            outline-offset: -2px;
+        }
 
         &[data-orientation='horizontal']{
             @each $size, $value in $widths {

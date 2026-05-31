@@ -20,6 +20,7 @@ import {
     useNestedLayers,
     useAutoFocus,
     useRestoreFocus,
+    useWindowBlur,
 } from '../hooks';
 import { NestedLayersHook } from '../hooks/useNestedLayers';
 
@@ -117,6 +118,11 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             // onEscape: closeOnEscape ? onClose : undefined,
         });
 
+        useWindowBlur({
+            active: isMounted && !modal,
+            onBlur: () => onClose?.(),
+        });
+
         useFocusOutside({
             active: isMounted && !modal,
 
@@ -195,7 +201,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         const panelHeight = isVertical ? size : undefined;
 
         return createPortal(
-            <OffcanvasProvider value={{ nestedLayers }}>
+            <OffcanvasProvider value={{ nestedLayers, onClose }}>
                 <div
                     className={prefix()}
                     data-animation-state={animationState}
@@ -224,7 +230,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
                         h={semanticSize == null ? panelHeight : undefined}
                         role="dialog"
                         aria-modal="true"
-                        tabIndex={-1}
+                        tabIndex={modal ? -1 : undefined}
                         data-animation-effect={animationEffect}
                         data-animation-state={animationState}
                         data-placement={placement}
@@ -253,22 +259,42 @@ type SectionProps = {
     render?: (props: SectionRenderProps) => React.ReactNode;
 };
 
-const OffcanvasHeader = ({ children, className, closeButton }: SectionProps) => {
-    return (
-        <div className={clsx(prefix('__header'), className)}>
-            <div>{children}</div>
+const OffcanvasHeader = ({ children, className, closeButton, render }: SectionProps) => {
+    const { nestedLayers, onClose } = useOffcanvasContext();
+    const { createNestedLayerRef } = nestedLayers;
 
-            {closeButton && (
-                <button type="button" className={prefix('__close')}>
-                    <CloseIcon />
-                </button>
+    return (
+        <Box className={clsx(prefix('__header'), className)}>
+            {render ? (
+                render({ createNestedLayerRef })
+            ) : (
+                <>
+                    <div>{children}</div>
+
+                    {closeButton && (
+                        <button
+                            onClick={() => onClose?.()}
+                            type="button"
+                            className={prefix('__close')}
+                        >
+                            <CloseIcon />
+                        </button>
+                    )}
+                </>
             )}
-        </div>
+        </Box>
     );
 };
 
-const OffcanvasFooter = ({ children, className }: SectionProps) => {
-    return <div className={clsx(prefix('__footer'), className)}>{children}</div>;
+const OffcanvasFooter = ({ children, className, render }: SectionProps) => {
+    const { nestedLayers } = useOffcanvasContext();
+    const { createNestedLayerRef } = nestedLayers;
+
+    return (
+        <Box className={clsx(prefix('__footer'), className)}>
+            {render ? render({ createNestedLayerRef }) : children}
+        </Box>
+    );
 };
 
 const OffcanvasBody = ({ children, className, render }: SectionProps) => {
