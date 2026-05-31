@@ -110,7 +110,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         ref,
     ) => {
         const panelRef = useRef<HTMLDivElement>(null);
-        const [restore, setRestore] = useState<'previous' | 'next'>('previous');
+        const [restoreMode, setRestoreMode] = useState<'previous' | 'next'>('previous');
 
         // ── Presence ─────────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
@@ -137,12 +137,12 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             containerRef: panelRef,
 
             onForwardBoundary: () => {
-                setRestore('next');
+                setRestoreMode('next');
                 onClose?.();
             },
 
             onBackwardBoundary: () => {
-                setRestore('previous');
+                setRestoreMode('previous');
                 onClose?.();
             },
         });
@@ -150,7 +150,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         useWindowBlur({
             active: isMounted && !modal,
             onBlur: () => {
-                setRestore('previous');
+                setRestoreMode('previous');
                 onClose?.();
             },
         });
@@ -165,7 +165,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
             active: opened && closeOnEscape,
             containerRef: panelRef,
             onEscape: () => {
-                setRestore('previous');
+                setRestoreMode('previous');
                 onClose?.();
             },
         });
@@ -173,11 +173,15 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         useRestoreFocus({
             active: opened,
             containerRef: panelRef,
-            restoreMode: modal ? 'previous' : restore,
+            restoreMode: modal ? 'previous' : restoreMode,
         });
 
         useEffect(() => {
             if (!isMounted) {
+                return;
+            }
+
+            if (!modal) {
                 return;
             }
 
@@ -231,7 +235,7 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
                         w={semanticSize == null ? panelWidth : undefined}
                         h={semanticSize == null ? panelHeight : undefined}
                         role="dialog"
-                        aria-modal="true"
+                        aria-modal={modal}
                         tabIndex={modal ? -1 : undefined}
                         data-animation-effect={animationEffect}
                         data-animation-state={animationState}
@@ -288,13 +292,14 @@ const OffcanvasHeader = ({
                 render({ createNestedLayerRef })
             ) : (
                 <>
-                    <div>{children}</div>
+                    <div className={prefix('__header-content')}>{children}</div>
 
                     {closeButton && (
                         <button
                             onClick={() => onClose?.()}
                             type="button"
                             className={prefix('__close')}
+                            aria-label="Close offcanvas"
                         >
                             <CloseIcon />
                         </button>

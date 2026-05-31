@@ -325,6 +325,7 @@ $heights: (
         flex: 1;
 
         overflow: auto;
+        overscroll-behavior: contain;
 
         //padding: 1rem;
     }
