@@ -9,6 +9,7 @@ import { mergeRefs } from '../utils/mergeRefs';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { usePresence } from '../hooks/usePresence';
 import { useStableId } from '../utils/useStableId';
+import { OffcanvasProvider, useOffcanvasContext } from './Offcanvas.context';
 
 import { Close as CloseIcon } from '../Icon';
 
@@ -20,6 +21,7 @@ import {
     useAutoFocus,
     useRestoreFocus,
 } from '../hooks';
+import { NestedLayersHook } from '../hooks/useNestedLayers';
 
 const prefix = (name = '') => classPrefix(`--offcanvas${name}`);
 
@@ -193,55 +195,62 @@ const OffcanvasRoot = forwardRef<HTMLDivElement, OffcanvasProps>(
         const panelHeight = isVertical ? size : undefined;
 
         return createPortal(
-            <div
-                className={prefix()}
-                data-animation-state={animationState}
-                style={
-                    {
-                        '--animation-enter-duration': animationEnterDuration + 'ms',
-                        '--animation-exit-duration': animationExitDuration + 'ms',
-                        '--animation-enter-easing': enterAnimationEasing,
-                        '--animation-exit-easing': exitAnimationEasing,
-                    } as CSSProperties
-                }
-            >
+            <OffcanvasProvider value={{ nestedLayers }}>
                 <div
-                    className={prefix('__overlay')}
-                    onClick={() => {
-                        if (closeOnOverlayClick) {
-                            onClose?.();
-                        }
-                    }}
-                />
-
-                <Box
-                    ref={mergeRefs(panelRef, ref)}
-                    className={clsx(prefix('__panel'), className)}
-                    w={semanticSize == null ? panelWidth : undefined}
-                    h={semanticSize == null ? panelHeight : undefined}
-                    role="dialog"
-                    aria-modal="true"
-                    tabIndex={-1}
-                    data-animation-effect={animationEffect}
+                    className={prefix()}
                     data-animation-state={animationState}
-                    data-placement={placement}
-                    data-size={semanticSize}
-                    data-orientation={isVertical ? 'vertical' : 'horizontal'}
+                    style={
+                        {
+                            '--animation-enter-duration': animationEnterDuration + 'ms',
+                            '--animation-exit-duration': animationExitDuration + 'ms',
+                            '--animation-enter-easing': enterAnimationEasing,
+                            '--animation-exit-easing': exitAnimationEasing,
+                        } as CSSProperties
+                    }
                 >
-                    <Box display="flex" flexDirection="column" h="100%">
-                        {children}
+                    <div
+                        className={prefix('__overlay')}
+                        onClick={() => {
+                            if (closeOnOverlayClick) {
+                                onClose?.();
+                            }
+                        }}
+                    />
+
+                    <Box
+                        ref={mergeRefs(panelRef, ref)}
+                        className={clsx(prefix('__panel'), className)}
+                        w={semanticSize == null ? panelWidth : undefined}
+                        h={semanticSize == null ? panelHeight : undefined}
+                        role="dialog"
+                        aria-modal="true"
+                        tabIndex={-1}
+                        data-animation-effect={animationEffect}
+                        data-animation-state={animationState}
+                        data-placement={placement}
+                        data-size={semanticSize}
+                        data-orientation={isVertical ? 'vertical' : 'horizontal'}
+                    >
+                        <Box display="flex" flexDirection="column" h="100%">
+                            {children}
+                        </Box>
                     </Box>
-                </Box>
-            </div>,
+                </div>
+            </OffcanvasProvider>,
             portalContainer ?? document.body,
         );
     },
 );
 
+type SectionRenderProps = {
+    createNestedLayerRef: () => (node: HTMLElement | null) => void;
+};
+
 type SectionProps = {
     children?: React.ReactNode;
     className?: string;
     closeButton?: boolean;
+    render?: (props: SectionRenderProps) => React.ReactNode;
 };
 
 const OffcanvasHeader = ({ children, className, closeButton }: SectionProps) => {
@@ -262,8 +271,16 @@ const OffcanvasFooter = ({ children, className }: SectionProps) => {
     return <div className={clsx(prefix('__footer'), className)}>{children}</div>;
 };
 
-const OffcanvasBody = ({ children, className }: SectionProps) => {
-    return <div className={clsx(prefix('__body'), className)}>{children}</div>;
+const OffcanvasBody = ({ children, className, render }: SectionProps) => {
+    const { nestedLayers } = useOffcanvasContext();
+
+    const { createNestedLayerRef } = nestedLayers;
+
+    return (
+        <Box className={clsx(prefix('__body'), className)}>
+            {render ? render({ createNestedLayerRef }) : children}
+        </Box>
+    );
 };
 
 type OffcanvasComponent = typeof OffcanvasRoot & {
