@@ -1,3 +1,5 @@
+@use './comps/box/box';
+
 @use 'config' as cfg;
 
 $prefix: cfg.$prefix;

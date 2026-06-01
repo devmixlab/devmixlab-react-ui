@@ -14,7 +14,12 @@
         "watch:scss": "sass src:dev --watch",
         "test": "vitest",
         "test:run": "vitest run",
-        "test:coverage": "vitest run --coverage"
+        "test:coverage": "vitest run --coverage",
+        "copy:scss": "cd src && cpy \"**/*.scss\" ../dist --parents",
+        "copy:scss:watch": "chokidar \"src/**/*.scss\" -c \"npm run copy:scss\""
+    },
+    "exports": {
+        "./src/Button/Button.scss": "./dist/scss/Button.scss"
     },
     "peerDependencies": {
         "@headlessui/react": "^2.2.9",
@@ -35,7 +40,9 @@
         "@typescript-eslint/eslint-plugin": "^8.54.0",
         "@typescript-eslint/parser": "^8.54.0",
         "@vitejs/plugin-react": "^6.0.1",
+        "chokidar-cli": "^3.0.0",
         "clsx": "^2.1.1",
+        "cpy-cli": "^7.0.0",
         "eslint": "^9.39.4",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",

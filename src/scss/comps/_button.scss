@@ -4,6 +4,8 @@
 @use '../config' as cfg;
 @use 'sass:map';
 
+@use './spinner';
+
 $p: cfg.$prefix;
 $button-prefix: #{$p}--button;
 $button-group-prefix: #{$button-prefix}-group;

@@ -4,7 +4,7 @@ import postcss from 'rollup-plugin-postcss';
 import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-    input: 'index.tsx',
+    input: 'index.ts',
     output: [
         {
             file: 'dist/index.esm.js',
