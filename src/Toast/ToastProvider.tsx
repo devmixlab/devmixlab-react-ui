@@ -4,7 +4,8 @@ import { ToastContext, ToastRecord } from './Toast.context';
 
 import { ToastViewport } from './ToastViewport';
 
-export type ToastIntent = 'success' | 'error' | 'warning' | 'info';
+// export type ToastIntent = 'success' | 'error' | 'warning' | 'info';
+export type ToastIntent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
 
 export type ToastOptions = {
     title?: React.ReactNode;

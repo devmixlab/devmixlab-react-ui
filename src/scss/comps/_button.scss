@@ -379,6 +379,7 @@ $intents: (indigo, violet, purple, rose, fuchsia, pink, olive, navy, brown, beig
                 --text: #{functions.intent-color($intent, 600)};
                 --text-hover: #{functions.intent-color($intent, 700)};
                 --text-active: #{functions.intent-color($intent, 800)};
+                --border: transparent;
 
                 &[data-active] {
                     // active ghost should feel quiet and stable

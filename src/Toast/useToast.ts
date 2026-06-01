@@ -18,7 +18,7 @@ export const useToast = () => {
             context.show({
                 title,
                 description,
-                intent: 'error',
+                intent: 'danger',
             }),
 
         warning: (title: React.ReactNode, description?: React.ReactNode) =>

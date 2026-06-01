@@ -4,6 +4,8 @@ import { ToastRecord, useToastContext } from './Toast.context';
 
 import { classPrefix } from '../utils/classPrefix';
 
+import { Alert } from '../Alert/Alert';
+
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
 type ToastItemProps = {
@@ -26,10 +28,14 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
     }, [toast.id, toast.duration, close]);
 
     return (
-        <div
+        <Alert
+            dismissible
+            accent
+            onDismiss={() => close(toast.id)}
             className={prefix('__item')}
+            intent={toast.intent}
             data-intent={toast.intent}
-            role={toast.intent === 'error' ? 'alert' : 'status'}
+            role={toast.intent === 'danger' ? 'alert' : 'status'}
         >
             <div className={prefix('__content')}>
                 {toast.title && <div className={prefix('__title')}>{toast.title}</div>}
@@ -39,11 +45,11 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
                 )}
             </div>
 
-            {toast.closable && (
-                <button type="button" onClick={() => close(toast.id)}>
-                    ×
-                </button>
-            )}
-        </div>
+            {/*{toast.closable && (*/}
+            {/*    <button type="button" onClick={() => close(toast.id)}>*/}
+            {/*        ×*/}
+            {/*    </button>*/}
+            {/*)}*/}
+        </Alert>
     );
 };

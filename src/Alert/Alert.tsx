@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { Info, Warning, Success, Close } from '../Icon';
 import { Density } from '../Card/card.tokens';
 import { sizeToDensityMap, Intent, Variant, Size } from './alert.tokens';
+import { Button } from '../Button/Button';
 
 export const prefix = (name: string = '') => {
     return `${CLASS_PREFIX}--alert${name}`;
@@ -75,20 +76,17 @@ const AlertImpl = (
 
     return (
         <Card
-            className={clsx(
-                prefix(),
-                prefix(`--${intent}-${variant}`),
-                prefix(`--size-${size}`),
-                className,
-            )}
+            className={clsx(prefix(), className)}
             density={density}
             direction="row"
             rounded="md"
-            // theme={themes[intent][variant]}
             ref={ref}
+            data-intent={intent}
+            data-variant={variant}
+            data-size={size}
             {...rest}
         >
-            <Card.Section density="none" d="flex" gap={size} flex="1">
+            <Card.Section density="none" d="flex" gap={size} flex="1" px={size}>
                 {resolvedIcon != null && (
                     // <Card.Media pl={2} mr={0} centerY justify="right">
                     //     <Card.Media.Icon size="md" justify="right" w={30}>
@@ -107,26 +105,41 @@ const AlertImpl = (
                 )}
 
                 {/*<Card.Body pos="relative">*/}
-                <Card.Section density="none" py={size} grow={1} flex={1}>
+                <Card.Section border="none" density="none" py={size} grow={1} flex={1}>
                     {children}
                 </Card.Section>
 
                 {dismissible && (
-                    <Card.Section pt={size} pr={size} density="none">
-                        <Box mt="2px">
-                            <Box
-                                as="button"
-                                rounded="xs"
-                                // size={26}
-                                onClick={handleDismiss}
-                                aria-label="Close alert"
-                                className={prefix('__dismiss-button')}
-                            >
-                                <span className={prefix('__dismiss-icon')}>
-                                    <Close />
-                                </span>
-                            </Box>
-                        </Box>
+                    <Card.Section
+                        d="flex"
+                        justify="center"
+                        align="centner"
+                        pt={size}
+                        density="none"
+                    >
+                        <Button
+                            onClick={handleDismiss}
+                            variant="ghost"
+                            intent={intent}
+                            iconOnly
+                            size="xs"
+                        >
+                            <Close />
+                        </Button>
+                        {/*<Box mt="2px">*/}
+                        {/*    <Box*/}
+                        {/*        as="button"*/}
+                        {/*        rounded="xs"*/}
+                        {/*        // size={26}*/}
+                        {/*        onClick={handleDismiss}*/}
+                        {/*        aria-label="Close alert"*/}
+                        {/*        className={prefix('__dismiss-button')}*/}
+                        {/*    >*/}
+                        {/*        <span className={prefix('__dismiss-icon')}>*/}
+                        {/*            <Close />*/}
+                        {/*        </span>*/}
+                        {/*    </Box>*/}
+                        {/*</Box>*/}
                     </Card.Section>
                 )}
             </Card.Section>
