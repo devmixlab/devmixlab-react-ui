@@ -173,7 +173,6 @@ $intents: (primary, secondary, info, warning, success, danger);
  * @attr data-icon-only Square icon-only button
  * @attr data-numeric Numeric button with tabular numbers
  * @attr data-long-number Allow wider numeric content
- * @attr data-pseudo-focused="true" Programmatic focus state
  * @attr data-no-interaction Disable all interactions and transitions
  */
 .#{$button-prefix} {
@@ -278,7 +277,6 @@ $intents: (primary, secondary, info, warning, success, danger);
         }
     }
 
-    &[data-pseudo-focused='true'],
     &:focus-visible {
         outline: 2px solid var(--button-ring);
         outline-offset: 2px;

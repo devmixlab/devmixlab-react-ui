@@ -16,8 +16,6 @@ export type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentPr
         size?: Size;
         number?: number; // to format value as tabular-nums
         disabled?: boolean;
-        pseudoFocused?: boolean;
-        pseudoActive?: boolean;
         active?: boolean; // selected / current (pagination, tabs)
         noInteraction?: boolean; // removes hover/active interaction styles
         rounded?: BoxProps['rounded'];
@@ -50,11 +48,8 @@ const ButtonImpl = (
         size = 'md',
         number,
         disabled = false,
-        pseudoFocused,
-        pseudoActive,
         active = false,
         noInteraction = false,
-        // fullWidth = false,
         rounded = 'md',
         iconOnly = false,
         startIcon,
@@ -126,7 +121,7 @@ const ButtonImpl = (
             aria-busy={showSpinner}
             aria-disabled={isDisabled}
             role={!isButton ? 'button' : undefined}
-            tabIndex={pseudoFocused !== undefined ? -1 : !isButton && !isDisabled ? 0 : undefined}
+            tabIndex={!isButton ? (isDisabled ? -1 : 0) : undefined}
             as={as}
             type={isButton ? type : undefined}
             ref={ref}
@@ -147,8 +142,6 @@ const ButtonImpl = (
             data-icon-only={iconOnly || undefined}
             data-loading={showSpinner || undefined}
             data-loading-position={showSpinner ? loadingPosition : undefined}
-            data-pseudo-focused={pseudoFocused || undefined}
-            data-pseudo-active={pseudoActive || undefined}
         >
             {/* START ICON */}
             {startIcon &&
