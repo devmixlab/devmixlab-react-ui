@@ -3,7 +3,7 @@
 
 @use './comps/form/form';
 @use './comps/chip';
-@use './comps/card';
+//@use './comps/card';
 @use './comps/badge';
 @use './comps/button';
 @use './comps/spinner';
@@ -17,4 +17,5 @@
 @use '../Offcanvas/Offcanvas';
 @use '../Toast/Toast';
 @use '../Alert/Alert';
+//@use '../Card/Card';
 @use './comps/box/box';

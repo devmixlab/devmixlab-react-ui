@@ -17,3 +17,5 @@ CompCard.Content = Content;
 CompCard.Section = Section;
 
 export { CompCard as Card };
+
+// export { default as cardStyles } from './Card.scss';
