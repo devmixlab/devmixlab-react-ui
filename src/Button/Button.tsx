@@ -69,6 +69,13 @@ const ButtonImpl = (
     const isButton = as === 'button';
     const isDisabled = disabled || loading || noInteraction;
 
+    const linkProps =
+        !isButton && isDisabled
+            ? {
+                  href: undefined,
+              }
+            : {};
+
     const { onClick, onKeyDown, ...restProps } = props;
 
     const cl = clsx(className, prefix());
@@ -120,6 +127,7 @@ const ButtonImpl = (
         <Box
             aria-busy={showSpinner}
             aria-disabled={isDisabled}
+            aria-pressed={active || undefined}
             role={!isButton ? 'button' : undefined}
             tabIndex={!isButton ? (isDisabled ? -1 : 0) : undefined}
             as={as}
@@ -129,6 +137,7 @@ const ButtonImpl = (
             disabled={isButton ? isDisabled : undefined}
             rounded={rounded}
             {...restProps}
+            {...linkProps}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
             data-size={size}
