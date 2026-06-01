@@ -1,35 +1,10 @@
-import React, { useEffect, useState, forwardRef, useMemo } from 'react';
+import React, { useEffect, useState, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Box, BoxComponentProps, type BoxProps } from '../Box/Box';
 import { createPolymorphic } from '../types/polymorphic';
 import { LoadingPosition, Size, Intent, Variant } from './button.tokens';
-import { isLongNumber, prefix } from './button.helpers';
+import { isLongNumber, prefix } from './Button.helpers';
 import { DefaultSpinner } from '../Spinner/DefaultSpinner';
-import { NavbarItemRenderProps } from '../Navbar/Navbar.types';
-
-// export type ButtonProps = React.ButtonHTMLAttributes<HTMLElement> & {
-// export type ButtonProps = {
-//     className?: string;
-//     children?: React.ReactNode;
-//     intent?: Intent;
-//     variant?: Variant;
-//     size?: Size;
-//     number?: number; // to format value as tabular-nums
-//     disabled?: boolean;
-//     pseudoFocused?: boolean;
-//     pseudoActive?: boolean;
-//     active?: boolean; // selected / current (pagination, tabs)
-//     noInteraction?: boolean; // removes hover/active interaction styles
-//     // fullWidth?: boolean;
-//     rounded?: BoxProps['rounded'];
-//     iconOnly?: boolean;
-//     startIcon?: React.ReactNode;
-//     endIcon?: React.ReactNode;
-//     loading?: boolean;
-//     loadingPosition?: LoadingPosition;
-//     spinnerDelay?: number;
-//     loadingComponent?: React.ReactNode;
-// };
 
 export type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
     C,
@@ -45,7 +20,6 @@ export type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentPr
         pseudoActive?: boolean;
         active?: boolean; // selected / current (pagination, tabs)
         noInteraction?: boolean; // removes hover/active interaction styles
-        // fullWidth?: boolean;
         rounded?: BoxProps['rounded'];
         iconOnly?: boolean;
         startIcon?: React.ReactNode;
@@ -102,24 +76,7 @@ const ButtonImpl = (
 
     const { onClick, onKeyDown, ...restProps } = props;
 
-    const cl = clsx(
-        className,
-        prefix(),
-        // prefix(`--${variant}`),
-        // prefix(`--${intent}`),
-        // prefix(`--size-${size}`),
-        {
-            // [prefix(`--numeric`)]: number != null,
-            // [prefix(`--long`)]: isLongNumber(number, 2),
-            // [prefix(`--disabled`)]: disabled,
-            // [prefix(`--active`)]: active,
-            // [prefix(`--no-interaction`)]: noInteraction,
-            // [bs.fullWidth]: fullWidth,
-            // [prefix(`--icon-only`)]: iconOnly,
-            // [prefix(`--loading`)]: showSpinner,
-            // [prefix(`--loading-${loadingPosition}`)]: showSpinner,
-        },
-    );
+    const cl = clsx(className, prefix());
 
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;

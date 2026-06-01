@@ -2,6 +2,6 @@
 
 $p: cfg.$prefix;
 
-@function variable($name) {
-    @return var(--#{$p}#{$name});
+@function v($name) {
+    @return var(--#{$p}-#{$name});
 }
