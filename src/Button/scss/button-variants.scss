@@ -1,0 +1,61 @@
+@use '../../scss/functions' as fn;
+@use '../../scss/config' as cfg;
+@use 'variant-mixins' as btn;
+@use './config' as *;
+
+$intents: (primary, secondary, info, warning, success, danger);
+
+.#{$button-prefix} {
+
+    @each $intent in $intents {
+        &[data-intent='#{$intent}'] {
+
+            --button-ring: #{fn.intent-color($intent, 600)};
+
+            &[data-variant='solid'] {
+                @include btn.solid($intent);
+            }
+
+            &[data-variant='base'] {
+                @include btn.base($intent);
+            }
+
+            &[data-variant='outlined'] {
+                @include btn.outlined($intent);
+            }
+
+            &[data-variant='ghost'] {
+                @include btn.ghost($intent);
+            }
+
+            &[data-variant='link'] {
+                @include btn.link($intent);
+            }
+
+            @include cfg.dark {
+                --button-ring: #{fn.intent-color($intent, 400)}; // lighter for dark bg
+
+                &[data-variant='solid'] {
+                    @include btn.solid($intent, 'dark');
+                }
+
+                &[data-variant='base'] {
+                    @include btn.base($intent, 'dark');
+                }
+
+                &[data-variant='outlined'] {
+                    @include btn.outlined($intent, 'dark');
+                }
+
+                &[data-variant='ghost'] {
+                    @include btn.ghost($intent, 'dark');
+                }
+
+                &[data-variant='link'] {
+                    @include btn.link($intent, 'dark');
+                }
+            }
+
+        }
+    }
+}

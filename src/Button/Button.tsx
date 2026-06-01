@@ -2,11 +2,11 @@ import React, { useEffect, useState, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Box, BoxComponentProps, type BoxProps } from '../Box/Box';
 import { createPolymorphic } from '../types/polymorphic';
-import { LoadingPosition, Size, Intent, Variant } from './button.tokens';
+import { LoadingPosition, Size, Intent, Variant } from './Button.tokens';
 import { isLongNumber, prefix } from './Button.helpers';
 import { DefaultSpinner } from '../Spinner/DefaultSpinner';
 
-export type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
+type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
     C,
     {
         className?: string;
@@ -29,7 +29,7 @@ export type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentPr
     }
 >;
 
-export type ButtonImplProps = ButtonProps & {
+type ButtonImplProps = ButtonProps & {
     as?: React.ElementType;
     type?: 'button' | 'submit' | 'reset';
 } & {
@@ -186,3 +186,5 @@ const ButtonImpl = (
 };
 
 export const Button = createPolymorphic<ButtonProps, 'button'>(forwardRef(ButtonImpl), 'Button');
+
+export type { ButtonProps, ButtonImplProps };

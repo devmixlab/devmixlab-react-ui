@@ -1,0 +1,5 @@
+@use '../../scss/config' as cfg;
+
+$p: cfg.$prefix;
+$button-prefix: #{$p}--button;
+$button-group-prefix: #{$button-prefix}-group;

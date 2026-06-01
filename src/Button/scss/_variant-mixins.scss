@@ -1,0 +1,361 @@
+@use '../../scss/functions' as fn;
+@use './config' as *;
+
+@mixin outlined-overlay {
+    position: relative;
+
+    &::after {
+        content: '';
+
+        position: absolute;
+        inset: 0;
+
+        border-radius: inherit;
+
+        border: 1px solid var(--button-border-hover);
+
+        pointer-events: none;
+
+        opacity: 0;
+
+        transition:
+            border-color var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
+            opacity var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+    }
+
+    &:not([data-disabled]):hover::after {
+        opacity: 1;
+    }
+}
+
+@mixin solid ($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --button-bg: #{fn.intent-color($intent, 600)};
+        --button-bg-hover: #{fn.intent-color($intent, 700)};
+        --button-bg-active: #{fn.intent-color($intent, 800)};
+
+        --button-text: #{fn.intent-color($intent, 0)};
+        --button-text-hover: var(--button-text);
+        --button-text-active: var(--button-text);
+        --button-border: transparent;
+
+        &[data-active] {
+            --button-bg: #{fn.intent-color($intent, 700)};
+            --button-bg-hover: #{fn.intent-color($intent, 750)};
+            --button-bg-active: #{fn.intent-color($intent, 800)};
+        }
+
+        &[data-disabled] {
+            --button-bg: #{fn.intent-color($intent, 200)};
+            --button-text: #{fn.intent-color($intent, 500)};
+        }
+    } @else {
+        --button-bg: #{fn.intent-color($intent, 500)};
+        --button-bg-hover: #{fn.intent-color($intent, 400)};
+        --button-bg-active: #{fn.intent-color($intent, 300)};
+
+        --button-text: #0b1220;
+        --button-border: transparent;
+
+        &[data-active] {
+            // active state should feel more locked-in
+            // with softer interaction changes
+            --button-bg: #{fn.intent-color($intent, 300)};
+            --button-bg-hover: #{fn.intent-color($intent, 250)};
+            --button-bg-active: #{fn.intent-color($intent, 200)};
+        }
+
+        &[data-disabled] {
+            --button-bg: #{fn.intent-color($intent, 800)};
+            --button-text: #{fn.intent-color($intent, 300)};
+            --button-border: transparent;
+        }
+    }
+}
+
+@mixin base ($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --button-bg: #{fn.intent-color($intent, 200)};
+        --button-bg-hover: #{fn.intent-color($intent, 300)};
+        --button-bg-active: #{fn.intent-color($intent, 400)};
+
+        --button-text: #{fn.intent-color($intent, 900)};
+        --button-text-hover: var(--button-text);
+        --button-text-active: var(--button-text);
+        --button-border: #{fn.intent-color($intent, 400)};
+
+        &[data-active] {
+            // calmer active state in light mode
+            --button-bg: #{fn.intent-color($intent, 300)};
+            --button-bg-hover: #{fn.intent-color($intent, 350)};
+            --button-bg-active: #{fn.intent-color($intent, 400)};
+
+            --button-border: #{fn.intent-color($intent, 500)};
+        }
+
+        &[data-disabled] {
+            --button-bg: #{fn.intent-color($intent, 100)};
+            --button-text: #{fn.intent-color($intent, 500)};
+            --button-border: #{fn.intent-color($intent, 300)};
+        }
+    } @else {
+        --button-bg: #{fn.intent-color($intent, 800)};
+        --button-bg-hover: #{fn.intent-color($intent, 700)};
+        --button-bg-active: #{fn.intent-color($intent, 600)};
+
+        --button-text: #{fn.intent-color($intent, 100)};
+        --button-border: #{fn.intent-color($intent, 600)};
+
+        &[data-active] {
+            // active buttons in dark mode should react less
+            // because they already carry visual emphasis
+            --button-bg: #{fn.intent-color($intent, 700)};
+            --button-bg-hover: #{fn.intent-color($intent, 650)};
+            --button-bg-active: #{fn.intent-color($intent, 600)};
+
+            --button-border: #{fn.intent-color($intent, 500)};
+        }
+
+        &[data-disabled] {
+            --button-bg: #{fn.intent-color($intent, 925)};
+            --button-text: #{fn.intent-color($intent, 400)};
+            --button-border: #{fn.intent-color($intent, 800)};
+        }
+    }
+}
+
+@mixin outlined ($intent, $mode: 'light') {
+    @include outlined-overlay;
+
+    @if ($mode == 'light') {
+        --button-bg: transparent;
+        --button-bg-hover: #{fn.intent-color($intent, 100)};
+        --button-bg-active: #{fn.intent-color($intent, 200)};
+
+        --button-text: #{fn.intent-color($intent, 600)};
+        --button-text-hover: var(--button-text);
+        --button-text-active: var(--button-text);
+
+        --button-border: #{fn.intent-color($intent, 300)};
+        --button-border-hover: #{fn.intent-color($intent, 500)};
+
+        &[data-active] {
+            // selected state should feel settled,
+            // not dramatically stronger on hover
+            --button-bg: #{fn.intent-color($intent, 100)};
+            --button-bg-hover: #{fn.intent-color($intent, 150)};
+            --button-bg-active: #{fn.intent-color($intent, 200)};
+
+            --button-border: #{fn.intent-color($intent, 600)};
+            --button-border-hover: #{fn.intent-color($intent, 650)};
+
+            --button-text: #{fn.intent-color($intent, 700)};
+
+            // outlined active already has strong border,
+            // so reduce hover outline intensity
+            &::after {
+                opacity: 0.4;
+            }
+
+            &:hover::after {
+                opacity: 0.7;
+            }
+        }
+
+        &[data-disabled] {
+            --button-bg: transparent;
+            --button-text: #{fn.intent-color($intent, 400)};
+            --button-border: #{fn.intent-color($intent, 200)};
+            --button-border-hover: #{fn.intent-color($intent, 200)};
+        }
+    } @else {
+        --button-bg: transparent;
+        --button-bg-hover: #{fn.intent-color($intent, 900)};
+        --button-bg-active: #{fn.intent-color($intent, 800)};
+
+        --button-text: #{fn.intent-color($intent, 300)};
+
+        --button-border: #{fn.intent-color($intent, 700)};
+        --button-border-hover: #{fn.intent-color($intent, 500)};
+
+        &[data-active] {
+            // active outlined buttons already stand out
+            // through border + filled background
+            --button-bg: #{fn.intent-color($intent, 900)};
+            --button-bg-hover: #{fn.intent-color($intent, 850)};
+            --button-bg-active: #{fn.intent-color($intent, 800)};
+
+            --button-border: #{fn.intent-color($intent, 500)};
+            --button-border-hover: #{fn.intent-color($intent, 450)};
+
+            --button-text: #{fn.intent-color($intent, 200)};
+
+            // softer outline animation for active state
+            &::after {
+                opacity: 0.35;
+            }
+
+            &:hover::after {
+                opacity: 0.6;
+            }
+        }
+
+        &[data-disabled] {
+            --button-bg: transparent;
+
+            --button-text: #{fn.intent-color($intent, 500)};
+
+            --button-border: #{fn.intent-color($intent, 850)};
+            --button-border-hover: #{fn.intent-color($intent, 850)};
+        }
+    }
+}
+
+@mixin ghost ($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --button-bg: transparent;
+        --button-bg-hover: #{fn.intent-color($intent, 100)};
+        --button-bg-active: #{fn.intent-color($intent, 200)};
+
+        --button-text: #{fn.intent-color($intent, 600)};
+        --button-text-hover: #{fn.intent-color($intent, 700)};
+        --button-text-active: #{fn.intent-color($intent, 800)};
+        --button-border: transparent;
+
+        &[data-active] {
+            // active ghost should feel quiet and stable
+            --button-bg: #{fn.intent-color($intent, 100)};
+            --button-bg-hover: #{fn.intent-color($intent, 150)};
+            --button-bg-active: #{fn.intent-color($intent, 200)};
+
+            --button-text: #{fn.intent-color($intent, 700)};
+            --button-text-hover: #{fn.intent-color($intent, 750)};
+            --button-text-active: #{fn.intent-color($intent, 800)};
+        }
+
+        &[data-disabled] {
+            --button-bg: transparent;
+            --button-text: #{fn.intent-color($intent, 400)};
+            --button-text-hover: #{fn.intent-color($intent, 400)};
+            --button-text-active: #{fn.intent-color($intent, 400)};
+        }
+    } @else {
+        --button-bg: transparent;
+        --button-bg-hover: #{fn.intent-color($intent, 900)};
+        --button-bg-active: #{fn.intent-color($intent, 800)};
+
+        --button-text: #{fn.intent-color($intent, 300)};
+        --button-text-hover: #{fn.intent-color($intent, 200)};
+        --button-text-active: #{fn.intent-color($intent, 100)};
+
+        &[data-active] {
+            // active ghost in dark mode should feel calm,
+            // not progressively brighter on interaction
+            --button-bg: #{fn.intent-color($intent, 800)};
+            --button-bg-hover: #{fn.intent-color($intent, 750)};
+            --button-bg-active: #{fn.intent-color($intent, 700)};
+
+            --button-text: #{fn.intent-color($intent, 200)};
+            --button-text-hover: #{fn.intent-color($intent, 150)};
+            --button-text-active: #{fn.intent-color($intent, 100)};
+        }
+
+        &[data-disabled] {
+            --button-bg: transparent;
+
+            --button-text: #{fn.intent-color($intent, 500)};
+            --button-text-hover: #{fn.intent-color($intent, 500)};
+            --button-text-active: #{fn.intent-color($intent, 500)};
+        }
+    }
+}
+
+@mixin link ($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --button-text: #{fn.intent-color($intent, 500)};
+        --button-text-hover: #{fn.intent-color($intent, 700)};
+        --button-text-active: #{fn.intent-color($intent, 900)};
+
+        &:not([data-disabled]) {
+            &:hover {
+                --button-text: var(--button-text-hover);
+                text-decoration: underline;
+            }
+
+            &:active {
+                --button-text: var(--button-text-active);
+            }
+        }
+
+        &[data-active] {
+            // active links should already feel selected,
+            // so interaction feedback stays subtle
+            --button-text: #{fn.intent-color($intent, 700)};
+            --button-text-hover: #{fn.intent-color($intent, 800)};
+            --button-text-active: #{fn.intent-color($intent, 900)};
+
+            &:not([data-disabled]) {
+                text-decoration: underline;
+
+                &:hover {
+                    --button-text: var(--button-text-hover);
+                }
+
+                &:active {
+                    --button-text: var(--button-text-active);
+                }
+            }
+        }
+
+        &[data-disabled] {
+            --button-text: #{fn.intent-color($intent, 300)};
+            --button-text-hover: #{fn.intent-color($intent, 300)};
+            --button-text-active: #{fn.intent-color($intent, 300)};
+
+            text-decoration: none;
+        }
+    } @else {
+        --button-text: #{fn.intent-color($intent, 400)};
+        --button-text-hover: #{fn.intent-color($intent, 200)};
+        --button-text-active: #{fn.intent-color($intent, 100)};
+
+        &:not([data-disabled]) {
+            &:hover {
+                --button-text: var(--button-text-hover);
+                text-decoration: underline;
+            }
+
+            &:active {
+                --button-text: var(--button-text-active);
+            }
+        }
+
+        &[data-active] {
+            // active links already have emphasis via underline + brighter text
+            // so interaction changes should stay restrained
+            --button-text: #{fn.intent-color($intent, 200)};
+            --button-text-hover: #{fn.intent-color($intent, 150)};
+            --button-text-active: #{fn.intent-color($intent, 100)};
+
+            &:not([data-disabled]) {
+                text-decoration: underline;
+
+                &:hover {
+                    --button-text: var(--button-text-hover);
+                }
+
+                &:active {
+                    --button-text: var(--button-text-active);
+                }
+            }
+        }
+
+        &[data-disabled] {
+            --button-text: #{fn.intent-color($intent, 600)};
+            --button-text-hover: #{fn.intent-color($intent, 600)};
+            --button-text-active: #{fn.intent-color($intent, 600)};
+
+            text-decoration: none;
+        }
+    }
+}

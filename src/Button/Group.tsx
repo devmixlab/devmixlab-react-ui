@@ -1,10 +1,9 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
-import { Size, Intent, Variant } from './button.tokens';
+import { Size, Intent, Variant } from './Button.tokens';
 import { Box, type BoxProps } from '../Box/Box';
 import { CLASS_PREFIX } from '../constants';
 import { createPolymorphic } from '../types/polymorphic';
-// import
 
 type GroupProps = {
     className?: string;
@@ -19,7 +18,7 @@ type GroupProps = {
     equalWidth?: boolean;
 };
 
-export const prefix = (name: string = '') => {
+const prefix = (name: string = '') => {
     return `${CLASS_PREFIX}--button-group${name}`;
 };
 
@@ -77,7 +76,6 @@ const GroupImpl = (
                     roundedBottom: roundedBottom,
                     w: child.props.w ?? (orientation === 'vertical' ? 'full' : undefined),
                     width: child.props.width ?? (orientation === 'vertical' ? 'full' : undefined),
-                    // className: child.props.className,
                 });
             })}
         </Box>
@@ -85,3 +83,5 @@ const GroupImpl = (
 };
 
 export const Group = createPolymorphic<GroupProps, 'div'>(forwardRef(GroupImpl), 'ButtonGroup');
+
+export type { GroupProps };
