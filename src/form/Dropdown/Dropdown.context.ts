@@ -23,9 +23,6 @@ type DropdownContextValue = {
     disabled: boolean;
     invalid: boolean;
 
-    optionPressed: number | null;
-    setOptionPressed: React.Dispatch<React.SetStateAction<number | null>>;
-
     isSearchable: boolean;
     setIsSearchable: React.Dispatch<React.SetStateAction<boolean>>;
     search: string;

@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
-import { useFloatingLayer } from '../hooks';
-import { PresenceState } from '../hooks/usePresence';
+import { useFloatingLayer } from '../../hooks';
+import { PresenceState } from '../../hooks/usePresence';
 import { PopoverRole } from './Popover';
 
 type PopoverContextValue = {

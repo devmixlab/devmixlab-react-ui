@@ -1,7 +1,7 @@
-@use '../scss/functions' as functions;
-@use '../scss/mixins' as mixins;
+@use '../../../scss/functions' as functions;
+@use '../../../scss/mixins' as mixins;
 
-@use '../scss/config' as cfg;
+@use '../../../scss/config' as cfg;
 @use 'sass:map';
 
 $p: cfg.$prefix;
@@ -65,7 +65,7 @@ $popover-prefix: #{$p}--popover;
         background: var(--panel-bg);
         border: 1px solid var(--panel-border);
 
-        border-radius: inherit;
+        //border-radius: inherit;
 
         //overflow: hidden;
 

@@ -12,7 +12,7 @@ import {
     PopoverPanelProps,
     PopoverProps,
     PopoverTriggerProps,
-} from '../../Popover';
+} from '../../Components/Popover';
 import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
@@ -45,7 +45,6 @@ export type DropdownGroupData = {
 
 export type DropdownProps = {
     children?: React.ReactNode;
-    className?: string;
     id?: string;
 
     // enables chevron on trigger
@@ -94,16 +93,13 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
     (
         {
             children,
-            className,
             id,
 
             chevron = true,
             onOpenChange,
 
             visibleOptions = 6,
-            // placement = 'bottom-end',
-            // offset,
-            // type = 'button',
+
             value,
             defaultValue,
             onChange,
@@ -111,9 +107,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
             invalid = false,
             disabled = false,
-
-            // rounded = 'md',
-            // size = 'md',
 
             triggerRender,
 
@@ -151,14 +144,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const unregisterOption = useCallback((id: string) => {
             setOptions((prev) => prev.filter((option) => option.id !== id));
         }, []);
-
-        // ------------------------------------------------------------------
-        // Trigger press state
-        // ------------------------------------------------------------------
-
-        const [triggerFocusedVisible, setTriggerFocusedVisible] = useState(false);
-        const [pressed, setPressed] = useState(false);
-        const [optionPressed, setOptionPressed] = useState<number | null>(null);
 
         // ------------------------------------------------------------------
         // Value / selection
@@ -280,8 +265,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 isGroupShown,
                 disabled,
                 invalid,
-                optionPressed,
-                setOptionPressed,
                 isSearchable,
                 setIsSearchable,
                 search,
@@ -309,8 +292,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 isGroupShown,
                 disabled,
                 invalid,
-                optionPressed,
-                setOptionPressed,
                 isSearchable,
                 setIsSearchable,
                 search,
@@ -336,7 +317,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         return (
             <DropdownContext.Provider value={ctxValue}>
                 <Popover
-                    className={prefix()}
                     open={opened}
                     onOpenChange={(state) => {
                         onOpenChange?.(state);
@@ -510,7 +490,6 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
             setSearch,
             searchInputRef,
             setOpened,
-            setOptionPressed,
             focusableList,
             options,
             filteredOptions,
@@ -605,7 +584,7 @@ Dropdown.List = DropdownList;
 
 type DropdownGroupProps = {
     children: React.ReactNode;
-    className: string;
+    className?: string;
     label?: string;
 } & BoxProps;
 
@@ -648,7 +627,7 @@ Dropdown.Group = DropdownGroup;
 
 export type DropdownLabelProps = {
     children: React.ReactNode;
-    className: string;
+    className?: string;
     sticky?: boolean;
 } & BoxProps;
 

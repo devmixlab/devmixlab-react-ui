@@ -32,7 +32,7 @@ export { FileUpload } from './src/form/FileUpload/FileUpload';
 export { FormField } from './src/form/FormField';
 
 export { Modal } from './src/Modal/Modal';
-export { Popover } from './src/Popover';
+export { Popover } from './src/Components/Popover';
 export { Collapse } from './src/Collapse/Collapse';
 export { Accordion } from './src/Accordion/Accordion';
 export { Carousel } from './src/Carousel/Carousel';

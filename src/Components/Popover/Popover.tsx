@@ -13,14 +13,14 @@ import {
     FloatingNode,
 } from '@floating-ui/react';
 import type { Placement } from '@floating-ui/react';
-import { Box, BoxProps } from '../Components/Box/Box';
-import { mergeRefs } from '../utils/mergeRefs';
-import { classPrefix } from '../utils/classPrefix';
-import { useStableId } from '../utils/useStableId';
-import { useFloatingLayer, usePresence } from '../hooks';
+import { Box, BoxProps } from '../Box/Box';
+import { mergeRefs } from '../../utils/mergeRefs';
+import { classPrefix } from '../../utils/classPrefix';
+import { useStableId } from '../../utils/useStableId';
+import { useFloatingLayer, usePresence } from '../../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
-import { Button, ButtonProps } from '../Components/Button/Button';
-import { ChevronDown as ChevronDownIcon } from '../Icon';
+import { Button, ButtonProps } from '../Button/Button';
+import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { clsx } from 'clsx';
 
 // ---------------------------------------------------------------------------
@@ -33,7 +33,6 @@ export type PopoverRole = 'dialog' | 'menu' | 'listbox';
 
 type PopoverProps = {
     children: React.ReactNode;
-    className?: string;
 
     tree?: boolean;
     role?: PopoverRole;
@@ -154,138 +153,128 @@ const prefix = (name: string = '') => {
 // Popover
 // ---------------------------------------------------------------------------
 
-const Popover = forwardRef<HTMLDivElement, PopoverProps>(
-    (
-        {
-            children,
-            className,
+const Popover = ({
+    children,
 
-            tree = false,
-            role = 'dialog',
+    tree = false,
+    role = 'dialog',
 
-            open,
-            defaultOpen = false,
-            onOpenChange,
+    open,
+    defaultOpen = false,
+    onOpenChange,
 
-            disabled = false,
+    disabled = false,
 
-            placement = 'bottom-start',
-            offset = 8,
+    placement = 'bottom-start',
+    offset = 8,
 
-            closeOnEscape = true,
-            closeOnOutsideClick = true,
+    closeOnEscape = true,
+    closeOnOutsideClick = true,
 
-            modal = false,
+    modal = false,
 
-            enterDuration = 0,
-            exitDuration = 200,
-            onAnimationEntered,
-            onAnimationExited,
+    enterDuration = 0,
+    exitDuration = 200,
+    onAnimationEntered,
+    onAnimationExited,
 
-            onMount,
-            onUnmount,
-            onReady,
-        },
-        ref,
-    ) => {
-        const isControlled = open !== undefined;
+    onMount,
+    onUnmount,
+    onReady,
+}: PopoverProps) => {
+    const isControlled = open !== undefined;
 
-        const [internalOpen, setInternalOpen] = useState(defaultOpen);
+    const [internalOpen, setInternalOpen] = useState(defaultOpen);
 
-        const opened = isControlled ? open : internalOpen;
+    const opened = isControlled ? open : internalOpen;
 
-        // ── Presence ──────────────────────────────────────────────────────
-        const { isMounted, state: animationState } = usePresence({
-            present: opened,
-            enterDuration,
-            exitDuration,
-            onEntered: onAnimationEntered,
-            onExited: onAnimationExited,
-            onMount,
-            onUnmount,
-        });
+    // ── Presence ──────────────────────────────────────────────────────
+    const { isMounted, state: animationState } = usePresence({
+        present: opened,
+        enterDuration,
+        exitDuration,
+        onEntered: onAnimationEntered,
+        onExited: onAnimationExited,
+        onMount,
+        onUnmount,
+    });
 
-        const setOpened = (next: boolean) => {
-            if (!isControlled) {
-                setInternalOpen(next);
-            }
-
-            onOpenChange?.(next);
-        };
-
-        const triggerId = useStableId('popover-trigger');
-        const panelId = useStableId('popover-panel');
-
-        const { context, refs, floatingStyles, getReferenceProps, getFloatingProps, nodeId } =
-            useFloatingLayer({
-                opened,
-                onOpenChange: setOpened,
-                placement,
-                offsetValue: offset,
-                closeOnOutsideClick,
-                closeOnEscape,
-            });
-
-        const value = useMemo<PopoverContextValue>(
-            () => ({
-                opened,
-                setOpened,
-
-                disabled,
-
-                refs,
-                context,
-                floatingStyles,
-
-                getReferenceProps,
-                getFloatingProps,
-
-                triggerId,
-                panelId,
-                role,
-
-                modal,
-
-                isMounted,
-                animationState,
-
-                onReady,
-            }),
-            [
-                opened,
-                disabled,
-                refs,
-                context,
-                floatingStyles,
-                getReferenceProps,
-                getFloatingProps,
-                triggerId,
-                panelId,
-                role,
-                modal,
-                isMounted,
-                animationState,
-                onReady,
-            ],
-        );
-
-        const content = (
-            <FloatingNode id={nodeId}>
-                <PopoverContext.Provider value={value}>
-                    <Box ref={ref} className={clsx(prefix(), className)}>
-                        {children}
-                    </Box>
-                </PopoverContext.Provider>
-            </FloatingNode>
-        );
-
-        if (tree) {
-            return <FloatingTree>{content}</FloatingTree>;
+    const setOpened = (next: boolean) => {
+        if (!isControlled) {
+            setInternalOpen(next);
         }
 
-        return content;
-    },
-) as PopoverComponent;
+        onOpenChange?.(next);
+    };
+
+    const triggerId = useStableId('popover-trigger');
+    const panelId = useStableId('popover-panel');
+
+    const { context, refs, floatingStyles, getReferenceProps, getFloatingProps, nodeId } =
+        useFloatingLayer({
+            opened,
+            onOpenChange: setOpened,
+            placement,
+            offsetValue: offset,
+            closeOnOutsideClick,
+            closeOnEscape,
+        });
+
+    const value = useMemo<PopoverContextValue>(
+        () => ({
+            opened,
+            setOpened,
+
+            disabled,
+
+            refs,
+            context,
+            floatingStyles,
+
+            getReferenceProps,
+            getFloatingProps,
+
+            triggerId,
+            panelId,
+            role,
+
+            modal,
+
+            isMounted,
+            animationState,
+
+            onReady,
+        }),
+        [
+            opened,
+            disabled,
+            refs,
+            context,
+            floatingStyles,
+            getReferenceProps,
+            getFloatingProps,
+            triggerId,
+            panelId,
+            role,
+            modal,
+            isMounted,
+            animationState,
+            onReady,
+        ],
+    );
+
+    const content = (
+        <FloatingNode id={nodeId}>
+            <PopoverContext.Provider value={value}>{children}</PopoverContext.Provider>
+        </FloatingNode>
+    );
+
+    if (tree) {
+        return <FloatingTree>{content}</FloatingTree>;
+    }
+
+    return content;
+};
 
 Popover.displayName = 'Popover';
 
@@ -384,7 +373,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
     },
 );
 
-PopoverTrigger.displayName = 'PopoverTrigger';
+PopoverTrigger.displayName = 'Popover.Trigger';
 
 // ---------------------------------------------------------------------------
 // Panel
@@ -431,14 +420,6 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             return null;
         }
 
-        // useLayoutEffect(() => {
-        //     if (!refs.floating.current) return;
-        //
-        //     queueMicrotask(() => {
-        //         onReady?.();
-        //     });
-        // }, [isMounted, refs.floating, onReady]);
-
         return (
             <FloatingPortal>
                 <FloatingFocusManager
@@ -448,7 +429,6 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                     // returnFocus={modal}
                 >
                     <Box
-                        // ref={mergeRefs(refs.setFloating, ref)}
                         ref={mergeRefs(handleFloatingRef, ref)}
                         id={panelId}
                         role={role}
@@ -462,9 +442,6 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                                 '--popover-trigger-width': refs.reference.current
                                     ? `${refs.reference.current.getBoundingClientRect().width}px`
                                     : undefined,
-                                // left: '1rem',
-                                // right: '1rem',
-                                // width: 'calc(100vw - 2rem)',
                             } as CSSProperties
                         }
                         className={[prefix('__panel'), className].filter(Boolean).join(' ')}
@@ -483,7 +460,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
     },
 );
 
-PopoverPanel.displayName = 'PopoverPanel';
+PopoverPanel.displayName = 'Popover.Panel';
 
 // ---------------------------------------------------------------------------
 // Compound API
