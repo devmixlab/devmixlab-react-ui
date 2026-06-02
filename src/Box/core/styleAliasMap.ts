@@ -99,9 +99,9 @@ function reverseMap<T extends Record<string, string>>(obj: T) {
 export const stylePropToAliasMap = reverseMap(styleAliasMap);
 
 // export const stylePropToAliasMap = Object.fromEntries(
-//     Object.entries(styleAliasMap).map(([alias, prop]) => [prop, alias]),
+//     Object.entries(__styleAliasMap).map(([alias, prop]) => [prop, alias]),
 // ) as {
-//     [K in (typeof styleAliasMap)[keyof typeof styleAliasMap]]: keyof typeof styleAliasMap;
+//     [K in (typeof __styleAliasMap)[keyof typeof __styleAliasMap]]: keyof typeof __styleAliasMap;
 // };
 
 export type StyleAliasKey = keyof typeof styleAliasMap;

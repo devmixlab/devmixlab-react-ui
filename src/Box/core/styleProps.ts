@@ -1,4 +1,4 @@
-import { defineStyleProps } from '../types/tuple';
+import { defineStyleProps } from '../../types/tuple';
 
 export const styleProps = defineStyleProps([
     // 1. Layout

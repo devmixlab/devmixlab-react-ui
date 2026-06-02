@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { styleAliasMap } from '../../tokens/styleAliasMap';
+import { styleAliasMap } from './styleAliasMap';
 import { StyleBox, StyleProps } from './StyleBox';
 import { type PolymorphicComponent } from '../../types/polymorphic';
 import { hasKey, typedEntries } from '../../utils/ts';

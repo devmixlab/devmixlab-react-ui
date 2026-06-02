@@ -57,8 +57,8 @@ import {
     selfAlignments,
 } from './tokens';
 import { Props, BoxProps } from '../Box';
-import { StyleAliasKey, StyleAliasValue, stylePropToAliasMap } from '../../tokens/styleAliasMap';
-import type { StyleProp } from '../../tokens/styleProps';
+import { StyleAliasKey, StyleAliasValue, stylePropToAliasMap } from './styleAliasMap';
+import type { StyleProp } from './styleProps';
 
 export type OriginProp = (StyleProp | keyof Props) & string;
 

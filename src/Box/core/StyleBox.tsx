@@ -1,5 +1,5 @@
 import React, { CSSProperties, forwardRef } from 'react';
-import { styleProps, type StyleProp as StylePropKey } from '../../tokens/styleProps';
+import { styleProps, type StyleProp as StylePropKey } from './styleProps';
 import { createPolymorphic } from '../../types/polymorphic';
 import { typedEntries } from '../../utils/ts';
 
