@@ -67,16 +67,16 @@ export const CardImpl = <C extends React.ElementType = 'div'>(
         density = 'md',
 
         interactive = false,
-        hoverable = false,
-        pressable = false,
-        focusable = false,
+        hoverable,
+        pressable,
+        focusable,
 
         active = false,
         disabled = false,
         accent = false,
         accentSide = 'left',
-        intent,
-        variant,
+        intent = 'secondary',
+        variant = 'base',
 
         focused,
 
@@ -144,6 +144,7 @@ export const CardImpl = <C extends React.ElementType = 'div'>(
                 data-active={active || undefined}
                 data-disabled={isDisabled || undefined}
                 data-accent={accent ? accentSide : undefined}
+                data-variant={variant}
                 data-intent={intent}
                 data-density={density}
                 data-focused={focused || undefined}

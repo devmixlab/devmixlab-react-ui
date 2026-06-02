@@ -7,136 +7,173 @@
 $p: cfg.$prefix;
 $card-prefix: #{$p}--card;
 
-@mixin card-theme($mode) {
-    --surface: var(--surface-#{$mode});
-    --surface-raised: var(--surface-raised-#{$mode});
-    --surface-hover: var(--surface-hover-#{$mode});
-    --surface-raised-hover: var(--surface-raised-hover-#{$mode});
+//@mixin card-theme($mode) {
+//    --surface: var(--surface-#{$mode});
+//    --surface-raised: var(--surface-raised-#{$mode});
+//    --surface-hover: var(--surface-hover-#{$mode});
+//    --surface-raised-hover: var(--surface-raised-hover-#{$mode});
+//
+//    --accent: var(--accent-#{$mode});
+//    --accent-disabled: var(--accent-disabled-#{$mode});
+//
+//    --border: var(--border-#{$mode});
+//    --border-section: var(--border-section-#{$mode});
+//    //--ring: var(--ring-#{$mode});
+//
+//    --icon-surface: var(--icon-surface-#{$mode});
+//    --icon-color: var(--icon-color-#{$mode});
+//
+//    --text: var(--text-#{$mode});
+//    --text-muted: var(--text-muted-#{$mode});
+//    --text-disabled: var(--text-disabled-#{$mode});
+//}
 
-    --accent: var(--accent-#{$mode});
-    --accent-disabled: var(--accent-disabled-#{$mode});
-
-    --border: var(--border-#{$mode});
-    --border-section: var(--border-section-#{$mode});
-    //--ring: var(--ring-#{$mode});
-
-    --icon-surface: var(--icon-surface-#{$mode});
-    --icon-color: var(--icon-color-#{$mode});
-
-    --text: var(--text-#{$mode});
-    --text-muted: var(--text-muted-#{$mode});
-    --text-disabled: var(--text-disabled-#{$mode});
-}
+$intents: (secondary, primary, warning, success, info, danger);
 
 @mixin card-root-colors {
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
+    background-color: var(--card-surface);
+    border: 1px solid var(--card-border);
+    color: var(--card-text);
 }
 
-@mixin card-intent ($intent: base, $mode: light) {
-    @if ($intent == light) {
-        --card-surface: var(--surface-#{$mode});
-        --card-surface-raised: var(--surface-raised-#{$mode});
-        --card-surface-hover: var(--surface-hover-#{$mode});
-        --card-surface-raised-hover: var(--surface-raised-hover-#{$mode});
+@mixin base($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --card-surface: #{functions.intent-color($intent, 0)};
+        --card-surface-raised: #{functions.intent-color($intent, 50)};
 
-        --card-accent: var(--accent-#{$mode});
-        --card-accent-disabled: var(--accent-disabled-#{$mode});
+        --card-surface-hover: #{functions.intent-color($intent, 100)};
+        --card-surface-active: #{functions.intent-color($intent, 150)};
 
-        --card-border: var(--border-#{$mode});
-        --card-border-section: var(--border-section-#{$mode});
+        --card-surface-raised-hover: #{functions.intent-color($intent, 150)};
+        --card-surface-raised-active: #{functions.intent-color($intent, 250)};
 
-        --card-icon-surface: var(--icon-surface-#{$mode});
-        --card-icon-color: var(--icon-color-#{$mode});
+        --card-accent: #{functions.intent-color($intent, 800)};
+        --card-accent-disabled: #{functions.intent-color($intent, 400)};
 
-        --card-text: var(--text-#{$mode});
-        --card-text-muted: var(--text-muted-#{$mode});
-        --card-text-disabled: var(--text-disabled-#{$mode});
+        --card-border: #{functions.intent-color($intent, 200)};
+        --card-border-active: #{functions.intent-color($intent, 300)};
+        --card-border-section: #{functions.intent-color($intent, 200)};
+
+        --card-icon-surface: #{functions.intent-color($intent, 50)};
+        --card-icon-color: #{functions.intent-color($intent, 800)};
+
+        --card-ring: #{functions.intent-color($intent, 500)};
+
+        //--card-text: #{functions.intent-color($intent, 900)};
+        //--card-text-muted: #{functions.intent-color($intent, 500)};
+        //--card-text-disabled: #{functions.intent-color($intent, 400)};
     } @else {
+        --card-surface: #{functions.intent-color($intent, 950)};
+        --card-surface-raised: #{functions.intent-color($intent, 900)};
+        --card-surface-hover: #{functions.intent-color($intent, 850)};
+        --card-surface-active: #{functions.intent-color($intent, 800)};
 
+        --card-surface-raised-hover: #{functions.intent-color($intent, 850)};
+        --card-surface-raised-active: #{functions.intent-color($intent, 800)};
+
+        --card-accent: #{functions.intent-color($intent, 400)};
+        --card-accent-disabled: #{functions.intent-color($intent, 700)};
+
+        --card-border: #{functions.intent-color($intent, 800)};
+        --card-border-active: #{functions.intent-color($intent, 700)};
+
+        --card-border-section: #{functions.intent-color($intent, 800)};
+
+        --card-icon-surface: #{functions.intent-color($intent, 850)};
+        --card-icon-color: #{functions.intent-color($intent, 300)};
+
+        //--card-text: #{functions.intent-color($intent, 100)};
+        //--card-text-muted: #{functions.intent-color($intent, 400)};
+        //--card-text-disabled: #{functions.intent-color($intent, 600)};
     }
 }
 
 .#{$card-prefix} {
 
-    /* ================== LIGHT ================== */
+    --card-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
 
-    --surface-light: var(--#{$p}-intent-gray-0);
+    --card-text: #{functions.intent-color(gray, 900)};
+    --card-text-muted: #{functions.intent-color(gray, 500)};
+    --card-text-disabled: #{functions.intent-color(gray, 400)};
 
-    --surface-raised-light: var(--#{$p}-intent-gray-50);
+    ///* ================== LIGHT ================== */
+    //
+    //--surface-light: var(--#{$p}-intent-gray-0);
+    //
+    //--surface-raised-light: var(--#{$p}-intent-gray-50);
+    //
+    //--surface-hover-light: var(--#{$p}-intent-gray-100);
+    //--surface-active-light: var(--#{$p}-intent-gray-150);
+    //
+    //--surface-raised-hover-light: var(--#{$p}-intent-gray-200);
+    //--surface-raised-active-light: var(--#{$p}-intent-gray-250);
+    //
+    //--accent-light: var(--#{$p}-intent-gray-800);
+    //--accent-disabled-light: var(--#{$p}-intent-gray-400);
+    //
+    //--border-light: var(--#{$p}-intent-gray-200);
+    //--border-active-light: var(--#{$p}-intent-gray-300);
+    //
+    //--border-section-light: var(--#{$p}-intent-gray-200);
+    //
+    //--icon-surface-light: var(--#{$p}-intent-gray-50);
+    //--icon-color-light: var(--#{$p}-intent-gray-800);
+    //
+    //--text-light: var(--#{$p}-intent-gray-900);
+    //--text-muted-light: var(--#{$p}-intent-gray-500);
+    //--text-disabled-light: var(--#{$p}-intent-gray-400);
+    //
+    //
+    ///* ================== DARK ================== */
+    //
+    //--surface-dark: var(--#{$p}-intent-zinc-900);
+    //
+    //--surface-raised-dark: var(--#{$p}-intent-zinc-800);
+    //
+    //--surface-hover-dark: var(--#{$p}-intent-zinc-850);
+    //--surface-active-dark: var(--#{$p}-intent-zinc-800);
+    //
+    //--surface-raised-hover-dark: var(--#{$p}-intent-zinc-700);
+    //--surface-raised-active-dark: var(--#{$p}-intent-zinc-600);
+    //
+    //--accent-dark: var(--#{$p}-intent-zinc-300);
+    //--accent-disabled-dark: var(--#{$p}-intent-zinc-500);
+    //
+    //--border-dark: var(--#{$p}-intent-zinc-700);
+    //--border-active-dark: var(--#{$p}-intent-zinc-600);
+    //
+    //--border-section-dark: var(--#{$p}-intent-zinc-700);
+    //
+    //--icon-surface-dark: var(--#{$p}-intent-gray-900);
+    //--icon-color-dark: var(--#{$p}-intent-gray-200);
+    //
+    //--text-dark: var(--#{$p}-intent-zinc-200);
+    //--text-muted-dark: var(--#{$p}-intent-zinc-400);
+    //--text-disabled-dark: var(--#{$p}-intent-zinc-600);
+    //
 
-    --surface-hover-light: var(--#{$p}-intent-gray-100);
-    --surface-active-light: var(--#{$p}-intent-gray-150);
-
-    --surface-raised-hover-light: var(--#{$p}-intent-gray-200);
-    --surface-raised-active-light: var(--#{$p}-intent-gray-250);
-
-    --accent-light: var(--#{$p}-intent-gray-800);
-    --accent-disabled-light: var(--#{$p}-intent-gray-400);
-
-    --border-light: var(--#{$p}-intent-gray-200);
-    --border-active-light: var(--#{$p}-intent-gray-300);
-
-    --border-section-light: var(--#{$p}-intent-gray-200);
-
-    --icon-surface-light: var(--#{$p}-intent-gray-50);
-    --icon-color-light: var(--#{$p}-intent-gray-800);
-
-    --text-light: var(--#{$p}-intent-gray-900);
-    --text-muted-light: var(--#{$p}-intent-gray-500);
-    --text-disabled-light: var(--#{$p}-intent-gray-400);
-
-
-    /* ================== DARK ================== */
-
-    --surface-dark: var(--#{$p}-intent-zinc-900);
-
-    --surface-raised-dark: var(--#{$p}-intent-zinc-800);
-
-    --surface-hover-dark: var(--#{$p}-intent-zinc-850);
-    --surface-active-dark: var(--#{$p}-intent-zinc-800);
-
-    --surface-raised-hover-dark: var(--#{$p}-intent-zinc-700);
-    --surface-raised-active-dark: var(--#{$p}-intent-zinc-600);
-
-    --accent-dark: var(--#{$p}-intent-zinc-300);
-    --accent-disabled-dark: var(--#{$p}-intent-zinc-500);
-
-    --border-dark: var(--#{$p}-intent-zinc-700);
-    --border-active-dark: var(--#{$p}-intent-zinc-600);
-
-    --border-section-dark: var(--#{$p}-intent-zinc-700);
-
-    --icon-surface-dark: var(--#{$p}-intent-gray-900);
-    --icon-color-dark: var(--#{$p}-intent-gray-200);
-
-    --text-dark: var(--#{$p}-intent-zinc-200);
-    --text-muted-dark: var(--#{$p}-intent-zinc-400);
-    --text-disabled-dark: var(--#{$p}-intent-zinc-600);
-
-    --ring: var(--#{$p}-accent-secondary);
+    //--card-ring: var(--#{$p}-accent-primary);
 
 
     /* ================== CARD ================== */
 
-    @include card-theme ('light');
-    @include cfg.dark {
-        @include card-theme ('dark');
-    }
+    //@include card-theme ('light');
+    //@include cfg.dark {
+    //    @include card-theme ('dark');
+    //}
 
     @include card-root-colors;
 
     .#{$card-prefix}__header {
-        background-color: var(--surface-raised);
-        border-bottom: 1px solid var(--border);
+        background-color: var(--card-surface-raised);
+        border-bottom: 1px solid var(--card-border);
         border-top-right-radius: inherit;
         border-top-left-radius: inherit;
     }
 
     .#{$card-prefix}__footer {
-        background-color: var(--surface-raised);
-        border-top: 1px solid var(--border);
+        background-color: var(--card-surface-raised);
+        border-top: 1px solid var(--card-border);
         border-bottom-right-radius: inherit;
         border-bottom-left-radius: inherit;
     }
@@ -188,16 +225,40 @@ $card-prefix: #{$p}--card;
         justify-content: center;
 
         border-radius: 50%;
-        background-color: var(--icon-surface);
-        color: var(--icon-color);
+        background-color: var(--card-icon-surface);
+        color: var(--card-icon-color);
 
         flex-shrink: 0;
 
-        &[data-size='xs'] { width: 20px; height: 20px; font-size: 12px; }
-        &[data-size='sm'] { width: 28px; height: 28px; font-size: 14px; }
-        &[data-size='md'] { width: 36px; height: 36px; font-size: 18px; }
-        &[data-size='lg'] { width: 44px; height: 44px; font-size: 22px; }
-        &[data-size='xl'] { width: 52px; height: 52px; font-size: 26px; }
+        &[data-size='xs'] {
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+        }
+
+        &[data-size='sm'] {
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+        }
+
+        &[data-size='md'] {
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+        }
+
+        &[data-size='lg'] {
+            width: 44px;
+            height: 44px;
+            font-size: 22px;
+        }
+
+        &[data-size='xl'] {
+            width: 52px;
+            height: 52px;
+            font-size: 26px;
+        }
 
         svg,
         .MuiSvgIcon-root {
@@ -215,7 +276,7 @@ $card-prefix: #{$p}--card;
     }
 
     .#{$card-prefix}__section {
-        border-bottom: 1px solid var(--border-section);
+        border-bottom: 1px solid var(--card-border-section);
 
         &:last-child {
             border-bottom: none;
@@ -227,55 +288,75 @@ $card-prefix: #{$p}--card;
         user-select: none;
     }
 
-    &[data-hoverable] {
-        transition: transform 120ms ease, background-color 120ms ease;
+    &[data-hoverable]:not([data-disabled]) {
+        transition: transform var(--card-transition), background-color var(--card-transition);
 
-        &:not([data-disabled]):hover {
-            background-color: var(--surface-hover);
-            transform: translateY(-1px);
+        .#{$card-prefix}__header,
+        .#{$card-prefix}__footer {
+            transition: background-color var(--card-transition);
+        }
+
+        &:hover {
+            background-color: var(--card-surface-hover);
+            //transform: translateY(-1px);
+
+            .#{$card-prefix}__header,
+            .#{$card-prefix}__footer {
+                background-color: var(--card-surface-raised-hover);
+            }
         }
     }
 
     &[data-pressable] {
         &:not([data-disabled]):active {
-            transform: translateY(0.5px);
+            //transform: translateY(0.5px);
         }
     }
 
     &[data-focusable] {
         &:not([data-disabled])[data-focused],
         &:not([data-disabled]):focus-visible {
-            outline: 2px solid var(--ring);
+            outline: 2px solid var(--card-ring);
             outline-offset: 2px;
         }
     }
 
     &[data-accent='left'] {
-        border-left: 4px solid var(--accent);
+        border-left: 4px solid var(--card-accent);
     }
 
     &[data-accent='top'] {
-        border-top: 4px solid var(--accent);
+        border-top: 4px solid var(--card-accent);
         border-top-left-radius: 0;
         border-top-right-radius: 0;
     }
 
     &[data-disabled] {
-        --accent: var(--accent-disabled);
-        --text: var(--text-disabled);
-        --icon-color: var(--text-disabled);
+        --accent: var(--card-accent-disabled);
+        --text: var(--card-text-disabled);
+        --icon-color: var(--card-text-disabled);
 
         cursor: not-allowed;
         user-select: none;
     }
 
     &[data-active] {
-        background-color: var(--surface-hover);
-        border-color: var(--accent);
+        background-color: var(--card-surface-active);
+        border-color: var(--card-accent);
 
         .#{$card-prefix}__header,
         .#{$card-prefix}__footer {
-            background-color: var(--surface-raised-hover);
+            background-color: var(--card-surface-raised-hover);
+        }
+    }
+
+    //@include base(secondary, 'light');
+
+    @each $intent in $intents {
+        &[data-intent='#{$intent}'] {
+            &[data-variant='base'] {
+                @include base($intent, 'light');
+            }
         }
     }
 }
