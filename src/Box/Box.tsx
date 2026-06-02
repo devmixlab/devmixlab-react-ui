@@ -7,20 +7,16 @@ import { configLookup, type PropValue } from './core/config';
 import { createPolymorphic, PolymorphicProps } from '../types/polymorphic';
 import { booleanClassMap } from './core/tokens';
 
-import { type Responsive, resolveResponsive, useBreakpoint } from '../utils/responsive';
-
-export type Responsiveify<T> = {
-    [K in keyof T]?: Responsive<T[K]>;
-};
+import { resolveResponsive, useBreakpoint, Responsiveify } from '../utils/responsive';
 
 export type Props = {
     appearanceNone?: boolean;
     grow?: boolean | 0 | DerivedProps['grow'];
 } & Omit<DerivedProps, 'grow'>;
 
-export type BoxProps = Responsiveify<Props>;
+type BoxProps = Responsiveify<Props>;
 
-export type BoxComponentProps<C extends React.ElementType = 'div', Props = {}> = PolymorphicProps<
+type BoxComponentProps<C extends React.ElementType = 'div', Props = {}> = PolymorphicProps<
     C,
     Props & BoxProps
 >;
@@ -95,10 +91,6 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
 
         const config = configLookup[key];
 
-        // console.log(config);
-        // console.log(value);
-        // console.log(config.isToken(value));
-
         locked.add(config.key);
         if (config.alias) locked.add(config.alias);
 
@@ -150,3 +142,5 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
 };
 
 export const Box = createPolymorphic<BoxProps, 'div'>(forwardRef(BoxImpl), 'Box');
+
+export type { BoxProps, BoxComponentProps };

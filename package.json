@@ -2,13 +2,14 @@
     "name": "react-tailwind-ui",
     "type": "module",
     "version": "1.0.0",
-    "main": "dev/index.js",
-    "module": "dev/index.js",
-    "types": "dist/index.d.ts",
+    "main": "./dist/index.esm.js",
+    "module": "./dist/index.esm.js",
+    "types": "dist/types/index.d.ts",
     "scripts": {
         "build": "rollup -c",
         "dev": "rollup -c -w",
         "dev:tsc": "tsc --watch -p tsconfig.dev.json",
+        "dev:dist:tsc": "tsc --watch -p tsconfig.dev.json",
         "type:build": "tsc --emitDeclarationOnly",
         "lint": "eslint src --ext .ts,.tsx",
         "watch:scss": "sass src:dev --watch",
@@ -17,9 +18,6 @@
         "test:coverage": "vitest run --coverage",
         "copy:scss": "cd src && cpy \"**/*.scss\" ../dist --parents",
         "copy:scss:watch": "chokidar \"src/**/*.scss\" -c \"npm run copy:scss\""
-    },
-    "exports": {
-        "./src/Button/Button.scss": "./dist/scss/Button.scss"
     },
     "peerDependencies": {
         "@headlessui/react": "^2.2.9",
