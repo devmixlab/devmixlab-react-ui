@@ -1,8 +1,8 @@
 import React, { forwardRef } from 'react';
-import { styleAliasMap } from './styleAliasMap';
-import { StyleBox, StyleProps } from './StyleBox';
-import { type PolymorphicComponent } from '../../types/polymorphic';
-import { hasKey, typedEntries } from '../../utils/ts';
+import { styleAliasMap } from './core/styleAliasMap';
+import { BoxStyled, StyleProps } from './BoxStyled';
+import { type PolymorphicComponent } from '../types/polymorphic';
+import { hasKey, typedEntries } from '../utils/ts';
 
 type AliasMap = typeof styleAliasMap;
 
@@ -25,7 +25,7 @@ const AliasBoxImpl = (props: ImplProps, ref: React.Ref<any>) => {
         mapped[finalKey] = value;
     }
 
-    return <StyleBox ref={ref} {...mapped} />;
+    return <BoxStyled ref={ref} {...mapped} />;
 };
 
 export const AliasBox = forwardRef(AliasBoxImpl) as PolymorphicComponent<AliasBoxProps, 'div'>;

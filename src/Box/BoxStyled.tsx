@@ -1,7 +1,7 @@
 import React, { CSSProperties, forwardRef } from 'react';
-import { styleProps, type StyleProp as StylePropKey } from './styleProps';
-import { createPolymorphic } from '../../types/polymorphic';
-import { typedEntries } from '../../utils/ts';
+import { styleProps, type StyleProp as StylePropKey } from './core/styleProps';
+import { createPolymorphic } from '../types/polymorphic';
+import { typedEntries } from '../utils/ts';
 
 const stylePropSet = new Set(styleProps);
 const isStyleProp = (key: string): key is StylePropKey => stylePropSet.has(key as StylePropKey);
@@ -44,7 +44,7 @@ const StyleBoxImpl = (
     );
 };
 
-export const StyleBox = createPolymorphic<StyleBoxProps, 'div'>(
+export const BoxStyled = createPolymorphic<StyleBoxProps, 'div'>(
     forwardRef(StyleBoxImpl),
-    'StyleBox',
+    'BoxStyled',
 );

@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { DerivedProps, DerivedBox } from './core/DerivedBox';
+import { DerivedProps, BoxDerived } from './BoxDerived';
 import clsx from 'clsx';
 import { classPrefix } from '../utils/classPrefix';
 import { hasKey, typedEntries } from '../utils/ts';
@@ -133,7 +133,7 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     });
 
     return (
-        <DerivedBox
+        <BoxDerived
             ref={ref}
             {...(propsToPassNext as DerivedProps)}
             className={clsx(classes, className)}

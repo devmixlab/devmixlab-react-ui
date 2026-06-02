@@ -1,6 +1,6 @@
 import React, { CSSProperties, forwardRef } from 'react';
-import { AliasBox, AliasProps } from './AliasBox';
-import { createPolymorphic } from '../../types/polymorphic';
+import { AliasBox, AliasProps } from './BoxAliased';
+import { createPolymorphic } from '../types/polymorphic';
 
 type Size = number | string;
 type Radius = CSSProperties['borderRadius'];
@@ -258,7 +258,7 @@ const DerivedBoxImpl = (
     return <AliasBox ref={ref} {...restProps} className={className} />;
 };
 
-export const DerivedBox = createPolymorphic<DerivedBoxProps, 'div'>(
+export const BoxDerived = createPolymorphic<DerivedBoxProps, 'div'>(
     forwardRef(DerivedBoxImpl),
-    'DerivedBox',
+    'BoxDerived',
 );

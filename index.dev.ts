@@ -58,9 +58,9 @@ export { Card } from './src/Card';
 export { Heading, H1, H2, H3, H4, H5, H6 } from './src/Heading';
 export { Text } from './src/Text/Text';
 
-export { StyleBox } from './src/Box/core/StyleBox';
-export { AliasBox } from './src/Box/core/AliasBox';
-export { DerivedBox } from './src/Box/core/DerivedBox';
+export { BoxStyled } from './src/Box/BoxStyled';
+export { AliasBox } from './src/Box/BoxAliased';
+export { BoxDerived } from './src/Box/BoxDerived';
 // export { Grid } from './src/Box/Grid';
 // export { Col } from './src/Box/Col';
 export { Box } from './src/Box/Box';
