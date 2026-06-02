@@ -52,14 +52,7 @@ type ImplProps = DerivedProps & {
     className?: string;
 } & React.HTMLAttributes<HTMLElement>;
 
-// type ImplProps = {
-//     children?: React.ReactNode;
-//     className?: string;
-// } & DerivedProps &
-//     Record<string, unknown>;
-
 type DerivedEntry = [keyof AliasProps, AliasProps[keyof AliasProps]];
-// type DerivedEntry = [string, string | number];
 
 const DerivedBoxImpl = (
     {
