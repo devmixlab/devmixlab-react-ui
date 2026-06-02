@@ -1,29 +1,48 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { cardPrefix as classPrefix } from './Card';
-import { Box, type BoxProps } from '../Components/Box/Box';
+import { Box } from '../Components/Box';
+import type { BoxProps, BoxComponentProps } from '../Components/Box';
 import { createPolymorphic } from '../types/polymorphic';
+import { OwnSectionProps } from './Section';
 
-export type ContentProps = {
-    children?: React.ReactNode;
-    className?: string;
-} & BoxProps;
+// -----------------------------------------------------------------------------
+// Types
+// -----------------------------------------------------------------------------
+
+type OwnContentProps = {};
+
+type ContentProps = OwnContentProps & BoxProps;
+
+type ImplContentProps<C extends React.ElementType = 'div'> = BoxComponentProps<C, OwnContentProps>;
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
 
 const prefix = (name: string = '') => {
     return classPrefix(`__content${name}`);
 };
 
+// -----------------------------------------------------------------------------
+// Content Implementation
+// -----------------------------------------------------------------------------
+
 export const ContentImpl = (
-    { className, children, ...rest }: ContentProps,
+    { className, children, ...rest }: ImplContentProps,
     ref: React.Ref<any>,
 ) => {
-    const cl = clsx(prefix(), className);
-
     return (
-        <Box ref={ref} className={cl} {...rest}>
+        <Box ref={ref} className={clsx(prefix(), className)} {...rest}>
             {children}
         </Box>
     );
 };
 
+// -----------------------------------------------------------------------------
+// Content Polymorphic
+// -----------------------------------------------------------------------------
+
 export const Content = createPolymorphic<ContentProps>(forwardRef(ContentImpl), 'Card.Content');
+
+export type { OwnContentProps, ContentProps, ImplContentProps };

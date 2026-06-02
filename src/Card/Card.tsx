@@ -5,18 +5,17 @@ import { Box } from '../Components/Box';
 import type { BoxProps, BoxComponentProps } from '../Components/Box';
 import clsx from 'clsx';
 import { createPolymorphic, type PolymorphicComponent } from '../types/polymorphic';
-import { type HeaderOwnProps } from './Header';
-import { type BodyOwnProps } from './Body';
-import { type MediaComponent } from './media/Media';
-import { type FooterOwnProps } from './Footer';
-import { type ContentProps } from './Content';
-import { type SectionOwnProps } from './Section';
+import type { HeaderProps } from './Header';
+import type { BodyProps } from './Body';
+import type { MediaComponent } from './media/Media';
+import type { FooterProps } from './Footer';
+import type { ContentProps } from './Content';
+import type { SectionProps } from './Section';
 import { classPrefix } from '../utils/classPrefix';
 
-// it used in Body, Header, Footer
-export const cardPrefix = (name: string = '') => {
-    return classPrefix(`--card${name}`);
-};
+// -----------------------------------------------------------------------------
+// Types
+// -----------------------------------------------------------------------------
 
 type OwnCardProps = {
     density?: Density;
@@ -36,18 +35,30 @@ type OwnCardProps = {
     focused?: boolean;
 };
 
-export type CardProps = OwnCardProps & BoxProps;
+type CardProps = OwnCardProps & BoxProps;
 
-export type ImplCardProps<C extends React.ElementType = 'div'> = BoxComponentProps<C, OwnCardProps>;
+type ImplCardProps<C extends React.ElementType = 'div'> = BoxComponentProps<C, OwnCardProps>;
 
-export type CardComponent = PolymorphicComponent<CardProps, 'div'> & {
-    Header: PolymorphicComponent<HeaderOwnProps>;
-    Body: PolymorphicComponent<BodyOwnProps>;
-    Footer: PolymorphicComponent<FooterOwnProps>;
+type CardComponent = PolymorphicComponent<CardProps, 'div'> & {
+    Header: PolymorphicComponent<HeaderProps>;
+    Body: PolymorphicComponent<BodyProps>;
+    Footer: PolymorphicComponent<FooterProps>;
     Media: MediaComponent;
     Content: PolymorphicComponent<ContentProps>;
-    Section: PolymorphicComponent<SectionOwnProps>;
+    Section: PolymorphicComponent<SectionProps>;
 };
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+export const cardPrefix = (name: string = '') => {
+    return classPrefix(`--card${name}`);
+};
+
+// -----------------------------------------------------------------------------
+// Card Implementation
+// -----------------------------------------------------------------------------
 
 export const CardImpl = <C extends React.ElementType = 'div'>(
     {
@@ -144,4 +155,10 @@ export const CardImpl = <C extends React.ElementType = 'div'>(
     );
 };
 
+// -----------------------------------------------------------------------------
+// Card Polymorphic
+// -----------------------------------------------------------------------------
+
 export const Card = createPolymorphic<CardProps, 'div'>(forwardRef(CardImpl), 'Card');
+
+export type { OwnCardProps, CardProps, ImplCardProps, CardComponent };

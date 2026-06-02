@@ -1,6 +1,3 @@
-// export const kinds = ['filled', 'solid', 'soft', 'outlined', 'ghost'] as const;
-// export type Kind = (typeof kinds)[number];
-
 export type BuiltinVariant = 'base';
 export type Variant = BuiltinVariant | (string & {});
 
@@ -10,7 +7,9 @@ export type Intent = BuiltinIntent | (string & {});
 export const density = ['none', 'xs', 'sm', 'md', 'lg', 'xl'] as const;
 export type Density = (typeof density)[number];
 
-export const densitySpacing = {
+export type SectionType = 'header' | 'body' | 'footer' | 'section';
+
+export const densitySpacings = {
     xs: {
         header: { px: 'xs', py: '0' },
         body: { px: 'xs', py: 'xs' },
