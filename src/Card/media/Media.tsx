@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { cardPrefix as classPrefix } from '../Card';
-import { Box, type BoxProps } from '../../Box/Box';
+import { Box, type BoxProps } from '../../Components/Box/Box';
 import { createPolymorphic, type PolymorphicComponent } from '../../types/polymorphic';
 import { type ImageProps } from './Image';
 import { type IconProps } from './Icon';

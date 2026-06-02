@@ -1,5 +1,5 @@
-@use '../../scss/functions' as fn;
-@use './config' as *;
+@use '../../../scss/functions' as fn;
+@use 'config' as *;
 
 @mixin outlined-overlay {
     position: relative;

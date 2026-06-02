@@ -1,4 +1,4 @@
-import { CLASS_PREFIX } from '../constants';
+import { CLASS_PREFIX } from '../../constants';
 
 export const isLongNumber = (value?: number, length = 2) => {
     // if (value === undefined || isNaN(value)) return false;

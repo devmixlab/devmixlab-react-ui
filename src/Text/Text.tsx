@@ -1,5 +1,5 @@
 import React, { CSSProperties, forwardRef } from 'react';
-import { Box, type BoxProps } from '../Box/Box';
+import { Box, type BoxProps } from '../Components/Box/Box';
 import clsx from 'clsx';
 import { createPolymorphic } from '../types/polymorphic';
 import { classPrefix } from '../utils/classPrefix';

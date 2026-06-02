@@ -8,7 +8,7 @@ import { FieldRoot } from '../FieldRoot/FieldRoot';
 import clsx from 'clsx';
 import { Chip } from '../../Chip/Chip';
 import { mergeRefs } from '../../utils/mergeRefs';
-import { Box, BoxProps } from '../../Box/Box';
+import { Box, BoxProps } from '../../Components/Box/Box';
 // import { Size, Variant } from '../Input/input.tokens';
 import { Size } from '../form.tokens';
 import { Variant } from '../FieldRoot/FieldRoot';

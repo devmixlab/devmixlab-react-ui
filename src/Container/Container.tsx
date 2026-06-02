@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps } from '../Box/Box';
+import { Box, BoxComponentProps } from '../Components/Box/Box';
 
 import { classPrefix } from '../utils/classPrefix';
 

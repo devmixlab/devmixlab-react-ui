@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
+import { Box, type BoxProps } from '../../Components/Box/Box';
 import { Size } from '../form.tokens';
 import { Variant } from '../FieldRoot/FieldRoot';
 import { mergeRefs } from '../../utils/mergeRefs';

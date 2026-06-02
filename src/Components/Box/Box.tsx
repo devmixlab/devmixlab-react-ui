@@ -1,13 +1,13 @@
 import React, { forwardRef } from 'react';
 import { DerivedProps, BoxDerived } from './BoxDerived';
 import clsx from 'clsx';
-import { classPrefix } from '../utils/classPrefix';
-import { hasKey, typedEntries } from '../utils/ts';
+import { classPrefix } from '../../utils/classPrefix';
+import { hasKey, typedEntries } from '../../utils/ts';
 import { configLookup, type PropValue } from './core/config';
-import { createPolymorphic, PolymorphicProps } from '../types/polymorphic';
+import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
 import { booleanClassMap } from './core/tokens';
 
-import { resolveResponsive, useBreakpoint, Responsiveify } from '../utils/responsive';
+import { resolveResponsive, useBreakpoint, Responsiveify } from '../../utils/responsive';
 
 export type Props = {
     appearanceNone?: boolean;

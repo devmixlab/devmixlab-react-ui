@@ -1,5 +1,5 @@
-@use '../../scss/config' as cfg;
-@use './box.variables' as *;
+@use '../../../scss/config' as cfg;
+@use 'box.variables' as *;
 @use 'sass:map';
 
 $p: cfg.$prefix;

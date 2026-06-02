@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { clsx } from 'clsx';
-import { Box, BoxComponentProps } from '../Box/Box';
+import { Box, BoxComponentProps } from '../Components/Box/Box';
 import { Collapse, CollapseProps } from '../Collapse/Collapse';
 import { classPrefix } from '../utils/classPrefix';
 import {

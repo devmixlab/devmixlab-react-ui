@@ -7,8 +7,8 @@ import * as badgeTokens from './src/tokens/badge';
 import * as alertTokens from './src/tokens/alert';
 import * as cardTokens from './src/tokens/card';
 
-export { Button } from './src/Button/Button';
-export { Group as ButtonGroup } from './src/Button/Group';
+export { Button } from './src/Components/Button/Button';
+export { Group as ButtonGroup } from './src/Components/Button/Group';
 export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 
 export { ResponsiveProvider } from './src/utils/responsive';
@@ -58,11 +58,11 @@ export { Card } from './src/Card';
 export { Heading, H1, H2, H3, H4, H5, H6 } from './src/Heading';
 export { Text } from './src/Text/Text';
 
-export { BoxStyled } from './src/Box/BoxStyled';
-export { AliasBox } from './src/Box/BoxAliased';
-export { BoxDerived } from './src/Box/BoxDerived';
+export { BoxStyled } from './src/Components/Box/BoxStyled';
+export { AliasBox } from './src/Components/Box/BoxAliased';
+export { BoxDerived } from './src/Components/Box/BoxDerived';
 // export { Grid } from './src/Box/Grid';
 // export { Col } from './src/Box/Col';
-export { Box } from './src/Box/Box';
+export { Box } from './src/Components/Box/Box';
 export { Icon } from './src/Icon/Icon';
 export { IconWrapper } from './src/Icon/IconWrapper';

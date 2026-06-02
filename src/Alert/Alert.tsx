@@ -1,15 +1,15 @@
 import React, { forwardRef, useState } from 'react';
 import { createPolymorphic, type PolymorphicComponent } from '../types/polymorphic';
-import { type BoxProps } from '../Box/Box';
+import { type BoxProps } from '../Components/Box/Box';
 import { Card } from '../Card';
 import { type CardProps } from '../Card/Card';
-import { Box } from '../Box/Box';
+import { Box } from '../Components/Box/Box';
 import { CLASS_PREFIX } from '../constants';
 import clsx from 'clsx';
 import { Info, Warning, Success, Close } from '../Icon';
 import { Density } from '../Card/card.tokens';
 import { sizeToDensityMap, Intent, Variant, Size } from './alert.tokens';
-import { Button } from '../Button/Button';
+import { Button } from '../Components/Button/Button';
 
 export const prefix = (name: string = '') => {
     return `${CLASS_PREFIX}--alert${name}`;

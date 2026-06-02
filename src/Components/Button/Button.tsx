@@ -1,10 +1,10 @@
 import React, { useEffect, useState, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Box, BoxComponentProps, type BoxProps } from '../Box/Box';
-import { createPolymorphic } from '../types/polymorphic';
+import { createPolymorphic } from '../../types/polymorphic';
 import { LoadingPosition, Size, Intent, Variant } from './Button.tokens';
 import { isLongNumber, prefix } from './Button.helpers';
-import { DefaultSpinner } from '../Spinner/DefaultSpinner';
+import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
 
 type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
     C,

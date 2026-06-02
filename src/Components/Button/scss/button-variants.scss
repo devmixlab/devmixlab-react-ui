@@ -1,7 +1,7 @@
-@use '../../scss/functions' as fn;
-@use '../../scss/config' as cfg;
+@use '../../../scss/functions' as fn;
+@use '../../../scss/config' as cfg;
 @use 'variant-mixins' as btn;
-@use './config' as *;
+@use 'config' as *;
 
 $intents: (primary, secondary, info, warning, success, danger);
 

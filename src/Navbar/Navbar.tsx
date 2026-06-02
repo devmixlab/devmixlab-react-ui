@@ -2,9 +2,9 @@ import React, { forwardRef, useState, useRef, useCallback, useEffect, useMemo } 
 
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps } from '../Box/Box';
+import { Box, BoxComponentProps } from '../Components/Box/Box';
 import { classPrefix } from '../utils/classPrefix';
-import { Button, ButtonProps } from '../Button/Button';
+import { Button, ButtonProps } from '../Components/Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import {
     NavbarContext,

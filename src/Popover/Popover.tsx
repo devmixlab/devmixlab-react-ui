@@ -13,13 +13,13 @@ import {
     FloatingNode,
 } from '@floating-ui/react';
 import type { Placement } from '@floating-ui/react';
-import { Box, BoxProps } from '../Box/Box';
+import { Box, BoxProps } from '../Components/Box/Box';
 import { mergeRefs } from '../utils/mergeRefs';
 import { classPrefix } from '../utils/classPrefix';
 import { useStableId } from '../utils/useStableId';
 import { useFloatingLayer, usePresence } from '../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
-import { Button, ButtonProps } from '../Button/Button';
+import { Button, ButtonProps } from '../Components/Button/Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { clsx } from 'clsx';
 

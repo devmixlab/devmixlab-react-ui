@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box/Box';
+import { Box, type BoxProps } from '../Components/Box/Box';
 import { Size, Intent, Variant } from './chip.tokens';
 // import { prefix } from './chip.helpers';
 import { CLASS_PREFIX } from '../constants';

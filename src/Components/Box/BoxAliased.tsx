@@ -1,8 +1,8 @@
 import React, { forwardRef } from 'react';
 import { styleAliasMap } from './core/styleAliasMap';
 import { BoxStyled, StyleProps } from './BoxStyled';
-import { type PolymorphicComponent } from '../types/polymorphic';
-import { hasKey, typedEntries } from '../utils/ts';
+import { type PolymorphicComponent } from '../../types/polymorphic';
+import { hasKey, typedEntries } from '../../utils/ts';
 
 type AliasMap = typeof styleAliasMap;
 

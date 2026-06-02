@@ -2,7 +2,7 @@ import React, { CSSProperties, forwardRef, useLayoutEffect, useRef, useState } f
 
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps } from '../Box/Box';
+import { Box, BoxComponentProps } from '../Components/Box/Box';
 import { usePresence, useReducedMotion } from '../hooks';
 import { classPrefix } from '../utils/classPrefix';
 

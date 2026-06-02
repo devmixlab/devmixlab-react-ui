@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box/Box';
+import { Box, type BoxProps } from '../Components/Box/Box';
 import { Size, Intent, Variant } from './badge.tokens';
 import { prefix } from './badge.helpers';
 

@@ -1,6 +1,6 @@
 import React, { CSSProperties, forwardRef } from 'react';
 import { AliasBox, AliasProps } from './BoxAliased';
-import { createPolymorphic } from '../types/polymorphic';
+import { createPolymorphic } from '../../types/polymorphic';
 
 type Size = number | string;
 type Radius = CSSProperties['borderRadius'];

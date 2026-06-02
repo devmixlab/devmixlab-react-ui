@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { CLASS_PREFIX } from '../constants';
 
-import { Box, type BoxProps } from '../Box/Box';
+import { Box, type BoxProps } from '../Components/Box/Box';
 import clsx from 'clsx';
 
 import { createPolymorphic, type PolymorphicComponent } from '../types/polymorphic';

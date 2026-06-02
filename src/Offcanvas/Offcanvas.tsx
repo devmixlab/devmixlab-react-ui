@@ -3,7 +3,7 @@ import React, { forwardRef, useEffect, useRef, CSSProperties, useState } from 'r
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 
-import { Box, BoxComponentProps, BoxProps } from '../Box/Box';
+import { Box, BoxComponentProps, BoxProps } from '../Components/Box/Box';
 
 import { mergeRefs } from '../utils/mergeRefs';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -25,7 +25,7 @@ import {
     useFocusBoundary,
 } from '../hooks';
 import { NestedLayersHook } from '../hooks/useNestedLayers';
-import { ButtonProps } from '../Button/Button';
+import { ButtonProps } from '../Components/Button/Button';
 
 const prefix = (name = '') => classPrefix(`--offcanvas${name}`);
 

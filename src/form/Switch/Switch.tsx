@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useEffect, useId, useState, useMemo } from 'react';
 import clsx from 'clsx';
-import { Box } from '../../Box/Box';
+import { Box } from '../../Components/Box/Box';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { CLASS_PREFIX } from '../../constants';
 import { useSwitchGroup } from './switchGroup.context';

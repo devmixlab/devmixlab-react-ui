@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
+import { Box, type BoxProps } from '../../Components/Box/Box';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { Check as CheckIcon } from '../../Icon/Check';
 import { Indeterminate as IndeterminateIcon } from '../../Icon/Indeterminate';

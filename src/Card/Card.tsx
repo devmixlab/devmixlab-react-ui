@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { CardProvider } from './card.context';
 import { Density } from './card.tokens';
-import { Box, type BoxProps } from '../Box/Box';
+import { Box, type BoxProps } from '../Components/Box/Box';
 import clsx from 'clsx';
 import { createPolymorphic, type PolymorphicComponent } from '../types/polymorphic';
 import { type HeaderOwnProps } from './Header';

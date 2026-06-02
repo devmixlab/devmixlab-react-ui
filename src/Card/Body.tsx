@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { Section, type SectionOwnProps } from './Section';
 import { createPolymorphic } from '../types/polymorphic';
-import { BoxProps } from '../Box/Box';
+import { BoxProps } from '../Components/Box/Box';
 import { useCardContext } from './card.context';
 
 export type BodyOwnProps = {

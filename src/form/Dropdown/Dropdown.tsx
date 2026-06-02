@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Box, BoxProps } from '../../Box/Box';
+import { Box, BoxProps } from '../../Components/Box/Box';
 import { useFormFieldContext } from '../FormField/formField.context';
 import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';

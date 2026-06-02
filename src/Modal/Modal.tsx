@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, BoxProps } from '../Box/Box';
+import { Box, BoxProps } from '../Components/Box/Box';
 import { classPrefix } from '../utils/classPrefix';
 import clsx from 'clsx';
 import { ModalContext, useModalContext } from './Modal.context';
