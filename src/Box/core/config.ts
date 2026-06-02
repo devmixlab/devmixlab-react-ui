@@ -35,37 +35,24 @@ import {
     transitionEasings as transitionEasingsTokens,
     transitionEasingsMap,
     transitionProperties as transitionPropertiesTokens,
-    // transitionPropertiesMap,
     zNumberIndexes,
     zIndexes as zIndexesTokens,
-    translates as translatesTokens,
-    scales as scalesTokens,
-    rotates as rotatesTokens,
     grids as gridsTokens,
     cols as colsTokens,
     insetsMap,
     whiteSpacesMap,
     wordBreaksMap,
     textDecorationsMap,
-    // opacities,
     visibilities as visibilitiesTokens,
     userSelects as userSelectsTokens,
     objectFits as objectFitsTokens,
     borderStyles as borderStylesTokens,
     selfAlignments as selfAlignmentsTokens,
-    borderStyles,
-    selfAlignments,
 } from './tokens';
-import { Props, BoxProps } from '../Box';
-import { StyleAliasKey, StyleAliasValue, stylePropToAliasMap } from './styleAliasMap';
-import type { StyleProp } from './styleProps';
-
-export type OriginProp = (StyleProp | keyof Props) & string;
+import { Props } from '../Box';
+import { StyleAliasKey, stylePropToAliasMap } from './styleAliasMap';
 
 type Key = keyof Props;
-
-// type Check = { isToken?: boolean; props: ResponsiveBoxProps; propKey: Key; value: string | number };
-// type ResolveInStyleProps = { value: string | number };
 
 export type PropValue = boolean | number | string | undefined;
 
@@ -82,22 +69,11 @@ export type OriginPropConfig = {
     prefix?: string;
     map?: Record<string, string | number>;
     tokens?: readonly string[];
-    // alias?: StyleAliasKey;
     check?: (props: Check) => boolean;
-    // check?: ({ props: ResponsiveBoxProps, key: Key, value: PropValue }) => boolean;
     resolveInStyle?: (props: ResolveInStyleProps) => string | number;
     isToken?: (isT: () => boolean, value: PropValue) => value is string;
     modifyValue?: (value: PropValue) => PropValue;
 };
-
-// export type OriginPropConfig = {
-//     key: OriginProp;
-//     prefix?: string;
-//     tokens?: readonly T[];
-//     map?: Record<T, string | number>;
-//     alias?: StyleAliasKey;
-//     type?: 'spacing' | 'transform' | 'transition';
-// };
 
 type SpacingProp = {
     key: Key;
@@ -125,15 +101,7 @@ export const spacingProps: SpacingProp[] = (
 ).map((key) => ({
     key,
     alias: stylePropToAliasMap[key],
-    // alias: stylePropToAliasMap[key as keyof typeof stylePropToAliasMap],
-    // alias: hasKey(stylePropToAliasMap, key) ? stylePropToAliasMap[key] : undefined,
 }));
-
-export const spacingLookup = new Set<string>(
-    spacingProps.flatMap(({ key, alias }) => [key, alias]),
-);
-
-export const transformLookup = new Set<string>(['tx', 'ty', 'scale', 'rotate']);
 
 export const rotateMap = {
     xs: '5deg',
@@ -227,34 +195,6 @@ export const resolveTransformTranslate = (v: string) => {
             return v;
     }
 };
-
-// export const durationMap = {
-//     fast: '150ms',
-//     normal: '250ms',
-//     slow: '400ms',
-// } as const;
-//
-// export const easingMap = {
-//     easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-//     easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
-//     easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-// } as const;
-
-// export const resolveTransitionDuration = (value: unknown): string => {
-//     if (typeof value === 'string' && value in durationMap) {
-//         return durationMap[value as keyof typeof durationMap];
-//     }
-//
-//     return String(value);
-// };
-//
-// export const resolveTransitionEasing = (value: unknown): string => {
-//     if (typeof value === 'string' && value in easingMap) {
-//         return easingMap[value as keyof typeof easingMap];
-//     }
-//
-//     return String(value);
-// };
 
 const widthsPrefixes = new Set(['w', 'min-w', 'max-w']);
 
@@ -371,8 +311,6 @@ export const config: OriginPropConfig[] = [
         check: ({ props }) => {
             return !props || props['transition'] === undefined;
         },
-
-        // transitionPropertiesTokens,
     },
 
     // Others
@@ -427,21 +365,6 @@ export const config: OriginPropConfig[] = [
         };
         return newConfig;
     }),
-    // {
-    //     key: 'flip',
-    //     resolveInStyle: ({ value }: ResolveInStyleProps) => 'scale(-1)',
-    //     check: ({ value }) => !!value,
-    // },
-    // {
-    //     key: 'flipX',
-    //     resolveInStyle: ({ value }: ResolveInStyleProps) => 'scaleX(-1)',
-    //     check: ({ value }) => !!value,
-    // },
-    // {
-    //     key: 'flipY',
-    //     resolveInStyle: ({ value }: ResolveInStyleProps) => 'scaleY(-1)',
-    //     check: ({ value }) => !!value,
-    // },
 
     // Gaps
     ...([['gap'], ['rowGap', 'row-gap'], ['columnGap', 'col-gap']] as const).map(
@@ -551,7 +474,6 @@ export const config: OriginPropConfig[] = [
 
 const isNonEmptyString = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0;
 
-// type isTokenValue = number | string | undefined;
 const isToken = (value: PropValue, tokens?: readonly string[]): value is string => {
     if (tokens == undefined) return false;
     return typeof value === 'string' && tokens.includes(value);
@@ -578,7 +500,7 @@ export const configLookup: Record<LookupKey, MapedPropConfig> = Object.fromEntri
             modifyValue,
         }) => {
             const alias = stylePropToAliasMap[key as keyof typeof stylePropToAliasMap];
-            // const alias = hasKey(stylePropToAliasMap, key) ? stylePropToAliasMap[key] : undefined;
+
             const mappedProp: MapedPropConfig = Object.freeze({
                 key,
                 prefix: prefix ?? key,
