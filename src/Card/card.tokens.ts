@@ -1,5 +1,11 @@
-export const kinds = ['filled', 'solid', 'soft', 'outlined', 'ghost'] as const;
-export type Kind = (typeof kinds)[number];
+// export const kinds = ['filled', 'solid', 'soft', 'outlined', 'ghost'] as const;
+// export type Kind = (typeof kinds)[number];
+
+export type BuiltinVariant = 'base';
+export type Variant = BuiltinVariant | (string & {});
+
+export type BuiltinIntent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+export type Intent = BuiltinIntent | (string & {});
 
 export const density = ['none', 'xs', 'sm', 'md', 'lg', 'xl'] as const;
 export type Density = (typeof density)[number];

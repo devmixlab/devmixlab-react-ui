@@ -1,7 +1,8 @@
 import React, { forwardRef } from 'react';
 import { CardProvider } from './card.context';
-import { Density } from './card.tokens';
-import { Box, type BoxProps } from '../Components/Box/Box';
+import { Density, Intent, Variant } from './card.tokens';
+import { Box } from '../Components/Box';
+import type { BoxProps, BoxComponentProps } from '../Components/Box';
 import clsx from 'clsx';
 import { createPolymorphic, type PolymorphicComponent } from '../types/polymorphic';
 import { type HeaderOwnProps } from './Header';
@@ -17,18 +18,7 @@ export const cardPrefix = (name: string = '') => {
     return classPrefix(`--card${name}`);
 };
 
-type SpreadProps = {
-    onClick?: React.MouseEventHandler;
-    onKeyDown?: React.KeyboardEventHandler;
-    href?: string;
-    role?: string;
-    tabIndex?: number;
-    type?: 'button' | 'submit' | 'reset';
-};
-
-export type CardProps = {
-    className?: string;
-    as?: React.ElementType;
+type OwnCardProps = {
     density?: Density;
     accent?: boolean;
     accentSide?: 'left' | 'top';
@@ -40,12 +30,15 @@ export type CardProps = {
 
     active?: boolean;
     disabled?: boolean;
-    intent?: string;
-    variant?: string;
+    intent?: Intent;
+    variant?: Variant;
 
     focused?: boolean;
-} & BoxProps &
-    SpreadProps;
+};
+
+export type CardProps = OwnCardProps & BoxProps;
+
+export type ImplCardProps<C extends React.ElementType = 'div'> = BoxComponentProps<C, OwnCardProps>;
 
 export type CardComponent = PolymorphicComponent<CardProps, 'div'> & {
     Header: PolymorphicComponent<HeaderOwnProps>;
@@ -56,10 +49,10 @@ export type CardComponent = PolymorphicComponent<CardProps, 'div'> & {
     Section: PolymorphicComponent<SectionOwnProps>;
 };
 
-export const CardImpl = (
+export const CardImpl = <C extends React.ElementType = 'div'>(
     {
         className,
-        as = 'div',
+        as,
         density = 'md',
 
         interactive = false,
@@ -79,10 +72,10 @@ export const CardImpl = (
         d = 'flex',
         direction = 'column',
         ...rest
-    }: CardProps,
+    }: ImplCardProps<C>,
     ref: React.Ref<any>,
 ) => {
-    const { onClick, onKeyDown, href, role, tabIndex, type, ...restProps } = rest;
+    const { onClick, onKeyDown, href, role, tabIndex, type, ...restProps } = rest as any;
 
     const isNaturallyInteractive = (as === 'a' && href != null) || as === 'button';
     const isDisabled = disabled;

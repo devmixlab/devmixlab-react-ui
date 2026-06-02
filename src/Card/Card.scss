@@ -34,6 +34,30 @@ $card-prefix: #{$p}--card;
     color: var(--text);
 }
 
+@mixin card-intent ($intent: base, $mode: light) {
+    @if ($intent == light) {
+        --card-surface: var(--surface-#{$mode});
+        --card-surface-raised: var(--surface-raised-#{$mode});
+        --card-surface-hover: var(--surface-hover-#{$mode});
+        --card-surface-raised-hover: var(--surface-raised-hover-#{$mode});
+
+        --card-accent: var(--accent-#{$mode});
+        --card-accent-disabled: var(--accent-disabled-#{$mode});
+
+        --card-border: var(--border-#{$mode});
+        --card-border-section: var(--border-section-#{$mode});
+
+        --card-icon-surface: var(--icon-surface-#{$mode});
+        --card-icon-color: var(--icon-color-#{$mode});
+
+        --card-text: var(--text-#{$mode});
+        --card-text-muted: var(--text-muted-#{$mode});
+        --card-text-disabled: var(--text-disabled-#{$mode});
+    } @else {
+
+    }
+}
+
 .#{$card-prefix} {
 
     /* ================== LIGHT ================== */
