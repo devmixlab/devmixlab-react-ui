@@ -1,9 +1,9 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { cardPrefix as classPrefix } from './Card';
-import { Box } from '../Components/Box';
-import type { BoxProps, BoxComponentProps } from '../Components/Box';
-import { createPolymorphic } from '../types/polymorphic';
+import { Box } from '../Box';
+import type { BoxProps, BoxComponentProps } from '../Box';
+import { createPolymorphic } from '../../types/polymorphic';
 import { OwnSectionProps } from './Section';
 
 // -----------------------------------------------------------------------------

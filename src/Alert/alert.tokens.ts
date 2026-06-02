@@ -1,4 +1,4 @@
-import { Density } from '../Card/card.tokens';
+import { Density } from '../Components/Card/card.tokens';
 
 export type Intent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
 export type Variant = 'base' | 'solid' | 'outlined' | 'subtle';

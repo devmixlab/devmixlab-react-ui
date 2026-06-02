@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { Section } from './Section';
 import type { SectionProps, ImplSectionProps } from './Section';
-import { createPolymorphic } from '../types/polymorphic';
+import { createPolymorphic } from '../../types/polymorphic';
 
 // -----------------------------------------------------------------------------
 // Types

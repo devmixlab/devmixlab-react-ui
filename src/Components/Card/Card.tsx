@@ -1,17 +1,17 @@
 import React, { forwardRef } from 'react';
 import { CardProvider } from './card.context';
 import { Density, Intent, Variant } from './card.tokens';
-import { Box } from '../Components/Box';
-import type { BoxProps, BoxComponentProps } from '../Components/Box';
+import { Box } from '../Box';
+import type { BoxProps, BoxComponentProps } from '../Box';
 import clsx from 'clsx';
-import { createPolymorphic, type PolymorphicComponent } from '../types/polymorphic';
+import { createPolymorphic, type PolymorphicComponent } from '../../types/polymorphic';
 import type { HeaderProps } from './Header';
 import type { BodyProps } from './Body';
 import type { MediaComponent } from './media/Media';
 import type { FooterProps } from './Footer';
 import type { ContentProps } from './Content';
 import type { SectionProps } from './Section';
-import { classPrefix } from '../utils/classPrefix';
+import { classPrefix } from '../../utils/classPrefix';
 
 // -----------------------------------------------------------------------------
 // Types

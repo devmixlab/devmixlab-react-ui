@@ -1,12 +1,12 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { cardPrefix as classPrefix } from './Card';
-import { Box } from '../Components/Box';
-import type { BoxProps, BoxComponentProps } from '../Components/Box';
+import { Box } from '../Box';
+import type { BoxProps, BoxComponentProps } from '../Box';
 import { Density, densitySpacings, SectionType } from './card.tokens';
 import { useCardContext } from './card.context';
-import { hasKey } from '../utils/ts';
-import { createPolymorphic } from '../types/polymorphic';
+import { hasKey } from '../../utils/ts';
+import { createPolymorphic } from '../../types/polymorphic';
 
 // -----------------------------------------------------------------------------
 // Types

@@ -43,7 +43,7 @@ import {
 
 import { Burger as BurgerIcon } from '../Icon';
 
-import { Card } from '../Card';
+import { Card } from '../Components/Card';
 
 // -----------------------------------------------------------------------------
 // Helpers
