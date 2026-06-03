@@ -46,8 +46,8 @@ export { ToastProvider, useToast } from './src/Toast';
 export { ToastContext, useToastContext } from './src/Toast/Toast.context';
 // export { ToastContext } from './src/Toast/Toast.context';
 
-export { Navbar } from './src/Navbar/Navbar';
-export { useNavbarMobileContext } from './src/Navbar/Navbar.context';
+export { Navbar } from './src/Components/Navbar/Navbar';
+export { useNavbarMobileContext } from './src/Components/Navbar/Navbar.context';
 
 export { Warning as WarningIcon } from './src/Icon/Warning';
 

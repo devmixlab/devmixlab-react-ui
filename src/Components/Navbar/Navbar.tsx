@@ -2,10 +2,10 @@ import React, { forwardRef, useState, useRef, useCallback, useEffect, useMemo } 
 
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps } from '../Components/Box/Box';
-import { classPrefix } from '../utils/classPrefix';
-import { Button, ButtonProps } from '../Components/Button/Button';
-import { ChevronDown as ChevronDownIcon } from '../Icon';
+import { Box, BoxComponentProps } from '../Box/Box';
+import { classPrefix } from '../../utils/classPrefix';
+import { Button, ButtonProps } from '../Button/Button';
+import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import {
     NavbarContext,
     useNavbarContext,
@@ -14,7 +14,7 @@ import {
     useNavbarMobileContext,
     NavbarMobileContextValue,
 } from './Navbar.context';
-import { FocusableItem, useFocusableList } from '../hooks/useFocusableList';
+import { FocusableItem, useFocusableList } from '../../hooks/useFocusableList';
 import {
     NavbarProps,
     NavbarBrandProps,
@@ -28,10 +28,10 @@ import {
     FocusScope,
     NavbarItemElementProps,
 } from './Navbar.types';
-import { useStableId } from '../utils/useStableId';
-import { breakpointOrder, useBreakpoint } from '../utils/responsive';
-import { Collapse } from '../Collapse/Collapse';
-import { mergeRefs } from '../utils/mergeRefs';
+import { useStableId } from '../../utils/useStableId';
+import { breakpointOrder, useBreakpoint } from '../../utils/responsive';
+import { Collapse } from '../../Collapse/Collapse';
+import { mergeRefs } from '../../utils/mergeRefs';
 import {
     useFocusTrap,
     useRestoreFocus,
@@ -39,11 +39,11 @@ import {
     useFocusOutside,
     usePointerOutside,
     useNestedLayers,
-} from '../hooks';
+} from '../../hooks';
 
-import { Burger as BurgerIcon } from '../Icon';
+import { Burger as BurgerIcon } from '../../Icon';
 
-import { Card } from '../Components/Card';
+import { Card } from '../Card';
 
 // -----------------------------------------------------------------------------
 // Helpers

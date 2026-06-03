@@ -1,8 +1,8 @@
 import React from 'react';
-import { BoxComponentProps } from '../Components/Box/Box';
-import { Breakpoint } from '../utils/responsive';
-import { CollapseProps } from '../Collapse/Collapse';
-import { ButtonProps } from '../Components/Button/Button';
+import { BoxComponentProps } from '../Box/Box';
+import { Breakpoint } from '../../utils/responsive';
+import { CollapseProps } from '../../Collapse/Collapse';
+import { ButtonProps } from '../Button/Button';
 
 export type Variant = 'base' | 'subtle' | 'solid' | 'outlined' | 'transparent';
 

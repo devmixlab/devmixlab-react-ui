@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
-import { FocusableItem, FocusableListResult } from '../hooks/useFocusableList';
+import { FocusableItem, FocusableListResult } from '../../hooks/useFocusableList';
 import { FocusScope } from './Navbar.types';
-import { NestedLayersHook } from '../hooks/useNestedLayers';
+import { NestedLayersHook } from '../../hooks/useNestedLayers';
 
 // -----------------------------------------------------------------------------
 // NavbarContext
