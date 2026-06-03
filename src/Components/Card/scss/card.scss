@@ -1,166 +1,19 @@
-@use '../../../scss/functions' as functions;
 @use '../../../scss/mixins' as mixins;
-
+@use './card-mixins' as *;
 @use '../../../scss/config' as cfg;
-@use 'sass:map';
 
 $p: cfg.$prefix;
 $card-prefix: #{$p}--card;
 
-//@mixin card-theme($mode) {
-//    --surface: var(--surface-#{$mode});
-//    --surface-raised: var(--surface-raised-#{$mode});
-//    --surface-hover: var(--surface-hover-#{$mode});
-//    --surface-raised-hover: var(--surface-raised-hover-#{$mode});
-//
-//    --accent: var(--accent-#{$mode});
-//    --accent-disabled: var(--accent-disabled-#{$mode});
-//
-//    --border: var(--border-#{$mode});
-//    --border-section: var(--border-section-#{$mode});
-//    //--ring: var(--ring-#{$mode});
-//
-//    --icon-surface: var(--icon-surface-#{$mode});
-//    --icon-color: var(--icon-color-#{$mode});
-//
-//    --text: var(--text-#{$mode});
-//    --text-muted: var(--text-muted-#{$mode});
-//    --text-disabled: var(--text-disabled-#{$mode});
-//}
-
 $intents: (secondary, primary, warning, success, info, danger);
-
-@mixin card-root-colors {
-    background-color: var(--card-surface);
-    border: 1px solid var(--card-border);
-    color: var(--card-text);
-}
-
-@mixin base($intent, $mode: 'light') {
-    @if ($mode == 'light') {
-        --card-surface: #{functions.intent-color($intent, 0)};
-        --card-surface-raised: #{functions.intent-color($intent, 50)};
-
-        --card-surface-hover: #{functions.intent-color($intent, 100)};
-        --card-surface-active: #{functions.intent-color($intent, 150)};
-
-        --card-surface-raised-hover: #{functions.intent-color($intent, 150)};
-        --card-surface-raised-active: #{functions.intent-color($intent, 250)};
-
-        --card-accent: #{functions.intent-color($intent, 800)};
-        --card-accent-disabled: #{functions.intent-color($intent, 400)};
-
-        --card-border: #{functions.intent-color($intent, 200)};
-        --card-border-active: #{functions.intent-color($intent, 300)};
-        --card-border-section: #{functions.intent-color($intent, 200)};
-
-        --card-icon-surface: #{functions.intent-color($intent, 50)};
-        --card-icon-color: #{functions.intent-color($intent, 800)};
-
-        --card-ring: #{functions.intent-color($intent, 500)};
-
-        //--card-text: #{functions.intent-color($intent, 900)};
-        //--card-text-muted: #{functions.intent-color($intent, 500)};
-        //--card-text-disabled: #{functions.intent-color($intent, 400)};
-    } @else {
-        --card-surface: #{functions.intent-color($intent, 950)};
-        --card-surface-raised: #{functions.intent-color($intent, 900)};
-        --card-surface-hover: #{functions.intent-color($intent, 850)};
-        --card-surface-active: #{functions.intent-color($intent, 800)};
-
-        --card-surface-raised-hover: #{functions.intent-color($intent, 850)};
-        --card-surface-raised-active: #{functions.intent-color($intent, 800)};
-
-        --card-accent: #{functions.intent-color($intent, 400)};
-        --card-accent-disabled: #{functions.intent-color($intent, 700)};
-
-        --card-border: #{functions.intent-color($intent, 800)};
-        --card-border-active: #{functions.intent-color($intent, 700)};
-
-        --card-border-section: #{functions.intent-color($intent, 800)};
-
-        --card-icon-surface: #{functions.intent-color($intent, 850)};
-        --card-icon-color: #{functions.intent-color($intent, 300)};
-
-        //--card-text: #{functions.intent-color($intent, 100)};
-        //--card-text-muted: #{functions.intent-color($intent, 400)};
-        //--card-text-disabled: #{functions.intent-color($intent, 600)};
-    }
-}
 
 .#{$card-prefix} {
 
     --card-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
 
-    --card-text: #{functions.intent-color(gray, 900)};
-    --card-text-muted: #{functions.intent-color(gray, 500)};
-    --card-text-disabled: #{functions.intent-color(gray, 400)};
-
-    ///* ================== LIGHT ================== */
-    //
-    //--surface-light: var(--#{$p}-intent-gray-0);
-    //
-    //--surface-raised-light: var(--#{$p}-intent-gray-50);
-    //
-    //--surface-hover-light: var(--#{$p}-intent-gray-100);
-    //--surface-active-light: var(--#{$p}-intent-gray-150);
-    //
-    //--surface-raised-hover-light: var(--#{$p}-intent-gray-200);
-    //--surface-raised-active-light: var(--#{$p}-intent-gray-250);
-    //
-    //--accent-light: var(--#{$p}-intent-gray-800);
-    //--accent-disabled-light: var(--#{$p}-intent-gray-400);
-    //
-    //--border-light: var(--#{$p}-intent-gray-200);
-    //--border-active-light: var(--#{$p}-intent-gray-300);
-    //
-    //--border-section-light: var(--#{$p}-intent-gray-200);
-    //
-    //--icon-surface-light: var(--#{$p}-intent-gray-50);
-    //--icon-color-light: var(--#{$p}-intent-gray-800);
-    //
-    //--text-light: var(--#{$p}-intent-gray-900);
-    //--text-muted-light: var(--#{$p}-intent-gray-500);
-    //--text-disabled-light: var(--#{$p}-intent-gray-400);
-    //
-    //
-    ///* ================== DARK ================== */
-    //
-    //--surface-dark: var(--#{$p}-intent-zinc-900);
-    //
-    //--surface-raised-dark: var(--#{$p}-intent-zinc-800);
-    //
-    //--surface-hover-dark: var(--#{$p}-intent-zinc-850);
-    //--surface-active-dark: var(--#{$p}-intent-zinc-800);
-    //
-    //--surface-raised-hover-dark: var(--#{$p}-intent-zinc-700);
-    //--surface-raised-active-dark: var(--#{$p}-intent-zinc-600);
-    //
-    //--accent-dark: var(--#{$p}-intent-zinc-300);
-    //--accent-disabled-dark: var(--#{$p}-intent-zinc-500);
-    //
-    //--border-dark: var(--#{$p}-intent-zinc-700);
-    //--border-active-dark: var(--#{$p}-intent-zinc-600);
-    //
-    //--border-section-dark: var(--#{$p}-intent-zinc-700);
-    //
-    //--icon-surface-dark: var(--#{$p}-intent-gray-900);
-    //--icon-color-dark: var(--#{$p}-intent-gray-200);
-    //
-    //--text-dark: var(--#{$p}-intent-zinc-200);
-    //--text-muted-dark: var(--#{$p}-intent-zinc-400);
-    //--text-disabled-dark: var(--#{$p}-intent-zinc-600);
-    //
-
-    //--card-ring: var(--#{$p}-accent-primary);
-
-
-    /* ================== CARD ================== */
-
-    //@include card-theme ('light');
-    //@include cfg.dark {
-    //    @include card-theme ('dark');
-    //}
+    transition: transform var(--card-transition),
+    background-color var(--card-transition),
+    border-color var(--card-transition);
 
     @include card-root-colors;
 
@@ -230,6 +83,10 @@ $intents: (secondary, primary, warning, success, info, danger);
 
         flex-shrink: 0;
 
+        transition: transform var(--card-transition),
+        background-color var(--card-transition),
+        border-color var(--card-transition);
+
         &[data-size='xs'] {
             width: 20px;
             height: 20px;
@@ -289,20 +146,74 @@ $intents: (secondary, primary, warning, success, info, danger);
     }
 
     &[data-hoverable]:not([data-disabled]) {
-        transition: transform var(--card-transition), background-color var(--card-transition);
 
         .#{$card-prefix}__header,
         .#{$card-prefix}__footer {
-            transition: background-color var(--card-transition);
+            transition: background-color var(--card-transition),
+            border-color var(--card-transition);
         }
 
         &:hover {
             background-color: var(--card-surface-hover);
+            border-color: var(--card-border-hover);
             //transform: translateY(-1px);
 
             .#{$card-prefix}__header,
             .#{$card-prefix}__footer {
                 background-color: var(--card-surface-raised-hover);
+                border-color: var(--card-border-section-hover, var(--card-border-section));
+            }
+
+            &[data-accent='left'],
+            &[data-accent='top']{
+                border-left-color: var(--card-accent);
+            }
+
+            .#{$card-prefix}__icon {
+                background-color: var(--card-icon-surface-hover, var(--card-icon-surface));
+                color: var(--card-icon-color-hover, var(--card-icon-color));
+            }
+        }
+    }
+
+    &[data-active] {
+        background-color: var(--card-surface-active);
+        border-color: var(--card-border-active);
+
+        .#{$card-prefix}__header,
+        .#{$card-prefix}__footer {
+            background-color: var(--card-surface-raised-active);
+            border-color: var(--card-border-section-active);
+        }
+
+        &[data-accent='left'],
+        &[data-accent='top']{
+            border-left-color: var(--card-accent);
+        }
+
+        .#{$card-prefix}__icon {
+            background-color: var(--card-icon-surface-active, var(--card-icon-surface));
+            color: var(--card-icon-color-active, var(--card-icon-color));
+        }
+
+        &[data-hoverable]:not([data-disabled]):hover{
+            background-color: var(--card-surface-active-hover);
+            border-color: var(--card-border-active-hover);
+
+            &[data-accent='left'],
+            &[data-accent='top']{
+                border-left-color: var(--card-accent);
+            }
+
+            .#{$card-prefix}__header,
+            .#{$card-prefix}__footer {
+                background-color: var(--card-surface-raised-active-hover);
+                border-color: var(--card-border-section-active-hover, var(--card-border-section-active));
+            }
+
+            .#{$card-prefix}__icon {
+                background-color: var(--card-icon-surface-active-hover, var(--card-icon-surface-active));
+                color: var(--card-icon-color-active-hover, var(--card-icon-color-active));
             }
         }
     }
@@ -332,21 +243,21 @@ $intents: (secondary, primary, warning, success, info, danger);
     }
 
     &[data-disabled] {
-        --accent: var(--card-accent-disabled);
-        --text: var(--card-text-disabled);
-        --icon-color: var(--card-text-disabled);
+        //--accent: var(--card-accent-disabled);
+        color: var(--card-text-disabled);
+        //--icon-color: var(--card-text-disabled);
 
         cursor: not-allowed;
         user-select: none;
-    }
 
-    &[data-active] {
-        background-color: var(--card-surface-active);
-        border-color: var(--card-accent);
+        &[data-accent='left'],
+        &[data-accent='top']{
+            border-left-color: var(--card-accent-disabled);
+        }
 
-        .#{$card-prefix}__header,
-        .#{$card-prefix}__footer {
-            background-color: var(--card-surface-raised-hover);
+        .#{$card-prefix}__icon {
+            //background-color: var(--card-icon-surface-active, var(--card-icon-surface));
+            color: var(--card-icon-color-disabled);
         }
     }
 
@@ -356,6 +267,16 @@ $intents: (secondary, primary, warning, success, info, danger);
         &[data-intent='#{$intent}'] {
             &[data-variant='base'] {
                 @include base($intent, 'light');
+            }
+        }
+    }
+
+    @include cfg.dark {
+        @each $intent in $intents {
+            &[data-intent='#{$intent}'] {
+                &[data-variant='base'] {
+                    @include base($intent, 'dark');
+                }
             }
         }
     }

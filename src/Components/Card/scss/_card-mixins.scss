@@ -1,0 +1,122 @@
+@use '../../../scss/functions' as fn;
+
+@mixin card-root-colors {
+    background-color: var(--card-surface);
+    border: 1px solid var(--card-border);
+    color: var(--card-text);
+}
+
+@mixin base($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+
+        --card-surface: #{fn.intent-color($intent, 50)};
+        --card-surface-raised: #{fn.intent-color($intent, 100)};
+
+        --card-surface-hover: #{fn.intent-color($intent, 100)};
+        --card-surface-raised-hover: #{fn.intent-color($intent, 150)};
+
+        --card-surface-active: #{fn.intent-color($intent, 150)};
+        --card-surface-raised-active: #{fn.intent-color($intent, 200)};
+
+        --card-surface-active-hover: #{fn.intent-color($intent, 200)};
+        --card-surface-raised-active-hover: #{fn.intent-color($intent, 250)};
+
+        --card-accent: #{fn.intent-color($intent, 800)};
+        --card-accent-disabled: #{fn.intent-color($intent, 400)};
+
+        --card-border: #{fn.intent-color($intent, 200)};
+        --card-border-hover: #{fn.intent-color($intent, 250)};
+        --card-border-active: #{fn.intent-color($intent, 350)};
+        --card-border-active-hover: #{fn.intent-color($intent, 400)};
+
+        --card-border-section: #{fn.intent-color($intent, 200)};
+        --card-border-section-hover: #{fn.intent-color($intent, 250)};
+
+        /* changed from 250 -> 300 */
+        --card-border-section-active: #{fn.intent-color($intent, 300)};
+
+        /* changed from 300 -> 350 */
+        --card-border-section-active-hover: #{fn.intent-color($intent, 350)};
+
+        --card-icon-surface: #{fn.intent-color($intent, 0)};
+        --card-icon-surface-hover: #{fn.intent-color($intent, 50)};
+
+        /* changed from 50 -> 100 */
+        --card-icon-surface-active: #{fn.intent-color($intent, 100)};
+
+        /* changed from 100 -> 150 */
+        --card-icon-surface-active-hover: #{fn.intent-color($intent, 150)};
+
+        --card-icon-color: #{fn.intent-color($intent, 800)};
+        --card-icon-color-hover: #{fn.intent-color($intent, 800)};
+
+        /* changed from intent-300 -> gray-400 */
+        --card-icon-color-disabled: #{fn.intent-color(gray, 400)};
+
+        --card-icon-color-active: #{fn.intent-color($intent, 850)};
+        --card-icon-color-active-hover: #{fn.intent-color($intent, 850)};
+
+        --card-text: #{fn.intent-color(gray, 900)};
+        --card-text-muted: #{fn.intent-color(gray, 500)};
+        --card-text-disabled: #{fn.intent-color(gray, 400)};
+
+        --card-ring: #{fn.intent-color($intent, 500)};
+
+        --card-shadow: transparent;
+        --card-shadow-hover: #{fn.intent-color($intent, 100)};
+
+        /* NEW */
+        --card-shadow-active: #{fn.intent-color($intent, 150)};
+    } @else {
+
+        --card-surface: #{fn.intent-color($intent, 925)};
+        --card-surface-raised: #{fn.intent-color($intent, 900)};
+
+        --card-surface-hover: #{fn.intent-color($intent, 900)};
+        --card-surface-raised-hover: #{fn.intent-color($intent, 850)};
+
+        --card-surface-active: #{fn.intent-color($intent, 850)};
+        --card-surface-raised-active: #{fn.intent-color($intent, 800)};
+
+        --card-surface-active-hover: #{fn.intent-color($intent, 800)};
+        --card-surface-raised-active-hover: #{fn.intent-color($intent, 750)};
+
+        --card-accent: #{fn.intent-color($intent, 400)};
+        --card-accent-disabled: #{fn.intent-color($intent, 700)};
+
+        --card-border: #{fn.intent-color($intent, 800)};
+        --card-border-hover: #{fn.intent-color($intent, 750)};
+        --card-border-active: #{fn.intent-color($intent, 650)};
+        --card-border-active-hover: #{fn.intent-color($intent, 550)};
+
+        --card-border-section: #{fn.intent-color($intent, 800)};
+        --card-border-section-hover: #{fn.intent-color($intent, 750)};
+
+        --card-border-section-active: #{fn.intent-color($intent, 700)};
+        --card-border-section-active-hover: #{fn.intent-color($intent, 650)};
+
+        --card-icon-surface: #{fn.intent-color($intent, 900)};
+        --card-icon-surface-hover: #{fn.intent-color($intent, 850)};
+
+        --card-icon-surface-active: #{fn.intent-color($intent, 800)};
+        --card-icon-surface-active-hover: #{fn.intent-color($intent, 750)};
+
+        --card-icon-color: #{fn.intent-color($intent, 300)};
+        --card-icon-color-hover: #{fn.intent-color($intent, 250)};
+
+        --card-icon-color-disabled: #{fn.intent-color(gray, 600)};
+
+        --card-icon-color-active: #{fn.intent-color($intent, 200)};
+        --card-icon-color-active-hover: #{fn.intent-color($intent, 150)};
+
+        --card-text: #{fn.intent-color(gray, 100)};
+        --card-text-muted: #{fn.intent-color(gray, 400)};
+        --card-text-disabled: #{fn.intent-color(gray, 600)};
+
+        --card-ring: #{fn.intent-color($intent, 400)};
+
+        --card-shadow: transparent;
+        --card-shadow-hover: rgba(0, 0, 0, 0.25);
+        --card-shadow-active: rgba(0, 0, 0, 0.4);
+    }
+}
