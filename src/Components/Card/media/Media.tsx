@@ -5,6 +5,7 @@ import { Box, type BoxProps } from '../../Box/Box';
 import { createPolymorphic, type PolymorphicComponent } from '../../../types/polymorphic';
 import { type ImageProps } from './Image';
 import { type IconProps } from './Icon';
+import type { HeroProps } from './Hero';
 
 export type MediaProps = {
     children?: React.ReactNode;
@@ -14,6 +15,7 @@ export type MediaProps = {
 export type MediaComponent = PolymorphicComponent<MediaProps, 'div'> & {
     Image: PolymorphicComponent<ImageProps>;
     Icon: PolymorphicComponent<IconProps>;
+    Hero: PolymorphicComponent<HeroProps>;
 };
 
 const prefix = (name: string = '') => {
