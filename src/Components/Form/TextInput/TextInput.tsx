@@ -157,6 +157,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                 variant={variant}
                 size={size}
                 data-clearable={clearable || undefined}
+                {...rest}
             >
                 <Box
                     ref={combinedRef}

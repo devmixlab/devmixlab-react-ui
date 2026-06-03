@@ -4,7 +4,6 @@ import { Box, type BoxProps } from '../../Box/Box';
 import { Size } from '../form.tokens';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { classPrefix } from '../../../utils/classPrefix';
-import { FieldRootBoxProps } from './FieldRoot.tokens';
 
 export type Variant = 'outlined' | 'filled' | 'ghost';
 
@@ -20,7 +19,6 @@ export type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
         disabled?: boolean;
         readOnly?: boolean;
         invalid?: boolean;
-        rounded?: BoxProps['rounded'];
 
         children: React.ReactNode;
         className?: string;
@@ -46,7 +44,6 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             disabled = false,
             readOnly = false,
             invalid = false,
-            rounded = 'md',
 
             children,
             className,
@@ -147,7 +144,6 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 data-readonly={readOnly || undefined}
                 data-size={size}
                 {...(variant ? { ['data-variant']: variant } : {})}
-                rounded={rounded}
                 onClick={handleClick}
                 onMouseDown={handleMouseDown}
                 {...rest}
