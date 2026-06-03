@@ -6,3 +6,4 @@ export * from './src/Components/Card';
 
 export * from './src/Components/Popover';
 export * from './src/form/Dropdown';
+export * from './src/Navbar';

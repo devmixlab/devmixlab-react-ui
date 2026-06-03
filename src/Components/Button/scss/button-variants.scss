@@ -10,7 +10,7 @@ $intents: (primary, secondary, info, warning, success, danger);
     @each $intent in $intents {
         &[data-intent='#{$intent}'] {
 
-            --button-ring: #{fn.intent-color($intent, 600)};
+            //--button-ring: #{fn.intent-color($intent, 600)};
 
             &[data-variant='solid'] {
                 @include btn.solid($intent);
@@ -33,7 +33,7 @@ $intents: (primary, secondary, info, warning, success, danger);
             }
 
             @include cfg.dark {
-                --button-ring: #{fn.intent-color($intent, 400)}; // lighter for dark bg
+                //--button-ring: #{fn.intent-color($intent, 400)}; // lighter for dark bg
 
                 &[data-variant='solid'] {
                     @include btn.solid($intent, 'dark');

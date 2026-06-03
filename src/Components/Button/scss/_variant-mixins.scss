@@ -30,6 +30,8 @@
 
 @mixin solid ($intent, $mode: 'light') {
     @if ($mode == 'light') {
+        --button-ring: #{fn.intent-color($intent, 600)};
+
         --button-bg: #{fn.intent-color($intent, 600)};
         --button-bg-hover: #{fn.intent-color($intent, 700)};
         --button-bg-active: #{fn.intent-color($intent, 800)};
@@ -50,6 +52,8 @@
             --button-text: #{fn.intent-color($intent, 500)};
         }
     } @else {
+        --button-ring: #{fn.intent-color($intent, 400)};
+
         --button-bg: #{fn.intent-color($intent, 500)};
         --button-bg-hover: #{fn.intent-color($intent, 400)};
         --button-bg-active: #{fn.intent-color($intent, 300)};
@@ -75,6 +79,8 @@
 
 @mixin base ($intent, $mode: 'light') {
     @if ($mode == 'light') {
+        --button-ring: #{fn.intent-color($intent, 600)};
+
         --button-bg: #{fn.intent-color($intent, 200)};
         --button-bg-hover: #{fn.intent-color($intent, 300)};
         --button-bg-active: #{fn.intent-color($intent, 400)};
@@ -99,6 +105,8 @@
             --button-border: #{fn.intent-color($intent, 300)};
         }
     } @else {
+        --button-ring: #{fn.intent-color($intent, 400)};
+
         --button-bg: #{fn.intent-color($intent, 800)};
         --button-bg-hover: #{fn.intent-color($intent, 700)};
         --button-bg-active: #{fn.intent-color($intent, 600)};
@@ -128,6 +136,8 @@
     @include outlined-overlay;
 
     @if ($mode == 'light') {
+        --button-ring: #{fn.intent-color($intent, 600)};
+
         --button-bg: transparent;
         --button-bg-hover: #{fn.intent-color($intent, 100)};
         --button-bg-active: #{fn.intent-color($intent, 200)};
@@ -169,6 +179,8 @@
             --button-border-hover: #{fn.intent-color($intent, 200)};
         }
     } @else {
+        --button-ring: #{fn.intent-color($intent, 400)};
+
         --button-bg: transparent;
         --button-bg-hover: #{fn.intent-color($intent, 900)};
         --button-bg-active: #{fn.intent-color($intent, 800)};
@@ -213,6 +225,8 @@
 
 @mixin ghost ($intent, $mode: 'light') {
     @if ($mode == 'light') {
+        --button-ring: #{fn.intent-color($intent, 600)};
+
         --button-bg: transparent;
         --button-bg-hover: #{fn.intent-color($intent, 100)};
         --button-bg-active: #{fn.intent-color($intent, 200)};
@@ -240,6 +254,8 @@
             --button-text-active: #{fn.intent-color($intent, 400)};
         }
     } @else {
+        --button-ring: #{fn.intent-color($intent, 400)};
+
         --button-bg: transparent;
         --button-bg-hover: #{fn.intent-color($intent, 900)};
         --button-bg-active: #{fn.intent-color($intent, 800)};
@@ -272,6 +288,8 @@
 
 @mixin link ($intent, $mode: 'light') {
     @if ($mode == 'light') {
+        --button-ring: #{fn.intent-color($intent, 600)};
+
         --button-text: #{fn.intent-color($intent, 500)};
         --button-text-hover: #{fn.intent-color($intent, 700)};
         --button-text-active: #{fn.intent-color($intent, 900)};
@@ -315,6 +333,8 @@
             text-decoration: none;
         }
     } @else {
+        --button-ring: #{fn.intent-color($intent, 400)};
+
         --button-text: #{fn.intent-color($intent, 400)};
         --button-text-hover: #{fn.intent-color($intent, 200)};
         --button-text-active: #{fn.intent-color($intent, 100)};
