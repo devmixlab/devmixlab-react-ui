@@ -1,0 +1,86 @@
+@use '../../../../scss/mixins' as mixins;
+@use '../../../../scss/config' as cfg;
+@use './field-config' as *;
+@use 'sass:map';
+
+@mixin dark {
+    @include cfg.dark {
+        @content;
+    }
+}
+
+@mixin applySize($conf) {
+    --gap: #{map.get($conf, gap)};
+    --action-gap: #{map.get($conf, actionsGap)};
+    --control-gap: #{map.get($conf, controlGap)};
+    --spacing-x: #{map.get($conf, spacingX)};
+    --fs: #{map.get($conf, fontSize)};
+}
+
+@mixin actionButton {
+    @include mixins.reset-button;
+
+    will-change: transform;
+
+    position: relative;
+    border-radius: 3px;
+
+    width: 1.2em;
+    height: 1.2em;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > span,
+    > .#{$p}--icon {
+        width: 100%;
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .#{$p}--icon {
+        width: 100%;
+        height: 100%;
+        > svg,
+        > .MuiSvgIcon-root {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            font-size: var(--icon-size);
+            display: block;
+        }
+    }
+
+    transition:
+        color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition-active);
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: calc(var(--action-hit-area-offset) * -1);
+        border-radius: inherit;
+    }
+
+    &:not([data-disabled]):hover {
+        color: var(--text);
+    }
+
+    &:not([data-disabled]):active {
+        transform: translateY(1px);
+        //transform: scale(0.94);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 2px var(--focus-ring);
+    }
+
+    &[data-disabled]{
+        cursor: default;
+    }
+}

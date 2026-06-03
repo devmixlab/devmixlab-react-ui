@@ -1,120 +1,15 @@
-@use '../../../../scss/functions' as functions;
-@use '../../../../scss/mixins' as mixins;
+@use './field-functions' as *;
+@use './field-config' as *;
 @use './field-mixins' as *;
-@use '../../../../scss/config' as cfg;
+@use './field-vars' as *;
 @use 'sass:map';
 
-$p: cfg.$prefix;
-$field-root-prefix: #{$p}--field-root;
+.#{$field-root} {
 
-$sizes: (
-    sm: (
-        gap: 4px,
-        actionsGap: 8px,
-        controlGap: 12px,
-        spacingX: 8px,
-        fontSize: 14px,
-    ),
-    md: (
-        gap: 6px,
-        actionsGap: 10px,
-        controlGap: 14px,
-        spacingX: 16px,
-        fontSize: 16px,
-    ),
-    lg: (
-        gap: 8px,
-        actionsGap: 12px,
-        controlGap: 16px,
-        spacingX: 24px,
-        fontSize: 18px,
-    )
-);
-
-@mixin applySize($size) {
-    $conf: map.get($sizes, $size);
-
-    --gap: #{map.get($conf, gap)};
-    --action-gap: #{map.get($conf, actionsGap)};
-    --control-gap: #{map.get($conf, controlGap)};
-    --spacing-x: #{map.get($conf, spacingX)};
-    --fs: #{map.get($conf, fontSize)};
-}
-
-@mixin action-button {
-    @include mixins.reset-button;
-
-    will-change: transform;
-
-    position: relative;
-    border-radius: 3px;
-
-    width: 1.2em;
-    height: 1.2em;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    > span,
-    > .#{$p}--icon {
-        width: 100%;
-        height: 100%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .#{$p}--icon {
-        width: 100%;
-        height: 100%;
-        > svg,
-        > .MuiSvgIcon-root {
-            width: var(--icon-size);
-            height: var(--icon-size);
-            font-size: var(--icon-size);
-            display: block;
-        }
-    }
-
-    transition:
-        color var(--transition),
-        box-shadow var(--transition),
-        transform var(--transition-active);
-
-    &::before {
-        content: '';
-        position: absolute;
-        inset: calc(var(--action-hit-area-offset) * -1);
-        border-radius: inherit;
-    }
-
-    &:not([data-disabled]):hover {
-        color: var(--text);
-    }
-
-    &:not([data-disabled]):active {
-        transform: translateY(1px);
-        //transform: scale(0.94);
-    }
-
-    &:focus-visible {
-        box-shadow: 0 0 0 2px var(--focus-ring);
-    }
-
-    &[data-disabled]{
-        cursor: default;
-    }
-}
-
-.#{$field-root-prefix} {
-
-    @include applySize(md);
+    @include applySize(map.get($sizes, md));
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
-            @include applySize($size);
+            @include applySize($value);
         }
     }
 
@@ -129,69 +24,69 @@ $sizes: (
     // focus
     --focus-ring: #{color-mix(
         in srgb,
-        #{functions.intent-color('primary', 500)} 28%,
+        #{intent('primary', 500)} 28%,
         transparent
     )};
     --focus-ring-danger: #{color-mix(
         in srgb,
-        #{functions.intent-color('danger', 500)} 28%,
+        #{intent('danger', 500)} 28%,
         transparent
     )};
 
     // text
-    --text: #{functions.intent-color('gray', 900)};
+    --text: #{intent('gray', 900)};
     --text-muted: var(--#{$p}-text-muted);
     --text-disabled: var(--#{$p}-text-disabled);
 
     // background
     --bg: transparent;
-    --bg-hover: #{functions.intent-color('gray', 50)};
+    --bg-hover: #{intent('gray', 50)};
 
     // border
-    --border: #{functions.intent-color('gray', 300)};
-    --border-hover: #{functions.intent-color('primary', 400)};
-    --border-focus: #{functions.intent-color('primary', 500)};
-    --border-danger: #{functions.intent-color('danger', 400)};
-    --border-danger-hover: #{functions.intent-color('danger', 500)};
-    --border-danger-focus: #{functions.intent-color('danger', 500)};
+    --border: #{intent('gray', 300)};
+    --border-hover: #{intent('primary', 400)};
+    --border-focus: #{intent('primary', 500)};
+    --border-danger: #{intent('danger', 400)};
+    --border-danger-hover: #{intent('danger', 500)};
+    --border-danger-focus: #{intent('danger', 500)};
 
     //filled surface;
-    --filled-surface-1: #{functions.intent-color('gray', 200)};
-    --filled-surface-2: #{functions.intent-color('gray', 300)};
-    --filled-surface-3: #{functions.intent-color('gray',400)};
+    --filled-surface-1: #{intent('gray', 200)};
+    --filled-surface-2: #{intent('gray', 300)};
+    --filled-surface-3: #{intent('gray',400)};
 
-    @include cfg.dark {
+    @include dark {
         // focus
         --focus-ring: #{color-mix(
             in srgb,
-            #{functions.intent-color('primary', 400)} 40%,
+            #{intent('primary', 400)} 40%,
             transparent
         )};
 
         --focus-ring-danger: #{color-mix(
             in srgb,
-            #{functions.intent-color('danger', 400)} 40%,
+            #{intent('danger', 400)} 40%,
             transparent
         )};
 
         // text
-        --text: #{functions.intent-color('gray', 100)};
+        --text: #{intent('gray', 100)};
 
         // background
-        --bg-hover: #{functions.intent-color('gray', 800)};
+        --bg-hover: #{intent('gray', 800)};
 
         // border
-        --border: #{functions.intent-color('gray', 700)};
-        --border-hover: #{functions.intent-color('primary', 500)};
-        --border-focus: #{functions.intent-color('primary', 400)};
-        --border-danger: #{functions.intent-color('danger', 300)};
-        --border-danger-hover: #{functions.intent-color('danger', 400)};
-        --border-danger-focus: #{functions.intent-color('danger', 400)};
+        --border: #{intent('gray', 700)};
+        --border-hover: #{intent('primary', 500)};
+        --border-focus: #{intent('primary', 400)};
+        --border-danger: #{intent('danger', 300)};
+        --border-danger-hover: #{intent('danger', 400)};
+        --border-danger-focus: #{intent('danger', 400)};
 
         //filled surface
-        --filled-surface-1: #{functions.intent-color('gray', 800)};
-        --filled-surface-2: #{functions.intent-color('gray', 700)};
-        --filled-surface-3: #{functions.intent-color('gray',600)};
+        --filled-surface-1: #{intent('gray', 800)};
+        --filled-surface-2: #{intent('gray', 700)};
+        --filled-surface-3: #{intent('gray',600)};
 
     }
 
@@ -381,14 +276,14 @@ $sizes: (
     }
 
     .#{$p}--upload-button {
-        @include action-button;
+        @include actionButton;
     }
 
     .#{$p}--clear-button {
-        @include action-button;
+        @include actionButton;
     }
 
     .#{$p}--toggle-button {
-        @include action-button;
+        @include actionButton;
     }
 }

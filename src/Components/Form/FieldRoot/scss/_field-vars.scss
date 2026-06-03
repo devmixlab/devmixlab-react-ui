@@ -1,0 +1,23 @@
+$sizes: (
+    sm: (
+        gap: 4px,
+        actionsGap: 8px,
+        controlGap: 12px,
+        spacingX: 8px,
+        fontSize: 14px,
+    ),
+    md: (
+        gap: 6px,
+        actionsGap: 10px,
+        controlGap: 14px,
+        spacingX: 16px,
+        fontSize: 16px,
+    ),
+    lg: (
+        gap: 8px,
+        actionsGap: 12px,
+        controlGap: 16px,
+        spacingX: 24px,
+        fontSize: 18px,
+    )
+);

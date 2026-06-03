@@ -1,0 +1,5 @@
+@use '../../../../scss/functions' as fn;
+
+@function intent($intent, $shade) {
+    @return fn.intent-color($intent, $shade);
+}
