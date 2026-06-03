@@ -8,3 +8,5 @@ export * from './src/Components/Popover';
 export * from './src/Components/Form/Dropdown';
 export * from './src/Components/Navbar';
 export * from './src/Components/Container';
+
+export * from './src/Components/Form';

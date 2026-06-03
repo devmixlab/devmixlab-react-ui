@@ -1,0 +1,50 @@
+import type { BoxProps } from '../../Box';
+
+type TextInputStyleProps = Pick<
+    BoxProps,
+    | 'display'
+    | 'width'
+    | 'minWidth'
+    | 'maxWidth'
+    | 'height'
+    | 'minHeight'
+    | 'maxHeight'
+    | 'margin'
+    | 'marginTop'
+    | 'marginRight'
+    | 'marginBottom'
+    | 'marginLeft'
+    | 'marginInline'
+    | 'marginBlock'
+    | 'flex'
+    | 'flexGrow'
+    | 'flexShrink'
+    | 'flexBasis'
+    | 'alignSelf'
+    | 'gridColumn'
+    | 'gridRow'
+    | 'borderRadius'
+
+    // aliases
+    | 'rounded'
+    | 'd'
+    | 'w'
+    | 'minW'
+    | 'maxW'
+    | 'h'
+    | 'minH'
+    | 'maxH'
+    | 'm'
+    | 'mt'
+    | 'mr'
+    | 'mb'
+    | 'ml'
+    | 'mx'
+    | 'my'
+    | 'grow'
+    | 'shrink'
+    | 'basis'
+    | 'gridCol'
+>;
+
+export type { TextInputStyleProps };

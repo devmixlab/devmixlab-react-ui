@@ -1,0 +1,26 @@
+@use '../../../../scss/functions' as functions;
+//@use '../../mixins' as mixins;
+
+@use '../../../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$text-input-prefix: #{$p}--text-input;
+
+$sizes: (
+    sm: (height: 32px, actionHitAreaOffset: 4px),
+    md: (height: 40px, actionHitAreaOffset: 6px),
+    lg: (height: 48px, actionHitAreaOffset: 8px),
+);
+
+.#{$text-input-prefix} {
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            --height: #{map.get($value, height)};
+            --min-height: auto;
+            --action-hit-area-offset: #{map.get($value, actionHitAreaOffset)};
+        }
+    }
+
+}

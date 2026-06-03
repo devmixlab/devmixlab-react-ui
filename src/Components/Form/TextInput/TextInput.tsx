@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
+import { Box } from '../../Box';
 import { Size } from '../form.tokens';
 import { Variant } from '../FieldRoot/FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
@@ -9,24 +9,25 @@ import { Close } from '../../../Icon/Close';
 import { IconWrapper } from '../../../Icon/IconWrapper';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
+import { TextInputStyleProps } from './TextInput.tokens';
 
-export type TextInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
-    variant?: Variant;
-    size?: Size;
-    htmlSize?: number;
-    invalid?: boolean;
-    rounded?: BoxProps['rounded'];
+type TextInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> &
+    TextInputStyleProps & {
+        variant?: Variant;
+        size?: Size;
+        htmlSize?: number;
+        invalid?: boolean;
 
-    start?: React.ReactNode;
-    end?: React.ReactNode;
-    actions?: React.ReactNode; // 👈 NEW
-    controls?: React.ReactNode; // 👈 optional (for NumberInput later)
+        start?: React.ReactNode;
+        end?: React.ReactNode;
+        actions?: React.ReactNode; // 👈 NEW
+        controls?: React.ReactNode; // 👈 optional (for NumberInput later)
 
-    clearable?: boolean;
-    clearIcon?: React.ReactNode;
-    onClear?: () => void;
-    onValueChange?: (value: string) => void;
-};
+        clearable?: boolean;
+        clearIcon?: React.ReactNode;
+        onClear?: () => void;
+        onValueChange?: (value: string) => void;
+    };
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);
 
@@ -180,3 +181,5 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 TextInput.displayName = 'TextInput';
 
 export { TextInput };
+
+export type { TextInputProps };
