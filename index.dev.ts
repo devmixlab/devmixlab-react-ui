@@ -14,22 +14,22 @@ export { buttonTokens, commonTokens, badgeTokens, alertTokens, cardTokens };
 export { ResponsiveProvider } from './src/utils/responsive';
 
 // Form
-export { TextInput } from './src/form/TextInput/TextInput';
-export { PasswordInput } from './src/form/PasswordInput/PasswordInput';
-export { SearchInput } from './src/form/SearchInput/SearchInput';
-export { NumberInput } from './src/form/NumberInput/NumberInput';
-export { TagsInput } from './src/form/TagsInput/TagsInput';
-export { Textarea } from './src/form/Textarea/Textarea';
-export { Select } from './src/form/Select/Select';
-export { Dropdown } from './src/form/Dropdown/Dropdown';
-export { Checkbox } from './src/form/Checkbox/Checkbox';
-export { CheckboxGroup } from './src/form/Checkbox/CheckboxGroup';
-export { Switch } from './src/form/Switch/Switch';
-export { SwitchGroup } from './src/form/Switch/SwitchGroup';
-export { Radio } from './src/form/Radio/Radio';
-export { RadioGroup } from './src/form/Radio/RadioGroup';
-export { FileUpload } from './src/form/FileUpload/FileUpload';
-export { FormField } from './src/form/FormField';
+export { TextInput } from './src/Components/Form/TextInput/TextInput';
+export { PasswordInput } from './src/Components/Form/PasswordInput/PasswordInput';
+export { SearchInput } from './src/Components/Form/SearchInput/SearchInput';
+export { NumberInput } from './src/Components/Form/NumberInput/NumberInput';
+export { TagsInput } from './src/Components/Form/TagsInput/TagsInput';
+export { Textarea } from './src/Components/Form/Textarea/Textarea';
+export { Select } from './src/Components/Form/Select/Select';
+export { Dropdown } from './src/Components/Form/Dropdown/Dropdown';
+export { Checkbox } from './src/Components/Form/Checkbox/Checkbox';
+export { CheckboxGroup } from './src/Components/Form/Checkbox/CheckboxGroup';
+export { Switch } from './src/Components/Form/Switch/Switch';
+export { SwitchGroup } from './src/Components/Form/Switch/SwitchGroup';
+export { Radio } from './src/Components/Form/Radio/Radio';
+export { RadioGroup } from './src/Components/Form/Radio/RadioGroup';
+export { FileUpload } from './src/Components/Form/FileUpload/FileUpload';
+export { FormField } from './src/Components/Form/FormField';
 
 export { Modal } from './src/Modal/Modal';
 export { Popover } from './src/Components/Popover';
