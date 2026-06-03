@@ -66,8 +66,8 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
 
         useLayoutEffect(() => {
             if (!hasStart && !hasEnd) {
-                rootRef.current?.style.setProperty('--start-width', `0px`);
-                rootRef.current?.style.setProperty('--end-width', `0px`);
+                rootRef.current?.style.setProperty('--fr-start-width', `0px`);
+                rootRef.current?.style.setProperty('--fr-end-width', `0px`);
                 return;
             }
 
@@ -75,8 +75,8 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 const startW = hasStart ? (startRef.current?.offsetWidth ?? 0) : 0;
                 const endW = hasEnd ? (endRef.current?.offsetWidth ?? 0) : 0;
 
-                rootRef.current?.style.setProperty('--start-width', `${startW}px`);
-                rootRef.current?.style.setProperty('--end-width', `${endW}px`);
+                rootRef.current?.style.setProperty('--fr-start-width', `${startW}px`);
+                rootRef.current?.style.setProperty('--fr-end-width', `${endW}px`);
             };
 
             measure();
@@ -95,8 +95,8 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
         }, [start, end, actions, controls]);
 
         const cl = clsx(className, classPrefix(`--field-root`), {
-            [classPrefix(`--has-start-slot`)]: hasStart,
-            [classPrefix(`--has-end-slot`)]: hasEnd,
+            // [classPrefix(`--has-start-slot`)]: hasStart,
+            // [classPrefix(`--has-end-slot`)]: hasEnd,
         });
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

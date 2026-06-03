@@ -15,9 +15,9 @@ $sizes: (
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
-            --height: #{map.get($value, height)};
-            --min-height: auto;
-            --action-hit-area-offset: #{map.get($value, actionHitAreaOffset)};
+            --fr-height: #{map.get($value, height)};
+            --fr-min-height: auto;
+            --fr-action-hit-area-offset: #{map.get($value, actionHitAreaOffset)};
         }
     }
 

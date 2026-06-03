@@ -13,84 +13,87 @@
         }
     }
 
-    --transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
-    --transition-active: var(--#{$p}-duration-fast) var(--#{$p}-ease-press);
-    --icon-size: 1.1em;
+    --fr-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+    --fr-transition-active: var(--#{$p}-duration-fast) var(--#{$p}-ease-press);
+    --fr-icon-size: 1.1em;
 
     // field
-    --field-pl: calc(var(--spacing-x) + var(--start-width) + var(--gap));
-    --field-pr: calc(var(--spacing-x) + var(--end-width) + var(--gap));
+    //--fr-field-pl: calc(var(--fr-spacing-x) + var(--fr-start-width) + var(--fr-gap));
+    //--fr-field-pr: calc(var(--fr-spacing-x) + var(--fr-end-width) + var(--fr-gap));
+
+    --fr-field-pl: calc(var(--fr-spacing-x) + var(--fr-start-width));
+    --fr-field-pr: calc(var(--fr-spacing-x) + var(--fr-end-width));
 
     // focus
-    --focus-ring: #{color-mix(
+    --fr-focus-ring: #{color-mix(
         in srgb,
         #{intent('primary', 500)} 28%,
         transparent
     )};
-    --focus-ring-danger: #{color-mix(
+    --fr-focus-ring-danger: #{color-mix(
         in srgb,
         #{intent('danger', 500)} 28%,
         transparent
     )};
 
     // text
-    --text: #{intent('gray', 900)};
-    --text-muted: var(--#{$p}-text-muted);
-    --text-disabled: var(--#{$p}-text-disabled);
+    --fr-text: #{intent('gray', 900)};
+    --fr-text-muted: var(--#{$p}-text-muted);
+    --fr-text-disabled: var(--#{$p}-text-disabled);
 
     // background
-    --bg: transparent;
-    --bg-hover: #{intent('gray', 50)};
+    --fr-bg: transparent;
+    --fr-bg-hover: #{intent('gray', 50)};
 
     // border
-    --border: #{intent('gray', 300)};
-    --border-hover: #{intent('primary', 400)};
-    --border-focus: #{intent('primary', 500)};
-    --border-danger: #{intent('danger', 400)};
-    --border-danger-hover: #{intent('danger', 500)};
-    --border-danger-focus: #{intent('danger', 500)};
+    --fr-border: #{intent('gray', 300)};
+    --fr-border-hover: #{intent('primary', 400)};
+    --fr-border-focus: #{intent('primary', 500)};
+    --fr-border-danger: #{intent('danger', 400)};
+    --fr-border-danger-hover: #{intent('danger', 500)};
+    --fr-border-danger-focus: #{intent('danger', 500)};
 
     //filled surface;
-    --filled-surface-1: #{intent('gray', 200)};
-    --filled-surface-2: #{intent('gray', 300)};
-    --filled-surface-3: #{intent('gray',400)};
+    --fr-filled-surface-1: #{intent('gray', 200)};
+    --fr-filled-surface-2: #{intent('gray', 300)};
+    --fr-filled-surface-3: #{intent('gray',400)};
 
     @include dark {
         // focus
-        --focus-ring: #{color-mix(
+        --fr-focus-ring: #{color-mix(
             in srgb,
             #{intent('primary', 400)} 40%,
             transparent
         )};
 
-        --focus-ring-danger: #{color-mix(
+        --fr-focus-ring-danger: #{color-mix(
             in srgb,
             #{intent('danger', 400)} 40%,
             transparent
         )};
 
         // text
-        --text: #{intent('gray', 100)};
+        --fr-text: #{intent('gray', 100)};
 
         // background
-        --bg-hover: #{intent('gray', 800)};
+        --fr-bg-hover: #{intent('gray', 800)};
 
         // border
-        --border: #{intent('gray', 700)};
-        --border-hover: #{intent('primary', 500)};
-        --border-focus: #{intent('primary', 400)};
-        --border-danger: #{intent('danger', 300)};
-        --border-danger-hover: #{intent('danger', 400)};
-        --border-danger-focus: #{intent('danger', 400)};
+        --fr-border: #{intent('gray', 700)};
+        --fr-border-hover: #{intent('primary', 500)};
+        --fr-border-focus: #{intent('primary', 400)};
+        --fr-border-danger: #{intent('danger', 300)};
+        --fr-border-danger-hover: #{intent('danger', 400)};
+        --fr-border-danger-focus: #{intent('danger', 400)};
 
         //filled surface
-        --filled-surface-1: #{intent('gray', 800)};
-        --filled-surface-2: #{intent('gray', 700)};
-        --filled-surface-3: #{intent('gray',600)};
+        --fr-filled-surface-1: #{intent('gray', 800)};
+        --fr-filled-surface-2: #{intent('gray', 700)};
+        --fr-filled-surface-3: #{intent('gray',600)};
 
     }
 
-    --group-color: var(--text-muted);
+    --fr-group-color: var(--fr-text-muted);
 
     position: relative;
     box-sizing: border-box;
@@ -101,50 +104,50 @@
     min-width: 0;
     cursor: text;
     user-select: none;
-    font-size: var(--fs);
+    font-size: var(--fr-fs);
 
-    padding-left: var(--pl, 0);
-    padding-right: var(--pr, 0);
-    padding-top: var(--pt, 0);
-    padding-bottom: var(--pb, 0);
+    padding-left: var(--fr-pl, 0);
+    padding-right: var(--fr-pr, 0);
+    padding-top: var(--fr-pt, 0);
+    padding-bottom: var(--fr-pb, 0);
 
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
+    border: 1px solid var(--fr-border);
+    background: var(--fr-bg);
+    color: var(--fr-text);
 
     //padding: 0;
 
-    min-height: var(--min-height, 40px);
-    height: var(--height, auto);
+    min-height: var(--fr-min-height, 40px);
+    height: var(--fr-height, auto);
 
-    transition: border-color var(--transition),
-    box-shadow var(--transition),
-    background var(--transition),
-    color var(--transition);
+    transition: border-color var(--fr-transition),
+    box-shadow var(--fr-transition),
+    background var(--fr-transition),
+    color var(--fr-transition);
 
     &:hover:not([data-disabled]):not([data-readonly]) {
-        border-color: var(--border-hover);
-        background: var(--bg-hover);
+        border-color: var(--fr-border-hover);
+        background: var(--fr-bg-hover);
     }
 
     &:focus-within {
-        --group-color: var(--text);
-        border-color: var(--border-focus);
-        box-shadow: 0 0 0 3px var(--focus-ring);
+        --fr-group-color: var(--fr-text);
+        border-color: var(--fr-border-focus);
+        box-shadow: 0 0 0 3px var(--fr-focus-ring);
     }
 
     /* states */
     &[data-invalid] {
-        --focus-ring: var(--focus-ring-danger);
-        --border: var(--border-danger);
-        --border-hover: var(--border-danger-hover);
-        --border-focus: var(--border-danger-focus);
+        --fr-focus-ring: var(--fr-focus-ring-danger);
+        --fr-border: var(--fr-border-danger);
+        --fr-border-hover: var(--fr-border-danger-hover);
+        --fr-border-focus: var(--fr-border-danger-focus);
     }
 
     &[data-disabled] {
         cursor: not-allowed;
-        --text: var(--text-disabled);
-        --text-muted: var(--text-disabled);
+        --fr-text: var(--fr-text-disabled);
+        --fr-text-muted: var(--fr-text-disabled);
 
         .#{$p}--slot {
             pointer-events: none;
@@ -157,33 +160,37 @@
         top: 0;
 
         display: flex;
-        height: var(--slot-h, 100%);
+        height: var(--fr-slot-h, 100%);
         line-height: 1;
-        align-items: var(--slot-align, center);
+        align-items: var(--fr-slot-align, center);
 
-        padding-left: var(--slot-pl, 0);
-        padding-right: var(--slot-pr, 0);
-        padding-top: var(--slot-pt, 0);
-        padding-bottom: var(--slot-pb, 0);
+        padding-left: var(--fr-slot-pl, 0);
+        padding-right: var(--fr-slot-pr, 0);
+        padding-top: var(--fr-slot-pt, 0);
+        padding-bottom: var(--fr-slot-pb, 0);
     }
 
     .#{$p}--slot-start {
-        left: var(--spacing-x);
+        left: var(--fr-spacing-x);
+        //padding-right: 20px;
+        .#{$p}--group {
+            margin-right: var(--fr-gap);
+        }
     }
 
     .#{$p}--slot-end {
-        right: var(--spacing-x);
+        right: var(--fr-spacing-x);
     }
 
     .#{$p}--group {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: var(--gap);
+        gap: var(--fr-gap);
         //gap: 10px;
-        color: var(--group-color);
+        color: var(--fr-group-color);
 
-        transition: color var(--transition);
+        transition: color var(--fr-transition);
 
         .#{$p}--group-item {
             height: 1em;
@@ -193,19 +200,19 @@
 
         > svg,
         > .MuiSvgIcon-root {
-            width: var(--icon-size);
-            height: var(--icon-size);
-            font-size: var(--icon-size);
+            width: var(--fr-icon-size);
+            height: var(--fr-icon-size);
+            font-size: var(--fr-icon-size);
             display: block;
         }
     }
 
     .#{$p}--actions-group {
-        margin-left: var(--action-gap);
+        margin-left: var(--fr-action-gap);
     }
 
     .#{$p}--controls-group {
-        margin-left: var(--control-gap);
+        margin-left: var(--fr-control-gap);
     }
 
     .#{$p}--field {
@@ -216,31 +223,31 @@
         background: transparent;
         user-select: text;
         font: inherit;
-        font-size: var(--field-fs, inherit);
+        font-size: var(--fr-field-fs, inherit);
 
-        padding-left: var(--field-pl, 0);
-        padding-right: var(--field-pr, 0);
-        padding-top: var(--field-pt, 0);
-        padding-bottom: var(--field-pb, 0);
+        padding-left: var(--fr-field-pl, 0);
+        padding-right: var(--fr-field-pr, 0);
+        padding-top: var(--fr-field-pt, 0);
+        padding-bottom: var(--fr-field-pb, 0);
 
         margin: 0;
 
         border-radius: 0;
 
-        height: var(--field-h, 100%);
-        min-height: var(--field-min-h, 100%);
+        height: var(--fr-field-h, 100%);
+        min-height: var(--fr-field-min-h, 100%);
         width: 100%;
         min-width: 0;
 
         flex: 1;
 
         line-height: normal;
-        color: var(--text);
+        color: var(--fr-text);
 
         outline: none; /* wrapper handles focus */
 
         &::placeholder {
-            color: var(--text-muted);
+            color: var(--fr-text-muted);
         }
 
         &:disabled {
@@ -255,23 +262,23 @@
     }
 
     &[data-variant='filled'] {
-        --bg: var(--filled-surface-1);
-        --bg-hover: var(--filled-surface-2);
+        --fr-bg: var(--fr-filled-surface-1);
+        --fr-bg-hover: var(--fr-filled-surface-2);
 
         &:not([data-invalid]) {
-            --border: var(--filled-surface-2);
-            --border-hover: var(--filled-surface-3);
-            --border-focus: var(--filled-surface-3);
+            --fr-border: var(--fr-filled-surface-2);
+            --fr-border-hover: var(--fr-filled-surface-3);
+            --fr-border-focus: var(--fr-filled-surface-3);
         }
     }
 
     &[data-variant='ghost'] {
-        --bg: transparent;
+        --fr-bg: transparent;
 
         &:not([data-invalid]) {
-            --border: transparent;
-            --border-hover: transparent;
-            --border-focus: transparent;
+            --fr-border: transparent;
+            --fr-border-hover: transparent;
+            --fr-border-focus: transparent;
         }
     }
 
