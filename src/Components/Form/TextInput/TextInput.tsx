@@ -1,27 +1,19 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Box } from '../../Box';
-import { Size } from '../form.tokens';
-import { Variant } from '../FieldRoot/FieldRoot';
+// import { Size } from '../form.tokens';
+import { FieldRoot, ShareFieldRootProps } from '../FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/formField.context';
-import { Close } from '../../../Icon/Close';
-import { IconWrapper } from '../../../Icon/IconWrapper';
-import { FieldRoot } from '../FieldRoot/FieldRoot';
+import { Close, IconWrapper } from '../../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 import { TextInputStyleProps } from './TextInput.tokens';
 
 type TextInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> &
-    TextInputStyleProps & {
-        variant?: Variant;
-        size?: Size;
+    TextInputStyleProps &
+    ShareFieldRootProps & {
         htmlSize?: number;
-        invalid?: boolean;
-
-        start?: React.ReactNode;
-        end?: React.ReactNode;
-        actions?: React.ReactNode; // 👈 NEW
-        controls?: React.ReactNode; // 👈 optional (for NumberInput later)
+        actions?: React.ReactNode;
 
         clearable?: boolean;
         clearIcon?: React.ReactNode;
@@ -35,15 +27,9 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     (
         {
             className,
-            variant = 'outlined',
-            size = 'md',
             invalid = false,
-            rounded = 'md',
 
-            start,
-            end,
             actions,
-            controls,
 
             disabled,
             value,
@@ -148,14 +134,8 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                 className={cl}
                 invalid={isInvalid}
                 disabled={disabled}
-                rounded={rounded}
                 focusTargetRef={inputRef}
-                start={start}
-                end={end}
                 actions={finalActions}
-                controls={controls}
-                variant={variant}
-                size={size}
                 data-clearable={clearable || undefined}
                 {...rest}
             >

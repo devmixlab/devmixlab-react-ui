@@ -1,33 +1,57 @@
 import React, { forwardRef, useRef, useLayoutEffect } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
+import { Box } from '../../Box';
+import type { BoxProps } from '../../Box';
 import { Size } from '../form.tokens';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { classPrefix } from '../../../utils/classPrefix';
 
-export type Variant = 'outlined' | 'filled' | 'ghost';
+type Variant = 'outlined' | 'filled' | 'ghost';
 
-export type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
-    BoxProps & {
-        start?: React.ReactNode;
-        end?: React.ReactNode;
-        actions?: React.ReactNode;
-        controls?: React.ReactNode;
+type ShareFieldRootProps = {
+    start?: React.ReactNode;
+    end?: React.ReactNode;
+    actions?: React.ReactNode;
+    controls?: React.ReactNode;
 
-        variant?: Variant;
-        size?: Size;
-        disabled?: boolean;
-        readOnly?: boolean;
-        invalid?: boolean;
+    variant?: Variant;
+    size?: Size;
+    disabled?: boolean;
+    readOnly?: boolean;
+    invalid?: boolean;
 
-        children: React.ReactNode;
-        className?: string;
+    // children: React.ReactNode;
+    // className?: string;
+    //
+    // focusTargetRef?: React.RefObject<HTMLElement | null>;
+    // onClick?: React.MouseEventHandler<HTMLDivElement>;
+};
 
-        focusTargetRef?: React.RefObject<HTMLElement | null>;
-        onClick?: React.MouseEventHandler<HTMLDivElement>;
-    };
+type OwnFieldRootProps = {
+    // start?: React.ReactNode;
+    // end?: React.ReactNode;
+    // actions?: React.ReactNode;
+    // controls?: React.ReactNode;
+    //
+    // variant?: Variant;
+    // size?: Size;
+    // disabled?: boolean;
+    // readOnly?: boolean;
+    // invalid?: boolean;
 
-export const renderGroupItem = (content: React.ReactNode) => (
+    children: React.ReactNode;
+    className?: string;
+
+    focusTargetRef?: React.RefObject<HTMLElement | null>;
+    onClick?: React.MouseEventHandler<HTMLDivElement>;
+};
+
+type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
+    BoxProps &
+    ShareFieldRootProps &
+    OwnFieldRootProps;
+
+const renderGroupItem = (content: React.ReactNode) => (
     <span className={classPrefix('--group-item')}>{content}</span>
 );
 
@@ -41,6 +65,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
 
             variant = 'outlined',
             size = 'md',
+            rounded = 'md',
             disabled = false,
             readOnly = false,
             invalid = false,
@@ -134,6 +159,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             <Box
                 ref={combinedRef}
                 className={clsx(className, classPrefix(`--field-root`))}
+                rounded={rounded}
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
                 data-readonly={readOnly || undefined}
@@ -200,4 +226,6 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
 
 FieldRoot.displayName = 'FieldRoot';
 
-export { FieldRoot };
+export { FieldRoot, renderGroupItem };
+
+export type { Variant, FieldRootProps, ShareFieldRootProps, OwnFieldRootProps };
