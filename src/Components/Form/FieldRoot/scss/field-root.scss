@@ -98,7 +98,7 @@
     position: relative;
     box-sizing: border-box;
     display: inline-flex;
-    gap: var(--gap);
+    gap: var(--fr-gap);
     vertical-align: middle;
     align-items: center;
     min-width: 0;
@@ -224,6 +224,7 @@
         user-select: text;
         font: inherit;
         font-size: var(--fr-field-fs, inherit);
+        box-sizing: border-box;
 
         padding-left: var(--fr-field-pl, 0);
         padding-right: var(--fr-field-pr, 0);
@@ -234,14 +235,15 @@
 
         border-radius: 0;
 
-        height: var(--fr-field-h, 100%);
-        min-height: var(--fr-field-min-h, 100%);
+        height: var(--fr-field-h, auto);
+        min-height: var(--fr-field-min-h, auto);
         width: 100%;
         min-width: 0;
 
         flex: 1;
+        align-self: stretch; // instead of height, min-height
 
-        line-height: normal;
+        line-height: var(--fr-field-lh, 1);
         color: var(--fr-text);
 
         outline: none; /* wrapper handles focus */
@@ -267,8 +269,8 @@
 
         &:not([data-invalid]) {
             --fr-border: var(--fr-filled-surface-2);
-            --fr-border-hover: var(--fr-filled-surface-3);
-            --fr-border-focus: var(--fr-filled-surface-3);
+            //--fr-border-hover: var(--fr-filled-surface-3);
+            //--fr-border-focus: var(--fr-filled-surface-3);
         }
     }
 

@@ -94,11 +94,6 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             return () => ro.disconnect();
         }, [start, end, actions, controls]);
 
-        const cl = clsx(className, classPrefix(`--field-root`), {
-            // [classPrefix(`--has-start-slot`)]: hasStart,
-            // [classPrefix(`--has-end-slot`)]: hasEnd,
-        });
-
         const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (disabled) return;
 
@@ -138,7 +133,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
         return (
             <Box
                 ref={combinedRef}
-                className={cl}
+                className={clsx(className, classPrefix(`--field-root`))}
                 data-invalid={invalid || undefined}
                 data-disabled={disabled || undefined}
                 data-readonly={readOnly || undefined}
