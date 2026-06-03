@@ -170,7 +170,6 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                     disabled={disabled}
                     readOnly={readOnly}
                     aria-invalid={isInvalid || undefined}
-                    {...rest}
                     {...inputProps}
                 />
             </FieldRoot>

@@ -4,6 +4,7 @@ import { Box, type BoxProps } from '../../Box/Box';
 import { Size } from '../form.tokens';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { classPrefix } from '../../../utils/classPrefix';
+import { FieldRootBoxProps } from './FieldRoot.tokens';
 
 export type Variant = 'outlined' | 'filled' | 'ghost';
 
