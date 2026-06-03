@@ -2,10 +2,14 @@ import { ReactNode } from 'react';
 
 import { ContainerContext, ContainerContextValue } from './Container.context';
 
-export type ContainerProviderProps = ContainerContextValue & {
+type ContainerProviderProps = ContainerContextValue & {
     children: ReactNode;
 };
 
-export function ContainerProvider({ children, ...value }: ContainerProviderProps) {
+function ContainerProvider({ children, ...value }: ContainerProviderProps) {
     return <ContainerContext.Provider value={value}>{children}</ContainerContext.Provider>;
 }
+
+export { ContainerProvider };
+
+export type { ContainerProviderProps };

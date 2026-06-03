@@ -1,23 +1,22 @@
 import React, { forwardRef } from 'react';
 import { clsx } from 'clsx';
-
-import { Box, BoxComponentProps } from '../Components/Box/Box';
-
-import { classPrefix } from '../utils/classPrefix';
-
+import { Box } from '../Box';
+import type { BoxComponentProps } from '../Box';
+import { classPrefix } from '../../utils/classPrefix';
 import {
     Breakpoint,
     breakpoints,
     resolveResponsive,
     useBreakpoint,
     Responsiveify,
-} from '../utils/responsive';
-
+} from '../../utils/responsive';
 import { useContainerContext } from './Container.context';
 
-const prefix = (name = '') => classPrefix(`--container${name}`);
+// -----------------------------------------------------------------------------
+// Types
+// -----------------------------------------------------------------------------
 
-export type ContainerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+type ContainerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
 type ContainerOwnProps = Responsiveify<{
     /**
@@ -32,7 +31,11 @@ type ContainerOwnProps = Responsiveify<{
     centered?: boolean;
 }>;
 
-export type ContainerProps = Omit<BoxComponentProps<'div'>, 'size'> & ContainerOwnProps;
+type ContainerProps = Omit<BoxComponentProps<'div'>, 'size'> & ContainerOwnProps;
+
+// -----------------------------------------------------------------------------
+// Map
+// -----------------------------------------------------------------------------
 
 const containerSizeMap: Record<Exclude<ContainerSize, 'full'>, Breakpoint> = {
     xs: 'xs',
@@ -42,6 +45,16 @@ const containerSizeMap: Record<Exclude<ContainerSize, 'full'>, Breakpoint> = {
     xl: 'xl',
     '2xl': '2xl',
 };
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+const prefix = (name = '') => classPrefix(`--container${name}`);
+
+// -----------------------------------------------------------------------------
+// Container component
+// -----------------------------------------------------------------------------
 
 export const Container = forwardRef<HTMLDivElement, ContainerProps>(
     (
@@ -91,3 +104,5 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
 );
 
 Container.displayName = 'Container';
+
+export type { ContainerSize, ContainerOwnProps, ContainerProps };

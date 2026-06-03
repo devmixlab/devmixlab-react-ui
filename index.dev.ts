@@ -37,8 +37,8 @@ export { Collapse } from './src/Collapse/Collapse';
 export { Accordion } from './src/Accordion/Accordion';
 export { Carousel } from './src/Carousel/Carousel';
 
-export { Container } from './src/Container/Container';
-export { ContainerProvider } from './src/Container/ContainerProvider';
+export { Container } from './src/Components/Container/Container';
+export { ContainerProvider } from './src/Components/Container/ContainerProvider';
 
 export { Offcanvas } from './src/Offcanvas/Offcanvas';
 
