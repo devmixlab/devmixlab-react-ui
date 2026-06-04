@@ -1,11 +1,12 @@
 @use 'sass:map';
 
 @mixin applySize($conf) {
-    --field-gap: #{map.get($conf, fieldGap)};
+    // gap between field and label/hing/error
+    --ff-field-gap: #{map.get($conf, fieldGap)};
 
-    --label-fs: #{map.get($conf, labelFontSize)};
-    --message-fs: #{map.get($conf, messageFontSize)};
+    --ff-label-fs: #{map.get($conf, labelFontSize)};
+    --ff-message-fs: #{map.get($conf, messageFontSize)};
 
-    --label-lh: #{map.get($conf, labelLineHeight)};
-    --message-lh: #{map.get($conf, messageLineHeight)};
+    --ff-label-lh: #{map.get($conf, labelLineHeight)};
+    --ff-message-lh: #{map.get($conf, messageLineHeight)};
 }

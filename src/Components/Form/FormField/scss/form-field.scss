@@ -30,16 +30,16 @@
             border: 0;
         }
         &__label {
-            font-size: var(--label-fs);
+            font-size: var(--ff-label-fs);
             color: var(--text);
             display: inline-flex;
             align-items: center;
-            margin-bottom: var(--field-gap);
+            margin-bottom: var(--ff-field-gap);
         }
         &__message {
-            margin-top: var(--field-gap);
-            font-size: var(--message-fs);
-            line-height: var(--message-lh);
+            margin-top: var(--ff-field-gap);
+            font-size: var(--ff-message-fs);
+            line-height: var(--ff-message-lh);
         }
         &__hint {
             color: var(--#{$p}-text-muted);
@@ -50,7 +50,7 @@
     }
 
     //.#{$form-field-prefix}--label {
-    //    font-size: var(--label-fs);
+    //    font-size: var(--ff-label-fs);
     //    color: var(--text);
     //    display: inline-flex;
     //    align-items: center;
