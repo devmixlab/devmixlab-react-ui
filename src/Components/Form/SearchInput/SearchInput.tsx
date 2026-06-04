@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import { TextInput, type TextInputProps } from '../TextInput/TextInput';
-import { useFormFieldContext } from '../FormField/formField.context';
+import { useFormFieldContext } from '../FormField/FormField.context';
 import { Search as SearchIcon } from '../../../Icon/Search';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { DefaultSpinner } from '../../../Spinner/DefaultSpinner';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFormFieldContext } from './formField.context';
+import { useFormFieldContext } from './FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
 
 const Label = ({ children }: { children: React.ReactNode }) => {

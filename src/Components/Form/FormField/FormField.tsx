@@ -1,12 +1,12 @@
 import React, { forwardRef, useMemo } from 'react';
-import { FormFieldProvider, FormFieldContextValule } from './formField.context';
-import { prefix } from './formField.helpers';
+import { FormFieldProvider, FormFieldContextValule } from './FormField.context';
+import { prefix } from './FormField.helpers';
 import clsx from 'clsx';
 // import { Variant } from '../FieldRoot/FieldRoot';
 import { Size } from '../form.tokens';
 import { classPrefix } from '../../../utils/classPrefix';
 
-export type FormFieldProps = {
+type FormFieldProps = {
     // variant?: Variant;
     size?: Size;
     id?: string;
@@ -15,7 +15,7 @@ export type FormFieldProps = {
     className?: string;
 };
 
-export type FormFieldComponent = React.ForwardRefExoticComponent<
+type FormFieldComponent = React.ForwardRefExoticComponent<
     FormFieldProps & React.RefAttributes<HTMLDivElement>
 > & {
     Hint: React.FC<{ children: React.ReactNode }>;
@@ -78,3 +78,5 @@ const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
 FormField.displayName = 'FormField';
 
 export { FormField };
+
+export type { FormFieldProps, FormFieldComponent };

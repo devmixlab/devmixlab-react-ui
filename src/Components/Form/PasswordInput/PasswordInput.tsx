@@ -1,7 +1,7 @@
 import React, { forwardRef, useState } from 'react';
 import { TextInput, type TextInputProps } from '../TextInput/TextInput';
 // import { prefix } from './input.helpers';
-import { useFormFieldContext } from '../FormField/formField.context';
+import { useFormFieldContext } from '../FormField/FormField.context';
 import { Eye } from '../../../Icon/Eye';
 import { EyeOff } from '../../../Icon/EyeOff';
 import { CLASS_PREFIX } from '../../../constants';

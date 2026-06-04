@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Box, BoxProps } from '../../Box/Box';
-import { useFormFieldContext } from '../FormField/formField.context';
+import { useFormFieldContext } from '../FormField/FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useStableId } from '../../../utils/useStableId';
 import { SearchInput, SearchInputProps } from '../SearchInput/SearchInput';

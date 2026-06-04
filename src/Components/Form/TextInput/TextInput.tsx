@@ -4,7 +4,7 @@ import { Box } from '../../Box';
 // import { Size } from '../form.tokens';
 import { FieldRoot, ShareFieldRootProps } from '../FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
-import { useFormFieldContext } from '../FormField/formField.context';
+import { useFormFieldContext } from '../FormField/FormField.context';
 import { Close, IconWrapper } from '../../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 import { TextInputStyleProps } from './TextInput.tokens';

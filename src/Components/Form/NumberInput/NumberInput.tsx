@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { TextInput, type TextInputProps } from '../TextInput/TextInput';
 import { renderGroupItem } from '../FieldRoot/FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
-import { useFormFieldContext } from '../FormField/formField.context';
+import { useFormFieldContext } from '../FormField/FormField.context';
 import { ChevronUp } from '../../../Icon/ChevronUp';
 import { ChevronDown } from '../../../Icon/ChevronDown';
 import Decimal from 'decimal.js';
