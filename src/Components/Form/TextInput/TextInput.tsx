@@ -7,19 +7,23 @@ import { mergeRefs } from '../../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { Close, IconWrapper } from '../../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
-import { TextInputStyleProps } from './TextInput.tokens';
+import { FieldLayoutProps, fieldRootPropKeys } from '../FieldRoot';
+import { splitProps } from '../../../utils/splitProps';
+
+type OwnTextInputProps = {
+    htmlSize?: number;
+    actions?: React.ReactNode;
+
+    clearable?: boolean;
+    clearIcon?: React.ReactNode;
+    onClear?: () => void;
+    onValueChange?: (value: string) => void;
+};
 
 type TextInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> &
-    TextInputStyleProps &
-    ShareFieldRootProps & {
-        htmlSize?: number;
-        actions?: React.ReactNode;
-
-        clearable?: boolean;
-        clearIcon?: React.ReactNode;
-        onClear?: () => void;
-        onValueChange?: (value: string) => void;
-    };
+    FieldLayoutProps &
+    ShareFieldRootProps &
+    OwnTextInputProps;
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);
 
@@ -48,6 +52,8 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         },
         ref,
     ) => {
+        const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
+
         const inputRef = useRef<HTMLInputElement>(null);
 
         const isControlled = value !== undefined;
@@ -58,10 +64,11 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         const isInvalid = ctx ? ctx.hasError || invalid : invalid;
         const inputProps = ctx
             ? {
+                  ...controlProps,
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
               }
-            : {};
+            : controlProps;
 
         // minimal UI state (only for uncontrolled)
         const [hasValueState, setHasValueState] = useState(
@@ -137,7 +144,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                 focusTargetRef={inputRef}
                 actions={finalActions}
                 data-clearable={clearable || undefined}
-                {...rest}
+                {...fieldRootProps}
             >
                 <Box
                     ref={combinedRef}
