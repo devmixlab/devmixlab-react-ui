@@ -1,3 +1,4 @@
+@use '../../FieldRoot/scss/field-root';
 @use '../../../../scss/config' as cfg;
 @use 'sass:map';
 
@@ -14,29 +15,28 @@ $sizes: (
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
-            --spacing: #{map.get($value, spacing)};
-            --wrapper-spacing: #{map.get($value, wrapperSpacing)};
+            --textarea-spacing: #{map.get($value, spacing)};
+            --textarea-wrapper-spacing: #{map.get($value, wrapperSpacing)};
             //--min-height: #{map.get($value, minHeight)};
             --field-min-h: #{map.get($value, minHeight)};
         }
     }
 
-    --field-min-h: 100%;
+    --fr-field-min-h: 100%;
+    --fr-field-lh: 1.5;
 
-    --slot-h: auto;
-    --slot-pt: calc(var(--spacing) + var(--wrapper-spacing));
-    //--slot-pt: 100px;
-    --pt: var(--wrapper-spacing);
-    --pl: var(--wrapper-spacing);
-    --pr: var(--wrapper-spacing);
-    --pb: var(--wrapper-spacing);
+    --fr-slot-h: auto;
 
-    --field-pt: var(--spacing);
-    --field-pb: var(--spacing);
+    // Optical alignment with the first line of textarea text.
+    --fr-slot-pt: calc(var(--textarea-spacing) + var(--textarea-wrapper-spacing) + 0.2em);
+
+    --fr-pt: var(--textarea-wrapper-spacing);
+    --fr-pl: var(--textarea-wrapper-spacing);
+    --fr-pr: var(--textarea-wrapper-spacing);
+    --fr-pb: var(--textarea-wrapper-spacing);
+
+    --fr-field-pt: var(--textarea-spacing);
+    --fr-field-pb: var(--textarea-spacing);
 
     align-items: start;
-
-    //padding-top: var(--spacing-top);
-
-    //.#{$p}--
 }
