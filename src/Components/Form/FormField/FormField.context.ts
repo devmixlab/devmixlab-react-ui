@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import { Size } from '../form.tokens';
 
 //----------------------------------------------------------------------
 // Context value
@@ -10,6 +11,7 @@ type FormFieldContextValule = {
     required?: boolean;
     setHintId: (id?: string) => void;
     setErrorId: (id?: string) => void;
+    size: Size;
 };
 
 //----------------------------------------------------------------------

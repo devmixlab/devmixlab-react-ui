@@ -59,8 +59,9 @@ const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
                 required,
                 setHintId: setHintIdSafe,
                 setErrorId: setErrorIdSafe,
+                size,
             }),
-            [id, hasError, describedBy, required, setHintIdSafe, setErrorIdSafe],
+            [id, hasError, describedBy, required, setHintIdSafe, setErrorIdSafe, size],
         );
 
         return (

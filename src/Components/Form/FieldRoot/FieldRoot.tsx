@@ -5,6 +5,7 @@ import type { BoxProps } from '../../Box';
 import { Size } from '../form.tokens';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { classPrefix } from '../../../utils/classPrefix';
+import { useFormFieldContext } from '../FormField/FormField.context';
 
 type Variant = 'outlined' | 'filled' | 'ghost';
 
@@ -19,31 +20,10 @@ type ShareFieldRootProps = {
     disabled?: boolean;
     readOnly?: boolean;
     invalid?: boolean;
-
-    // children: React.ReactNode;
-    // className?: string;
-    //
-    // focusTargetRef?: React.RefObject<HTMLElement | null>;
-    // onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 type OwnFieldRootProps = {
-    // start?: React.ReactNode;
-    // end?: React.ReactNode;
-    // actions?: React.ReactNode;
-    // controls?: React.ReactNode;
-    //
-    // variant?: Variant;
-    // size?: Size;
-    // disabled?: boolean;
-    // readOnly?: boolean;
-    // invalid?: boolean;
-
-    children: React.ReactNode;
-    className?: string;
-
     focusTargetRef?: React.RefObject<HTMLElement | null>;
-    onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
@@ -64,7 +44,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             controls,
 
             variant = 'outlined',
-            size = 'md',
+            size: componentSize,
             rounded = 'md',
             disabled = false,
             readOnly = false,
@@ -80,6 +60,10 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
         },
         ref,
     ) => {
+        const ctx = useFormFieldContext();
+
+        const size = componentSize ?? ctx?.size ?? 'md';
+
         const startRef = useRef<HTMLDivElement>(null);
         const endRef = useRef<HTMLDivElement>(null);
         const rootRef = useRef<HTMLDivElement>(null);
