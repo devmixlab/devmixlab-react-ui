@@ -1,0 +1,11 @@
+@use 'sass:map';
+
+@mixin applySize($conf) {
+    --field-gap: #{map.get($conf, fieldGap)};
+
+    --label-fs: #{map.get($conf, labelFontSize)};
+    --message-fs: #{map.get($conf, messageFontSize)};
+
+    --label-lh: #{map.get($conf, labelLineHeight)};
+    --message-lh: #{map.get($conf, messageLineHeight)};
+}

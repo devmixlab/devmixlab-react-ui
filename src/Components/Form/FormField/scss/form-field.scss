@@ -1,0 +1,85 @@
+@use 'form-field-config' as *;
+@use 'form-field-variables' as *;
+@use 'form-field-mixins' as *;
+@use 'sass:map';
+
+.#{$form-field-prefix} {
+
+    @include applySize(map.get($sizes, md));
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            @include applySize($value);
+        }
+    }
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .#{$form-field-prefix} {
+        &__sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        &__label {
+            font-size: var(--label-fs);
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: var(--field-gap);
+        }
+        &__message {
+            margin-top: var(--field-gap);
+            font-size: var(--message-fs);
+            line-height: var(--message-lh);
+        }
+        &__hint {
+            color: var(--#{$p}-text-muted);
+        }
+        &__error {
+            color: var(--#{$p}-text-danger-strong);
+        }
+    }
+
+    //.#{$form-field-prefix}--label {
+    //    font-size: var(--label-fs);
+    //    color: var(--text);
+    //    display: inline-flex;
+    //    align-items: center;
+    //    margin-bottom: var(--field-gap);
+    //}
+
+    //.#{$p}--message {
+    //    margin-top: var(--field-gap);
+    //    font-size: var(--message-fs);
+    //    line-height: var(--message-lh);
+    //}
+
+    //.#{$form-field-prefix}--hint {
+    //    color: var(--#{$p}-text-muted);
+    //}
+
+    //.#{$form-field-prefix}--error {
+    //    color: var(--#{$p}-text-danger-strong);
+    //    margin-top: var(--field-gap);
+    //    font-size: var(--message-fs);
+    //    line-height: var(--message-lh);
+    //}
+
+    &[data-required] .#{$form-field-prefix}__label {
+        font-weight: 500;
+    }
+
+    &[data-invalid] .#{$form-field-prefix}__label {
+        color: var(--#{$p}-text-danger);
+    }
+
+}

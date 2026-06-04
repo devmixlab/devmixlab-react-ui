@@ -1,9 +1,13 @@
 import React, { useEffect } from 'react';
 import { useFormFieldContext } from './FormField.context';
-import { classPrefix } from '../../../utils/classPrefix';
+import { prefix } from './FormField.helpers';
 import clsx from 'clsx';
+import { Box } from '../../Box';
+import type { BoxProps } from '../../Box';
 
-const Hint = ({ children }: { children: React.ReactNode }) => {
+type HintProps = React.HTMLAttributes<HTMLDivElement> & BoxProps;
+
+const Hint = ({ children, ...rest }: HintProps) => {
     const ctx = useFormFieldContext();
     if (!ctx) return null;
 
@@ -18,12 +22,14 @@ const Hint = ({ children }: { children: React.ReactNode }) => {
     if (ctx.hasError) return null;
 
     return (
-        <div id={id} className={clsx(classPrefix('--hint'), classPrefix('--message'))}>
+        <Box id={id} className={clsx(prefix('__hint'), prefix('__message'))} {...rest}>
             {children}
-        </div>
+        </Box>
     );
 };
 
 Hint.displayName = 'FormField.Hint';
 
 export { Hint };
+
+export type { HintProps };

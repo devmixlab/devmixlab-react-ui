@@ -1,24 +1,30 @@
 import React from 'react';
 import { useFormFieldContext } from './FormField.context';
-import { classPrefix } from '../../../utils/classPrefix';
+import { prefix } from './FormField.helpers';
+import { Box } from '../../Box';
+import type { BoxProps } from '../../Box';
 
-const Label = ({ children }: { children: React.ReactNode }) => {
+type LabelProps = React.HTMLAttributes<HTMLLabelElement> & BoxProps;
+
+const Label = ({ children, ...rest }: LabelProps) => {
     const ctx = useFormFieldContext();
     if (!ctx) return null;
 
     return (
-        <label htmlFor={ctx.id} className={classPrefix('--label')}>
+        <Box as="label" htmlFor={ctx.id} className={prefix('__label')} {...rest}>
             {children}
             {ctx.required && (
                 <span>
                     <span aria-hidden="true">&nbsp;*</span>
-                    <span className={classPrefix('--sr-only')}> (required)</span>
+                    <span className={prefix('__sr-only')}> (required)</span>
                 </span>
             )}
-        </label>
+        </Box>
     );
 };
 
 Label.displayName = 'FormField.Label';
 
 export { Label };
+
+export type { LabelProps };

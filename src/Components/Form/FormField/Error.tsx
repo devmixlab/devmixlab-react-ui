@@ -1,9 +1,13 @@
 import React, { useEffect } from 'react';
 import { useFormFieldContext } from './FormField.context';
-import { classPrefix } from '../../../utils/classPrefix';
+import { Box } from '../../Box';
+import type { BoxProps } from '../../Box';
+import { prefix } from './FormField.helpers';
 import clsx from 'clsx';
 
-const Error = ({ children }: { children: React.ReactNode }) => {
+type ErrorProps = React.HTMLAttributes<HTMLDivElement> & BoxProps;
+
+const Error = ({ children, ...rest }: ErrorProps) => {
     const ctx = useFormFieldContext();
     if (!ctx || !children) return null;
 
@@ -15,18 +19,21 @@ const Error = ({ children }: { children: React.ReactNode }) => {
     }, [id, ctx.setErrorId]);
 
     return (
-        <div
+        <Box
             id={id}
-            className={clsx(classPrefix('--error'), classPrefix('--message'))}
+            className={clsx(prefix('__error'), prefix('__message'))}
             role="alert"
             aria-live="assertive"
             aria-atomic="true"
+            {...rest}
         >
             {children}
-        </div>
+        </Box>
     );
 };
 
 Error.displayName = 'FormField.Error';
 
 export { Error };
+
+export type { ErrorProps };

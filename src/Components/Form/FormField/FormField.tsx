@@ -2,27 +2,32 @@ import React, { forwardRef, useMemo } from 'react';
 import { FormFieldProvider, FormFieldContextValule } from './FormField.context';
 import { prefix } from './FormField.helpers';
 import clsx from 'clsx';
-// import { Variant } from '../FieldRoot/FieldRoot';
 import { Size } from '../form.tokens';
-import { classPrefix } from '../../../utils/classPrefix';
+import { HintProps } from './Hint';
+import { LabelProps } from './Label';
+import { ErrorProps } from './Error';
 
-type FormFieldProps = {
-    // variant?: Variant;
+//----------------------------------------------------------------------
+// Types
+//----------------------------------------------------------------------
+type OwnFormFieldProps = {
     size?: Size;
-    id?: string;
     required?: boolean;
-    children: React.ReactNode;
-    className?: string;
 };
+
+type FormFieldProps = React.HTMLAttributes<HTMLDivElement> & OwnFormFieldProps;
 
 type FormFieldComponent = React.ForwardRefExoticComponent<
     FormFieldProps & React.RefAttributes<HTMLDivElement>
 > & {
-    Hint: React.FC<{ children: React.ReactNode }>;
-    Label: React.FC<{ children: React.ReactNode }>;
-    Error: React.FC<{ children: React.ReactNode }>;
+    Hint: React.FC<HintProps>;
+    Label: React.FC<LabelProps>;
+    Error: React.FC<ErrorProps>;
 };
 
+//----------------------------------------------------------------------
+// Component
+//----------------------------------------------------------------------
 const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     (
         { size = 'md', className, required, children, id: idProp }: FormFieldProps,
@@ -63,7 +68,7 @@ const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
                 <div
                     ref={ref}
                     role="group"
-                    className={clsx(classPrefix('--form-field'), className)}
+                    className={clsx(prefix(), className)}
                     data-invalid={hasError || undefined}
                     data-required={required || undefined}
                     data-size={size}

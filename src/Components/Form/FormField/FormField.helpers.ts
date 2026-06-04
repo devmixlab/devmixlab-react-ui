@@ -1,5 +1,5 @@
-import { CLASS_PREFIX } from '../../../constants';
+import { classPrefix } from '../../../utils/classPrefix';
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--form-field${name}`;
+    return classPrefix(`--form-field${name}`);
 };
