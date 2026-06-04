@@ -6,6 +6,7 @@ import { Size } from '../form.tokens';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useFormFieldContext } from '../FormField/FormField.context';
+import { defineExactKeys } from '../../../types/tuple';
 
 type Variant = 'outlined' | 'filled' | 'ghost';
 
@@ -21,6 +22,20 @@ type ShareFieldRootProps = {
     readOnly?: boolean;
     invalid?: boolean;
 };
+
+const shareFieldRootProps = defineExactKeys<ShareFieldRootProps>()([
+    'start',
+    'end',
+    'actions',
+    'controls',
+
+    'variant',
+    'size',
+
+    'disabled',
+    'readOnly',
+    'invalid',
+]);
 
 type OwnFieldRootProps = {
     focusTargetRef?: React.RefObject<HTMLElement | null>;
@@ -210,6 +225,6 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
 
 FieldRoot.displayName = 'FieldRoot';
 
-export { FieldRoot, renderGroupItem };
+export { FieldRoot, renderGroupItem, shareFieldRootProps };
 
 export type { Variant, FieldRootProps, ShareFieldRootProps, OwnFieldRootProps };

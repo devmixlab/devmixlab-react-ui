@@ -6,22 +6,14 @@ import { Variant } from '../FieldRoot/FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { IconWrapper, Close } from '../../../Icon';
-import { FieldRoot } from '../FieldRoot/FieldRoot';
+import { FieldRoot, ShareFieldRootProps } from '../FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
+import { FieldLayoutProps, fieldRootPropKeys } from '../FieldRoot';
+import { splitProps } from '../../../utils/splitProps';
+import { defineUniqueTuple } from '../../../types/tuple';
 
-export type TextareaProps = Omit<
-    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-    'size' | 'wrap'
-> & {
-    variant?: Variant;
-    size?: Size;
-    invalid?: boolean;
-    rounded?: BoxProps['rounded'];
-
-    start?: React.ReactNode;
-    end?: React.ReactNode;
-    actions?: React.ReactNode; // 👈 NEW
-    controls?: React.ReactNode; // 👈 optional (for NumberInput later)
+type OwnTextareaProps = {
+    // actions?: React.ReactNode; // 👈 NEW
 
     clearable?: boolean;
     clearIcon?: React.ReactNode;
@@ -31,19 +23,21 @@ export type TextareaProps = Omit<
     rows?: number;
 };
 
+export type TextareaProps = Omit<
+    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+    'size' | 'wrap'
+> &
+    FieldLayoutProps &
+    ShareFieldRootProps &
+    OwnTextareaProps;
+
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     (
         {
             className,
-            variant = 'outlined',
-            size = 'md',
             invalid = false,
-            rounded = 'md',
 
-            start,
-            end,
             actions,
-            controls,
 
             disabled,
             value,
@@ -60,8 +54,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
             ...rest
         },
+        // props,
         ref,
     ) => {
+        const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
+
         const textareaRef = useRef<HTMLTextAreaElement>(null);
 
         const isControlled = value !== undefined;
@@ -71,10 +68,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         const isInvalid = ctx ? ctx.hasError || invalid : invalid;
         const textareaProps = ctx
             ? {
+                  ...controlProps,
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
               }
-            : {};
+            : controlProps;
 
         const [hasValueState, setHasValueState] = useState(
             () => defaultValue != null && String(defaultValue).length > 0,
@@ -145,14 +143,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 className={cl}
                 invalid={isInvalid}
                 disabled={disabled}
-                rounded={rounded}
                 focusTargetRef={textareaRef}
-                start={start}
-                end={end}
                 actions={finalActions}
-                controls={controls}
-                variant={variant}
-                size={size}
+                {...fieldRootProps}
             >
                 <Box
                     ref={combinedRef}
@@ -165,7 +158,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                     disabled={disabled}
                     readOnly={readOnly}
                     aria-invalid={isInvalid || undefined}
-                    {...rest}
                     {...textareaProps}
                 />
             </FieldRoot>
