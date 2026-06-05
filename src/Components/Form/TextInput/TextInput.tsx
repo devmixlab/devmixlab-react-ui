@@ -109,10 +109,6 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 
         const showClearable = clearable && isTextLike && hasValue && !disabled && !readOnly;
 
-        const cl = clsx(className, classPrefix('--text-input'), {
-            [classPrefix(`--clearable`)]: clearable,
-        });
-
         const combinedRef = mergeRefs(inputRef, ref);
 
         const clearButton = (
@@ -138,7 +134,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 
         return (
             <FieldRoot
-                className={cl}
+                className={clsx(classPrefix('--text-input'), className)}
                 invalid={isInvalid}
                 disabled={disabled}
                 focusTargetRef={inputRef}

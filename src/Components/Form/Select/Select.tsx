@@ -13,7 +13,7 @@ import {
 import { classPrefix } from '../../../utils/classPrefix';
 import { splitProps } from '../../../utils/splitProps';
 
-export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> &
+type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> &
     FieldLayoutProps &
     SharedFieldRootProps & {
         controls?: React.ReactNode;
@@ -84,3 +84,5 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 Select.displayName = 'Select';
 
 export { Select };
+
+export type { SelectProps };

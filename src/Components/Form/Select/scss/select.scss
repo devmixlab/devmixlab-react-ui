@@ -14,13 +14,19 @@ $sizes: (
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
-            --height: #{map.get($value, height)};
-            --min-height: auto;
-            --fs: #{map.get($value, fontSize)};
+            --fr-height: #{map.get($value, height)};
+            --fr-min-height: auto;
+            --fr-fs: #{map.get($value, fontSize)};
         }
     }
 
     .#{$p}--slot-end, .#{$p}--slot-start {
         pointer-events: none;
+    }
+
+    .#{$p}--field {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
