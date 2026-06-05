@@ -1,10 +1,11 @@
 import React, { forwardRef, useRef, useEffect, useId, useState, useMemo } from 'react';
 import clsx from 'clsx';
-import { Box } from '../../Box/Box';
+import { Box } from '../../Box';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { CLASS_PREFIX } from '../../../constants';
 import { useSwitchGroup } from './switchGroup.context';
 import { useStableId } from '../../../utils/useStableId';
+import { classPrefix } from '../../../utils/classPrefix';
 
 export type Intent = 'danger' | 'warning' | 'success' | 'info';
 
@@ -18,7 +19,7 @@ type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 's
 };
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--switch${name}`;
+    return classPrefix(`--switch${name}`);
 };
 
 const Switch = forwardRef<HTMLInputElement, SwitchProps>(

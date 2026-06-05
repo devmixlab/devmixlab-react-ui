@@ -1,0 +1,184 @@
+@use './switch-config' as *;
+@use '../../../../scss/mixins/mode' as *;
+@use 'sass:map';
+@use '../../../../scss/functions/common' as *;
+@use './switch-vars' as *;
+@use './switch-mixins' as *;
+
+.#{$switch-prefix} {
+
+    @include applySize(map.get($sizes, md));
+
+    @each $size, $conf in $sizes {
+        &[data-size="#{$size}"] {
+            @include applySize($conf);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .#{$switch-prefix}__thumb,
+        .#{$switch-prefix}__track {
+            transition: none;
+        }
+    }
+
+    // Text
+    --switch-text: var(--#{$p}-text);
+    --switch-text-disabled: var(--#{$p}-text-disabled);
+    --switch-text-muted: var(--#{$p}-text-muted);
+
+    // Shadows
+    --switch-shadow: var(--#{$p}-control-shadow);
+    --switch-shadow-hover: 0 0 0 3px color-mix(
+        in srgb,
+        var(--switch-track-bg-checked) 20%,
+        transparent
+    );
+    --switch-shadow-hover-secondary: var(--#{$p}-control-shadow-hover-secondary);
+    --switch-shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
+    0 0 0 4px color-mix(
+        in srgb,
+        var(--switch-track-bg-checked) 50%,
+        transparent
+    );
+
+    // Track/thumb colors
+    --switch-track-bg: #{intent('gray', 300)};
+    --switch-track-bg-checked: var(--#{$p}-control-accent);
+    --switch-thumb-bg: #ffffff;
+    --switch-track-bg-disabled: #{intent('gray', 300)};
+    --switch-thumb-bg-disabled: #{intent('gray', 200)};
+
+    // Intent colors
+    --switch-track-bg-danger: var(--#{$p}-control-accent-danger);
+    --switch-track-bg-success: var(--#{$p}-control-accent-success);
+    --switch-track-bg-warning: var(--#{$p}-control-accent-warning);
+    --switch-track-bg-info: var(--#{$p}-control-accent-info);
+
+    @include dark {
+        // Track/thumb colors dark
+        --switch-track-bg: #{intent('gray', 600)};
+        --switch-track-bg-checked: #{intent('primary', 400)};
+        --switch-thumb-bg: #{intent('gray', 100)};
+        --switch-track-bg-disabled: #{intent('gray', 700)};
+        --switch-thumb-bg-disabled: #{intent('gray', 600)};
+    }
+
+    --switch-thumb-x: var(--switch-padding);
+    --switch-thumb-scale: 1;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    gap: var(--switch-gap);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    .#{$switch-prefix}__input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: inherit;
+        z-index: 1;
+
+        &:focus-visible + .#{$switch-prefix}__track {
+            box-shadow: var(--shadow-focus);
+        }
+    }
+
+    .#{$switch-prefix}__label {
+        line-height: 1;
+        font-size: 1em;
+        color: var(--switch-text);
+    }
+
+    .#{$switch-prefix}__text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .#{$switch-prefix}__description {
+        font-size: 0.85em;
+        color: var(--switch-text-muted);
+        margin-top: 2px;
+    }
+
+    .#{$switch-prefix}__track {
+        width: var(--switch-width);
+        height: var(--switch-height);
+        background: var(--switch-track-bg);
+        border-radius: 999px;
+        position: relative;
+        transition:
+            background var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
+            box-shadow var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+        box-shadow: var(--switch-shadow);
+    }
+
+    .#{$switch-prefix}__thumb {
+        width: var(--switch-thumb);
+        height: var(--switch-thumb);
+        background: var(--switch-thumb-bg);
+        border-radius: 50%;
+        will-change: transform;
+
+        position: absolute;
+        top: 50%;
+        left: 0;
+
+        --switch-thumb-y: -50%;
+        transform: translate(var(--switch-thumb-x), var(--switch-thumb-y)) scale(var(--switch-thumb-scale));
+        transition:
+            transform var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+    }
+
+    &[data-state='checked'] {
+        --switch-track-bg: var(--switch-track-bg-checked);
+        --switch-thumb-x: calc(
+            var(--switch-width)
+            - var(--switch-thumb)
+            - var(--switch-padding)
+        );
+    }
+
+    &:not([data-disabled]):active {
+        --switch-thumb-scale: 0.95;
+    }
+
+    &:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {
+        --shadow: var(--switch-shadow-hover-secondary);
+    }
+
+    &[data-state='checked']:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {
+        --shadow: var(--switch-shadow-hover);
+    }
+
+    &[data-intent='danger'] {
+        --switch-track-bg-checked: var(--switch-track-bg-danger);
+    }
+
+    &[data-intent='success'] {
+        --switch-track-bg-checked: var(--switch-track-bg-success);
+    }
+
+    &[data-intent='warning'] {
+        --switch-track-bg-checked: var(--switch-track-bg-warning);
+    }
+
+    &[data-intent='info'] {
+        --switch-track-bg-checked: var(--switch-track-bg-info);
+    }
+
+    &[data-disabled] {
+        cursor: not-allowed;
+        --switch-track-bg: var(--switch-track-bg-disabled);
+        --switch-thumb-bg: var(--switch-thumb-bg-disabled);
+        --switch-text: var(--switch-text-disabled);
+        --switch-text-muted: var(--switch-text-disabled);
+    }
+
+}

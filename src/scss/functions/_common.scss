@@ -1,0 +1,7 @@
+@use '../config' as cfg;
+
+$prefix: cfg.$prefix;
+
+@function intent($name, $step) {
+    @return var(--#{$prefix}-intent-#{$name}-#{$step});
+}

@@ -4,12 +4,10 @@
 import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { type TextInputProps } from '../TextInput/TextInput';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
-// import { prefix } from '../Input/input.helpers';
 import clsx from 'clsx';
 import { Chip } from '../../../Chip/Chip';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { Box, BoxProps } from '../../Box/Box';
-// import { Size, Variant } from '../Input/input.tokens';
 import { Size } from '../form.tokens';
 import { Variant } from '../FieldRoot/FieldRoot';
 import { Close } from '../../../Icon/Close';

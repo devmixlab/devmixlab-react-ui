@@ -1,0 +1,29 @@
+$sizes: (
+    sm: (
+        height: 18px,
+        width: 32px,
+        thumb: 14px,
+        padding: 2px,
+        gap: 6px,
+        font-size: 13px,
+    ),
+
+    md: (
+        height: 22px,
+        width: 40px,
+        thumb: 18px,
+        padding: 2px,
+        gap: 8px,
+        font-size: 14px,
+    ),
+
+    lg: (
+        height: 26px,
+        width: 48px,
+        thumb: 22px,
+        padding: 2px,
+        gap: 10px,
+        font-size: 16px,
+    ),
+);
+

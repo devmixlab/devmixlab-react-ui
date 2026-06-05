@@ -1,0 +1,11 @@
+@use 'sass:map';
+
+@mixin applySize($conf) {
+    --switch-height: #{map.get($conf, height)};
+    --switch-width: #{map.get($conf, width)};
+    --switch-thumb: #{map.get($conf, thumb)};
+    --switch-gap: #{map.get($conf, gap)};
+    --switch-padding: #{map.get($conf, padding)};
+
+    font-size: map.get($conf, font-size);
+}
