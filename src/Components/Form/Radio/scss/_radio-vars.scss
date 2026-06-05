@@ -1,0 +1,23 @@
+$sizes: (
+    sm: (
+        size: 16px,
+        indicator: 8px,
+        gap: 6px,
+        font-size: 13px
+    ),
+    md: (
+        size: 20px,
+        indicator: 11px,
+        gap: 8px,
+        font-size: 14px
+    ),
+    lg: (
+        size: 24px,
+        indicator: 13px,
+        gap: 10px,
+        font-size: 16px
+    )
+);
+
+$intents: (secondary, primary, warning, danger, info, success);
+$dark-intents: (secondary, zinc, neutral, gray, stone, slate);

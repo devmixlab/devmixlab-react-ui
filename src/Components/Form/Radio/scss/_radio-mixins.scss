@@ -1,0 +1,62 @@
+@use '../../../../scss/functions/common' as *;
+@use './radio-config' as *;
+@use 'sass:map';
+
+@mixin applySize($conf) {
+    --radio-size: #{map.get($conf, size)};
+    --radio-indicator: #{map.get($conf, indicator)};
+    --radio-gap: #{map.get($conf, gap)};
+
+    font-size: #{map.get($conf, font-size)};
+}
+
+@mixin outline ($intent, $mode: 'light') {
+    --radio-control-border-disabled: var(--#{$p}-surface-disabled);
+    --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
+
+    @if ($mode == 'light') {
+        --radio-control-border: #{intent(gray, 400)};
+        --radio-control-bg: #{intent(gray, 100)};
+        --radio-ring: #{intent($intent, 500)};
+
+        --radio-indicator-bg: #{intent($intent, 500)};
+        --radio-control-border-checked: #{intent($intent, 500)};
+    } @else {
+        --radio-control-border: #{intent(gray, 600)};
+        --radio-control-bg: #{intent(gray, 900)};
+        --radio-ring: #{intent($intent, 400)};
+
+        --radio-indicator-bg: #{intent($intent, 400)};
+        --radio-control-border-checked: #{intent($intent, 400)};
+    }
+}
+
+@mixin solid ($intent, $mode: 'light') {
+    --radio-control-border-disabled: var(--#{$p}-surface-disabled);
+    --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
+
+    // NEW
+    --radio-control-bg-checked: #{intent($intent, 500)};
+    --radio-indicator-bg-checked: white;
+
+    --radio-indicator-scale-checked: 0.7;
+
+    @if ($mode == 'light') {
+        --radio-control-border: #{intent(gray, 400)};
+        --radio-control-bg: #{intent(gray, 100)};
+        --radio-ring: #{intent($intent, 500)};
+
+        --radio-indicator-bg: #{intent($intent, 500)};
+        --radio-control-border-checked: #{intent($intent, 500)};
+    } @else {
+        --radio-control-border: #{intent(gray, 600)};
+        --radio-control-bg: #{intent(gray, 900)};
+        --radio-ring: #{intent($intent, 400)};
+
+        // NEW
+        --radio-control-bg-checked: #{intent($intent, 400)};
+
+        --radio-indicator-bg: #{intent($intent, 400)};
+        --radio-control-border-checked: #{intent($intent, 400)};
+    }
+}

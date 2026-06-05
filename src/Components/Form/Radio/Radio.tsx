@@ -1,16 +1,21 @@
 import React, { forwardRef, useRef, useEffect, useId, useState, useMemo } from 'react';
 import clsx from 'clsx';
-import { Box } from '../../Box/Box';
+import { Box } from '../../Box';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { CLASS_PREFIX } from '../../../constants';
 import { useRadioGroup } from './radioGroup.context';
 
 export type Size = 'sm' | 'md' | 'lg';
-export type Intent = 'danger' | 'warning' | 'success' | 'info';
+// export type Intent = 'danger' | 'warning' | 'success' | 'info';
+
+type Intent = 'danger' | 'warning' | 'success' | 'info' | 'secondary' | (string & {});
+// type Variant = 'solid' | 'outlined' | 'soft' | 'filled' | 'ghost' | (string & {});
+type Variant = 'solid' | (string & {});
 
 type RadioProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     value: string;
     intent?: Intent;
+    variant?: Variant;
     size?: Size;
     children?: React.ReactNode;
     description?: React.ReactNode;
@@ -31,7 +36,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
             description,
             labelPosition = 'right',
             value,
-            intent,
+            intent = 'primary',
+            variant = 'solid',
             onChange,
             ...rest
         },
@@ -46,7 +52,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
         //     console.warn('Radio should be used inside RadioGroup for proper behavior');
         // }
 
-        const finalSize = size ?? group?.size ?? 'sm';
+        const finalSize = size ?? group?.size ?? 'md';
         const name = rest.name ?? group?.name ?? undefined;
 
         const isDisabled = disabled || group?.disabled;
@@ -83,7 +89,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={isDisabled || undefined}
                 data-size={finalSize}
-                {...(intent ? { ['data-intent']: intent } : {})}
+                data-intent={intent}
+                data-variant={variant}
             >
                 {labelPosition === 'left' && labelNode}
 
@@ -98,7 +105,6 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                     onChange={handleChange}
                     ref={combinedRef}
                     disabled={isDisabled}
-                    // aria-checked={isChecked}
                     aria-labelledby={labelId || undefined}
                     aria-describedby={descriptionId}
                     aria-label={labelId ? undefined : rest['aria-label']}
@@ -118,3 +124,5 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 Radio.displayName = 'Radio';
 
 export { Radio };
+
+export type { RadioProps };
