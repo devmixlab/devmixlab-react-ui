@@ -8,14 +8,14 @@ import {
     FieldRoot,
     fieldRootPropKeys,
     type FieldLayoutProps,
-    type ShareFieldRootProps,
+    type SharedFieldRootProps,
 } from '../FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
 import { splitProps } from '../../../utils/splitProps';
 
 export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> &
     FieldLayoutProps &
-    ShareFieldRootProps & {
+    SharedFieldRootProps & {
         controls?: React.ReactNode;
     };
 

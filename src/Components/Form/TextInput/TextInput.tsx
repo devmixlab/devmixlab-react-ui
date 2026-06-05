@@ -2,7 +2,7 @@ import React, { forwardRef, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Box } from '../../Box';
 // import { Size } from '../form.tokens';
-import { FieldRoot, ShareFieldRootProps } from '../FieldRoot';
+import { FieldRoot, SharedFieldRootProps } from '../FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { Close, IconWrapper } from '../../../Icon';
@@ -22,7 +22,7 @@ type OwnTextInputProps = {
 
 type TextInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> &
     FieldLayoutProps &
-    ShareFieldRootProps &
+    SharedFieldRootProps &
     OwnTextInputProps;
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'url', 'tel', 'password']);

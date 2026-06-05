@@ -1,8 +1,8 @@
 import type { BoxProps } from '../../Box';
 import { defineExactKeys, defineUniqueTuple } from '../../../types/tuple';
-import { ShareFieldRootProps } from './FieldRoot';
+import { SharedFieldRootProps } from './FieldRoot';
 
-const shareFieldRootPropKeys = defineExactKeys<ShareFieldRootProps>()([
+const shareFieldRootPropKeys = defineExactKeys<SharedFieldRootProps>()([
     'start',
     'end',
     'actions',

@@ -6,7 +6,7 @@ import { Variant } from '../FieldRoot/FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { IconWrapper, Close } from '../../../Icon';
-import { FieldRoot, ShareFieldRootProps } from '../FieldRoot';
+import { FieldRoot, SharedFieldRootProps } from '../FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
 import { FieldLayoutProps, fieldRootPropKeys } from '../FieldRoot';
 import { splitProps } from '../../../utils/splitProps';
@@ -28,7 +28,7 @@ export type TextareaProps = Omit<
     'size' | 'wrap'
 > &
     FieldLayoutProps &
-    ShareFieldRootProps &
+    SharedFieldRootProps &
     OwnTextareaProps;
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(

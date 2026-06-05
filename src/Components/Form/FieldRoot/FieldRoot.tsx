@@ -10,7 +10,7 @@ import { defineExactKeys } from '../../../types/tuple';
 
 type Variant = 'outlined' | 'filled' | 'ghost';
 
-type ShareFieldRootProps = {
+type SharedFieldRootProps = {
     start?: React.ReactNode;
     end?: React.ReactNode;
     actions?: React.ReactNode;
@@ -23,7 +23,7 @@ type ShareFieldRootProps = {
     invalid?: boolean;
 };
 
-const shareFieldRootProps = defineExactKeys<ShareFieldRootProps>()([
+const shareFieldRootProps = defineExactKeys<SharedFieldRootProps>()([
     'start',
     'end',
     'actions',
@@ -43,7 +43,7 @@ type OwnFieldRootProps = {
 
 type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
     BoxProps &
-    ShareFieldRootProps &
+    SharedFieldRootProps &
     OwnFieldRootProps;
 
 const renderGroupItem = (content: React.ReactNode) => (
@@ -227,4 +227,4 @@ FieldRoot.displayName = 'FieldRoot';
 
 export { FieldRoot, renderGroupItem, shareFieldRootProps };
 
-export type { Variant, FieldRootProps, ShareFieldRootProps, OwnFieldRootProps };
+export type { Variant, FieldRootProps, SharedFieldRootProps, OwnFieldRootProps };
