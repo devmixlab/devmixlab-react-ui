@@ -4,6 +4,55 @@
 @use './switch-vars' as *;
 @use './switch-mixins' as *;
 @use 'sass:map';
+@use 'sass:list';
+
+$intents: (secondary, primary, warning, danger, info, success);
+$dark-intents: (secondary, zink, neutral, gray, stone, slate);
+
+@mixin solid ($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --switch-ring: #{intent($intent, 500)};
+        --switch-track-bg-checked: #{intent($intent, 500)};
+    } @else {
+        --switch-ring: #{intent($intent, 400)};
+        $is-dark-intent: list.index($dark-intents, $intent) != null;
+        @if $is-dark-intent {
+            --switch-track-bg-checked: #{intent($intent, 300)};
+            --switch-thumb-bg-checked: #{intent($intent, 600)};
+        } @else {
+            --switch-track-bg-checked: #{intent($intent, 400)};
+        }
+    }
+}
+
+@mixin outlined($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --switch-ring: #{intent($intent, 500)};
+        --switch-track-bg: transparent;
+        //--switch-track-bg-checked: transparent;
+        --switch-track-border: #{intent(gray, 300)};
+        --switch-track-border-checked: #{intent($intent, 300)};
+        --switch-thumb-bg-checked: #{intent($intent, 500)};
+        --switch-thumb-bg: #{intent(gray, 300)};
+        --switch-track-bg-checked: #{intent($intent, 50)};
+    } @else {
+        $is-dark-intent: list.index($dark-intents, $intent) != null;
+        --switch-track-bg: transparent;
+        --switch-track-border: #{intent(gray, 600)};
+        --switch-ring: #{intent($intent, 400)};
+        --switch-thumb-bg: #{intent(gray, 600)};
+
+        @if $is-dark-intent {
+            --switch-track-bg-checked: transparent;
+            --switch-track-border-checked: #{intent($intent, 300)};
+            --switch-thumb-bg-checked: #{intent($intent, 300)};
+        } @else {
+            --switch-track-bg-checked: transparent;
+            --switch-track-border-checked: #{intent($intent, 400)};
+            --switch-thumb-bg-checked: #{intent($intent, 400)};
+        }
+    }
+}
 
 .#{$switch-prefix} {
 
@@ -35,45 +84,36 @@
     --switch-shadow: var(--#{$p}-control-shadow);
     --switch-shadow-hover: 0 0 0 3px color-mix(
         in srgb,
-        var(--switch-track-bg-checked) 20%,
+        var(--switch-ring) 20%,
         transparent
     );
     --switch-shadow-hover-secondary: var(--#{$p}-control-shadow-hover-secondary);
     --switch-shadow-focus: 0 0 0 2px var(--#{$p}-control-bg),
     0 0 0 4px color-mix(
         in srgb,
-        var(--switch-track-bg-checked) 50%,
+        var(--switch-ring) 50%,
         transparent
     );
 
     // Track/thumb colors
     --switch-track-bg: #{intent('gray', 300)};
-    --switch-track-bg-checked: var(--#{$p}-control-accent);
+    //--switch-track-bg-checked: var(--#{$p}-control-accent);
     --switch-thumb-bg: #{intent('gray', 0)};
     --switch-thumb-bg-checked: #{intent('gray', 0)};
     --switch-track-bg-disabled: #{intent('gray', 300)};
     --switch-thumb-bg-disabled: #{intent('gray', 200)};
 
-    // Intent colors
-    --switch-track-bg-danger: var(--#{$p}-control-accent-danger);
-    --switch-track-bg-success: var(--#{$p}-control-accent-success);
-    --switch-track-bg-warning: var(--#{$p}-control-accent-warning);
-    --switch-track-bg-info: var(--#{$p}-control-accent-info);
+    --switch-track-border: transparent;
+    --switch-track-border-checked: transparent;
 
-    --switch-track-bg-secondary: #{intent('gray', 400)};
-    --switch-thumb-bg-secondary: #{intent('gray', 50)};
 
     @include dark {
         // Track/thumb colors dark
         --switch-track-bg: #{intent('gray', 600)};
-        --switch-track-bg-checked: #{intent('primary', 400)};
+        //--switch-track-bg-checked: #{intent('primary', 400)};
         --switch-thumb-bg: #{intent('gray', 100)};
         --switch-track-bg-disabled: #{intent('gray', 700)};
         --switch-thumb-bg-disabled: #{intent('gray', 600)};
-        --switch-track-bg-secondary: #{intent('gray', 200)};
-
-        --switch-track-bg-secondary: #{intent('gray', 300)};
-        --switch-thumb-bg-secondary: #{intent('gray', 500)};
     }
 
     --switch-thumb-x: var(--switch-padding);
@@ -122,6 +162,8 @@
             background: var(--switch-track-bg);
             border-radius: 999px;
             position: relative;
+            box-sizing: border-box;
+            border: 1px solid var(--switch-track-border);
             transition:
                 background var(--switch-transition),
                 box-shadow var(--switch-transition);
@@ -145,8 +187,13 @@
     }
 
     &[data-state='checked'] {
-        --switch-track-bg: var(--switch-track-bg-checked);
-        --switch-thumb-bg: var(--switch-thumb-bg-checked);
+        .#{$switch-prefix}__track {
+            background-color: var(--switch-track-bg-checked, var(--switch-track-bg));
+            border-color: var(--switch-track-border-checked);
+        }
+        .#{$switch-prefix}__thumb {
+            background-color: var(--switch-thumb-bg-checked, var(--switch-thumb-bg));
+        }
         --switch-thumb-x: calc(
             var(--switch-width)
             - var(--switch-thumb)
@@ -166,27 +213,6 @@
         --switch-shadow: var(--switch-shadow-hover);
     }
 
-    &[data-intent='danger'] {
-        --switch-track-bg-checked: var(--switch-track-bg-danger);
-    }
-
-    &[data-intent='success'] {
-        --switch-track-bg-checked: var(--switch-track-bg-success);
-    }
-
-    &[data-intent='warning'] {
-        --switch-track-bg-checked: var(--switch-track-bg-warning);
-    }
-
-    &[data-intent='info'] {
-        --switch-track-bg-checked: var(--switch-track-bg-info);
-    }
-
-    &[data-intent='secondary'] {
-        --switch-track-bg-checked: var(--switch-track-bg-secondary);
-        --switch-thumb-bg-checked: var(--switch-thumb-bg-secondary);
-    }
-
     &[data-disabled] {
         cursor: not-allowed;
         --switch-track-bg: var(--switch-track-bg-disabled);
@@ -194,5 +220,32 @@
         --switch-text: var(--switch-text-disabled);
         --switch-text-muted: var(--switch-text-disabled);
     }
+
+
+    @each $intent in $intents {
+        &[data-intent='#{$intent}'] {
+            &[data-variant='solid']{
+                @include solid($intent);
+            }
+            &[data-variant='outlined'] {
+                @include outlined($intent);
+            }
+        }
+
+        @include dark {
+            &[data-intent='#{$intent}'] {
+                &[data-variant='solid']{
+                    @include solid($intent, 'dark');
+                }
+                &[data-variant='outlined'] {
+                    @include outlined($intent, 'dark');
+                }
+            }
+        }
+    }
+
+    //&[data-variant='solid'] {
+    //
+    //}
 
 }

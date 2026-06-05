@@ -11,10 +11,12 @@ import { classPrefix } from '../../../utils/classPrefix';
 //-----------------------------------------------------------------------
 type Intent = 'danger' | 'warning' | 'success' | 'info' | 'secondary' | (string & {});
 
+type Variant = 'solid' | 'outlined' | (string & {});
+
 type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: 'sm' | 'md' | 'lg';
     intent?: Intent;
-    variant?: string;
+    variant?: Variant;
     children?: React.ReactNode;
     description?: React.ReactNode;
     labelPosition?: 'left' | 'right';
@@ -40,8 +42,8 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             children,
             description,
             labelPosition = 'right',
-            intent,
-            variant,
+            intent = 'primary',
+            variant = 'solid',
             onChange,
             checked,
             defaultChecked,
