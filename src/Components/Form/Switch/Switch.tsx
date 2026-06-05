@@ -9,11 +9,12 @@ import { classPrefix } from '../../../utils/classPrefix';
 //-----------------------------------------------------------------------
 // Types
 //-----------------------------------------------------------------------
-type Intent = 'danger' | 'warning' | 'success' | 'info';
+type Intent = 'danger' | 'warning' | 'success' | 'info' | 'secondary' | (string & {});
 
 type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: 'sm' | 'md' | 'lg';
     intent?: Intent;
+    variant?: string;
     children?: React.ReactNode;
     description?: React.ReactNode;
     labelPosition?: 'left' | 'right';
@@ -40,10 +41,12 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             description,
             labelPosition = 'right',
             intent,
+            variant,
             onChange,
             checked,
             defaultChecked,
             onCheckedChange,
+            readOnly: isReadOnly,
             ...rest
         },
         ref,
@@ -67,7 +70,6 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         }, [group, name]);
 
         const isDisabled = disabled || group?.disabled;
-        const isReadOnly = rest.readOnly;
         const isChecked =
             group && name
                 ? (group.value[name] ?? false)
@@ -125,6 +127,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 data-testid="switch"
                 data-name={name}
                 data-intent={intent}
+                data-variant={variant}
             >
                 {labelPosition === 'left' && labelNode}
 
@@ -140,6 +143,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                     aria-describedby={descriptionId}
                     checked={isChecked}
                     onChange={handleChange}
+                    onClick={isReadOnly ? (e) => e.preventDefault() : undefined}
                     ref={combinedRef}
                     disabled={isDisabled}
                     className={prefix('__input')}
