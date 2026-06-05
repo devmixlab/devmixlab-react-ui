@@ -1,11 +1,11 @@
 import React, { forwardRef, useRef, useState, useEffect } from 'react';
-import { TextInput, type TextInputProps } from '../TextInput/TextInput';
+import { TextInput, type TextInputProps } from '../TextInput';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { Search as SearchIcon } from '../../../Icon/Search';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { DefaultSpinner } from '../../../Spinner/DefaultSpinner';
 
-export type SearchInputProps = Omit<TextInputProps, 'type'> & {
+type SearchInputProps = Omit<TextInputProps, 'type'> & {
     searchIcon?: React.ReactNode;
     clearIcon?: React.ReactNode;
 
@@ -38,9 +38,12 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 
         const inputId = idProp ?? ctx?.id;
 
-        const finalSearchIcon = loading
-            ? (loadingIcon ?? <DefaultSpinner />)
-            : (searchIcon ?? <SearchIcon />);
+        // const finalSearchIcon = loading
+        //     ? (loadingIcon ?? <DefaultSpinner />)
+        //     : (searchIcon ?? <SearchIcon />);
+
+        const finalLoadingSpinner = loadingIcon ?? <DefaultSpinner />;
+        const finalSearchIcon = searchIcon ?? <SearchIcon />;
 
         const isControlled = props.value !== undefined;
         const [innerValue, setInnerValue] = useState('');
@@ -104,12 +107,13 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         return (
             <TextInput
                 {...props}
-                clearable={clearable}
+                clearable={!loading && clearable}
                 clearIcon={clearIcon}
                 id={inputId}
                 ref={combinedRef}
                 type={'search'}
                 start={finalSearchIcon}
+                end={(loading && finalLoadingSpinner) || undefined}
                 onValueChange={handleValueChange}
                 onKeyDown={handleKeyDown}
             />
@@ -120,3 +124,5 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 SearchInput.displayName = 'SearchInput';
 
 export { SearchInput };
+
+export type { SearchInputProps };
