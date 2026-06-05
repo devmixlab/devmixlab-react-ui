@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box/Box';
+import { Box, type BoxProps } from '../../Box';
 import { Size } from '../form.tokens';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { TriangleDown as TriangleDownIcon } from '../../../Icon';
