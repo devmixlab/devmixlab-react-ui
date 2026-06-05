@@ -1,25 +1,23 @@
 import React, { forwardRef, useRef } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../../Box';
-import { Size } from '../form.tokens';
+import { Box } from '../../Box';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { TriangleDown as TriangleDownIcon } from '../../../Icon';
 import { mergeRefs } from '../../../utils/mergeRefs';
-import { FieldRoot } from '../FieldRoot/FieldRoot';
+import {
+    FieldRoot,
+    fieldRootPropKeys,
+    type FieldLayoutProps,
+    type ShareFieldRootProps,
+} from '../FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
-import { Variant } from '../FieldRoot/FieldRoot';
+import { splitProps } from '../../../utils/splitProps';
 
-export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> & {
-    variant?: Variant;
-    size?: Size;
-    invalid?: boolean;
-    rounded?: BoxProps['rounded'];
-
-    start?: React.ReactNode;
-    end?: React.ReactNode;
-    actions?: React.ReactNode;
-    controls?: React.ReactNode;
-};
+export type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> &
+    FieldLayoutProps &
+    ShareFieldRootProps & {
+        controls?: React.ReactNode;
+    };
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
     (
@@ -27,35 +25,30 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className,
             children,
 
-            variant = 'outlined',
-            size = 'md',
             invalid = false,
             disabled = false,
-            rounded = 'md',
 
-            start,
-            end,
-            actions,
             controls,
 
             ...rest
         },
         ref,
     ) => {
+        const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
+
         const selectRef = useRef<HTMLSelectElement>(null);
 
         const ctx = useFormFieldContext();
         const isInvalid = ctx ? ctx.hasError || invalid : invalid;
         const selectProps = ctx
             ? {
+                  ...controlProps,
                   id: rest.id ?? ctx.id,
                   'aria-describedby': ctx.describedBy,
               }
-            : {};
+            : controlProps;
 
         const combinedRef = mergeRefs(selectRef, ref);
-
-        const cl = clsx(className, classPrefix('--select'));
 
         const finalControls = (
             <>
@@ -66,17 +59,12 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 
         return (
             <FieldRoot
-                className={cl}
+                className={clsx(classPrefix('--select'), className)}
                 invalid={isInvalid}
                 disabled={disabled}
-                rounded={rounded}
                 focusTargetRef={selectRef}
-                start={start}
-                end={end}
-                actions={actions}
                 controls={finalControls}
-                variant={variant}
-                size={size}
+                {...fieldRootProps}
             >
                 <Box
                     as="select"
@@ -84,7 +72,6 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                     className={classPrefix(`--field`)}
                     disabled={disabled}
                     aria-invalid={isInvalid || undefined}
-                    {...rest}
                     {...selectProps}
                 >
                     {children}
