@@ -35,13 +35,16 @@
     --radio-control-border-disabled: var(--#{$p}-surface-disabled);
     --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
 
+    --radio-indicator: 100%;
+
     // NEW
     --radio-control-bg-checked: #{intent($intent, 500)};
-    --radio-indicator-bg-checked: white;
 
-    --radio-indicator-scale-checked: 0.7;
+    --radio-indicator-scale-checked: .7;
 
     @if ($mode == 'light') {
+        --radio-indicator-bg-checked: #{intent($intent, 100)};
+
         --radio-control-border: #{intent(gray, 400)};
         --radio-control-bg: #{intent(gray, 100)};
         --radio-ring: #{intent($intent, 500)};
@@ -49,6 +52,8 @@
         --radio-indicator-bg: #{intent($intent, 500)};
         --radio-control-border-checked: #{intent($intent, 500)};
     } @else {
+        --radio-indicator-bg-checked: #{intent($intent, 900)};
+
         --radio-control-border: #{intent(gray, 600)};
         --radio-control-bg: #{intent(gray, 900)};
         --radio-ring: #{intent($intent, 400)};
