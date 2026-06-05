@@ -1,4 +1,3 @@
-// SwitchGroup.context.ts
 import { createContext, useContext } from 'react';
 
 export type SwitchGroupContextValue = {

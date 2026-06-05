@@ -1,9 +1,9 @@
 @use './switch-config' as *;
 @use '../../../../scss/mixins/mode' as *;
-@use 'sass:map';
 @use '../../../../scss/functions/common' as *;
 @use './switch-vars' as *;
 @use './switch-mixins' as *;
+@use 'sass:map';
 
 .#{$switch-prefix} {
 
@@ -22,10 +22,14 @@
         }
     }
 
+    --switch-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+
     // Text
     --switch-text: var(--#{$p}-text);
     --switch-text-disabled: var(--#{$p}-text-disabled);
     --switch-text-muted: var(--#{$p}-text-muted);
+
+    --switch-lh: 1.2;
 
     // Shadows
     --switch-shadow: var(--#{$p}-control-shadow);
@@ -70,70 +74,66 @@
     position: relative;
     display: inline-flex;
     align-items: center;
-    line-height: 1;
+    line-height: var(--switch-lh);
     gap: var(--switch-gap);
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 
-    .#{$switch-prefix}__input {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        cursor: inherit;
-        z-index: 1;
+    .#{$switch-prefix} {
+        &__input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: inherit;
+            z-index: 1;
 
-        &:focus-visible + .#{$switch-prefix}__track {
-            box-shadow: var(--shadow-focus);
+            &:focus-visible + .#{$switch-prefix}__track {
+                box-shadow: var(--switch-shadow-focus);
+            }
         }
-    }
+        &__label {
+            line-height: var(--switch-lh);
+            font-size: 1em;
+            color: var(--switch-text);
+        }
+        &__text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: var(--switch-lh);
+        }
+        &__description {
+            font-size: 0.85em;
+            color: var(--switch-text-muted);
+            margin-top: 2px;
+        }
+        &__track {
+            width: var(--switch-width);
+            height: var(--switch-height);
+            background: var(--switch-track-bg);
+            border-radius: 999px;
+            position: relative;
+            transition:
+                background var(--switch-transition),
+                box-shadow var(--switch-transition);
+            box-shadow: var(--switch-shadow);
+        }
+        &__thumb {
+            width: var(--switch-thumb);
+            height: var(--switch-thumb);
+            background: var(--switch-thumb-bg);
+            border-radius: 50%;
+            will-change: transform;
 
-    .#{$switch-prefix}__label {
-        line-height: 1;
-        font-size: 1em;
-        color: var(--switch-text);
-    }
+            position: absolute;
+            top: 50%;
+            left: 0;
 
-    .#{$switch-prefix}__text {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        line-height: 1;
-    }
-
-    .#{$switch-prefix}__description {
-        font-size: 0.85em;
-        color: var(--switch-text-muted);
-        margin-top: 2px;
-    }
-
-    .#{$switch-prefix}__track {
-        width: var(--switch-width);
-        height: var(--switch-height);
-        background: var(--switch-track-bg);
-        border-radius: 999px;
-        position: relative;
-        transition:
-            background var(--#{$p}-duration-normal) var(--#{$p}-ease-standard),
-            box-shadow var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
-        box-shadow: var(--switch-shadow);
-    }
-
-    .#{$switch-prefix}__thumb {
-        width: var(--switch-thumb);
-        height: var(--switch-thumb);
-        background: var(--switch-thumb-bg);
-        border-radius: 50%;
-        will-change: transform;
-
-        position: absolute;
-        top: 50%;
-        left: 0;
-
-        --switch-thumb-y: -50%;
-        transform: translate(var(--switch-thumb-x), var(--switch-thumb-y)) scale(var(--switch-thumb-scale));
-        transition:
-            transform var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+            --switch-thumb-y: -50%;
+            transform: translate(var(--switch-thumb-x), var(--switch-thumb-y)) scale(var(--switch-thumb-scale));
+            transition: transform var(--switch-transition);
+        }
     }
 
     &[data-state='checked'] {
@@ -150,11 +150,11 @@
     }
 
     &:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {
-        --shadow: var(--switch-shadow-hover-secondary);
+        --switch-shadow: var(--switch-shadow-hover-secondary);
     }
 
     &[data-state='checked']:not([data-disabled]):not(:focus-within):hover .#{$switch-prefix}__track {
-        --shadow: var(--switch-shadow-hover);
+        --switch-shadow: var(--switch-shadow-hover);
     }
 
     &[data-intent='danger'] {

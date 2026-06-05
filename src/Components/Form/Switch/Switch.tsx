@@ -1,13 +1,15 @@
-import React, { forwardRef, useRef, useEffect, useId, useState, useMemo } from 'react';
+import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { Box } from '../../Box';
 import { mergeRefs } from '../../../utils/mergeRefs';
-import { CLASS_PREFIX } from '../../../constants';
-import { useSwitchGroup } from './switchGroup.context';
+import { useSwitchGroup } from './SwitchGroup.context';
 import { useStableId } from '../../../utils/useStableId';
 import { classPrefix } from '../../../utils/classPrefix';
 
-export type Intent = 'danger' | 'warning' | 'success' | 'info';
+//-----------------------------------------------------------------------
+// Types
+//-----------------------------------------------------------------------
+type Intent = 'danger' | 'warning' | 'success' | 'info';
 
 type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: 'sm' | 'md' | 'lg';
@@ -18,10 +20,16 @@ type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 's
     onCheckedChange?: (checked: boolean) => void;
 };
 
+//-----------------------------------------------------------------------
+// Helpers
+//-----------------------------------------------------------------------
 export const prefix = (name: string = '') => {
     return classPrefix(`--switch${name}`);
 };
 
+//-----------------------------------------------------------------------
+// Component
+//-----------------------------------------------------------------------
 const Switch = forwardRef<HTMLInputElement, SwitchProps>(
     (
         {
@@ -52,9 +60,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         const group = useSwitchGroup();
         const name = rest.name;
 
-        if (group && !name) {
-            console.warn('Switch inside SwitchGroup requires a "name" prop');
-        }
+        useEffect(() => {
+            if (group && !name) {
+                console.warn('Switch inside SwitchGroup requires a "name" prop');
+            }
+        }, [group, name]);
 
         const isDisabled = disabled || group?.disabled;
         const isChecked =
@@ -141,3 +151,5 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
 Switch.displayName = 'Switch';
 
 export { Switch };
+
+export type { Intent, SwitchProps };
