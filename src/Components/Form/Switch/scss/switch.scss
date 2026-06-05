@@ -1,58 +1,8 @@
 @use './switch-config' as *;
 @use '../../../../scss/mixins/mode' as *;
-@use '../../../../scss/functions/common' as *;
 @use './switch-vars' as *;
 @use './switch-mixins' as *;
 @use 'sass:map';
-@use 'sass:list';
-
-$intents: (secondary, primary, warning, danger, info, success);
-$dark-intents: (secondary, zink, neutral, gray, stone, slate);
-
-@mixin solid ($intent, $mode: 'light') {
-    @if ($mode == 'light') {
-        --switch-ring: #{intent($intent, 500)};
-        --switch-track-bg-checked: #{intent($intent, 500)};
-    } @else {
-        --switch-ring: #{intent($intent, 400)};
-        $is-dark-intent: list.index($dark-intents, $intent) != null;
-        @if $is-dark-intent {
-            --switch-track-bg-checked: #{intent($intent, 300)};
-            --switch-thumb-bg-checked: #{intent($intent, 600)};
-        } @else {
-            --switch-track-bg-checked: #{intent($intent, 400)};
-        }
-    }
-}
-
-@mixin outlined($intent, $mode: 'light') {
-    @if ($mode == 'light') {
-        --switch-ring: #{intent($intent, 500)};
-        --switch-track-bg: transparent;
-        //--switch-track-bg-checked: transparent;
-        --switch-track-border: #{intent(gray, 300)};
-        --switch-track-border-checked: #{intent($intent, 300)};
-        --switch-thumb-bg-checked: #{intent($intent, 500)};
-        --switch-thumb-bg: #{intent(gray, 300)};
-        --switch-track-bg-checked: #{intent($intent, 50)};
-    } @else {
-        $is-dark-intent: list.index($dark-intents, $intent) != null;
-        --switch-track-bg: transparent;
-        --switch-track-border: #{intent(gray, 600)};
-        --switch-ring: #{intent($intent, 400)};
-        --switch-thumb-bg: #{intent(gray, 600)};
-
-        @if $is-dark-intent {
-            --switch-track-bg-checked: transparent;
-            --switch-track-border-checked: #{intent($intent, 300)};
-            --switch-thumb-bg-checked: #{intent($intent, 300)};
-        } @else {
-            --switch-track-bg-checked: transparent;
-            --switch-track-border-checked: #{intent($intent, 400)};
-            --switch-thumb-bg-checked: #{intent($intent, 400)};
-        }
-    }
-}
 
 .#{$switch-prefix} {
 
@@ -95,27 +45,7 @@ $dark-intents: (secondary, zink, neutral, gray, stone, slate);
         transparent
     );
 
-    // Track/thumb colors
-    --switch-track-bg: #{intent('gray', 300)};
-    //--switch-track-bg-checked: var(--#{$p}-control-accent);
-    --switch-thumb-bg: #{intent('gray', 0)};
-    --switch-thumb-bg-checked: #{intent('gray', 0)};
-    --switch-track-bg-disabled: #{intent('gray', 300)};
-    --switch-thumb-bg-disabled: #{intent('gray', 200)};
-
-    --switch-track-border: transparent;
-    --switch-track-border-checked: transparent;
-
-
-    @include dark {
-        // Track/thumb colors dark
-        --switch-track-bg: #{intent('gray', 600)};
-        //--switch-track-bg-checked: #{intent('primary', 400)};
-        --switch-thumb-bg: #{intent('gray', 100)};
-        --switch-track-bg-disabled: #{intent('gray', 700)};
-        --switch-thumb-bg-disabled: #{intent('gray', 600)};
-    }
-
+    --switch-thumb-offset: 0px;
     --switch-thumb-x: var(--switch-padding);
     --switch-thumb-scale: 1;
 
@@ -165,7 +95,8 @@ $dark-intents: (secondary, zink, neutral, gray, stone, slate);
             box-sizing: border-box;
             border: 1px solid var(--switch-track-border);
             transition:
-                background var(--switch-transition),
+                border-color var(--switch-transition),
+                background-color var(--switch-transition),
                 box-shadow var(--switch-transition);
             box-shadow: var(--switch-shadow);
         }
@@ -180,9 +111,12 @@ $dark-intents: (secondary, zink, neutral, gray, stone, slate);
             top: 50%;
             left: 0;
 
+            //margin-top: -0.01em;
+
             --switch-thumb-y: -50%;
             transform: translate(var(--switch-thumb-x), var(--switch-thumb-y)) scale(var(--switch-thumb-scale));
-            transition: transform var(--switch-transition);
+            transition: transform var(--switch-transition),
+            background-color var(--switch-transition);
         }
     }
 
@@ -198,6 +132,7 @@ $dark-intents: (secondary, zink, neutral, gray, stone, slate);
             var(--switch-width)
             - var(--switch-thumb)
             - var(--switch-padding)
+            + var(--switch-thumb-offset)
         );
     }
 
@@ -215,12 +150,17 @@ $dark-intents: (secondary, zink, neutral, gray, stone, slate);
 
     &[data-disabled] {
         cursor: not-allowed;
-        --switch-track-bg: var(--switch-track-bg-disabled);
-        --switch-thumb-bg: var(--switch-thumb-bg-disabled);
+        .#{$switch-prefix}__track {
+            background-color: var(--switch-track-bg-disabled);
+            border-color: var(--switch-track-border-disabled);
+        }
+        .#{$switch-prefix}__thumb {
+            background-color: var(--switch-thumb-bg-disabled);
+        }
+
         --switch-text: var(--switch-text-disabled);
         --switch-text-muted: var(--switch-text-disabled);
     }
-
 
     @each $intent in $intents {
         &[data-intent='#{$intent}'] {
@@ -229,6 +169,12 @@ $dark-intents: (secondary, zink, neutral, gray, stone, slate);
             }
             &[data-variant='outlined'] {
                 @include outlined($intent);
+            }
+            &[data-variant='soft'] {
+                @include soft($intent);
+            }
+            &[data-variant='filled'] {
+                @include filled($intent);
             }
         }
 
@@ -240,12 +186,13 @@ $dark-intents: (secondary, zink, neutral, gray, stone, slate);
                 &[data-variant='outlined'] {
                     @include outlined($intent, 'dark');
                 }
+                &[data-variant='soft'] {
+                    @include soft($intent, 'dark');
+                }
+                &[data-variant='filled'] {
+                    @include filled($intent, 'dark');
+                }
             }
         }
     }
-
-    //&[data-variant='solid'] {
-    //
-    //}
-
 }
