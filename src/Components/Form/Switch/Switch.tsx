@@ -11,7 +11,7 @@ import { classPrefix } from '../../../utils/classPrefix';
 //-----------------------------------------------------------------------
 type Intent = 'danger' | 'warning' | 'success' | 'info' | 'secondary' | (string & {});
 
-type Variant = 'solid' | 'outlined' | 'soft' | 'filled' | (string & {});
+type Variant = 'solid' | 'outlined' | 'soft' | 'filled' | 'ghost' | (string & {});
 
 type SwitchProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
     size?: 'sm' | 'md' | 'lg';

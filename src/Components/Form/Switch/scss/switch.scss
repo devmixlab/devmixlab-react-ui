@@ -176,6 +176,9 @@
             &[data-variant='filled'] {
                 @include filled($intent);
             }
+            &[data-variant='ghost'] {
+                @include ghost($intent);
+            }
         }
 
         @include dark {
@@ -191,6 +194,9 @@
                 }
                 &[data-variant='filled'] {
                     @include filled($intent, 'dark');
+                }
+                &[data-variant='ghost'] {
+                    @include ghost($intent, 'dark');
                 }
             }
         }
