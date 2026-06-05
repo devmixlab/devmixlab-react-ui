@@ -67,6 +67,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         }, [group, name]);
 
         const isDisabled = disabled || group?.disabled;
+        const isReadOnly = rest.readOnly;
         const isChecked =
             group && name
                 ? (group.value[name] ?? false)
@@ -79,6 +80,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         const labelId = children ? `${id}-label` : undefined;
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (isReadOnly) {
+                e.preventDefault();
+                return;
+            }
+
             const next = e.target.checked;
 
             if (group && name) {
@@ -114,10 +120,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 className={clsx(prefix(), className)}
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={isDisabled || undefined}
+                data-readonly={isReadOnly || undefined}
                 data-size={size}
                 data-testid="switch"
                 data-name={name}
-                {...(intent ? { ['data-intent']: intent } : {})}
+                data-intent={intent}
             >
                 {labelPosition === 'left' && labelNode}
 

@@ -145,7 +145,7 @@
         );
     }
 
-    &:not([data-disabled]):active {
+    &:not([data-disabled]):not([data-readonly]):active {
         --switch-thumb-scale: 0.95;
     }
 
