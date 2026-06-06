@@ -1,0 +1,40 @@
+$sizes: (
+    sm: (
+        optionHeight: 28px,
+        optionPaddingX: 10px,
+
+        contentPaddingY: 4px,
+
+        searchPaddingX: 6px,
+        searchPaddingY: 6px,
+
+        groupLabelPaddingY: 6px,
+        groupLabelStickyPaddingY: 8px,
+    ),
+
+    md: (
+        optionHeight: 36px,
+        optionPaddingX: 14px,
+
+        contentPaddingY: 6px,
+
+        searchPaddingX: 8px,
+        searchPaddingY: 8px,
+
+        groupLabelPaddingY: 7px,
+        groupLabelStickyPaddingY: 9px,
+    ),
+
+    lg: (
+        optionHeight: 42px,
+        optionPaddingX: 18px,
+
+        contentPaddingY: 8px,
+
+        searchPaddingX: 10px,
+        searchPaddingY: 10px,
+
+        groupLabelPaddingY: 8px,
+        groupLabelStickyPaddingY: 10px,
+    ),
+);

@@ -195,14 +195,6 @@ $sizes: (
         isolation: isolate;
     }
 
-    .#{$dropdown-prefix}__option-wrapper {
-        &:focus,
-        &:focus-visible {
-            outline: none;
-            box-shadow: none;
-        }
-    }
-
     .#{$dropdown-prefix}__option {
         background-color: var(--option-bg);
         height: var(--option-height);
@@ -214,6 +206,12 @@ $sizes: (
         transition: background-color var(--option-transition),
         color var(--option-transition);
         user-select: none;
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+            background: var(--option-bg-selected-focus);
+        }
 
         &:not([data-disabled]) {
             cursor: pointer;

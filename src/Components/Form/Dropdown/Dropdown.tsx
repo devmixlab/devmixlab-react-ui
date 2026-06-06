@@ -1,9 +1,9 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Box, BoxProps } from '../../Box/Box';
+import { Box, BoxProps } from '../../Box';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useStableId } from '../../../utils/useStableId';
-import { SearchInput, SearchInputProps } from '../SearchInput/SearchInput';
+import { SearchInput, SearchInputProps } from '../SearchInput';
 import { Text } from '../../../Text/Text';
 import { useFocusableList, useTypeahead } from '../../../hooks';
 import {
@@ -16,6 +16,7 @@ import {
 import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
+import { mergeRefs } from '../../../utils/mergeRefs';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -25,8 +26,6 @@ export type OnReadyCallbackProps = {
     isSearchable: boolean;
     searchInputRef: React.RefObject<HTMLInputElement>;
 };
-
-export type DropdownRole = 'menu' | 'listbox';
 
 export type DropdownOptionData = {
     id: string;
@@ -38,10 +37,10 @@ export type DropdownOptionData = {
     group?: GroupContextValue;
 };
 
-export type DropdownGroupData = {
-    id: string;
-    label?: string;
-};
+// export type DropdownGroupData = {
+//     id: string;
+//     label?: string;
+// };
 
 export type DropdownProps = {
     children?: React.ReactNode;
@@ -118,8 +117,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         },
         ref,
     ) => {
-        // const dropdownId = id ?? useStableId('dropdown');
-
         // ------------------------------------------------------------------
         // Open / search state
         // ------------------------------------------------------------------
@@ -185,20 +182,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         // ------------------------------------------------------------------
 
         const focusableList = useFocusableList(filteredOptions);
-        const {
-            focusedId: optionFocused,
-            // focusedVisibleId: optionFocusedVisible,
-            // setFocusedId: setOptionFocused,
-            // setFocusedVisibleId: setOptionFocusedVisible,
-            setFocuses,
-            // focusFirst,
-            // focusLast,
-            // focusNext,
-            // setRef: setOptionRef,
-            // firstFocusableId,
-            // lastFocusableId,
-            itemRefs: optionRefs,
-        } = focusableList;
+        const { focusedId: optionFocused, setFocuses, itemRefs: optionRefs } = focusableList;
 
         useEffect(() => {
             if (optionFocused == null) return;
@@ -264,7 +248,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 isOptionShown,
                 isGroupShown,
                 disabled,
-                invalid,
+                invalid: isInvalid,
                 isSearchable,
                 setIsSearchable,
                 search,
@@ -292,6 +276,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 isGroupShown,
                 disabled,
                 invalid,
+                isInvalid,
                 isSearchable,
                 setIsSearchable,
                 search,
@@ -658,21 +643,41 @@ Dropdown.Label = DropdownLabel;
 // DropdownOption
 // ---------------------------------------------------------------------------
 
+export type DropdownOptionElementProps = React.HTMLAttributes<HTMLDivElement> & {
+    ref?: React.Ref<HTMLDivElement>;
+
+    role: 'option';
+
+    'aria-selected'?: boolean;
+    'aria-disabled'?: boolean;
+
+    'data-selected'?: boolean;
+    'data-disabled'?: boolean;
+};
+
+export type OptionRenderProps = {
+    disabled: boolean;
+    opened: boolean;
+    setOpened: (open: boolean) => void;
+    optionClassName: string;
+    optionProps: DropdownOptionElementProps;
+};
+
 export type DropdownOptionProps = {
-    id?: string;
     value: string;
     label?: string;
     disabled?: boolean;
-    children: React.ReactNode;
-    className: string;
-} & BoxProps;
+    render?: (props: OptionRenderProps) => React.ReactNode;
+} & BoxProps &
+    React.HTMLAttributes<HTMLElement>;
 
 const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
-    ({ id, value, label, disabled, children, className, ...rest }, ref) => {
+    (
+        { id, value, label, disabled, children, className, onClick, onKeyDown, render, ...rest },
+        ref,
+    ) => {
         // const finalId = id ?? useStableId('dropdown-option');
         const optionId = id ?? value;
-
-        const [pressed, setPressed] = useState<boolean>(false);
 
         const {
             registerOption,
@@ -685,6 +690,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
             isSearchable,
             searchInputRef,
             setOpened,
+            opened,
             isOptionShown,
             // triggerRef,
             options,
@@ -753,7 +759,6 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 e.preventDefault();
                 focusLast();
             } else if (key === 'Enter' || key === ' ') {
-                setPressed(true);
                 handleSelect(value);
             } else if (key === 'Escape') {
                 e.preventDefault();
@@ -762,58 +767,61 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
             }
         };
 
+        const mergedRef = mergeRefs(setRef(optionId), ref);
+
+        const optionProps: DropdownOptionElementProps = {
+            onClick: (e: React.MouseEvent<HTMLElement>) => {
+                onClick?.(e);
+
+                if (!finalDisabled) {
+                    handleSelect(value);
+                }
+            },
+
+            onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+                if (!finalDisabled) {
+                    handleKeyDown(e);
+                }
+
+                onKeyDown?.(e);
+            },
+
+            onFocus: (e: React.FocusEvent<HTMLElement>) => {
+                if (finalDisabled) return;
+                setFocusedId(optionId);
+            },
+
+            ref: mergedRef,
+            id: optionId,
+            role: 'option',
+
+            tabIndex: finalDisabled ? -1 : 0,
+
+            'aria-selected': selected || undefined,
+            'aria-disabled': finalDisabled || undefined,
+            'data-selected': selected || undefined,
+            'data-disabled': finalDisabled || undefined,
+        };
+
+        const optionClassName = prefix('__option');
+
         if (!isOptionShown(option)) {
             return;
         }
 
+        if (render) {
+            return render({
+                disabled: !!disabled,
+                opened,
+                setOpened,
+                optionClassName,
+                optionProps,
+            });
+        }
+
         return (
-            <Box
-                ref={setRef(optionId) as React.Ref<HTMLDivElement>}
-                tabIndex={finalDisabled ? -1 : 0}
-                className={prefix('__option-wrapper')}
-                onClick={() => {
-                    if (finalDisabled) return;
-                    handleSelect(value);
-                }}
-                onFocus={(e) => {
-                    if (finalDisabled) return;
-                    setFocusedVisibleId(
-                        e.currentTarget.matches(':focus-visible') ? optionId : null,
-                    );
-                    setFocusedId(optionId);
-                }}
-                onBlur={() => {
-                    setFocusedId(null);
-                    setFocusedVisibleId(null);
-                    setPressed(false);
-                }}
-                onKeyDown={(e) => {
-                    if (finalDisabled) return;
-                    handleKeyDown(e);
-                }}
-                onKeyUp={(e: React.KeyboardEvent) => {
-                    if (e.key === 'Enter' || e.key === ' ') setPressed(false);
-                }}
-                onMouseDown={() => {
-                    if (finalDisabled) return;
-                    setPressed(true);
-                }}
-                onMouseUp={() => setPressed(false)}
-                onMouseLeave={() => setPressed(false)}
-                role="option"
-                id={optionId}
-                aria-selected={selected || undefined}
-                aria-disabled={finalDisabled || undefined}
-            >
-                <Box
-                    className={prefix('__option')}
-                    data-pseudo-focused={focusedVisibleId === optionId ? true : undefined}
-                    data-pseudo-active={pressed || undefined}
-                    data-selected={selected || undefined}
-                    data-disabled={finalDisabled}
-                >
-                    {children}
-                </Box>
+            <Box className={optionClassName} {...optionProps} {...rest}>
+                {children}
             </Box>
         );
     },
