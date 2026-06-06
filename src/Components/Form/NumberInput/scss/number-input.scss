@@ -5,7 +5,7 @@
 @use 'sass:map';
 
 .#{$number-input-prefix} {
-    --ni-stepper-width: calc(var(--height) * 0.6);
+    --ni-stepper-width: calc(var(--fr-height) * .7);
     --ni-stepper-bg-active: rgba(0, 0, 0, 0.1);
     --ni-stepper-bg-hover: rgba(0, 0, 0, 0.05);
 
@@ -17,7 +17,7 @@
     .#{$p}--stepper {
         display: flex;
         flex-direction: column;
-        height: var(--height);
+        height: var(--fr-height);
         width: var(--ni-stepper-width);
     }
     .#{$p}--stepper button {
@@ -34,9 +34,19 @@
         width: 100%;
 
         line-height: 0;
+        overflow: hidden;
+
+        //background-color: red;
 
         svg {
-            width: 1.2em;
+            width: 60%;
+        }
+
+        &:first-child svg{
+            transform: translateY(.1em);
+        }
+        &:last-child svg{
+            transform: translateY(-.1em);
         }
 
         &:hover {

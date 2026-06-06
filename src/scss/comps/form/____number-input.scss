@@ -8,7 +8,7 @@ $p: cfg.$prefix;
 $number-input-prefix: #{$p}--number-input;
 
 .#{$number-input-prefix} {
-    --stepper-width: calc(var(--height) * 0.6);
+    --stepper-width: calc(var(--fr-height) * 0.8);
     --stepper-bg-active: rgba(0, 0, 0, 0.1);
     --stepper-bg-hover: rgba(0, 0, 0, 0.05);
 
@@ -20,7 +20,7 @@ $number-input-prefix: #{$p}--number-input;
     .#{$p}--stepper {
         display: flex;
         flex-direction: column;
-        height: var(--height);
+        height: var(--fr-height);
         width: var(--stepper-width);
     }
     .#{$p}--stepper button {
