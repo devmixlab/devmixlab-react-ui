@@ -17,6 +17,9 @@ import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
 import { mergeRefs } from '../../../utils/mergeRefs';
+import { FieldRoot, SharedFieldRootProps } from '../FieldRoot';
+import { TriangleDown as TriangleDownIcon } from '../../../Icon';
+import { PopoverTriggerElementProps } from '../../Popover/Popover';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -70,6 +73,7 @@ type DropdownComponent = React.ForwardRefExoticComponent<
     DropdownProps & React.RefAttributes<HTMLDivElement>
 > & {
     Trigger: typeof DropdownTrigger;
+    FieldTrigger: typeof DropdownFieldTrigger;
     Content: typeof DropdownContent;
     Search: typeof DropdownSearch;
     List: typeof DropdownList;
@@ -330,14 +334,20 @@ Dropdown.displayName = 'Dropdown';
 // DropdownTrigger
 // ---------------------------------------------------------------------------
 
+type DropdownRenderContent = {
+    selectedOption?: DropdownOptionData;
+    selectedValue?: string;
+};
+
 type DropdownTriggerProps = {
     placeholder?: React.ReactNode;
-} & PopoverTriggerProps;
+} & PopoverTriggerProps<DropdownRenderContent>;
 
 const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
     ({ placeholder = 'Select option', render, onKeyDown, ...rest }, ref) => {
         const {
             selectedOption,
+            selectedValue,
             isSearchable,
             focusableList,
             searchInputRef,
@@ -350,6 +360,8 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
         } = useDropdownContext();
 
         const { focusFirst, focusLast, focusById } = focusableList;
+
+        const renderContent: DropdownRenderContent = { selectedOption, selectedValue };
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
             const key = e.key;
@@ -420,7 +432,12 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
         };
 
         return render ? (
-            <Popover.Trigger className={triggerClassName} {...triggerProps} render={render} />
+            <Popover.Trigger
+                className={triggerClassName}
+                {...triggerProps}
+                renderContent={renderContent}
+                render={render}
+            />
         ) : (
             <Popover.Trigger className={triggerClassName} {...triggerProps}>
                 {selectedOption?.children ?? (
@@ -436,6 +453,56 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
 DropdownTrigger.displayName = 'DropdownTrigger';
 
 Dropdown.Trigger = DropdownTrigger;
+
+// ---------------------------------------------------------------------------
+// DropdownFieldTrigger
+// ---------------------------------------------------------------------------
+
+type DropdownFieldTriggerProps = DropdownTriggerProps & SharedFieldRootProps;
+
+const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
+    ({ start, end, actions, controls, children, ...rest }, ref) => {
+        return (
+            <DropdownTrigger
+                ref={ref}
+                {...rest}
+                render={({ content, triggerProps, ...rest }) => {
+                    const { selectedOption, selectedValue } = content;
+
+                    const { ref: triggerRef, ...restTriggerProps } = triggerProps;
+                    return (
+                        <FieldRoot
+                            focusVisibleOnly
+                            start={start}
+                            end={end}
+                            actions={actions}
+                            controls={
+                                <>
+                                    {controls}
+                                    <TriangleDownIcon />
+                                </>
+                            }
+                        >
+                            <Box
+                                ref={triggerRef as React.Ref<HTMLButtonElement>}
+                                as="button"
+                                type="button"
+                                className={classPrefix('--field')}
+                                {...restTriggerProps}
+                            >
+                                {selectedValue ?? 'Select ...'}
+                            </Box>
+                        </FieldRoot>
+                    );
+                }}
+            />
+        );
+    },
+);
+
+DropdownFieldTrigger.displayName = 'DropdownFieldTrigger';
+
+Dropdown.FieldTrigger = DropdownFieldTrigger;
 
 // ---------------------------------------------------------------------------
 // DropdownContent

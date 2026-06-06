@@ -106,6 +106,7 @@ type TriggerRenderProps = {
     opened: boolean;
     triggerClassName: string;
     triggerProps: PopoverTriggerElementProps;
+    content?: any;
     // focusedVisible: boolean;
     // pressed: boolean;
 };
@@ -116,12 +117,13 @@ type TriggerRenderProps = {
 //     chevron?: boolean;
 //     render?: (props: TriggerRenderProps) => React.ReactNode;
 // };
-type PopoverTriggerProps = React.HTMLAttributes<HTMLElement> & {
+type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
     className?: string;
     children?: React.ReactNode;
     chevron?: boolean;
     render?: (props: TriggerRenderProps) => React.ReactNode;
     btnProps?: ButtonProps;
+    renderContent?: T;
 };
 
 type PopoverPanelProps = {
@@ -284,7 +286,17 @@ Popover.displayName = 'Popover';
 
 const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
     (
-        { children, className, chevron = false, render, btnProps, onClick, onKeyDown, ...rest },
+        {
+            children,
+            className,
+            chevron = false,
+            render,
+            btnProps,
+            onClick,
+            onKeyDown,
+            renderContent,
+            ...rest
+        },
         ref,
     ) => {
         const {
@@ -345,6 +357,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 opened,
                 triggerClassName,
                 triggerProps,
+                content: renderContent,
             });
         }
 
