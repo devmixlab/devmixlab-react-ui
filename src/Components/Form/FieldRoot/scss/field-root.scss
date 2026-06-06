@@ -134,6 +134,7 @@
 
     &[data-active] {
         border-color: var(--fr-border-hover);
+        box-shadow: 0 0 0 3px var(--fr-focus-ring);
     }
 
 

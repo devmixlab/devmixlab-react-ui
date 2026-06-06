@@ -17,9 +17,10 @@ import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
 import { mergeRefs } from '../../../utils/mergeRefs';
-import { FieldRoot, SharedFieldRootProps } from '../FieldRoot';
+import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } from '../FieldRoot';
 import { TriangleDown as TriangleDownIcon } from '../../../Icon';
 import { PopoverTriggerElementProps } from '../../Popover/Popover';
+import { splitProps } from '../../../utils/splitProps';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -458,10 +459,32 @@ Dropdown.Trigger = DropdownTrigger;
 // DropdownFieldTrigger
 // ---------------------------------------------------------------------------
 
-type DropdownFieldTriggerProps = DropdownTriggerProps & SharedFieldRootProps;
+type DropdownFieldTriggerProps = DropdownTriggerProps & FieldLayoutProps & SharedFieldRootProps;
 
 const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
-    ({ start, end, actions, controls, children, ...rest }, ref) => {
+    ({ controls, children, ...rest }, ref) => {
+        const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
+
+        const {
+            // setOpened,
+            opened,
+        } = useDropdownContext();
+
+        const [triggerActive, setTriggerActive] = useState(true);
+
+        useEffect(() => {
+            if (opened) {
+                setTriggerActive(true);
+                return;
+            }
+
+            const timeout = setTimeout(() => {
+                setTriggerActive(false);
+            }, 300);
+
+            return () => clearTimeout(timeout);
+        }, [opened]);
+
         return (
             <DropdownTrigger
                 ref={ref}
@@ -473,23 +496,21 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                     return (
                         <FieldRoot
                             focusVisibleOnly
-                            start={start}
-                            end={end}
-                            actions={actions}
-                            active={(!disabled && opened) || undefined}
-                            variant="ghost"
+                            active={(!disabled && (opened || triggerActive)) || undefined}
                             controls={
                                 <>
                                     {controls}
                                     <TriangleDownIcon />
                                 </>
                             }
+                            {...fieldRootProps}
                         >
                             <Box
                                 ref={triggerRef as React.Ref<HTMLButtonElement>}
                                 as="button"
                                 type="button"
                                 className={classPrefix('--field')}
+                                {...controlProps}
                                 {...restTriggerProps}
                             >
                                 {selectedValue ?? 'Select ...'}
