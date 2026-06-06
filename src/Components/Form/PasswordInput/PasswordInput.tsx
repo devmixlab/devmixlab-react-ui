@@ -1,13 +1,10 @@
 import React, { forwardRef, useState } from 'react';
-import { TextInput, type TextInputProps } from '../TextInput/TextInput';
-// import { prefix } from './input.helpers';
+import { TextInput, type TextInputProps } from '../TextInput';
 import { useFormFieldContext } from '../FormField/FormField.context';
-import { Eye } from '../../../Icon/Eye';
-import { EyeOff } from '../../../Icon/EyeOff';
-import { CLASS_PREFIX } from '../../../constants';
+import { Eye, EyeOff } from '../../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 
-export type PasswordInputProps = Omit<TextInputProps, 'type'> & {
+type PasswordInputProps = Omit<TextInputProps, 'type'> & {
     showToggle?: boolean;
 };
 
@@ -25,7 +22,6 @@ const ToggleButton = ({ toggle, visible, id }: ToggleButtonProps) => (
         aria-label={visible ? 'Hide password' : 'Show password'}
         aria-pressed={visible}
         aria-controls={id ?? undefined}
-        // tabIndex={-1} // prevent stealing focus
         className={classPrefix('--toggle-button')}
     >
         <span aria-hidden="true">{visible ? <EyeOff /> : <Eye />}</span>
@@ -65,3 +61,5 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 PasswordInput.displayName = 'PasswordInput';
 
 export { PasswordInput };
+
+export type { PasswordInputProps };
