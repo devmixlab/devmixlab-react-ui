@@ -18,7 +18,7 @@ import {
     findCursorFromDigits,
 } from './NumberInput.helpers';
 
-type NumberInputProps = Omit<TextInputProps, 'type'> & {
+type NumberInputProps = Omit<TextInputProps, 'type' | 'prefix' | 'suffix'> & {
     unit?: string;
     prefix?: React.ReactNode;
     suffix?: React.ReactNode;
