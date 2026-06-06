@@ -14,6 +14,7 @@ const shareFieldRootPropKeys = defineExactKeys<SharedFieldRootProps>()([
     'disabled',
     'readOnly',
     'invalid',
+    'active',
 ]);
 
 const fieldLayoutPropKeys = [

@@ -43,7 +43,8 @@
 
     // background
     --fr-bg: transparent;
-    --fr-bg-hover: #{intent('gray', 50)};
+    --fr-bg-hover: #{intent('gray', 100)};
+    --fr-bg-active: #{intent('gray',50)};
 
     // border
     --fr-border: #{intent('gray', 300)};
@@ -77,6 +78,7 @@
 
         // background
         --fr-bg-hover: #{intent('gray', 800)};
+        --fr-bg-active: #{intent('gray',900)};
 
         // border
         --fr-border: #{intent('gray', 700)};
@@ -128,6 +130,10 @@
     &:hover:not([data-disabled]):not([data-readonly]) {
         border-color: var(--fr-border-hover);
         background: var(--fr-bg-hover);
+    }
+
+    &[data-active] {
+        border-color: var(--fr-border-hover);
     }
 
 
@@ -306,6 +312,10 @@
 
     &[data-variant='ghost'] {
         --fr-bg: transparent;
+
+        &[data-active] {
+            background: var(--fr-bg-active);
+        }
 
         &:not([data-invalid]) {
             --fr-border: transparent;

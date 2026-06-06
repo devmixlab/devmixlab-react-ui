@@ -21,6 +21,7 @@ type SharedFieldRootProps = {
     disabled?: boolean;
     readOnly?: boolean;
     invalid?: boolean;
+    active?: boolean;
 };
 
 const shareFieldRootProps = defineExactKeys<SharedFieldRootProps>()([
@@ -35,6 +36,7 @@ const shareFieldRootProps = defineExactKeys<SharedFieldRootProps>()([
     'disabled',
     'readOnly',
     'invalid',
+    'active',
 ]);
 
 type OwnFieldRootProps = {
@@ -73,6 +75,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
             onClick,
 
             focusVisibleOnly = false,
+            active,
 
             ...rest
         },
@@ -167,6 +170,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 data-readonly={readOnly || undefined}
                 data-size={size}
                 data-focus-visible-only={focusVisibleOnly || undefined}
+                data-active={active || undefined}
                 {...(variant ? { ['data-variant']: variant } : {})}
                 onClick={handleClick}
                 onMouseDown={handleMouseDown}

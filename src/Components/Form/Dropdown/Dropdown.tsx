@@ -466,7 +466,7 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
             <DropdownTrigger
                 ref={ref}
                 {...rest}
-                render={({ content, triggerProps, ...rest }) => {
+                render={({ content, triggerProps, opened, disabled, ...rest }) => {
                     const { selectedOption, selectedValue } = content;
 
                     const { ref: triggerRef, ...restTriggerProps } = triggerProps;
@@ -476,6 +476,8 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                             start={start}
                             end={end}
                             actions={actions}
+                            active={(!disabled && opened) || undefined}
+                            variant="ghost"
                             controls={
                                 <>
                                     {controls}
