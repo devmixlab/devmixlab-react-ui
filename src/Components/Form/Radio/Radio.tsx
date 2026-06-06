@@ -32,6 +32,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
             className,
             size,
             disabled,
+            readOnly,
             children,
             description,
             labelPosition = 'right',
@@ -48,6 +49,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 
         const group = useRadioGroup();
 
+        const isReadOnly = readOnly || group?.readOnly;
+
         // if (!group) {
         //     console.warn('Radio should be used inside RadioGroup for proper behavior');
         // }
@@ -63,6 +66,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
         const labelId = children ? `${id}-label` : undefined;
 
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (isReadOnly) return;
+
             if (group) group.onValueChange?.(value);
             onChange?.(e);
         };
@@ -88,6 +93,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                 className={clsx(prefix(), className)}
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={isDisabled || undefined}
+                data-readonly={isReadOnly || undefined}
                 data-size={finalSize}
                 data-intent={intent}
                 data-variant={variant}
@@ -102,6 +108,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                     value={value}
                     {...rest}
                     {...(group ? { checked: isChecked } : {})}
+                    readOnly={isReadOnly}
+                    aria-readonly={isReadOnly || undefined}
                     onChange={handleChange}
                     ref={combinedRef}
                     disabled={isDisabled}

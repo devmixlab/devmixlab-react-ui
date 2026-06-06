@@ -170,9 +170,6 @@
             &[data-variant='outlined'] {
                 @include outlined($intent);
             }
-            &[data-variant='soft'] {
-                @include soft($intent);
-            }
             &[data-variant='filled'] {
                 @include filled($intent);
             }
@@ -188,9 +185,6 @@
                 }
                 &[data-variant='outlined'] {
                     @include outlined($intent, 'dark');
-                }
-                &[data-variant='soft'] {
-                    @include soft($intent, 'dark');
                 }
                 &[data-variant='filled'] {
                     @include filled($intent, 'dark');

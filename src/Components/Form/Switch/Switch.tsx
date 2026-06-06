@@ -125,6 +125,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 data-state={isChecked ? 'checked' : 'unchecked'}
                 data-disabled={isDisabled || undefined}
                 data-readonly={isReadOnly || undefined}
+                onClick={isReadOnly ? (e) => e.preventDefault() : undefined}
                 data-size={size}
                 data-testid="switch"
                 data-name={name}

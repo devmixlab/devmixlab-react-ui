@@ -13,42 +13,6 @@
     font-size: map.get($conf, font-size);
 }
 
-@mixin solid ($intent, $mode: 'light') {
-    @if ($mode == 'light') {
-        --switch-ring: #{intent($intent, 500)};
-        --switch-track-bg-checked: #{intent($intent, 500)};
-
-        --switch-track-bg: #{intent('gray', 300)};
-        --switch-thumb-bg: #{intent('gray', 0)};
-
-        --switch-track-bg-disabled: #{intent('gray', 100)};
-        --switch-thumb-bg-disabled: #{intent('gray', 200)};
-        --switch-track-border-disabled: #{intent('gray', 200)};
-    } @else {
-        $is-dark-intent: list.index($dark-intents, $intent) != null;
-
-        --switch-ring: #{intent($intent, 400)};
-
-        --switch-track-bg: #{intent('gray', 600)};
-        --switch-thumb-bg: #{intent('gray', 100)};
-
-        --switch-track-bg-disabled: #{intent(gray, 700)};
-        --switch-track-border-disabled: #{intent(gray, 600)};
-        --switch-thumb-bg-disabled: #{intent(gray, 600)};
-
-        // keep thumb white for colored intents
-        @if $is-dark-intent {
-            --switch-track-bg-checked: #{intent($intent, 300)};
-            --switch-thumb-bg-checked: #{intent($intent, 600)};
-        } @else {
-            --switch-track-bg-checked: #{intent($intent, 400)};
-        }
-    }
-
-    --switch-track-border: var(--switch-track-bg);
-    --switch-track-border-checked: var(--switch-track-bg-checked);
-}
-
 @mixin outlined($intent, $mode: 'light') {
     --switch-track-bg: transparent;
     --switch-track-bg-disabled: transparent;
@@ -57,10 +21,13 @@
 
     @if ($mode == 'light') {
         --switch-ring: #{intent($intent, 500)};
+
         --switch-track-border: #{intent(gray, 300)};
         --switch-track-border-checked: #{intent($intent, 300)};
-        --switch-thumb-bg-checked: #{intent($intent, 500)};
+
         --switch-thumb-bg: #{intent(gray, 350)};
+        --switch-thumb-bg-checked: #{intent($intent, 500)};
+
         --switch-track-bg-checked: #{intent($intent, 50)};
 
         --switch-track-border-disabled: #{intent(gray, 200)};
@@ -68,14 +35,11 @@
     } @else {
         $is-dark-intent: list.index($dark-intents, $intent) != null;
 
-        --switch-track-border: #{intent(gray, 600)};
         --switch-ring: #{intent($intent, 400)};
+
+        --switch-track-border: #{intent(gray, 600)};
         --switch-thumb-bg: #{intent(gray, 400)};
 
-        --switch-track-border-disabled: #{intent(gray, 600)};
-        --switch-thumb-bg-disabled: #{intent(gray, 600)};
-
-        //--switch-track-bg-checked: transparent;
         --switch-track-bg-checked: #{intent($intent, 950)};
 
         @if $is-dark-intent {
@@ -85,58 +49,215 @@
             --switch-track-border-checked: #{intent($intent, 400)};
             --switch-thumb-bg-checked: #{intent($intent, 400)};
         }
+
+        --switch-track-border-disabled: #{intent(gray, 600)};
+        --switch-thumb-bg-disabled: #{intent(gray, 600)};
     }
 }
 
-@mixin soft($intent, $mode: 'light') {
-    @if ($mode == 'light') {
+@mixin ghost($intent, $mode: 'light') {
+    --switch-track-border: transparent;
+
+    @if $mode == 'light' {
         --switch-ring: #{intent($intent, 500)};
 
         --switch-track-bg: #{intent(gray, 100)};
-        --switch-thumb-bg: #{intent(gray, 400)};
+        --switch-thumb-bg: #{intent(gray, 500)};
 
-        --switch-track-bg-checked: #{intent($intent, 100)};
+        --switch-track-bg-checked: #{intent($intent, 50)};
+        --switch-track-border-checked: transparent;
         --switch-thumb-bg-checked: #{intent($intent, 500)};
 
-        --switch-track-border: transparent;
-        --switch-track-border-checked: transparent;
-
         --switch-track-bg-disabled: #{intent(gray, 100)};
-        --switch-thumb-bg-disabled: #{intent(gray, 200)};
         --switch-track-border-disabled: transparent;
+        --switch-thumb-bg-disabled: #{intent(gray, 300)};
     } @else {
         $is-dark-intent: list.index($dark-intents, $intent) != null;
 
         --switch-ring: #{intent($intent, 400)};
 
         --switch-track-bg: #{intent(gray, 800)};
-        --switch-thumb-bg: #{intent(gray, 400)};
+        --switch-thumb-bg: #{intent(gray, 500)};
 
         @if $is-dark-intent {
-            --switch-track-bg-checked: #{intent($intent, 800)};
+            --switch-track-bg-checked: #{intent($intent, 900)};
             --switch-thumb-bg-checked: #{intent($intent, 300)};
         } @else {
             --switch-track-bg-checked: #{intent($intent, 950)};
             --switch-thumb-bg-checked: #{intent($intent, 400)};
         }
 
-        --switch-track-border: transparent;
         --switch-track-border-checked: transparent;
 
         --switch-track-bg-disabled: #{intent(gray, 800)};
+        --switch-track-border-disabled: transparent;
+        --switch-thumb-bg-disabled: #{intent(gray, 700)};
+    }
+}
+
+@mixin filled($intent, $mode: 'light') {
+    --switch-track-border: transparent;
+    --switch-track-border-checked: transparent;
+
+    @if $mode == 'light' {
+        --switch-ring: #{intent($intent, 500)};
+
+        --switch-track-bg: #{intent($intent, 100)};
+        --switch-thumb-bg: #{intent($intent, 600)};
+
+        --switch-track-bg-checked: #{intent($intent, 600)};
+        --switch-thumb-bg-checked: #{intent($intent, 100)};
+
+        --switch-track-bg-disabled: #{intent(gray, 100)};
+        --switch-thumb-bg-disabled: #{intent(gray, 300)};
+        --switch-track-border-disabled: transparent;
+    } @else {
+        $is-dark-intent: list.index($dark-intents, $intent) != null;
+
+        --switch-ring: #{intent($intent, 400)};
+
+        @if $is-dark-intent {
+            --switch-track-bg: #{intent($intent, 800)};
+            --switch-thumb-bg: #{intent($intent, 300)};
+
+            --switch-track-bg-checked: #{intent($intent, 300)};
+            --switch-thumb-bg-checked: #{intent($intent, 800)};
+        } @else {
+            --switch-track-bg: #{intent($intent, 900)};
+            --switch-thumb-bg: #{intent($intent, 300)};
+
+            --switch-track-bg-checked: #{intent($intent, 400)};
+            --switch-thumb-bg-checked: #{intent($intent, 900)};
+        }
+
+        --switch-track-bg-disabled: #{intent(gray, 700)};
         --switch-thumb-bg-disabled: #{intent(gray, 600)};
         --switch-track-border-disabled: transparent;
     }
 }
 
-//@mixin filled($intent, $mode: 'light') {
+@mixin solid($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --switch-ring: #{intent($intent, 500)};
+
+        --switch-track-bg: #{intent(gray, 300)};
+        --switch-thumb-bg: #{intent(gray, 0)};
+
+        --switch-track-bg-checked: #{intent($intent, 500)};
+        --switch-thumb-bg-checked: white;
+
+        --switch-track-bg-disabled: #{intent(gray, 100)};
+        --switch-thumb-bg-disabled: #{intent(gray, 200)};
+        --switch-track-border-disabled: #{intent(gray, 200)};
+    } @else {
+        $is-dark-intent: list.index($dark-intents, $intent) != null;
+
+        --switch-ring: #{intent($intent, 400)};
+
+        --switch-track-bg: #{intent(gray, 600)};
+        --switch-thumb-bg: #{intent(gray, 100)};
+
+        @if $is-dark-intent {
+            --switch-track-bg-checked: #{intent($intent, 300)};
+            --switch-thumb-bg-checked: #{intent($intent, 700)};
+        } @else {
+            --switch-track-bg-checked: #{intent($intent, 400)};
+            --switch-thumb-bg-checked: #{intent($intent, 950)};
+        }
+
+        --switch-track-bg-disabled: #{intent(gray, 700)};
+        --switch-track-border-disabled: #{intent(gray, 600)};
+        --switch-thumb-bg-disabled: #{intent(gray, 600)};
+    }
+
+    --switch-track-border: var(--switch-track-bg);
+    --switch-track-border-checked: var(--switch-track-bg-checked);
+}
+
+//@mixin solid ($intent, $mode: 'light') {
+//    @if ($mode == 'light') {
+//        --switch-ring: #{intent($intent, 500)};
+//        --switch-track-bg-checked: #{intent($intent, 500)};
+//
+//        --switch-track-bg: #{intent('gray', 300)};
+//        --switch-thumb-bg: #{intent('gray', 0)};
+//
+//        --switch-track-bg-disabled: #{intent('gray', 100)};
+//        --switch-thumb-bg-disabled: #{intent('gray', 200)};
+//        --switch-track-border-disabled: #{intent('gray', 200)};
+//    } @else {
+//        $is-dark-intent: list.index($dark-intents, $intent) != null;
+//
+//        --switch-ring: #{intent($intent, 400)};
+//
+//        --switch-track-bg: #{intent('gray', 600)};
+//        --switch-thumb-bg: #{intent('gray', 100)};
+//
+//        --switch-track-bg-disabled: #{intent(gray, 700)};
+//        --switch-track-border-disabled: #{intent(gray, 600)};
+//        --switch-thumb-bg-disabled: #{intent(gray, 600)};
+//
+//        // keep thumb white for colored intents
+//        @if $is-dark-intent {
+//            --switch-track-bg-checked: #{intent($intent, 300)};
+//            --switch-thumb-bg-checked: #{intent($intent, 600)};
+//        } @else {
+//            --switch-track-bg-checked: #{intent($intent, 400)};
+//        }
+//    }
+//
+//    --switch-track-border: var(--switch-track-bg);
+//    --switch-track-border-checked: var(--switch-track-bg-checked);
+//}
+//
+//@mixin outlined($intent, $mode: 'light') {
+//    --switch-track-bg: transparent;
+//    --switch-track-bg-disabled: transparent;
+//
+//    --switch-thumb-offset: -0.05em;
+//
+//    @if ($mode == 'light') {
+//        --switch-ring: #{intent($intent, 500)};
+//        --switch-track-border: #{intent(gray, 300)};
+//        --switch-track-border-checked: #{intent($intent, 300)};
+//        --switch-thumb-bg-checked: #{intent($intent, 500)};
+//        --switch-thumb-bg: #{intent(gray, 350)};
+//        --switch-track-bg-checked: #{intent($intent, 50)};
+//
+//        --switch-track-border-disabled: #{intent(gray, 200)};
+//        --switch-thumb-bg-disabled: #{intent(gray, 200)};
+//    } @else {
+//        $is-dark-intent: list.index($dark-intents, $intent) != null;
+//
+//        --switch-track-border: #{intent(gray, 600)};
+//        --switch-ring: #{intent($intent, 400)};
+//        --switch-thumb-bg: #{intent(gray, 400)};
+//
+//        --switch-track-border-disabled: #{intent(gray, 600)};
+//        --switch-thumb-bg-disabled: #{intent(gray, 600)};
+//
+//        //--switch-track-bg-checked: transparent;
+//        --switch-track-bg-checked: #{intent($intent, 950)};
+//
+//        @if $is-dark-intent {
+//            --switch-track-border-checked: #{intent($intent, 300)};
+//            --switch-thumb-bg-checked: #{intent($intent, 300)};
+//        } @else {
+//            --switch-track-border-checked: #{intent($intent, 400)};
+//            --switch-thumb-bg-checked: #{intent($intent, 400)};
+//        }
+//    }
+//}
+//
+//@mixin soft($intent, $mode: 'light') {
 //    @if ($mode == 'light') {
 //        --switch-ring: #{intent($intent, 500)};
 //
-//        --switch-track-bg: #{intent($intent, 200)};
-//        --switch-track-bg-checked: #{intent($intent, 500)};
+//        --switch-track-bg: #{intent(gray, 100)};
+//        --switch-thumb-bg: #{intent(gray, 400)};
 //
-//        --switch-thumb-bg: #{intent(gray, 0)};
+//        --switch-track-bg-checked: #{intent($intent, 100)};
+//        --switch-thumb-bg-checked: #{intent($intent, 500)};
 //
 //        --switch-track-border: transparent;
 //        --switch-track-border-checked: transparent;
@@ -149,118 +270,116 @@
 //
 //        --switch-ring: #{intent($intent, 400)};
 //
+//        --switch-track-bg: #{intent(gray, 800)};
+//        --switch-thumb-bg: #{intent(gray, 400)};
+//
 //        @if $is-dark-intent {
-//            --switch-track-bg: #{intent($intent, 800)};
-//            --switch-track-bg-checked: #{intent($intent, 400)};
-//
-//            --switch-thumb-bg: #{intent($intent, 300)};
-//            --switch-thumb-bg-checked: #{intent($intent, 700)};
+//            --switch-track-bg-checked: #{intent($intent, 800)};
+//            --switch-thumb-bg-checked: #{intent($intent, 300)};
 //        } @else {
-//            --switch-track-bg: #{intent($intent, 950)};
-//            --switch-track-bg-checked: #{intent($intent, 400)};
-//
-//            --switch-thumb-bg: #{intent($intent, 400)};
+//            --switch-track-bg-checked: #{intent($intent, 950)};
+//            --switch-thumb-bg-checked: #{intent($intent, 400)};
 //        }
 //
 //        --switch-track-border: transparent;
 //        --switch-track-border-checked: transparent;
 //
+//        --switch-track-bg-disabled: #{intent(gray, 800)};
+//        --switch-thumb-bg-disabled: #{intent(gray, 600)};
+//        --switch-track-border-disabled: transparent;
+//    }
+//}
+//
+//@mixin filled($intent, $mode: 'light') {
+//    --switch-track-border: transparent;
+//    --switch-track-border-checked: transparent;
+//
+//    @if $mode == 'light' {
+//        --switch-ring: #{intent($intent, 500)};
+//
+//        // OFF
+//        --switch-track-bg: #{intent($intent, 100)};
+//        --switch-thumb-bg: #{intent($intent, 600)};
+//
+//        // ON
+//        --switch-track-bg-checked: #{intent($intent, 600)};
+//        --switch-thumb-bg-checked: #{intent($intent, 100)};
+//
+//        // DISABLED
+//        --switch-track-bg-disabled: #{intent(gray, 100)};
+//        --switch-thumb-bg-disabled: #{intent(gray, 300)};
+//        --switch-track-border-disabled: transparent;
+//    } @else {
+//        $is-dark-intent: list.index($dark-intents, $intent) != null;
+//
+//        --switch-ring: #{intent($intent, 400)};
+//
+//        @if $is-dark-intent {
+//            // OFF
+//            --switch-track-bg: #{intent($intent, 900)};
+//            --switch-thumb-bg: #{intent($intent, 300)};
+//
+//            // ON
+//            --switch-track-bg-checked: #{intent($intent, 300)};
+//            --switch-thumb-bg-checked: #{intent($intent, 900)};
+//        } @else {
+//            // OFF
+//            --switch-track-bg: #{intent($intent, 950)};
+//            --switch-thumb-bg: #{intent($intent, 300)};
+//
+//            // ON
+//            --switch-track-bg-checked: #{intent($intent, 400)};
+//            --switch-thumb-bg-checked: #{intent($intent, 950)};
+//        }
+//
+//        // DISABLED
 //        --switch-track-bg-disabled: #{intent(gray, 700)};
 //        --switch-thumb-bg-disabled: #{intent(gray, 600)};
 //        --switch-track-border-disabled: transparent;
 //    }
 //}
-
-@mixin filled($intent, $mode: 'light') {
-    --switch-track-border: transparent;
-    --switch-track-border-checked: transparent;
-
-    @if $mode == 'light' {
-        --switch-ring: #{intent($intent, 500)};
-
-        // OFF
-        --switch-track-bg: #{intent($intent, 100)};
-        --switch-thumb-bg: #{intent($intent, 600)};
-
-        // ON
-        --switch-track-bg-checked: #{intent($intent, 600)};
-        --switch-thumb-bg-checked: #{intent($intent, 100)};
-
-        // DISABLED
-        --switch-track-bg-disabled: #{intent(gray, 100)};
-        --switch-thumb-bg-disabled: #{intent(gray, 300)};
-        --switch-track-border-disabled: transparent;
-    } @else {
-        $is-dark-intent: list.index($dark-intents, $intent) != null;
-
-        --switch-ring: #{intent($intent, 400)};
-
-        @if $is-dark-intent {
-            // OFF
-            --switch-track-bg: #{intent($intent, 900)};
-            --switch-thumb-bg: #{intent($intent, 300)};
-
-            // ON
-            --switch-track-bg-checked: #{intent($intent, 300)};
-            --switch-thumb-bg-checked: #{intent($intent, 900)};
-        } @else {
-            // OFF
-            --switch-track-bg: #{intent($intent, 950)};
-            --switch-thumb-bg: #{intent($intent, 300)};
-
-            // ON
-            --switch-track-bg-checked: #{intent($intent, 400)};
-            --switch-thumb-bg-checked: #{intent($intent, 950)};
-        }
-
-        // DISABLED
-        --switch-track-bg-disabled: #{intent(gray, 700)};
-        --switch-thumb-bg-disabled: #{intent(gray, 600)};
-        --switch-track-border-disabled: transparent;
-    }
-}
-
-@mixin ghost($intent, $mode: 'light') {
-    --switch-track-border: transparent;
-
-    @if $mode == 'light' {
-        --switch-ring: #{intent($intent, 500)};
-
-        // OFF
-        --switch-track-bg: #{intent(gray, 100)};
-        --switch-thumb-bg: #{intent(gray, 500)};
-
-        // ON
-        --switch-track-bg-checked: #{intent($intent, 50)};
-        --switch-track-border-checked: #{intent($intent, 200)};
-        --switch-thumb-bg-checked: #{intent($intent, 500)};
-
-        // DISABLED
-        --switch-track-bg-disabled: #{intent(gray, 100)};
-        --switch-track-border-disabled: transparent;
-        --switch-thumb-bg-disabled: #{intent(gray, 300)};
-    } @else {
-        $is-dark-intent: list.index($dark-intents, $intent) != null;
-
-        --switch-ring: #{intent($intent, 400)};
-
-        // OFF
-        --switch-track-bg: #{intent(gray, 800)};
-        --switch-thumb-bg: #{intent(gray, 500)};
-
-        @if $is-dark-intent {
-            --switch-track-bg-checked: #{intent($intent, 900)};
-            --switch-track-border-checked: #{intent($intent, 700)};
-            --switch-thumb-bg-checked: #{intent($intent, 300)};
-        } @else {
-            --switch-track-bg-checked: #{intent($intent, 950)};
-            --switch-track-border-checked: #{intent($intent, 800)};
-            --switch-thumb-bg-checked: #{intent($intent, 400)};
-        }
-
-        // DISABLED
-        --switch-track-bg-disabled: #{intent(gray, 800)};
-        --switch-track-border-disabled: transparent;
-        --switch-thumb-bg-disabled: #{intent(gray, 700)};
-    }
-}
+//
+//@mixin ghost($intent, $mode: 'light') {
+//    --switch-track-border: transparent;
+//
+//    @if $mode == 'light' {
+//        --switch-ring: #{intent($intent, 500)};
+//
+//        // OFF
+//        --switch-track-bg: #{intent(gray, 100)};
+//        --switch-thumb-bg: #{intent(gray, 500)};
+//
+//        // ON
+//        --switch-track-bg-checked: #{intent($intent, 50)};
+//        --switch-track-border-checked: #{intent($intent, 200)};
+//        --switch-thumb-bg-checked: #{intent($intent, 500)};
+//
+//        // DISABLED
+//        --switch-track-bg-disabled: #{intent(gray, 100)};
+//        --switch-track-border-disabled: transparent;
+//        --switch-thumb-bg-disabled: #{intent(gray, 300)};
+//    } @else {
+//        $is-dark-intent: list.index($dark-intents, $intent) != null;
+//
+//        --switch-ring: #{intent($intent, 400)};
+//
+//        // OFF
+//        --switch-track-bg: #{intent(gray, 800)};
+//        --switch-thumb-bg: #{intent(gray, 500)};
+//
+//        @if $is-dark-intent {
+//            --switch-track-bg-checked: #{intent($intent, 900)};
+//            --switch-track-border-checked: #{intent($intent, 700)};
+//            --switch-thumb-bg-checked: #{intent($intent, 300)};
+//        } @else {
+//            --switch-track-bg-checked: #{intent($intent, 950)};
+//            --switch-track-border-checked: #{intent($intent, 800)};
+//            --switch-thumb-bg-checked: #{intent($intent, 400)};
+//        }
+//
+//        // DISABLED
+//        --switch-track-bg-disabled: #{intent(gray, 800)};
+//        --switch-track-border-disabled: transparent;
+//        --switch-thumb-bg-disabled: #{intent(gray, 700)};
+//    }
+//}

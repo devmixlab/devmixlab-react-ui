@@ -183,12 +183,30 @@
             &[data-variant='solid']{
                 @include solid($intent);
             }
+            &[data-variant='outlined']{
+                @include outlined($intent);
+            }
+            &[data-variant='filled']{
+                @include filled($intent);
+            }
+            &[data-variant='ghost']{
+                @include ghost($intent);
+            }
         }
 
         @include dark {
             &[data-intent='#{$intent}'] {
                 &[data-variant='solid']{
                     @include solid($intent, 'dark');
+                }
+                &[data-variant='outlined']{
+                    @include outlined($intent, 'dark');
+                }
+                &[data-variant='filled']{
+                    @include filled($intent, 'dark');
+                }
+                &[data-variant='ghost']{
+                    @include ghost($intent, 'dark');
                 }
             }
         }

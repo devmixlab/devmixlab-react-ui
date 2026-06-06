@@ -10,20 +10,20 @@
     font-size: #{map.get($conf, font-size)};
 }
 
-@mixin outline ($intent, $mode: 'light') {
+@mixin outlined($intent, $mode: 'light') {
     --radio-control-border-disabled: var(--#{$p}-surface-disabled);
     --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
 
     @if ($mode == 'light') {
         --radio-control-border: #{intent(gray, 400)};
-        --radio-control-bg: #{intent(gray, 100)};
+        --radio-control-bg: transparent;
         --radio-ring: #{intent($intent, 500)};
 
         --radio-indicator-bg: #{intent($intent, 500)};
         --radio-control-border-checked: #{intent($intent, 500)};
     } @else {
         --radio-control-border: #{intent(gray, 600)};
-        --radio-control-bg: #{intent(gray, 900)};
+        --radio-control-bg: transparent;
         --radio-ring: #{intent($intent, 400)};
 
         --radio-indicator-bg: #{intent($intent, 400)};
@@ -31,37 +31,103 @@
     }
 }
 
-@mixin solid ($intent, $mode: 'light') {
+@mixin ghost($intent, $mode: 'light') {
+    --radio-control-border-disabled: transparent;
+    --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
+
+    @if ($mode == 'light') {
+        --radio-control-bg: #{intent($intent, 50)};
+        --radio-control-bg-checked: #{intent($intent, 100)}; // NEW
+
+        --radio-control-border: transparent;
+        --radio-ring: #{intent($intent, 500)};
+
+        --radio-indicator-bg: #{intent($intent, 500)};
+        --radio-control-border-checked: transparent;
+    } @else {
+        --radio-control-bg: #{intent($intent, 950)};
+        --radio-control-bg-checked: #{intent($intent, 900)}; // NEW
+
+        --radio-control-border: transparent;
+        --radio-ring: #{intent($intent, 400)};
+
+        --radio-indicator-bg: #{intent($intent, 400)};
+        --radio-control-border-checked: transparent;
+    }
+}
+
+@mixin filled($intent, $mode: 'light') {
     --radio-control-border-disabled: var(--#{$p}-surface-disabled);
     --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
 
-    --radio-indicator: 100%;
-
-    // NEW
-    --radio-control-bg-checked: #{intent($intent, 500)};
-
-    --radio-indicator-scale-checked: .7;
-
     @if ($mode == 'light') {
-        --radio-indicator-bg-checked: #{intent($intent, 100)};
-
-        --radio-control-border: #{intent(gray, 400)};
-        --radio-control-bg: #{intent(gray, 100)};
+        --radio-control-border: #{intent($intent, 300)};
+        --radio-control-bg: #{intent($intent, 100)};
         --radio-ring: #{intent($intent, 500)};
 
         --radio-indicator-bg: #{intent($intent, 500)};
         --radio-control-border-checked: #{intent($intent, 500)};
     } @else {
-        --radio-indicator-bg-checked: #{intent($intent, 900)};
-
-        --radio-control-border: #{intent(gray, 600)};
-        --radio-control-bg: #{intent(gray, 900)};
+        --radio-control-border: #{intent($intent, 600)};
+        --radio-control-bg: #{intent($intent, 900)};
         --radio-ring: #{intent($intent, 400)};
-
-        // NEW
-        --radio-control-bg-checked: #{intent($intent, 400)};
 
         --radio-indicator-bg: #{intent($intent, 400)};
         --radio-control-border-checked: #{intent($intent, 400)};
+    }
+}
+
+//@mixin solid($intent, $mode: 'light') {
+//    --radio-control-border-disabled: var(--#{$p}-surface-disabled);
+//    --radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
+//
+//    --radio-indicator-scale-checked: .7;
+//
+//    @if ($mode == 'light') {
+//        --radio-control-border: #{intent(gray, 400)};
+//        --radio-control-bg: #{intent(gray, 100)};
+//        --radio-ring: #{intent($intent, 500)};
+//
+//        --radio-control-bg-checked: #{intent($intent, 500)};
+//        --radio-indicator-bg-checked: #{intent($intent, 100)};
+//
+//        --radio-indicator-bg: #{intent($intent, 500)};
+//        --radio-control-border-checked: #{intent($intent, 500)};
+//    } @else {
+//        --radio-control-border: #{intent(gray, 600)};
+//        --radio-control-bg: #{intent(gray, 900)};
+//        --radio-ring: #{intent($intent, 400)};
+//
+//        --radio-control-bg-checked: #{intent($intent, 400)};
+//        --radio-indicator-bg-checked: #{intent($intent, 900)};
+//
+//        --radio-indicator-bg: #{intent($intent, 400)};
+//        --radio-control-border-checked: #{intent($intent, 400)};
+//    }
+//}
+
+@mixin solid($intent, $mode: 'light') {
+    --radio-control-border-disabled: var(--#{$p}-surface-disabled);
+    --radio-indicator-bg-disabled: transparent;
+
+    // Hide indicator for solid variant
+    --radio-indicator-scale-checked: 0;
+
+    @if ($mode == 'light') {
+        --radio-control-border: #{intent(gray, 400)};
+        --radio-control-bg: #{intent(gray, 100)};
+
+        --radio-control-border-checked: #{intent($intent, 500)};
+        --radio-control-bg-checked: #{intent($intent, 500)};
+
+        --radio-ring: #{intent($intent, 500)};
+    } @else {
+        --radio-control-border: #{intent(gray, 600)};
+        --radio-control-bg: #{intent(gray, 900)};
+
+        --radio-control-border-checked: #{intent($intent, 400)};
+        --radio-control-bg-checked: #{intent($intent, 400)};
+
+        --radio-ring: #{intent($intent, 400)};
     }
 }
