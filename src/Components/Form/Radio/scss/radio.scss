@@ -11,11 +11,6 @@
     --text-disabled: var(--#{$p}-text-disabled);
     --text-muted: var(--#{$p}-text-muted);
 
-    // Control colors
-    //--radio-control-border: var(--#{$p}-control-border);
-    //--radio-control-bg: var(--#{$p}-control-bg);
-    //--radio-accent: var(--#{$p}-control-accent);
-
     // Shadows
     --radio-shadow: var(--#{$p}-control-shadow);
     --radio-shadow-hover: 0 0 0 3px color-mix(
@@ -30,20 +25,6 @@
         var(--radio-ring) 50%,
         transparent
     );
-
-    // Disabled
-    //--radio-control-border-disabled: var(--#{$p}-surface-disabled);
-    //--radio-indicator-bg-disabled: var(--#{$p}-surface-disabled);
-
-    // Intent colors
-    //--radio-accent-danger: var(--#{$p}-control-accent-danger); // indicator
-    //--radio-border-danger: var(--#{$p}-control-accent-danger-active); // border
-    //--radio-accent-success: var(--#{$p}-control-accent-success);
-    //--radio-border-success: var(--#{$p}-control-accent-success-active);
-    //--radio-accent-warning: var(--#{$p}-control-accent-warning);
-    //--radio-border-warning: var(--#{$p}-control-accent-warning-active);
-    //--radio-accent-info: var(--#{$p}-control-accent-info);
-    //--radio-border-info: var(--#{$p}-control-accent-info-active);
 
     --radio-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
 
@@ -62,8 +43,6 @@
     user-select: none;
     touch-action: manipulation;
     position: relative;
-
-    //--radio-control-scale: 1;
 
     .#{$radio-prefix}__input {
         position: absolute;
@@ -108,7 +87,6 @@
         will-change: transform;
 
         --radio-indicator-scale: 0;
-        //transform: scale(var(--radio-indicator-scale));
         transform: scale(
             calc(
                 var(--radio-indicator-scale) *
