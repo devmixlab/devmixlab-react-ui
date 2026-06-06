@@ -1,31 +1,24 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
-import { TextInput, type TextInputProps } from '../TextInput/TextInput';
-import { renderGroupItem } from '../FieldRoot/FieldRoot';
+import { TextInput, type TextInputProps } from '../TextInput';
+import { renderGroupItem } from '../FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useFormFieldContext } from '../FormField/FormField.context';
-import { ChevronUp } from '../../../Icon/ChevronUp';
-import { ChevronDown } from '../../../Icon/ChevronDown';
+import { ChevronUp, ChevronDown } from '../../../Icon';
 import Decimal from 'decimal.js';
 import clsx from 'clsx';
+import {
+    isAtBound,
+    toDecimal,
+    snapToStep,
+    toNumber,
+    formatWithSeparator,
+    formatDisplay,
+    sanitizeInput,
+    countDigits,
+    findCursorFromDigits,
+} from './NumberInput.helpers';
 
-const isAtBound = (value: Decimal, bound: number | undefined, cmp: 'lte' | 'gte') => {
-    if (bound === undefined) return false;
-    return value[cmp](bound);
-};
-
-const toDecimal = (val: number | string | undefined) => {
-    if (val === '' || val === '-' || val === '.' || val === '-.') {
-        return null;
-    }
-
-    try {
-        return new Decimal(val ?? 0);
-    } catch {
-        return null;
-    }
-};
-
-export type NumberInputProps = Omit<TextInputProps, 'type'> & {
+type NumberInputProps = Omit<TextInputProps, 'type'> & {
     unit?: string;
     prefix?: React.ReactNode;
     suffix?: React.ReactNode;
@@ -41,73 +34,6 @@ export type NumberInputProps = Omit<TextInputProps, 'type'> & {
     min?: number;
     max?: number;
     step?: number;
-};
-
-const snapToStep = (value: Decimal, step: number) => {
-    const s = new Decimal(step);
-
-    return value.div(s).round().mul(s);
-};
-
-const toNumber = (val: number | string | undefined) => {
-    const n = typeof val === 'number' ? val : Number(val);
-    return Number.isFinite(n) ? n : null;
-};
-
-const formatWithSeparator = (val: string) => {
-    if (!val) return val;
-
-    const [int, dec] = val.split('.');
-
-    const formattedInt = int
-        .replace('-', '') // handle negative separately
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-    const sign = int.startsWith('-') ? '-' : '';
-
-    return dec != null ? `${sign}${formattedInt}.${dec}` : `${sign}${formattedInt}`;
-};
-
-const formatDisplay = (d: Decimal, fixed?: number, thousandSeparator?: boolean) => {
-    let str = fixed != null ? d.toFixed(fixed) : d.toString();
-
-    if (thousandSeparator) {
-        str = formatWithSeparator(str);
-    }
-
-    return str;
-};
-
-const sanitizeInput = (val: string) => {
-    if (!val) return val;
-
-    return (
-        val
-            // remove group separators (IMPORTANT: add comma)
-            .replace(/[,\s_]/g, '') // ✅ comma added
-            // remove currency symbols
-            .replace(/[$€£¥]/g, '')
-    );
-};
-
-const countDigits = (str: string) => {
-    return str.replace(/\D/g, '').length;
-};
-
-const findCursorFromDigits = (formatted: string, digitIndex: number) => {
-    let count = 0;
-
-    for (let i = 0; i < formatted.length; i++) {
-        if (/\d/.test(formatted[i])) {
-            count++;
-        }
-
-        if (count >= digitIndex) {
-            return i + 1;
-        }
-    }
-
-    return formatted.length;
 };
 
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
@@ -479,3 +405,5 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 NumberInput.displayName = 'NumberInput';
 
 export { NumberInput };
+
+export type { NumberInputProps };
