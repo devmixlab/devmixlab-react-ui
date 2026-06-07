@@ -25,6 +25,13 @@ $checkbox-sizes: (
     )
 );
 
+@mixin applySize($conf) {
+    --checkbox-size: #{map.get($conf, size)};
+    --checkbox-icon-size: #{map.get($conf, icon)};
+    --checkbox-stroke: #{map.get($conf, stroke)};
+    --checkbox-gap: #{map.get($conf, gap)};
+}
+
 @mixin checkbox-size($size) {
     $conf: map.get($checkbox-sizes, $size);
 
