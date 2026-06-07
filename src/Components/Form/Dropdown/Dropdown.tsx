@@ -22,6 +22,7 @@ import { TriangleDown as TriangleDownIcon, ChevronDown as ChevronDownIcon } from
 import { PopoverTriggerElementProps } from '../../Popover/Popover';
 import { splitProps } from '../../../utils/splitProps';
 import { capitalize } from '../../../utils/capitalize';
+import { focusRelativeToElement } from '../../../utils/focusRelativeToElement';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -196,6 +197,12 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             optionRefs.current.get(optionFocused)?.scrollIntoView({ block: 'nearest' });
         }, [optionFocused]);
 
+        // useEffect(() => {
+        //     if (!opened && !modal) {
+        //         focusRelativeToElement(triggerRef.current, 1);
+        //     }
+        // }, [opened]);
+
         // ------------------------------------------------------------------
         // Typeahead
         // ------------------------------------------------------------------
@@ -212,6 +219,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const readyCallbacksRef = useRef<Array<() => void>>([]);
         const searchInputRef = useRef<HTMLInputElement>(null);
         const triggerRef = useRef<HTMLElement>(null);
+        const panelRef = useRef<HTMLDivElement>(null);
 
         // ------------------------------------------------------------------
         // Handlers
@@ -251,6 +259,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 opened,
                 setOpened,
                 triggerRef,
+                panelRef,
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
@@ -279,6 +288,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 opened,
                 setOpened,
                 triggerRef,
+                panelRef,
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
@@ -379,11 +389,13 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
                 return;
             }
 
-            if (selectedOption) {
-                focusById(selectedOption.id, true);
-            } else {
-                focusFirst(true);
-            }
+            requestAnimationFrame(() => {
+                if (selectedOption) {
+                    focusById(selectedOption.id);
+                } else {
+                    focusFirst();
+                }
+            });
         }, [opened, selectedOption, focusById, focusFirst]);
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
@@ -560,8 +572,17 @@ type DropdownContentProps = {
 
 const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
     ({ children, className, size = 'md', ...rest }, ref) => {
+        const { panelRef } = useDropdownContext();
+
+        const mergedRef = mergeRefs(ref, panelRef);
+
         return (
-            <Popover.Panel ref={ref} className={prefix('__content')} {...rest} data-size={size}>
+            <Popover.Panel
+                ref={mergedRef}
+                className={prefix('__content')}
+                {...rest}
+                data-size={size}
+            >
                 {children}
             </Popover.Panel>
         );
@@ -880,9 +901,11 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 setOpened(false);
             } else if (key === 'Tab' && !modal) {
                 setOpened(false);
-
+                focusRelativeToElement(triggerRef.current, 1);
                 // let browser continue normal tab navigation
                 return;
+            } else if (key === 'Escape' && !modal) {
+                triggerRef.current?.focus();
             }
         };
 

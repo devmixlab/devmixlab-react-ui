@@ -13,6 +13,7 @@ type DropdownContextValue = {
     setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 
     triggerRef: React.RefObject<HTMLElement>;
+    panelRef: React.RefObject<HTMLDivElement>;
 
     handleSelect: (nextValue: string) => void;
 
