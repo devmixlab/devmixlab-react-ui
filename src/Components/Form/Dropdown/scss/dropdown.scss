@@ -8,52 +8,74 @@
 $p: cfg.$prefix;
 $dropdown-prefix: #{$p}--dropdown;
 $content-prefix: #{$dropdown-prefix}__content;
+$trigger-prefix: #{$dropdown-prefix}__trigger;
 
 $sizes: (
     sm: (
         optionHeight: 28px,
         optionPaddingX: 10px,
-
         contentPaddingY: 4px,
-
         searchPaddingX: 6px,
         searchPaddingY: 6px,
-
         groupLabelPaddingY: 6px,
         groupLabelStickyPaddingY: 8px,
     ),
-
     md: (
         optionHeight: 36px,
         optionPaddingX: 14px,
-
         contentPaddingY: 6px,
-
         searchPaddingX: 8px,
         searchPaddingY: 8px,
-
         groupLabelPaddingY: 7px,
         groupLabelStickyPaddingY: 9px,
     ),
-
     lg: (
         optionHeight: 42px,
         optionPaddingX: 18px,
-
         contentPaddingY: 8px,
-
         searchPaddingX: 10px,
         searchPaddingY: 10px,
-
         groupLabelPaddingY: 8px,
         groupLabelStickyPaddingY: 10px,
     ),
 );
 
-.#{$dropdown-prefix} {
+.#{$trigger-prefix} {
+    --dropdown-transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
 
+    .#{$dropdown-prefix} {
 
+        &__chevron {
+            flex-shrink: 0;
+            pointer-events: none;
 
+            opacity: 0.8;
+
+            transition: transform var(--dropdown-transition),
+            opacity var(--dropdown-transition);
+
+            &[data-opened] {
+                transform: rotate(-180deg);
+                opacity: 1;
+            }
+        }
+
+    }
+
+    .#{$p}--slot-end {
+        pointer-events: none;
+    }
+
+    .#{$p}--field {
+        //@include mixins.reset-button;
+        text-align: left;
+    }
+
+    &:not([data-selected]) {
+        .#{$p}--field {
+            color: var(--#{$p}-text-muted);
+        }
+    }
 }
 
 .#{$content-prefix} {

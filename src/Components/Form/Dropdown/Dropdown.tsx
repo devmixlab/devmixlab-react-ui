@@ -18,9 +18,10 @@ import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dro
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } from '../FieldRoot';
-import { TriangleDown as TriangleDownIcon } from '../../../Icon';
+import { TriangleDown as TriangleDownIcon, ChevronDown as ChevronDownIcon } from '../../../Icon';
 import { PopoverTriggerElementProps } from '../../Popover/Popover';
 import { splitProps } from '../../../utils/splitProps';
+import { capitalize } from '../../../utils/capitalize';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -358,11 +359,24 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             focusByTypeahead,
             openOnArrowKeys,
             disabled,
+            options,
         } = useDropdownContext();
 
-        const { focusFirst, focusLast, focusById } = focusableList;
+        const { focusFirst, focusLast, focusById, itemRefs } = focusableList;
 
         const renderContent: DropdownRenderContent = { selectedOption, selectedValue };
+
+        useEffect(() => {
+            if (!opened) {
+                return;
+            }
+
+            if (selectedOption) {
+                focusById(selectedOption.id, true);
+            } else {
+                focusFirst(true);
+            }
+        }, [opened, selectedOption, focusById, focusFirst]);
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
             const key = e.key;
@@ -373,6 +387,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             }
 
             if (key === 'ArrowUp' && openOnArrowKeys) {
+                // console.log(234234234);
                 e.preventDefault();
                 if (!opened) {
                     setOpened(true);
@@ -397,24 +412,44 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
                     focusFirst();
                 }
             } else if (key === 'Enter' || key === ' ') {
-                runAfterReady(() => {
-                    if (opened) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setOpened(false);
-                        return;
-                    }
+                if (!opened) {
+                    setOpened(true);
+                    return;
+                }
 
-                    if (searchInputRef.current) {
-                        searchInputRef.current?.focus();
-                    } else {
-                        if (selectedOption) {
-                            focusById(selectedOption.id);
-                        } else {
-                            focusFirst();
-                        }
-                    }
-                });
+                setOpened(false);
+                // console.log(43434343);
+                // runAfterReady(() => {
+                // if (opened) {
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     setOpened(false);
+                //     return;
+                // }
+                //
+                // if (searchInputRef.current) {
+                //     searchInputRef.current?.focus();
+                // } else {
+                //     // console.log(43434343);
+                //     // console.log(selectedOption);
+                //     console.log('opened', opened);
+                //     console.log('options', options.length);
+                //     console.log('refs', itemRefs.current.size);
+                //     if (selectedOption) {
+                //         focusById(selectedOption.id, true);
+                //     } else {
+                //         focusFirst(true);
+                //     }
+                //
+                //     // setTimeout(() => {
+                //     //     if (selectedOption) {
+                //     //         focusById(selectedOption.id, true);
+                //     //     } else {
+                //     //         focusFirst(true);
+                //     //     }
+                //     // }, 300);
+                // }
+                // });
             }
         };
 
@@ -465,6 +500,11 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
     ({ controls, children, ...rest }, ref) => {
         const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
 
+        const ctx = useDropdownContext();
+
+        const ctxFormField = useFormFieldContext();
+        const isInvalid = ctxFormField ? ctxFormField.hasError || ctx.invalid : ctx.invalid;
+
         const {
             // setOpened,
             opened,
@@ -496,14 +536,21 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                     return (
                         <FieldRoot
                             focusVisibleOnly
+                            invalid={isInvalid}
+                            className={prefix('__trigger')}
                             active={(!disabled && (opened || triggerActive)) || undefined}
                             controls={
                                 <>
                                     {controls}
-                                    <TriangleDownIcon />
+                                    <ChevronDownIcon
+                                        className={prefix('__chevron')}
+                                        data-opened={opened || undefined}
+                                        aria-hidden
+                                    />
                                 </>
                             }
                             {...fieldRootProps}
+                            data-selected={selectedValue}
                         >
                             <Box
                                 ref={triggerRef as React.Ref<HTMLButtonElement>}
@@ -513,7 +560,7 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                                 {...controlProps}
                                 {...restTriggerProps}
                             >
-                                {selectedValue ?? 'Select ...'}
+                                {selectedValue ? capitalize(selectedValue) : 'Select ...'}
                             </Box>
                         </FieldRoot>
                     );
