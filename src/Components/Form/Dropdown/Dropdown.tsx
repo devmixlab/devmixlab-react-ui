@@ -549,7 +549,7 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                                 {...controlProps}
                                 {...restTriggerProps}
                             >
-                                {selectedValue ? capitalize(selectedValue) : 'Select ...'}
+                                {selectedOption ? selectedOption?.children : 'Select ...'}
                             </Box>
                         </FieldRoot>
                     );
@@ -901,12 +901,13 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 e.stopPropagation();
                 setOpened(false);
             } else if (key === 'Tab' && !modal) {
+                e.preventDefault();
+
                 setOpened(false);
-                focusRelativeToElement(triggerRef.current, 1);
-                // let browser continue normal tab navigation
+                requestAnimationFrame(() => {
+                    focusRelativeToElement(triggerRef.current, e.shiftKey ? -1 : 1);
+                });
                 return;
-            } else if (key === 'Escape' && !modal) {
-                triggerRef.current?.focus();
             }
         };
 
