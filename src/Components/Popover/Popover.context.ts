@@ -24,6 +24,7 @@ type PopoverContextValue = {
     panelId: string;
 
     modal: boolean;
+    returnFocus: boolean;
 
     isMounted: boolean;
     animationState: PresenceState;

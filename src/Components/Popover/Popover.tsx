@@ -68,6 +68,8 @@ type PopoverProps = {
      */
     modal?: boolean;
 
+    returnFocus?: boolean;
+
     /**
      * Duration (ms) of the enter animations.
      * @default 200
@@ -174,6 +176,7 @@ const Popover = ({
     closeOnOutsideClick = true,
 
     modal = false,
+    returnFocus = true,
 
     enterDuration = 0,
     exitDuration = 200,
@@ -241,6 +244,7 @@ const Popover = ({
             role,
 
             modal,
+            returnFocus,
 
             isMounted,
             animationState,
@@ -259,6 +263,7 @@ const Popover = ({
             panelId,
             role,
             modal,
+            returnFocus,
             isMounted,
             animationState,
             onReady,
@@ -439,7 +444,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                     context={context}
                     modal={modal}
                     initialFocus={modal ? 0 : -1}
-                    // returnFocus={modal}
+                    returnFocus={modal}
                 >
                     <Box
                         ref={mergeRefs(handleFloatingRef, ref)}

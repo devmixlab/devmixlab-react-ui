@@ -8,6 +8,7 @@ import { GroupContextValue } from './Group.context';
 // import { PopoverRole } from './Popover';
 
 type DropdownContextValue = {
+    modal: boolean;
     opened: boolean;
     setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 

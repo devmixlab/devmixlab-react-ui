@@ -118,6 +118,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             stickyGroupLabels = false,
 
             openOnArrowKeys = true,
+            modal = false,
 
             ...rest
         },
@@ -246,6 +247,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
         const ctxValue = useMemo<DropdownContextValue>(
             () => ({
+                modal,
                 opened,
                 setOpened,
                 triggerRef,
@@ -273,6 +275,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 openOnArrowKeys,
             }),
             [
+                modal,
                 opened,
                 setOpened,
                 triggerRef,
@@ -308,6 +311,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         return (
             <DropdownContext.Provider value={ctxValue}>
                 <Popover
+                    modal={modal}
+                    returnFocus={false}
                     open={opened}
                     onOpenChange={(state) => {
                         onOpenChange?.(state);
@@ -418,38 +423,6 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
                 }
 
                 setOpened(false);
-                // console.log(43434343);
-                // runAfterReady(() => {
-                // if (opened) {
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     setOpened(false);
-                //     return;
-                // }
-                //
-                // if (searchInputRef.current) {
-                //     searchInputRef.current?.focus();
-                // } else {
-                //     // console.log(43434343);
-                //     // console.log(selectedOption);
-                //     console.log('opened', opened);
-                //     console.log('options', options.length);
-                //     console.log('refs', itemRefs.current.size);
-                //     if (selectedOption) {
-                //         focusById(selectedOption.id, true);
-                //     } else {
-                //         focusFirst(true);
-                //     }
-                //
-                //     // setTimeout(() => {
-                //     //     if (selectedOption) {
-                //     //         focusById(selectedOption.id, true);
-                //     //     } else {
-                //     //         focusFirst(true);
-                //     //     }
-                //     // }, 300);
-                // }
-                // });
             }
         };
 
@@ -831,6 +804,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
             isOptionShown,
             // triggerRef,
             options,
+            modal,
         } = useDropdownContext();
 
         const group = useGroupContext();
@@ -901,6 +875,11 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 e.preventDefault();
                 e.stopPropagation();
                 setOpened(false);
+            } else if (key === 'Tab' && !modal) {
+                setOpened(false);
+
+                // let browser continue normal tab navigation
+                return;
             }
         };
 
