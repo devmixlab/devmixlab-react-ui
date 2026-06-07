@@ -7,3 +7,4 @@ export * from './Textarea';
 export * from './Switch';
 export * from './Select';
 export * from './Radio';
+export * from './Checkbox';

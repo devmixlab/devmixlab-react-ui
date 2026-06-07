@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { CheckboxGroupProvider, CheckboxGroupContextValue } from './checkboxGroup.context';
+import { CheckboxGroupProvider, CheckboxGroupContextValue } from './CheckboxGroup.context';
 import { Size } from './Checkbox';
 
-export type Value = string | number;
+type Value = string | number;
 
 type CheckboxGroupProps<T extends Value> = {
     value?: T[];
@@ -15,7 +15,7 @@ type CheckboxGroupProps<T extends Value> = {
     ariaLabel?: string;
 };
 
-export function CheckboxGroup<T extends Value>({
+function CheckboxGroup<T extends Value>({
     value,
     defaultValue = [],
     onChange,
@@ -78,3 +78,7 @@ export function CheckboxGroup<T extends Value>({
         </CheckboxGroupProvider>
     );
 }
+
+export { CheckboxGroup };
+
+export type { CheckboxGroupProps, Value };

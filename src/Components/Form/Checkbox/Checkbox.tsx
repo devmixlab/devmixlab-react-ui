@@ -5,7 +5,7 @@ import { mergeRefs } from '../../../utils/mergeRefs';
 import { Check as CheckIcon } from '../../../Icon/Check';
 import { Indeterminate as IndeterminateIcon } from '../../../Icon/Indeterminate';
 import { CLASS_PREFIX } from '../../../constants';
-import { useCheckboxGroupContext } from './checkboxGroup.context';
+import { useCheckboxGroupContext } from './CheckboxGroup.context';
 import { useStableId } from '../../../utils/useStableId';
 
 export type Size = 'sm' | 'md' | 'lg';
@@ -161,3 +161,5 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 Checkbox.displayName = 'Checkbox';
 
 export { Checkbox };
+
+export type { CheckboxProps };
