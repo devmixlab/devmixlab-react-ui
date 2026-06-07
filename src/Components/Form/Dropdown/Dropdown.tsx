@@ -220,6 +220,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const searchInputRef = useRef<HTMLInputElement>(null);
         const triggerRef = useRef<HTMLElement>(null);
         const panelRef = useRef<HTMLDivElement>(null);
+        const restoreFocusRef = useRef(true);
 
         // ------------------------------------------------------------------
         // Handlers
@@ -322,7 +323,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             <DropdownContext.Provider value={ctxValue}>
                 <Popover
                     modal={modal}
-                    returnFocus={false}
+                    // returnFocus={modal || restoreFocusRef.current}
+                    // returnFocus={true}
                     open={opened}
                     onOpenChange={(state) => {
                         onOpenChange?.(state);

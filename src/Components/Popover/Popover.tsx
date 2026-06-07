@@ -418,6 +418,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             animationState,
 
             onReady,
+            returnFocus,
         } = usePopoverContext();
 
         const handleFloatingRef = useCallback(
@@ -444,7 +445,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                     context={context}
                     modal={modal}
                     initialFocus={modal ? 0 : -1}
-                    returnFocus={modal}
+                    returnFocus={returnFocus}
                 >
                     <Box
                         ref={mergeRefs(handleFloatingRef, ref)}
