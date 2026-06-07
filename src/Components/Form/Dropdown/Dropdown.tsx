@@ -863,7 +863,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
         useEffect(() => {
             registerOption(option);
 
-            // return () => unregisterOption(optionId);
+            return () => unregisterOption(optionId);
         }, [optionId, value, label, finalDisabled, children, group]);
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
