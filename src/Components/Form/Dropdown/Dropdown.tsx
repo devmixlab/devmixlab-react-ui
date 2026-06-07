@@ -365,7 +365,10 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             openOnArrowKeys,
             disabled,
             options,
+            triggerRef,
         } = useDropdownContext();
+
+        const mergedRef = mergeRefs(ref, triggerRef);
 
         const { focusFirst, focusLast, focusById, itemRefs } = focusableList;
 
@@ -429,7 +432,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
         const triggerClassName = prefix('__trigger');
 
         const triggerProps = {
-            ref,
+            ref: mergedRef,
             ...rest,
             onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
                 if (!disabled) {
@@ -802,7 +805,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
             setOpened,
             opened,
             isOptionShown,
-            // triggerRef,
+            triggerRef,
             options,
             modal,
         } = useDropdownContext();
