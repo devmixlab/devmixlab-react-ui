@@ -688,7 +688,7 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
             <Box className={prefix('__search-wrapper')}>
                 <SearchInput
                     {...rest}
-                    w="full"
+                    // w="full"
                     ref={searchInputRef}
                     value={search}
                     onValueChange={setSearch}
