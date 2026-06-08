@@ -62,8 +62,9 @@ $popover-prefix: #{$p}--popover;
 
         outline: none;
 
-        background: var(--panel-bg);
+        //background: var(--panel-bg);
         border: 1px solid var(--panel-border);
+        backdrop-filter: blur(3px);
 
         //border-radius: inherit;
 

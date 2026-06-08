@@ -1,44 +1,11 @@
 @use '../../../Popover/scss/popover';
-@use '../../../../scss/functions' as functions;
-@use '../../../../scss/mixins' as mixins;
+@use '../../../../scss/functions/common' as *;
+@use '../../../../scss/mixins/mode' as *;
 
-@use '../../../../scss/config' as cfg;
+@use './dropdown-conf' as *;
+@use './dropdown-vars' as *;
+
 @use 'sass:map';
-
-$p: cfg.$prefix;
-$dropdown-prefix: #{$p}--dropdown;
-$content-prefix: #{$dropdown-prefix}__content;
-$trigger-prefix: #{$dropdown-prefix}__trigger;
-
-$sizes: (
-    sm: (
-        optionHeight: 28px,
-        optionPaddingX: 10px,
-        contentPaddingY: 4px,
-        searchPaddingX: 6px,
-        searchPaddingY: 6px,
-        groupLabelPaddingY: 6px,
-        groupLabelStickyPaddingY: 8px,
-    ),
-    md: (
-        optionHeight: 36px,
-        optionPaddingX: 14px,
-        contentPaddingY: 6px,
-        searchPaddingX: 8px,
-        searchPaddingY: 8px,
-        groupLabelPaddingY: 7px,
-        groupLabelStickyPaddingY: 9px,
-    ),
-    lg: (
-        optionHeight: 42px,
-        optionPaddingX: 18px,
-        contentPaddingY: 8px,
-        searchPaddingX: 10px,
-        searchPaddingY: 10px,
-        groupLabelPaddingY: 8px,
-        groupLabelStickyPaddingY: 10px,
-    ),
-);
 
 .#{$trigger-prefix} {
     --dropdown-transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
@@ -67,7 +34,6 @@ $sizes: (
     }
 
     .#{$p}--field {
-        //@include mixins.reset-button;
         text-align: left;
     }
 
@@ -80,57 +46,57 @@ $sizes: (
 
 .#{$content-prefix} {
 
-    --option-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+    --dd-option-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
-    --content-bg: #{functions.intent-color('gray', 200)};
-    --content-border: #{functions.intent-color('zinc', 300)};
+    --dd-content-bg: #{intent('gray', 200)};
+    --dd-content-border: #{intent('zinc', 300)};
 
-    --option-bg: transparent;
+    --dd-option-bg: transparent;
 
-    --option-bg-hover: #{functions.intent-color('zinc', 100)};
-    --option-bg-focus: #{functions.intent-color('zinc', 150)};
-    --option-bg-active: #{functions.intent-color('zinc', 200)};
+    --dd-option-bg-hover: #{intent('zinc', 100)};
+    --dd-option-bg-focus: #{intent('zinc', 150)};
+    --dd-option-bg-active: #{intent('zinc', 200)};
 
-    --option-bg-selected: #{functions.intent-color('primary', 100)};
-    --option-bg-selected-focus: #{functions.intent-color('primary', 150)};
-    --option-bg-selected-active: #{functions.intent-color('primary', 200)};
+    --dd-option-bg-selected: #{intent('primary', 100)};
+    --dd-option-bg-selected-focus: #{intent('primary', 150)};
+    --dd-option-bg-selected-active: #{intent('primary', 200)};
 
-    --option-text: inherit;
-    --option-text-focus: inherit;
-    --option-text-selected: #{functions.intent-color('primary', 800)};
-    --option-text-disabled: #{functions.intent-color('zinc', 500)};
+    --dd-option-text: inherit;
+    --dd-option-text-focus: inherit;
+    --dd-option-text-selected: #{intent('primary', 800)};
+    --dd-option-text-disabled: #{intent('zinc', 500)};
 
-    --option-outline-focus: #{functions.intent-color('zinc', 400)};
+    --dd-option-outline-focus: #{intent('zinc', 400)};
 
-    @include cfg.dark {
-        --content-bg: #{functions.intent-color('zinc', 900)};
-        --content-border: #{functions.intent-color('zinc', 800)};
+    @include dark {
+        --dd-content-bg: #{intent('zinc', 900)};
+        --dd-content-border: #{intent('zinc', 800)};
 
-        --option-bg-hover: #{functions.intent-color('zinc', 800)};
-        --option-bg-focus: #{functions.intent-color('zinc', 750)};
-        --option-bg-active: #{functions.intent-color('zinc', 700)};
+        --dd-option-bg-hover: #{intent('zinc', 800)};
+        --dd-option-bg-focus: #{intent('zinc', 750)};
+        --dd-option-bg-active: #{intent('zinc', 700)};
 
-        --option-bg-selected: #{functions.intent-color('primary', 900)};
-        --option-bg-selected-focus: #{functions.intent-color('primary', 800)};
-        --option-bg-selected-active: #{functions.intent-color('primary', 700)};
+        --dd-option-bg-selected: #{intent('primary', 900)};
+        --dd-option-bg-selected-focus: #{intent('primary', 800)};
+        --dd-option-bg-selected-active: #{intent('primary', 700)};
 
-        --option-text-selected: #{functions.intent-color('primary', 200)};
-        --option-text-disabled: #{functions.intent-color('zinc', 500)};
+        --dd-option-text-selected: #{intent('primary', 200)};
+        --dd-option-text-disabled: #{intent('zinc', 500)};
 
-        --option-outline-focus: #{functions.intent-color('zinc', 600)};
+        --dd-option-outline-focus: #{intent('zinc', 600)};
     }
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
-            --option-height: #{map.get($value, optionHeight)};
-            --option-padding-x: #{map.get($value, optionPaddingX)};
-            --content-padding-y: #{map.get($value, contentPaddingY)};
+            --dd-option-height: #{map.get($value, optionHeight)};
+            --dd-option-padding-x: #{map.get($value, optionPaddingX)};
+            --dd-content-padding-y: #{map.get($value, contentPaddingY)};
 
-            --search-padding-x: #{map.get($value, searchPaddingX)};
-            --search-padding-y: #{map.get($value, searchPaddingY)};
+            --dd-search-padding-x: #{map.get($value, searchPaddingX)};
+            --dd-search-padding-y: #{map.get($value, searchPaddingY)};
 
-            --group-label-padding-y: #{map.get($value, groupLabelPaddingY)};
-            --group-label-sticky-padding-y: #{map.get($value, groupLabelStickyPaddingY)};
+            --dd-group-label-padding-y: #{map.get($value, groupLabelPaddingY)};
+            --dd-group-label-sticky-padding-y: #{map.get($value, groupLabelStickyPaddingY)};
         }
     }
 
@@ -138,17 +104,17 @@ $sizes: (
 
     //z-index: 1000;
 
-    padding-top: var(--content-padding-y);
-    padding-bottom: var(--content-padding-y);
+    padding-top: var(--dd-content-padding-y);
+    padding-bottom: var(--dd-content-padding-y);
 
-    background-color: var(--content-bg);
-    border: 1px solid var(--content-border);
+    background-color: var(--dd-content-bg);
+    border: 1px solid var(--dd-content-border);
 
-    //isolation: isolate;
+    isolation: isolate;
     //backdrop-filter: blur(12px);
 
     .#{$dropdown-prefix}__search-wrapper {
-        padding: calc(var(--search-padding-y) - var(--content-padding-y)) var(--search-padding-x) var(--search-padding-y);
+        padding: calc(var(--dd-search-padding-y) - var(--dd-content-padding-y)) var(--dd-search-padding-x) var(--dd-search-padding-y);
     }
 
     .#{$dropdown-prefix}__search-results {
@@ -158,8 +124,8 @@ $sizes: (
     .#{$dropdown-prefix}__list {
         min-width: max-content;
         max-height: calc(
-            var(--option-height) *
-            var(--visible-options)
+            var(--dd-option-height) *
+            var(--dd-visible-options)
         );
 
         display: flex;
@@ -177,12 +143,12 @@ $sizes: (
 
         &:not(:first-child) {
             margin-top: 4px;
-            border-top: 1px solid var(--content-border);
+            border-top: 1px solid var(--dd-content-border);
         }
     }
 
     .#{$dropdown-prefix}__group-label {
-        padding: var(--group-label-padding-y) var(--option-padding-x);
+        padding: var(--dd-group-label-padding-y) var(--dd-option-padding-x);
 
         font-size: 0.75rem;
         font-weight: 600;
@@ -191,7 +157,7 @@ $sizes: (
         text-transform: uppercase;
         letter-spacing: 0.04em;
 
-        color: var(--option-text-disabled);
+        color: var(--dd-option-text-disabled);
 
         user-select: none;
         pointer-events: none;
@@ -206,71 +172,71 @@ $sizes: (
         right: 0;
         z-index: 1;
 
-        padding-top: var(--group-label-sticky-padding-y);
-        padding-bottom: var(--group-label-sticky-padding-y);
+        padding-top: var(--dd-group-label-sticky-padding-y);
+        padding-bottom: var(--dd-group-label-sticky-padding-y);
 
-        background-color: rgb(from var(--content-bg) r g b / 0.85);
+        background-color: rgb(from var(--dd-content-bg) r g b / 0.85);
 
         backdrop-filter: blur(8px);
 
-        border-bottom: 1px solid var(--content-border);
+        border-bottom: 1px solid var(--dd-content-border);
 
         isolation: isolate;
     }
 
     .#{$dropdown-prefix}__option {
-        background-color: var(--option-bg);
-        height: var(--option-height);
-        padding: 0 var(--option-padding-x);
+        background-color: var(--dd-option-bg);
+        height: var(--dd-option-height);
+        padding: 0 var(--dd-option-padding-x);
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        color: var(--option-text);
-        transition: background-color var(--option-transition),
-        color var(--option-transition);
+        color: var(--dd-option-text);
+        transition: background-color var(--dd-option-transition),
+        color var(--dd-option-transition);
         user-select: none;
 
         &:focus-visible {
             outline: none;
             box-shadow: none;
-            background: var(--option-bg-selected-focus);
+            background: var(--dd-option-bg-selected-focus);
         }
 
         &:not([data-disabled]) {
             cursor: pointer;
 
             &:hover {
-                background: var(--option-bg-hover);
+                background: var(--dd-option-bg-hover);
             }
 
             &[data-pseudo-focused] {
-                background: var(--option-bg-focus);
-                color: var(--option-text-focus);
+                background: var(--dd-option-bg-focus);
+                color: var(--dd-option-text-focus);
 
-                box-shadow: inset 0 0 0 1px var(--option-outline-focus);
+                box-shadow: inset 0 0 0 1px var(--dd-option-outline-focus);
             }
 
             &[data-pseudo-active] {
-                background: var(--option-bg-active);
+                background: var(--dd-option-bg-active);
             }
 
             &[data-selected] {
-                background: var(--option-bg-selected);
-                color: var(--option-text-selected);
+                background: var(--dd-option-bg-selected);
+                color: var(--dd-option-text-selected);
                 font-weight: 500;
 
                 &[data-pseudo-active] {
-                    background: var(--option-bg-selected-active);
+                    background: var(--dd-option-bg-selected-active);
                 }
             }
 
             &[data-selected][data-pseudo-focused] {
-                background: var(--option-bg-selected-focus);
+                background: var(--dd-option-bg-selected-focus);
             }
         }
 
         &[data-disabled] {
-            color: var(--option-text-disabled);
+            color: var(--dd-option-text-disabled);
             cursor: default;
 
             opacity: 0.5;
