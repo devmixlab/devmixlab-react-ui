@@ -2,7 +2,13 @@ import { createContext, useContext } from 'react';
 
 import { useFloatingLayer } from '../../hooks';
 import { PresenceState } from '../../hooks/usePresence';
-import { BackdropVariant, PopoverAnimation, PopoverRole, PopoverVariant } from './Popover';
+import {
+    BackdropVariant,
+    PopoverAnimation,
+    PopoverRole,
+    PopoverVariant,
+    PopoverTriggerMode,
+} from './Popover';
 import type { Placement } from '@floating-ui/react';
 
 type PopoverContextValue = {
@@ -20,6 +26,12 @@ type PopoverContextValue = {
     animationExitDuration: number;
     enterAnimationEasing: string;
     exitAnimationEasing: string;
+
+    trigger: PopoverTriggerMode;
+    openDelay: number;
+    closeDelay: number;
+    handleHoverEnter: () => void;
+    handleHoverLeave: () => void;
 
     context: ReturnType<typeof useFloatingLayer>['context'];
     refs: ReturnType<typeof useFloatingLayer>['refs'];

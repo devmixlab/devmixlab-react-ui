@@ -5,6 +5,7 @@ import React, {
     useState,
     useLayoutEffect,
     useCallback,
+    useRef,
 } from 'react';
 import {
     FloatingTree,
@@ -27,6 +28,8 @@ import { clsx } from 'clsx';
 // Types
 // ---------------------------------------------------------------------------
 
+export type PopoverTriggerMode = 'click' | 'hover';
+
 export type BackdropVariant = 'transparent' | 'blur' | 'dim';
 
 export type PopoverAnimation = 'none' | 'fade' | 'scale' | 'slide' | 'scale-fade' | 'slide-fade';
@@ -45,6 +48,20 @@ type PopoverProps = {
 
     variant?: PopoverVariant;
     animation?: PopoverAnimation;
+
+    trigger?: PopoverTriggerMode;
+
+    /**
+     * Delay before opening when trigger="hover".
+     * @default 100
+     */
+    openDelay?: number;
+
+    /**
+     * Delay before closing when trigger="hover".
+     * @default 100
+     */
+    closeDelay?: number;
 
     // State
     open?: boolean;
@@ -198,6 +215,10 @@ const Popover = ({
     // animation = 'slide',
     // animation = 'scale',
 
+    trigger = 'hover',
+    openDelay = 100,
+    closeDelay = 100,
+
     open,
     defaultOpen = false,
     onOpenChange,
@@ -275,6 +296,25 @@ const Popover = ({
         closeOnEscape,
     });
 
+    const openTimeoutRef = useRef<number>();
+    const closeTimeoutRef = useRef<number>();
+
+    const handleHoverEnter = () => {
+        clearTimeout(closeTimeoutRef.current);
+
+        openTimeoutRef.current = window.setTimeout(() => {
+            setOpened(true);
+        }, openDelay);
+    };
+
+    const handleHoverLeave = () => {
+        clearTimeout(openTimeoutRef.current);
+
+        closeTimeoutRef.current = window.setTimeout(() => {
+            setOpened(false);
+        }, closeDelay);
+    };
+
     const value = useMemo<PopoverContextValue>(
         () => ({
             opened,
@@ -286,6 +326,12 @@ const Popover = ({
             animationExitDuration,
             enterAnimationEasing,
             exitAnimationEasing,
+
+            trigger,
+            openDelay,
+            closeDelay,
+            handleHoverEnter,
+            handleHoverLeave,
 
             disabled,
 
@@ -322,6 +368,9 @@ const Popover = ({
             animationExitDuration,
             enterAnimationEasing,
             exitAnimationEasing,
+            trigger,
+            openDelay,
+            closeDelay,
             disabled,
             refs,
             context,
@@ -372,6 +421,8 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             btnProps,
             onClick,
             onKeyDown,
+            onMouseEnter,
+            onMouseLeave,
             renderContent,
             ...rest
         },
@@ -389,6 +440,12 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
 
             triggerId,
             panelId,
+
+            trigger,
+            openDelay,
+            closeDelay,
+            handleHoverEnter,
+            handleHoverLeave,
         } = usePopoverContext();
 
         const combinedRef = mergeRefs(refs.setReference, ref);
@@ -416,6 +473,24 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                     }
 
                     onKeyDown?.(e as React.KeyboardEvent<HTMLElement>);
+                },
+                onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+                    onMouseEnter?.(e);
+
+                    if (trigger !== 'hover' || disabled) {
+                        return;
+                    }
+
+                    handleHoverEnter();
+                },
+                onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+                    onMouseLeave?.(e);
+
+                    if (trigger !== 'hover' || disabled) {
+                        return;
+                    }
+
+                    handleHoverLeave();
                 },
             }),
 
@@ -472,7 +547,16 @@ PopoverTrigger.displayName = 'Popover.Trigger';
 
 const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
     (
-        { children, className, matchTriggerWidth = false, shadow = 'lg', rounded = 'md', ...rest },
+        {
+            children,
+            className,
+            matchTriggerWidth = false,
+            shadow = 'lg',
+            rounded = 'md',
+            onMouseEnter,
+            onMouseLeave,
+            ...rest
+        },
         ref,
     ) => {
         const {
@@ -505,6 +589,14 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             opened,
             setOpened,
             closeOnOutsideClick,
+
+            trigger,
+            openDelay,
+            closeDelay,
+            handleHoverEnter,
+            handleHoverLeave,
+
+            disabled,
         } = usePopoverContext();
 
         const handleFloatingRef = useCallback(
@@ -527,7 +619,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
         return (
             <FloatingPortal>
-                {backdrop && opened && (
+                {backdrop && opened && trigger === 'click' && (
                     <div
                         className={prefix('__backdrop')}
                         onClick={() => closeOnOutsideClick && setOpened(false)}
@@ -584,6 +676,24 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         data-variant={variant}
                         data-placement={placement}
                         {...rest}
+                        onMouseEnter={(e) => {
+                            onMouseEnter?.(e);
+
+                            if (trigger !== 'hover' || disabled) {
+                                return;
+                            }
+
+                            handleHoverEnter();
+                        }}
+                        onMouseLeave={(e) => {
+                            onMouseLeave?.(e);
+
+                            if (trigger !== 'hover' || disabled) {
+                                return;
+                            }
+
+                            handleHoverLeave();
+                        }}
                     >
                         {children}
                     </Box>
