@@ -27,6 +27,8 @@ import { clsx } from 'clsx';
 // Types
 // ---------------------------------------------------------------------------
 
+export type PopoverVariant = 'solid' | 'glass' | 'gradient' | (string & {});
+
 export type PopoverPanelSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 export type PopoverRole = 'dialog' | 'menu' | 'listbox';
@@ -36,6 +38,8 @@ type PopoverProps = {
 
     tree?: boolean;
     role?: PopoverRole;
+
+    variant?: PopoverVariant;
 
     // State
     open?: boolean;
@@ -167,6 +171,7 @@ const Popover = ({
 
     tree = false,
     role = 'dialog',
+    variant = 'glass',
 
     open,
     defaultOpen = false,
@@ -236,6 +241,7 @@ const Popover = ({
         () => ({
             opened,
             setOpened,
+            variant,
 
             disabled,
 
@@ -261,6 +267,7 @@ const Popover = ({
         }),
         [
             opened,
+            variant,
             disabled,
             refs,
             context,
@@ -414,6 +421,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         const {
             role,
             modal,
+            variant,
 
             refs,
             context,
@@ -483,6 +491,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         {...getFloatingProps()}
                         data-animation-state={animationState}
                         data-match-trigger-width={matchTriggerWidth || undefined}
+                        data-variant={variant}
                         {...rest}
                     >
                         {children}

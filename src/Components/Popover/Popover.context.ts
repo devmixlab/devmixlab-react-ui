@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 
 import { useFloatingLayer } from '../../hooks';
 import { PresenceState } from '../../hooks/usePresence';
-import { PopoverRole } from './Popover';
+import { PopoverRole, PopoverVariant } from './Popover';
 
 type PopoverContextValue = {
     opened: boolean;
@@ -10,6 +10,8 @@ type PopoverContextValue = {
 
     disabled?: boolean;
     role?: PopoverRole;
+
+    variant: PopoverVariant;
 
     context: ReturnType<typeof useFloatingLayer>['context'];
     refs: ReturnType<typeof useFloatingLayer>['refs'];
