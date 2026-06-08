@@ -27,6 +27,8 @@ import { clsx } from 'clsx';
 // Types
 // ---------------------------------------------------------------------------
 
+export type PopoverAnimation = 'none' | 'fade' | 'scale' | 'slide' | 'scale-fade' | 'slide-fade';
+
 export type PopoverVariant = 'solid' | 'glass' | 'gradient' | (string & {});
 
 export type PopoverPanelSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
@@ -40,6 +42,7 @@ type PopoverProps = {
     role?: PopoverRole;
 
     variant?: PopoverVariant;
+    animation?: PopoverAnimation;
 
     // State
     open?: boolean;
@@ -78,14 +81,18 @@ type PopoverProps = {
      * Duration (ms) of the enter animations.
      * @default 200
      */
-    enterDuration?: number;
+    animationEnterDuration?: number;
     /**
      * Duration (ms) of the exit animations.
      * The modal stays mounted for this long after `opened` becomes false so the
      * exit animation can finish before the DOM node is removed.
      * @default 200
      */
-    exitDuration?: number;
+    animationExitDuration?: number;
+
+    enterAnimationEasing?: string;
+    exitAnimationEasing?: string;
+
     /** Called when the modal has fully entered (animation complete). */
     onAnimationEntered?: () => void;
     /** Called when the modal has fully exited (animation complete, just before unmount). */
@@ -171,7 +178,15 @@ const Popover = ({
 
     tree = false,
     role = 'dialog',
-    variant = 'glass',
+    variant = 'solid',
+    // animation = 'none',
+    animation = 'scale-fade',
+    // animation = 'fade',
+    // animation = 'slide-fade',
+    // animation = 'slide',
+    // animation = 'scale',
+
+    // export type PopoverAnimation = 'none' | 'fade' | 'scale' | 'slide' | 'scale-fade' | 'slide-fade';
 
     open,
     defaultOpen = false,
@@ -180,6 +195,7 @@ const Popover = ({
     disabled = false,
 
     placement = 'bottom-start',
+    // placement = 'left-start',
     offset = 8,
 
     closeOnEscape = true,
@@ -188,8 +204,11 @@ const Popover = ({
     modal = false,
     returnFocus = true,
 
-    enterDuration = 0,
-    exitDuration = 200,
+    animationEnterDuration = 120,
+    animationExitDuration = 120,
+    enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+    exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+
     onAnimationEntered,
     onAnimationExited,
 
@@ -208,8 +227,8 @@ const Popover = ({
     // ── Presence ──────────────────────────────────────────────────────
     const { isMounted, state: animationState } = usePresence({
         present: opened,
-        enterDuration,
-        exitDuration,
+        enterDuration: animation === 'none' ? 0 : animationEnterDuration,
+        exitDuration: animation === 'none' ? 0 : animationExitDuration,
         onEntered: onAnimationEntered,
         onExited: onAnimationExited,
         onMount,
@@ -227,21 +246,34 @@ const Popover = ({
     const triggerId = useStableId('popover-trigger');
     const panelId = useStableId('popover-panel');
 
-    const { context, refs, floatingStyles, getReferenceProps, getFloatingProps, nodeId } =
-        useFloatingLayer({
-            opened,
-            onOpenChange: setOpened,
-            placement,
-            offsetValue: offset,
-            closeOnOutsideClick,
-            closeOnEscape,
-        });
+    const {
+        context,
+        refs,
+        floatingStyles,
+        getReferenceProps,
+        getFloatingProps,
+        nodeId,
+        placement: resolvedPlacement,
+    } = useFloatingLayer({
+        opened,
+        onOpenChange: setOpened,
+        placement,
+        offsetValue: offset,
+        closeOnOutsideClick,
+        closeOnEscape,
+    });
 
     const value = useMemo<PopoverContextValue>(
         () => ({
             opened,
             setOpened,
+            placement: resolvedPlacement,
             variant,
+            animation,
+            animationEnterDuration,
+            animationExitDuration,
+            enterAnimationEasing,
+            exitAnimationEasing,
 
             disabled,
 
@@ -267,7 +299,14 @@ const Popover = ({
         }),
         [
             opened,
+            setOpened,
+            resolvedPlacement,
             variant,
+            animation,
+            animationEnterDuration,
+            animationExitDuration,
+            enterAnimationEasing,
+            exitAnimationEasing,
             disabled,
             refs,
             context,
@@ -421,7 +460,13 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         const {
             role,
             modal,
+            placement,
             variant,
+            animation,
+            animationEnterDuration,
+            animationExitDuration,
+            enterAnimationEasing,
+            exitAnimationEasing,
 
             refs,
             context,
@@ -480,6 +525,11 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                                 ...floatingStyles,
                                 display: !isMounted ? 'none' : undefined,
 
+                                '--animation-enter-duration': animationEnterDuration + 'ms',
+                                '--animation-exit-duration': animationExitDuration + 'ms',
+                                '--animation-enter-easing': enterAnimationEasing,
+                                '--animation-exit-easing': exitAnimationEasing,
+
                                 '--popover-trigger-width': refs.reference.current
                                     ? `${refs.reference.current.getBoundingClientRect().width}px`
                                     : undefined,
@@ -489,9 +539,11 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         shadow={shadow}
                         rounded={rounded}
                         {...getFloatingProps()}
+                        data-animation={animation}
                         data-animation-state={animationState}
                         data-match-trigger-width={matchTriggerWidth || undefined}
                         data-variant={variant}
+                        data-placement={placement}
                         {...rest}
                     >
                         {children}

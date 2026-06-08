@@ -2,16 +2,24 @@ import { createContext, useContext } from 'react';
 
 import { useFloatingLayer } from '../../hooks';
 import { PresenceState } from '../../hooks/usePresence';
-import { PopoverRole, PopoverVariant } from './Popover';
+import { PopoverAnimation, PopoverRole, PopoverVariant } from './Popover';
+import type { Placement } from '@floating-ui/react';
 
 type PopoverContextValue = {
     opened: boolean;
     setOpened: (value: boolean) => void;
 
+    placement: Placement;
+
     disabled?: boolean;
     role?: PopoverRole;
 
     variant: PopoverVariant;
+    animation: PopoverAnimation;
+    animationEnterDuration: number;
+    animationExitDuration: number;
+    enterAnimationEasing: string;
+    exitAnimationEasing: string;
 
     context: ReturnType<typeof useFloatingLayer>['context'];
     refs: ReturnType<typeof useFloatingLayer>['refs'];

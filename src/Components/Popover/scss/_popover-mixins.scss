@@ -1,0 +1,37 @@
+@use '../../../scss/mixins/mode' as *;
+@use '../../../scss/functions/common' as *;
+
+@mixin solid ($mode: 'light'){
+    @if ($mode == 'light') {
+        --panel-bg: #{intent(gray, 200)};
+        --panel-border: #{intent(zinc, 300)};
+    } @else {
+        --panel-bg: #{intent('zinc', 900)};
+        --panel-border: #{intent('zinc', 800)};
+    }
+}
+
+@mixin gradient($mode: 'light') {
+    @if ($mode == 'light') {
+        --panel-bg: #{intent(gray, 200)};
+        --panel-bg-secondary: #{intent(gray, 100)};
+        --panel-border: #{intent(zinc, 300)};
+    } @else {
+        --panel-bg: #{intent(zinc, 900)};
+        --panel-bg-secondary: #{intent(zinc, 850)};
+        --panel-border: #{intent(zinc, 800)};
+    }
+}
+
+// NEW
+@mixin glass($mode: 'light') {
+    @if ($mode == 'light') {
+        --panel-bg: rgb(255 255 255 / 0.72);
+        --panel-border: rgb(255 255 255 / 0.18);
+        --panel-blur: 12px;
+    } @else {
+        --panel-bg: rgb(24 24 27 / 0.72);
+        --panel-border: rgb(255 255 255 / 0.08);
+        --panel-blur: 12px;
+    }
+}

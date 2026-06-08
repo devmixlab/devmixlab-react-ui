@@ -1,46 +1,23 @@
-@use '../../../scss/functions/common' as *;
-@use '../../../scss/mixins' as mixins;
 @use '../../../scss/mixins/mode' as *;
+@use './popover-mixins' as *;
+@use './popover-conf' as *;
+@use './popover-keyframes' as *;
 
+.#{$popover-trigger-prefix} {
+    --transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
 
-@use '../../../scss/config' as cfg;
-@use 'sass:map';
+    .#{$popover-prefix}__chevron {
+        flex-shrink: 0;
 
-$p: cfg.$prefix;
-$popover-prefix: #{$p}--popover;
+        opacity: 0.8;
 
-@mixin solid ($mode: 'light'){
-    @if ($mode == 'light') {
-        --panel-bg: #{intent(gray, 200)};
-        --panel-border: #{intent(zinc, 300)};
-    } @else {
-        --panel-bg: #{intent('zinc', 900)};
-        --panel-border: #{intent('zinc', 800)};
-    }
-}
+        transition: transform var(--transition),
+        opacity var(--transition);
 
-@mixin gradient($mode: 'light') {
-    @if ($mode == 'light') {
-        --panel-bg: #{intent(gray, 200)};
-        --panel-bg-secondary: #{intent(gray, 100)};
-        --panel-border: #{intent(zinc, 300)};
-    } @else {
-        --panel-bg: #{intent(zinc, 900)};
-        --panel-bg-secondary: #{intent(zinc, 850)};
-        --panel-border: #{intent(zinc, 800)};
-    }
-}
-
-// NEW
-@mixin glass($mode: 'light') {
-    @if ($mode == 'light') {
-        --panel-bg: rgb(255 255 255 / 0.72);
-        --panel-border: rgb(255 255 255 / 0.18);
-        --panel-blur: 12px;
-    } @else {
-        --panel-bg: rgb(24 24 27 / 0.72);
-        --panel-border: rgb(255 255 255 / 0.08);
-        --panel-blur: 12px;
+        &[data-opened] {
+            transform: rotate(-180deg);
+            opacity: 1;
+        }
     }
 }
 
@@ -51,34 +28,15 @@ $popover-prefix: #{$p}--popover;
     display: inline-flex;
     flex-direction: column;
 
-    .#{$popover-prefix}__chevron {
-        flex-shrink: 0;
-
-        opacity: 0.8;
-
-        transition:
-            transform var(--transition),
-            opacity var(--transition);
-
-        &[data-opened] {
-            transform: rotate(180deg);
-            opacity: 1;
-        }
-    }
-
     &__panel {
-        //--panel-bg: #{intent(gray, 200)};
-        //--panel-border: #{intent(zinc, 300)};
-        //
-        //@include cfg.dark {
-        //    --panel-bg: #{intent('zinc', 900)};
-        //    --panel-border: #{intent('zinc', 800)};
-        //}
+        --animation-enter-duration: 120ms;
+        --animation-exit-duration: 120ms;
+        --animation-enter-easing: var(--#{$p}-ease-standard);
+        --animation-exit-easing: var(--#{$p}-ease-standard);
 
         position: absolute;
         z-index: 1000;
 
-        //min-width: max-content;
         width: max-content;
         min-width: 0;
         max-width: calc(100vw - 1rem);
@@ -93,19 +51,9 @@ $popover-prefix: #{$p}--popover;
 
         background: var(--panel-bg);
         border: var(--panel-border-width, 1px) solid var(--panel-border);
-        //backdrop-filter: blur(3px);
 
-        //border-radius: inherit;
-
-        //overflow: hidden;
-
-        box-shadow:
-            0 10px 38px rgba(0, 0, 0, 0.12),
-            0 10px 20px rgba(0, 0, 0, 0.08);
-
-        will-change:
-            transform,
-            opacity;
+        box-shadow: 0 10px 38px rgba(0, 0, 0, 0.12),
+        0 10px 20px rgba(0, 0, 0, 0.08);
 
         transform-origin: var(
             --floating-transform-origin,
@@ -114,32 +62,12 @@ $popover-prefix: #{$p}--popover;
 
         &:focus-visible {
             outline: 2px solid var(--#{$p}-accent-primary);
-
+            outline-offset: -2px;
         }
 
-        &[data-animation-state='entering'] {
-            opacity: 0;
-            transform: scale(0.96);
-        }
-
-        &[data-animation-state='entered'] {
-            opacity: 1;
-            transform: scale(1);
-
-            transition:
-                opacity 120ms ease,
-                transform 120ms ease;
-        }
-
-        &[data-animation-state='exiting'] {
-            opacity: 0;
-            transform: scale(0.96);
-
-            transition:
-                opacity 380ms ease,
-                transform 380ms ease;
-
-            pointer-events: none;
+        [data-animation-state='entering'],
+        [data-animation-state='exiting'] {
+            will-change: transform, opacity;
         }
 
         &[data-align='viewport'] {
@@ -211,26 +139,137 @@ $popover-prefix: #{$p}--popover;
 // Animations
 // ---------------------------------------------------------------------------
 
-//@keyframes popover-in {
-//    from {
-//        opacity: 0;
-//        transform: scale(0.36);
-//    }
-//
-//    to {
-//        opacity: 1;
-//        transform: scale(1);
-//    }
-//}
-//
-//@keyframes popover-out {
-//    from {
-//        opacity: 1;
-//        transform: scale(1);
-//    }
-//
-//    to {
-//        opacity: 0;
-//        transform: scale(0.38);
-//    }
-//}
+.#{$popover-prefix} {
+    &__panel {
+
+        --slide-distance: 8px;
+
+        // ---------------------------------------------------------------------------
+        // Placement-aware slide variables
+        // ---------------------------------------------------------------------------
+
+        &[data-placement^='top'] {
+            --slide-x: 0;
+            --slide-y: var(--slide-distance, 8px);
+        }
+
+        &[data-placement^='bottom'] {
+            --slide-x: 0;
+            --slide-y: calc(var(--slide-distance, 8px) * -1);
+        }
+
+        &[data-placement^='left'] {
+            --slide-x: var(--slide-distance, 8px);
+            --slide-y: 0;
+        }
+
+        &[data-placement^='right'] {
+            --slide-x: calc(var(--slide-distance, 8px) * -1);
+            --slide-y: 0;
+        }
+
+        // ---------------------------------------------------------------------------
+        // Animation variants
+        // ---------------------------------------------------------------------------
+
+        &[data-animation='fade'] {
+            &[data-animation-state='entering'] {
+                animation:
+                    popover-fade-in
+                    var(--animation-enter-duration)
+                    var(--animation-enter-easing)
+                    forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation:
+                    popover-fade-out
+                    var(--animation-exit-duration)
+                    var(--animation-exit-easing)
+                    forwards;
+
+                pointer-events: none;
+            }
+        }
+
+        &[data-animation='scale'] {
+            &[data-animation-state='entering'] {
+                animation:
+                    popover-scale-in
+                    var(--animation-enter-duration)
+                    var(--animation-enter-easing)
+                    forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation:
+                    popover-scale-out
+                    var(--animation-exit-duration)
+                    var(--animation-exit-easing)
+                    forwards;
+
+                pointer-events: none;
+            }
+        }
+
+        &[data-animation='scale-fade'] {
+            &[data-animation-state='entering'] {
+                animation:
+                    popover-scale-fade-in
+                    var(--animation-enter-duration)
+                    var(--animation-enter-easing)
+                    forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation:
+                    popover-scale-fade-out
+                    var(--animation-exit-duration)
+                    var(--animation-exit-easing)
+                    forwards;
+
+                pointer-events: none;
+            }
+        }
+
+        &[data-animation='slide'] {
+            &[data-animation-state='entering'] {
+                animation:
+                    popover-slide-in
+                    var(--animation-enter-duration)
+                    var(--animation-enter-easing)
+                    forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation:
+                    popover-slide-out
+                    var(--animation-exit-duration)
+                    var(--animation-exit-easing)
+                    forwards;
+
+                pointer-events: none;
+            }
+        }
+
+        &[data-animation='slide-fade'] {
+            &[data-animation-state='entering'] {
+                animation:
+                    popover-slide-fade-in
+                    var(--animation-enter-duration)
+                    var(--animation-enter-easing)
+                    forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation:
+                    popover-slide-fade-out
+                    var(--animation-exit-duration)
+                    var(--animation-exit-easing)
+                    forwards;
+
+                pointer-events: none;
+            }
+        }
+    }
+}

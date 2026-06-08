@@ -1,0 +1,5 @@
+@use '../../../scss/config' as cfg;
+
+$p: cfg.$prefix;
+$popover-prefix: #{$p}--popover;
+$popover-trigger-prefix: #{$popover-prefix}__trigger;

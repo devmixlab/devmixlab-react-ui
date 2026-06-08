@@ -32,7 +32,12 @@ export function useFloatingLayer({
     const nodeId = useFloatingNodeId();
     const parentId = useFloatingParentNodeId();
 
-    const { refs, floatingStyles, context } = useFloating<HTMLDivElement>({
+    const {
+        refs,
+        floatingStyles,
+        context,
+        placement: resolvedPlacement,
+    } = useFloating<HTMLDivElement>({
         nodeId,
         open: opened,
         onOpenChange,
@@ -98,5 +103,6 @@ export function useFloatingLayer({
         getReferenceProps,
         getFloatingProps,
         restoreFocus,
+        placement: resolvedPlacement,
     };
 }
