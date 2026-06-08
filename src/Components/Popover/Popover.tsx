@@ -452,8 +452,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 <FloatingFocusManager
                     context={context}
                     modal={modal}
-                    // initialFocus={modal ? 0 : -1}
-                    // initialFocus={0}
+                    initialFocus={modal ? 0 : -1}
                     returnFocus={returnFocus}
                 >
                     <Box

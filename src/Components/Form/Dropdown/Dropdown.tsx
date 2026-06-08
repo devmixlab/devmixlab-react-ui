@@ -344,7 +344,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 <Popover
                     modal={modal}
                     // returnFocus={modal}
-                    // returnFocus={true}
+                    returnFocus={true}
                     open={opened}
                     onOpenChange={(state) => {
                         onOpenChange?.(state);
@@ -361,7 +361,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     onReady={() => {
                         flushReadyCallbacks();
                     }}
-                    keepMounted
+                    // keepMounted
                     role="listbox"
                 >
                     {children}
@@ -417,120 +417,12 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
                 return;
             }
 
-            // queueMicrotask(() => {
-            // console.log('------------------------------');
-            // console.log('itemRefs', itemRefs);
-            //
-            // const node = itemRefs.current.get(selectedOption.id);
-            //
-            // console.log('node', node);
-            // node?.focus();
-            //
-            // console.log('panelRef', getComputedStyle(panelRef.current!).display);
-            // });
-
-            // runAfterReady(() => {
-            //     queueMicrotask(() => {
-            //         // console.log('------------------------------');
-            //         // console.log('itemRefs', itemRefs);
-            //         // if (selectedOption) {
-            //         //     focusById(selectedOption.id);
-            //         // } else {
-            //         //     focusFirst();
-            //         // }
-            //     });
-            //     // alert(43434);
-            //     // requestAnimationFrame(() => {
-            //     //     if (selectedOption) {
-            //     //         focusById(selectedOption.id, true);
-            //     //     } else {
-            //     //         focusFirst();
-            //     //     }
-            //     // });
-            //
-            //     // console.log('-------------------------------');
-            //     //
-            //     // const node = itemRefs.current.get(selectedOption.id);
-            //     //
-            //     // node?.focus();
-            //     //
-            //     // // console.log('before', document.activeElement);
-            //     //
-            //     // console.log('node', node);
-            //     //
-            //     // console.log('after', document.activeElement);
-            // });
-
-            // console.log('-------------------------------');
-            //
-            // const node = itemRefs.current.get(selectedOption.id);
-            //
-            // node?.focus();
-            //
-            // // console.log('before', document.activeElement);
-            //
-            // console.log('node', node);
-            //
-            // console.log('after', document.activeElement);
-
-            // requestAnimationFrame(() => {
-            //     console.log('after', document.activeElement);
-            //
-            //     if (selectedOption) {
-            //         focusById(selectedOption.id);
-            //     } else {
-            //         focusFirst();
-            //     }
-            //
-            //     console.log('after focus', document.activeElement);
-            // });
-
-            // requestAnimationFrame(() => {
-            //     requestAnimationFrame(() => {
-            //         const node = itemRefs.current.get(selectedOption.id);
-            //
-            //         console.log('before', document.activeElement);
-            //
-            //         node?.focus();
-            //
-            //         console.log('after', document.activeElement);
-            //         console.log('same?', document.activeElement === node);
-            //     });
-            // });
-
-            // if (selectedOption) {
-            //     console.log(323232);
-            //     // console.log(selectedOption);
-            //     console.log(selectedOption?.id, itemRefs.current.get(selectedOption?.id ?? ''));
-            //     focusById(selectedOption.id);
-            // } else {
-            //     focusFirst(true);
-            // }
-
-            // alert(2222);
-            //
             runOnEntered(() => {
-                // if (selectedOption) {
-                //     focusById(selectedOption.id);
-                // } else {
-                //     focusFirst();
-                // }
-
-                // queueMicrotask(() => {
-                //     node?.focus();
-                // });
-
-                requestAnimationFrame(() => {
-                    console.log('------------------------------');
-                    console.log('itemRefs', itemRefs);
-
-                    const node = itemRefs.current.get(selectedOption.id);
-
-                    console.log('node', node);
-                    node?.focus();
-
-                    console.log('panelRef', getComputedStyle(panelRef.current!).display);
-                });
+                if (selectedOption) {
+                    focusById(selectedOption.id);
+                } else {
+                    focusFirst();
+                }
             });
         }, [opened, selectedOption, focusById, focusFirst]);
 
@@ -636,18 +528,18 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
 
         const [triggerActive, setTriggerActive] = useState(true);
 
-        useEffect(() => {
-            if (opened) {
-                setTriggerActive(true);
-                return;
-            }
-
-            const timeout = setTimeout(() => {
-                setTriggerActive(false);
-            }, 300);
-
-            return () => clearTimeout(timeout);
-        }, [opened]);
+        // useEffect(() => {
+        //     if (opened) {
+        //         setTriggerActive(true);
+        //         return;
+        //     }
+        //
+        //     const timeout = setTimeout(() => {
+        //         setTriggerActive(false);
+        //     }, 300);
+        //
+        //     return () => clearTimeout(timeout);
+        // }, [opened]);
 
         return (
             <DropdownTrigger
@@ -662,7 +554,7 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                             focusVisibleOnly
                             invalid={isInvalid}
                             className={prefix('__trigger')}
-                            active={(!disabled && (opened || triggerActive)) || undefined}
+                            active={(!disabled && opened) || undefined}
                             controls={
                                 <>
                                     {controls}
