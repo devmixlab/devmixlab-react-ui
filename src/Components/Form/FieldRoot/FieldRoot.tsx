@@ -42,6 +42,7 @@ const shareFieldRootProps = defineExactKeys<SharedFieldRootProps>()([
 type OwnFieldRootProps = {
     focusTargetRef?: React.RefObject<HTMLElement | null>;
     focusVisibleOnly?: boolean;
+    pseudoHovered?: boolean;
 };
 
 type FieldRootProps = React.HTMLAttributes<HTMLDivElement> &
@@ -76,6 +77,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
 
             focusVisibleOnly = false,
             active,
+            pseudoHovered = false,
 
             ...rest
         },
@@ -170,6 +172,7 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldRootProps>(
                 data-readonly={readOnly || undefined}
                 data-size={size}
                 data-focus-visible-only={focusVisibleOnly || undefined}
+                data-pseudo-hovered={pseudoHovered || undefined}
                 data-active={active || undefined}
                 {...(variant ? { ['data-variant']: variant } : {})}
                 onClick={handleClick}

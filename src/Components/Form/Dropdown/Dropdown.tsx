@@ -133,6 +133,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         const [opened, setOpened] = useState(false);
         const [isSearchable, setIsSearchable] = useState(false);
         const [search, setSearch] = useState('');
+        const [isPanelHovered, setIsPanelHovered] = useState(false);
 
         const registerOption = useCallback((option: DropdownOptionData) => {
             setOptions((prev) => {
@@ -279,6 +280,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 setOpened,
                 triggerRef,
                 panelRef,
+                isPanelHovered,
+                setIsPanelHovered,
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
@@ -309,6 +312,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 setOpened,
                 triggerRef,
                 panelRef,
+                isPanelHovered,
+                setIsPanelHovered,
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
@@ -361,7 +366,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     onReady={() => {
                         flushReadyCallbacks();
                     }}
-                    // keepMounted
+                    keepMounted
                     role="listbox"
                 >
                     {children}
@@ -528,18 +533,18 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
 
         const [triggerActive, setTriggerActive] = useState(true);
 
-        // useEffect(() => {
-        //     if (opened) {
-        //         setTriggerActive(true);
-        //         return;
-        //     }
-        //
-        //     const timeout = setTimeout(() => {
-        //         setTriggerActive(false);
-        //     }, 300);
-        //
-        //     return () => clearTimeout(timeout);
-        // }, [opened]);
+        useEffect(() => {
+            if (opened) {
+                setTriggerActive(true);
+                return;
+            }
+
+            const timeout = setTimeout(() => {
+                setTriggerActive(false);
+            }, 300);
+
+            return () => clearTimeout(timeout);
+        }, [opened]);
 
         return (
             <DropdownTrigger
@@ -549,12 +554,18 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                     const { selectedOption, selectedValue } = content;
 
                     const { ref: triggerRef, ...restTriggerProps } = triggerProps;
+
+                    const isActive = !disabled ? opened || (ctx.modal && triggerActive) : undefined;
                     return (
                         <FieldRoot
-                            focusVisibleOnly
+                            // focusVisibleOnly
                             invalid={isInvalid}
                             className={prefix('__trigger')}
-                            active={(!disabled && opened) || undefined}
+                            // active={(!disabled && (opened || triggerActive)) || undefined}
+                            active={isActive}
+                            // active={!disabled && opened}
+                            pseudoHovered={ctx.isPanelHovered}
+                            // pseudoHovered={true}
                             controls={
                                 <>
                                     {controls}
@@ -599,8 +610,8 @@ type DropdownContentProps = {
 } & PopoverPanelProps;
 
 const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
-    ({ children, className, size = 'md', ...rest }, ref) => {
-        const { panelRef } = useDropdownContext();
+    ({ children, className, size = 'md', onMouseEnter, onMouseLeave, ...rest }, ref) => {
+        const { panelRef, setIsPanelHovered } = useDropdownContext();
 
         const mergedRef = mergeRefs(ref, panelRef);
 
@@ -610,6 +621,14 @@ const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
                 className={prefix('__content')}
                 {...rest}
                 data-size={size}
+                onMouseEnter={(e) => {
+                    setIsPanelHovered(true);
+                    onMouseEnter?.(e);
+                }}
+                onMouseLeave={(e) => {
+                    setIsPanelHovered(false);
+                    onMouseLeave?.(e);
+                }}
             >
                 {children}
             </Popover.Panel>

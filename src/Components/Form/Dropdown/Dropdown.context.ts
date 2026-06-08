@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, MutableRefObject } from 'react';
 import { DropdownOptionProps, DropdownOptionData, OnReadyCallbackProps } from './Dropdown';
 import { FocusableListResult } from '../../../hooks/useFocusableList';
 import { GroupContextValue } from './Group.context';
@@ -14,6 +14,9 @@ type DropdownContextValue = {
 
     triggerRef: React.RefObject<HTMLElement>;
     panelRef: React.RefObject<HTMLDivElement>;
+
+    isPanelHovered: boolean;
+    setIsPanelHovered: React.Dispatch<React.SetStateAction<boolean>>;
 
     handleSelect: (nextValue: string) => void;
 

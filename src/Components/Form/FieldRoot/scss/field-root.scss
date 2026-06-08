@@ -127,6 +127,8 @@
     background var(--fr-transition),
     color var(--fr-transition);
 
+
+    &[data-pseudo-hovered]:not([data-disabled]):not([data-readonly]),
     &:hover:not([data-disabled]):not([data-readonly]) {
         border-color: var(--fr-border-hover);
         background: var(--fr-bg-hover);

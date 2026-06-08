@@ -13,13 +13,13 @@ import {
     FloatingNode,
 } from '@floating-ui/react';
 import type { Placement } from '@floating-ui/react';
-import { Box, BoxProps } from '../Box/Box';
+import { Box, BoxProps, BoxComponentProps } from '../Box';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';
 import { useFloatingLayer, usePresence } from '../../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
-import { Button, ButtonProps } from '../Button/Button';
+import { Button, ButtonProps } from '../Button';
 import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { clsx } from 'clsx';
 
@@ -130,15 +130,18 @@ type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
     renderContent?: T;
 };
 
-type PopoverPanelProps = {
-    children: React.ReactNode;
-    className?: string;
+type PopoverPanelProps<C extends React.ElementType = 'div'> = BoxComponentProps<
+    C,
+    {
+        children: React.ReactNode;
+        className?: string;
 
-    /**
-     * Makes panel width match trigger width.
-     */
-    matchTriggerWidth?: boolean;
-} & BoxProps;
+        /**
+         * Makes panel width match trigger width.
+         */
+        matchTriggerWidth?: boolean;
+    }
+>;
 
 type PopoverComponent = React.ForwardRefExoticComponent<
     PopoverProps & React.RefAttributes<HTMLDivElement>
