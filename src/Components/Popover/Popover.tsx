@@ -90,6 +90,8 @@ type PopoverProps = {
     onMount?: () => void;
     onUnmount?: () => void;
     onReady?: () => void;
+
+    keepMounted?: boolean;
 };
 
 // export type TriggerProps = Omit<React.HTMLAttributes<HTMLElement>, 'ref'> & {
@@ -186,6 +188,8 @@ const Popover = ({
     onMount,
     onUnmount,
     onReady,
+
+    keepMounted = false,
 }: PopoverProps) => {
     const isControlled = open !== undefined;
 
@@ -250,6 +254,7 @@ const Popover = ({
             animationState,
 
             onReady,
+            keepMounted,
         }),
         [
             opened,
@@ -267,6 +272,7 @@ const Popover = ({
             isMounted,
             animationState,
             onReady,
+            keepMounted,
         ],
     );
 
@@ -419,6 +425,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
             onReady,
             returnFocus,
+            keepMounted,
+            opened,
         } = usePopoverContext();
 
         const handleFloatingRef = useCallback(
@@ -435,7 +443,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         );
 
         // ── Unmount after exit animation ─────────────────────────────────
-        if (!isMounted) {
+        if (!keepMounted && !isMounted) {
             return null;
         }
 
@@ -444,7 +452,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 <FloatingFocusManager
                     context={context}
                     modal={modal}
-                    initialFocus={modal ? 0 : -1}
+                    // initialFocus={modal ? 0 : -1}
+                    // initialFocus={0}
                     returnFocus={returnFocus}
                 >
                     <Box
@@ -455,9 +464,12 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         aria-modal={modal || undefined}
                         // aria-modal={role === 'dialog' ? false : undefined}
                         aria-labelledby={role === 'dialog' ? triggerId : undefined}
+                        aria-hidden={!isMounted || undefined}
                         style={
                             {
                                 ...floatingStyles,
+                                display: !isMounted ? 'none' : undefined,
+
                                 '--popover-trigger-width': refs.reference.current
                                     ? `${refs.reference.current.getBoundingClientRect().width}px`
                                     : undefined,

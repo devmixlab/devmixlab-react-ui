@@ -30,6 +30,8 @@ type PopoverContextValue = {
     animationState: PresenceState;
 
     onReady?: () => void;
+
+    keepMounted: boolean;
 };
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);

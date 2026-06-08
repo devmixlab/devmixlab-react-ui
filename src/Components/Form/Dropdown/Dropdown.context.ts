@@ -43,6 +43,7 @@ type DropdownContextValue = {
     unregisterOption: (id: string) => void;
 
     runAfterReady: (callback: () => void) => void;
+    runOnEntered: (callback: () => void) => void;
 
     stickyGroupLabels: boolean;
     openOnArrowKeys: boolean;
