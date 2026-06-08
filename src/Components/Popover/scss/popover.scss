@@ -22,11 +22,66 @@
 }
 
 .#{$popover-prefix} {
-    --transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+    //--transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
     position: relative;
     display: inline-flex;
     flex-direction: column;
+
+    &__backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+
+        opacity: 0;
+
+        touch-action: none;
+
+        &[data-variant='blur'] {
+            backdrop-filter: blur(4px);
+            background: rgb(0 0 0 / 0.15);
+        }
+
+        &[data-variant='dim'] {
+            background: rgb(0 0 0 / 0.45);
+        }
+
+        @include dark {
+            &[data-variant='blur'] {
+                background: rgb(255 255 255 / 0.03);
+            }
+
+            &[data-variant='dim'] {
+                background: rgb(0 0 0 / 0.6);
+            }
+        }
+
+        &[data-animation-state='entering'] {
+            animation:
+                popover-backdrop-in
+                var(--animation-enter-duration)
+                var(--animation-enter-easing)
+                forwards;
+        }
+
+        &[data-animation-state='exiting'] {
+            animation:
+                popover-backdrop-out
+                var(--animation-exit-duration)
+                var(--animation-exit-easing)
+                forwards;
+
+            pointer-events: none;
+        }
+
+        &[data-animation-state='entered'] {
+            opacity: 1;
+        }
+
+        &[data-animation-state='exited'] {
+            opacity: 0;
+        }
+    }
 
     &__panel {
         --animation-enter-duration: 120ms;

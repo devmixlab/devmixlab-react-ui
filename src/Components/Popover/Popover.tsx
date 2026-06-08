@@ -27,6 +27,8 @@ import { clsx } from 'clsx';
 // Types
 // ---------------------------------------------------------------------------
 
+export type BackdropVariant = 'transparent' | 'blur' | 'dim';
+
 export type PopoverAnimation = 'none' | 'fade' | 'scale' | 'slide' | 'scale-fade' | 'slide-fade';
 
 export type PopoverVariant = 'solid' | 'glass' | 'gradient' | (string & {});
@@ -74,6 +76,16 @@ type PopoverProps = {
      * Whether focus should be trapped inside the popover.
      */
     modal?: boolean;
+
+    /**
+     * Renders a backdrop behind the panel.
+     */
+    backdrop?: boolean;
+
+    /**
+     * Backdrop opacity/color variant.
+     */
+    backdropVariant?: BackdropVariant;
 
     returnFocus?: boolean;
 
@@ -200,6 +212,8 @@ const Popover = ({
     closeOnOutsideClick = true,
 
     modal = false,
+    backdrop = false,
+    backdropVariant = 'blur',
     returnFocus = true,
 
     animationEnterDuration = 120,
@@ -287,6 +301,8 @@ const Popover = ({
             role,
 
             modal,
+            backdrop,
+            backdropVariant,
             returnFocus,
 
             isMounted,
@@ -315,6 +331,8 @@ const Popover = ({
             panelId,
             role,
             modal,
+            backdrop,
+            backdropVariant,
             returnFocus,
             isMounted,
             animationState,
@@ -458,6 +476,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         const {
             role,
             modal,
+            backdrop,
+            backdropVariant,
             placement,
             variant,
             animation,
@@ -481,6 +501,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             returnFocus,
             keepMounted,
             opened,
+            setOpened,
         } = usePopoverContext();
 
         const handleFloatingRef = useCallback(
@@ -503,6 +524,24 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
         return (
             <FloatingPortal>
+                {backdrop && opened && (
+                    <div
+                        className={prefix('__backdrop')}
+                        // onClick={() => closeOnOutsideClick && setOpened(false)}
+                        onClick={() => setOpened(false)}
+                        data-variant={backdropVariant}
+                        data-animation-state={animationState}
+                        style={
+                            {
+                                '--animation-enter-duration': animationEnterDuration + 'ms',
+                                '--animation-exit-duration': animationExitDuration + 'ms',
+                                '--animation-enter-easing': enterAnimationEasing,
+                                '--animation-exit-easing': exitAnimationEasing,
+                            } as CSSProperties
+                        }
+                    />
+                )}
+
                 <FloatingFocusManager
                     context={context}
                     modal={modal}

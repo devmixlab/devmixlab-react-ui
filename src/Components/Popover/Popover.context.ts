@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 
 import { useFloatingLayer } from '../../hooks';
 import { PresenceState } from '../../hooks/usePresence';
-import { PopoverAnimation, PopoverRole, PopoverVariant } from './Popover';
+import { BackdropVariant, PopoverAnimation, PopoverRole, PopoverVariant } from './Popover';
 import type { Placement } from '@floating-ui/react';
 
 type PopoverContextValue = {
@@ -34,6 +34,8 @@ type PopoverContextValue = {
     panelId: string;
 
     modal: boolean;
+    backdrop: boolean;
+    backdropVariant?: BackdropVariant;
     returnFocus: boolean;
 
     isMounted: boolean;
