@@ -186,8 +186,6 @@ const Popover = ({
     // animation = 'slide',
     // animation = 'scale',
 
-    // export type PopoverAnimation = 'none' | 'fade' | 'scale' | 'slide' | 'scale-fade' | 'slide-fade';
-
     open,
     defaultOpen = false,
     onOpenChange,
