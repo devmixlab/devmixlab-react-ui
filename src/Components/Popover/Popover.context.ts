@@ -35,7 +35,8 @@ type PopoverContextValue = {
 
     modal: boolean;
     backdrop: boolean;
-    backdropVariant?: BackdropVariant;
+    backdropVariant: BackdropVariant;
+    closeOnOutsideClick: boolean;
     returnFocus: boolean;
 
     isMounted: boolean;

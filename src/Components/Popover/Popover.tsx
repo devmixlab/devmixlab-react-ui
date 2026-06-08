@@ -303,6 +303,7 @@ const Popover = ({
             modal,
             backdrop,
             backdropVariant,
+            closeOnOutsideClick,
             returnFocus,
 
             isMounted,
@@ -333,6 +334,7 @@ const Popover = ({
             modal,
             backdrop,
             backdropVariant,
+            closeOnOutsideClick,
             returnFocus,
             isMounted,
             animationState,
@@ -502,6 +504,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             keepMounted,
             opened,
             setOpened,
+            closeOnOutsideClick,
         } = usePopoverContext();
 
         const handleFloatingRef = useCallback(
@@ -527,8 +530,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 {backdrop && opened && (
                     <div
                         className={prefix('__backdrop')}
-                        // onClick={() => closeOnOutsideClick && setOpened(false)}
-                        onClick={() => setOpened(false)}
+                        onClick={() => closeOnOutsideClick && setOpened(false)}
                         data-variant={backdropVariant}
                         data-animation-state={animationState}
                         style={
