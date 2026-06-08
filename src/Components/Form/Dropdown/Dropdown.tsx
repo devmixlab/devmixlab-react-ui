@@ -423,13 +423,26 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
             }
 
             runOnEntered(() => {
+                if (isSearchable) {
+                    searchInputRef.current?.focus();
+                    return;
+                }
+
                 if (selectedOption) {
                     focusById(selectedOption.id);
                 } else {
                     focusFirst();
                 }
             });
-        }, [opened, selectedOption, focusById, focusFirst]);
+        }, [
+            opened,
+            selectedOption,
+            focusById,
+            focusFirst,
+            isSearchable,
+            searchInputRef,
+            runOnEntered,
+        ]);
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
             const key = e.key;
@@ -659,6 +672,8 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
             focusableList,
             options,
             filteredOptions,
+            triggerRef,
+            modal,
         } = useDropdownContext();
 
         useEffect(() => {
@@ -673,6 +688,7 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
             <Box className={prefix('__search-wrapper')}>
                 <SearchInput
                     {...rest}
+                    w="full"
                     ref={searchInputRef}
                     value={search}
                     onValueChange={setSearch}
@@ -692,6 +708,18 @@ const DropdownSearch = forwardRef<HTMLElement, DropdownSearchProps>(
                             e.preventDefault();
                             e.stopPropagation();
                             setOpened(false);
+                            requestAnimationFrame(() => {
+                                triggerRef.current?.focus();
+                            });
+                        } else if (e.key === 'Tab' && !modal) {
+                            e.preventDefault();
+
+                            setOpened(false);
+                            requestAnimationFrame(() => {
+                                // focusRelativeToElement(triggerRef.current, e.shiftKey ? -1 : 1);
+                                triggerRef.current?.focus();
+                            });
+                            return;
                         }
                     }}
                 />
@@ -941,17 +969,26 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
                 e.preventDefault();
                 focusLast();
             } else if (key === 'Enter' || key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
                 handleSelect(value);
+                requestAnimationFrame(() => {
+                    triggerRef.current?.focus();
+                });
             } else if (key === 'Escape') {
                 e.preventDefault();
                 e.stopPropagation();
                 setOpened(false);
+                requestAnimationFrame(() => {
+                    triggerRef.current?.focus();
+                });
             } else if (key === 'Tab' && !modal) {
                 e.preventDefault();
 
                 setOpened(false);
                 requestAnimationFrame(() => {
-                    focusRelativeToElement(triggerRef.current, e.shiftKey ? -1 : 1);
+                    // focusRelativeToElement(triggerRef.current, e.shiftKey ? -1 : 1);
+                    triggerRef.current?.focus();
                 });
                 return;
             }
@@ -965,6 +1002,9 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
 
                 if (!finalDisabled) {
                     handleSelect(value);
+                    requestAnimationFrame(() => {
+                        triggerRef.current?.focus();
+                    });
                 }
             },
 
