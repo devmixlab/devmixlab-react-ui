@@ -3,11 +3,11 @@
 @use 'config' as *;
 
 $button-sizes: (
-    xs: (height: 28px, padding-x: 10px, font-size: 0.75rem),
-    sm: (height: 32px, padding-x: 12px, font-size: 0.875rem),
-    md: (height: 40px, padding-x: 16px, font-size: 0.95rem),
-    lg: (height: 48px, padding-x: 20px, font-size: 1rem),
-    xl: (height: 56px, padding-x: 24px, font-size: 1.1rem),
+    xs: (height: 28px, padding-x: 10px, font-size: 0.75rem, icon-slot-width: 10px,),
+    sm: (height: 32px, padding-x: 12px, font-size: 0.875rem, icon-slot-width: 12px,),
+    md: (height: 40px, padding-x: 16px, font-size: 0.95rem, icon-slot-width: 14px,),
+    lg: (height: 48px, padding-x: 20px, font-size: 1rem, icon-slot-width: 16px,),
+    xl: (height: 56px, padding-x: 24px, font-size: 1.1rem, icon-slot-width: 18px,),
 );
 
 @mixin icon {
@@ -150,6 +150,7 @@ $button-sizes: (
             --button-pl: #{map.get($props, padding-x)};
             --button-pr: #{map.get($props, padding-x)};
             --button-fs: #{map.get($props, font-size)};
+            --button-icon-slot-width: #{map.get($props, icon-slot-width)};
         }
     }
 
@@ -224,18 +225,6 @@ $button-sizes: (
         }
     }
 
-    &[data-loading-position='start'] {
-        .#{$button-prefix}__loader {
-            margin-right: 0.5em;
-        }
-    }
-
-    &[data-loading-position='end'] {
-        .#{$button-prefix}__loader {
-            margin-left: 0.5em;
-        }
-    }
-
     &:focus-visible {
         outline: 2px solid var(--button-ring);
         outline-offset: 2px;
@@ -268,6 +257,8 @@ $button-sizes: (
         display: inline-flex;
         align-items: center;
         justify-content: center;
+
+        width: var(--button-icon-slot-width);
 
         > svg,
         > .MuiSvgIcon-root {
