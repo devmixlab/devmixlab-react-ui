@@ -3,5 +3,5 @@ export type {
     PopoverProps,
     PopoverTriggerProps,
     PopoverPanelProps,
-    TriggerRenderProps,
+    PopoverTriggerRenderProps,
 } from './Popover';

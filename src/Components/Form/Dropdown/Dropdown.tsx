@@ -8,7 +8,7 @@ import { Text } from '../../../Text/Text';
 import { useFocusableList, useTypeahead } from '../../../hooks';
 import {
     Popover,
-    TriggerRenderProps,
+    PopoverTriggerRenderProps,
     PopoverPanelProps,
     PopoverProps,
     PopoverTriggerProps,
@@ -65,7 +65,7 @@ export type DropdownProps = {
 
     invalid?: boolean;
 
-    triggerRender?: (props: TriggerRenderProps) => React.ReactNode;
+    triggerRender?: (props: PopoverTriggerRenderProps) => React.ReactNode;
 
     stickyGroupLabels?: boolean;
 

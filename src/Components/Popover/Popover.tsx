@@ -161,7 +161,7 @@ export type PopoverTriggerElementProps<T extends HTMLElement = HTMLElement> = Om
     ref?: React.Ref<T>;
 };
 
-type TriggerRenderProps = {
+type PopoverTriggerRenderProps = {
     disabled: boolean;
     opened: boolean;
     triggerClassName: string;
@@ -181,7 +181,7 @@ type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
     className?: string;
     children?: React.ReactNode;
     chevron?: PopoverChevron;
-    render?: (props: TriggerRenderProps) => React.ReactNode;
+    render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
     btnProps?: ButtonProps;
     renderContent?: T;
 };
@@ -758,4 +758,4 @@ Popover.Panel = PopoverPanel;
 
 export { Popover };
 
-export type { PopoverProps, PopoverTriggerProps, PopoverPanelProps, TriggerRenderProps };
+export type { PopoverProps, PopoverTriggerProps, PopoverPanelProps, PopoverTriggerRenderProps };
