@@ -24,6 +24,14 @@ import { Button, ButtonProps } from '../Button';
 import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { clsx } from 'clsx';
 
+export const BUTTON_ICON_SLOT_WIDTHS = {
+    xs: 6,
+    sm: 8,
+    md: 10,
+    lg: 12,
+    xl: 14,
+} as const;
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -529,10 +537,13 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             />
         );
 
+        const buttonSize = btnProps?.size ?? 'md';
+
         return (
             <Button
                 {...rest}
                 {...triggerProps}
+                iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[buttonSize]}
                 className={triggerClassName}
                 type="button"
                 disabled={disabled}

@@ -6,28 +6,53 @@ import { LoadingPosition, Size, Intent, Variant } from './Button.tokens';
 import { isLongNumber, prefix } from './Button.helpers';
 import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
 
-type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
-    C,
-    {
-        className?: string;
-        children?: React.ReactNode;
-        intent?: Intent;
-        variant?: Variant;
-        size?: Size;
-        number?: number; // to format value as tabular-nums
-        disabled?: boolean;
-        active?: boolean; // selected / current (pagination, tabs)
-        noInteraction?: boolean; // removes hover/active interaction styles
-        rounded?: BoxProps['rounded'];
-        iconOnly?: boolean;
-        startIcon?: React.ReactNode;
-        endIcon?: React.ReactNode;
-        loading?: boolean;
-        loadingPosition?: LoadingPosition;
-        spinnerDelay?: number;
-        loadingComponent?: React.ReactNode;
-    }
->;
+type OwnButtonProps = {
+    className?: string;
+    children?: React.ReactNode;
+    intent?: Intent;
+    variant?: Variant;
+    size?: Size;
+    number?: number; // to format value as tabular-nums
+    disabled?: boolean;
+    active?: boolean; // selected / current (pagination, tabs)
+    noInteraction?: boolean; // removes hover/active interaction styles
+    rounded?: BoxProps['rounded'];
+    iconOnly?: boolean;
+    startIcon?: React.ReactNode;
+    endIcon?: React.ReactNode;
+    loading?: boolean;
+    loadingPosition?: LoadingPosition;
+    spinnerDelay?: number;
+    loadingComponent?: React.ReactNode;
+    iconSlotWidth?: number | string;
+};
+
+type ButtonProps<C extends React.ElementType = 'button'> = Omit<BoxComponentProps<C>, 'size'> &
+    OwnButtonProps;
+
+// type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
+//     C,
+//     {
+//         className?: string;
+//         children?: React.ReactNode;
+//         intent?: Intent;
+//         variant?: Variant;
+//         size?: Size;
+//         number?: number; // to format value as tabular-nums
+//         disabled?: boolean;
+//         active?: boolean; // selected / current (pagination, tabs)
+//         noInteraction?: boolean; // removes hover/active interaction styles
+//         rounded?: BoxProps['rounded'];
+//         iconOnly?: boolean;
+//         startIcon?: React.ReactNode;
+//         endIcon?: React.ReactNode;
+//         loading?: boolean;
+//         loadingPosition?: LoadingPosition;
+//         spinnerDelay?: number;
+//         loadingComponent?: React.ReactNode;
+//         iconSlotWidth?: number | string;
+//     }
+// >;
 
 type ButtonImplProps = ButtonProps & {
     as?: React.ElementType;
@@ -58,6 +83,8 @@ const ButtonImpl = (
         loadingPosition = 'center',
         spinnerDelay = 150,
         loadingComponent,
+        iconSlotWidth,
+        style,
         ...props
     }: ButtonImplProps,
     ref: React.Ref<any>,
@@ -138,6 +165,13 @@ const ButtonImpl = (
             rounded={rounded}
             {...restProps}
             {...linkProps}
+            style={
+                {
+                    ...style,
+                    '--button-icon-slot-width':
+                        typeof iconSlotWidth === 'number' ? `${iconSlotWidth}px` : iconSlotWidth,
+                } as React.CSSProperties
+            }
             onClick={handleClick}
             onKeyDown={handleKeyDown}
             data-size={size}
