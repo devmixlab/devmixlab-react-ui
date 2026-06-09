@@ -225,7 +225,7 @@ const Popover = ({
     // animation = 'slide',
     // animation = 'scale',
 
-    trigger = 'hover',
+    trigger = 'click',
     openDelay = 100,
     closeDelay = 100,
 
