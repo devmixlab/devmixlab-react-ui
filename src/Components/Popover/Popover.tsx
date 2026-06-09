@@ -603,7 +603,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             className,
             matchTriggerWidth = false,
             shadow = 'lg',
-            rounded = 'md',
+            rounded = 'sm',
             onMouseEnter,
             onMouseLeave,
             ...rest

@@ -69,8 +69,8 @@
 @keyframes popover-slide-in {
     from {
         transform: translate(
-            var(--slide-x),
-            var(--slide-y)
+            var(--popover-slide-x),
+            var(--popover-slide-y)
         );
     }
 
@@ -86,8 +86,8 @@
 
     to {
         transform: translate(
-            var(--slide-x),
-            var(--slide-y)
+            var(--popover-slide-x),
+            var(--popover-slide-y)
         );
     }
 }
@@ -96,8 +96,8 @@
     from {
         opacity: 0;
         transform: translate(
-            var(--slide-x),
-            var(--slide-y)
+            var(--popover-slide-x),
+            var(--popover-slide-y)
         );
     }
 
@@ -116,8 +116,8 @@
     to {
         opacity: 0;
         transform: translate(
-            var(--slide-x),
-            var(--slide-y)
+            var(--popover-slide-x),
+            var(--popover-slide-y)
         );
     }
 }
