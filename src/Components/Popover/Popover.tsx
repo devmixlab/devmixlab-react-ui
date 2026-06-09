@@ -489,12 +489,15 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
 
         const combinedRef = mergeRefs(refs.setReference, ref);
 
-        const handleKeyDown = (e: React.KeyboardEvent) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setOpened(!opened);
-            }
-        };
+        const handleKeyDown = useCallback(
+            (e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setOpened(!opened);
+                }
+            },
+            [opened, setOpened],
+        );
 
         const triggerProps = {
             ...getReferenceProps({
