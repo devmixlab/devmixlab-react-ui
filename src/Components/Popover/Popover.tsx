@@ -28,6 +28,8 @@ import { clsx } from 'clsx';
 // Types
 // ---------------------------------------------------------------------------
 
+type PopoverChevron = 'rotate' | 'fixed' | 'none';
+
 export type PopoverTriggerMode = 'click' | 'hover';
 
 export type BackdropVariant = 'transparent' | 'blur' | 'dim';
@@ -164,7 +166,7 @@ type TriggerRenderProps = {
 type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
     className?: string;
     children?: React.ReactNode;
-    chevron?: boolean;
+    chevron?: PopoverChevron;
     render?: (props: TriggerRenderProps) => React.ReactNode;
     btnProps?: ButtonProps;
     renderContent?: T;
@@ -416,7 +418,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
         {
             children,
             className,
-            chevron = false,
+            chevron = 'none',
             render,
             btnProps,
             onClick,
@@ -446,6 +448,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             closeDelay,
             handleHoverEnter,
             handleHoverLeave,
+            placement,
         } = usePopoverContext();
 
         const combinedRef = mergeRefs(refs.setReference, ref);
@@ -514,6 +517,18 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             });
         }
 
+        const isLeftPlacement = placement.startsWith('left');
+
+        const chevronIcon = (chevron == 'rotate' || chevron == 'fixed') && (
+            <ChevronDownIcon
+                className={prefix('__chevron')}
+                data-opened={opened || undefined}
+                data-rotate={chevron == 'rotate' || undefined}
+                data-placement={placement}
+                aria-hidden
+            />
+        );
+
         return (
             <Button
                 {...rest}
@@ -523,15 +538,9 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 disabled={disabled}
                 active={opened}
                 {...btnProps}
-                endIcon={
-                    chevron && (
-                        <ChevronDownIcon
-                            className={prefix('__chevron')}
-                            data-opened={opened || undefined}
-                            aria-hidden
-                        />
-                    )
-                }
+                // endIcon={chevronIcon}
+                startIcon={isLeftPlacement ? chevronIcon : btnProps?.startIcon}
+                endIcon={!isLeftPlacement ? chevronIcon : btnProps?.endIcon}
             >
                 {children}
             </Button>
