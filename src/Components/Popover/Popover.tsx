@@ -20,6 +20,12 @@ import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';
 import { useFloatingLayer, usePresence } from '../../hooks';
 import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
+import { usePopoverStateContext } from './PopoverState.context';
+import { usePopoverInteractionContext } from './PopoverInteraction.context';
+import { usePopoverFloatingContext } from './PopoverFloating.context';
+import { usePopoverAccessibilityContext } from './PopoverAccessibility.context';
+import { usePopoverConfigContext } from './PopoverConfig.context';
+import { PopoverProviders } from './PopoverProviders';
 import { Button, ButtonProps } from '../Button';
 import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { clsx } from 'clsx';
@@ -327,94 +333,101 @@ const Popover = ({
         };
     }, []);
 
-    const handleHoverEnter = () => {
+    const handleHoverEnter = useCallback(() => {
         clearTimeout(closeTimeoutRef.current);
 
         openTimeoutRef.current = window.setTimeout(() => {
             setOpened(true);
         }, openDelay);
-    };
+    }, [setOpened, openDelay]);
 
-    const handleHoverLeave = () => {
+    const handleHoverLeave = useCallback(() => {
         clearTimeout(openTimeoutRef.current);
 
         closeTimeoutRef.current = window.setTimeout(() => {
             setOpened(false);
         }, closeDelay);
-    };
+    }, [setOpened, closeDelay]);
 
-    const value = useMemo<PopoverContextValue>(
+    const stateValue = useMemo(
         () => ({
             opened,
             setOpened,
+            isMounted,
+            animationState,
+        }),
+        [opened, setOpened, isMounted, animationState],
+    );
+
+    const interactionValue = useMemo(
+        () => ({
+            trigger,
+            openDelay,
+            closeDelay,
+            disabled,
+            handleHoverEnter,
+            handleHoverLeave,
+        }),
+        [trigger, openDelay, closeDelay, disabled, handleHoverEnter, handleHoverLeave],
+    );
+
+    const floatingValue = useMemo(
+        () => ({
+            refs,
+            context,
+            floatingStyles,
+            getReferenceProps,
+            getFloatingProps,
             placement: resolvedPlacement,
+        }),
+        [refs, context, floatingStyles, getReferenceProps, getFloatingProps, resolvedPlacement],
+    );
+
+    const accessibilityValue = useMemo(
+        () => ({
+            triggerId,
+            panelId,
+            role,
+        }),
+        [triggerId, panelId, role],
+    );
+
+    const configValue = useMemo(
+        () => ({
             variant,
+
             animation,
             animationEnterDuration,
             animationExitDuration,
             enterAnimationEasing,
             exitAnimationEasing,
 
-            trigger,
-            openDelay,
-            closeDelay,
-            handleHoverEnter,
-            handleHoverLeave,
-
-            disabled,
-
-            refs,
-            context,
-            floatingStyles,
-
-            getReferenceProps,
-            getFloatingProps,
-
-            triggerId,
-            panelId,
-            role,
-
             modal,
             backdrop,
             backdropVariant,
+
             closeOnOutsideClick,
             returnFocus,
-
-            isMounted,
-            animationState,
 
             onReady,
             keepMounted,
         }),
         [
-            opened,
-            setOpened,
-            resolvedPlacement,
             variant,
+
             animation,
             animationEnterDuration,
             animationExitDuration,
             enterAnimationEasing,
             exitAnimationEasing,
-            trigger,
-            openDelay,
-            closeDelay,
-            disabled,
-            refs,
-            context,
-            floatingStyles,
-            getReferenceProps,
-            getFloatingProps,
-            triggerId,
-            panelId,
-            role,
+
             modal,
             backdrop,
             backdropVariant,
+
             closeOnOutsideClick,
             returnFocus,
-            isMounted,
-            animationState,
+
             onReady,
             keepMounted,
         ],
@@ -422,7 +435,16 @@ const Popover = ({
 
     const content = (
         <FloatingNode id={nodeId}>
-            <PopoverContext.Provider value={value}>{children}</PopoverContext.Provider>
+            {/*<PopoverContext.Provider value={value}>{children}</PopoverContext.Provider>*/}
+            <PopoverProviders
+                state={stateValue}
+                floating={floatingValue}
+                interaction={interactionValue}
+                accessibility={accessibilityValue}
+                config={configValue}
+            >
+                {children}
+            </PopoverProviders>
         </FloatingNode>
     );
 
@@ -456,24 +478,14 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
         },
         ref,
     ) => {
-        const {
-            opened,
-            setOpened,
+        const { opened, setOpened } = usePopoverStateContext();
 
-            disabled,
-            role,
+        const { disabled, trigger, handleHoverEnter, handleHoverLeave } =
+            usePopoverInteractionContext();
 
-            refs,
-            getReferenceProps,
+        const { refs, getReferenceProps, placement } = usePopoverFloatingContext();
 
-            triggerId,
-            panelId,
-
-            trigger,
-            handleHoverEnter,
-            handleHoverLeave,
-            placement,
-        } = usePopoverContext();
+        const { triggerId, panelId, role } = usePopoverAccessibilityContext();
 
         const combinedRef = mergeRefs(refs.setReference, ref);
 
@@ -494,12 +506,12 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                     }
                 },
 
-                onKeyDown: (e) => {
+                onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
                     if (!disabled) {
                         handleKeyDown(e);
                     }
 
-                    onKeyDown?.(e as React.KeyboardEvent<HTMLElement>);
+                    onKeyDown?.(e);
                 },
                 onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
                     onMouseEnter?.(e);
@@ -595,12 +607,17 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         },
         ref,
     ) => {
+        const { opened, setOpened, isMounted, animationState } = usePopoverStateContext();
+
+        const { trigger, disabled, handleHoverEnter, handleHoverLeave } =
+            usePopoverInteractionContext();
+
+        const { refs, context, floatingStyles, getFloatingProps, placement } =
+            usePopoverFloatingContext();
+
+        const { triggerId, panelId, role } = usePopoverAccessibilityContext();
+
         const {
-            role,
-            modal,
-            backdrop,
-            backdropVariant,
-            placement,
             variant,
             animation,
             animationEnterDuration,
@@ -608,32 +625,16 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             enterAnimationEasing,
             exitAnimationEasing,
 
-            refs,
-            context,
-            floatingStyles,
-            getFloatingProps,
+            modal,
+            backdrop,
+            backdropVariant,
 
-            triggerId,
-            panelId,
-
-            isMounted,
-            animationState,
+            closeOnOutsideClick,
+            returnFocus,
 
             onReady,
-            returnFocus,
             keepMounted,
-            opened,
-            setOpened,
-            closeOnOutsideClick,
-
-            trigger,
-            openDelay,
-            closeDelay,
-            handleHoverEnter,
-            handleHoverLeave,
-
-            disabled,
-        } = usePopoverContext();
+        } = usePopoverConfigContext();
 
         const handleFloatingRef = useCallback(
             (node: HTMLDivElement | null) => {
