@@ -48,8 +48,10 @@
 
     --dd-option-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
-    --dd-content-bg: #{intent('gray', 200)};
+    --dd-content-bg: var(--popover-panel-bg);
     --dd-content-border: #{intent('zinc', 300)};
+
+    --dd-group-label-bg: var(--popover-panel-bg);
 
     --dd-option-bg: transparent;
 
@@ -69,7 +71,6 @@
     --dd-option-outline-focus: #{intent('zinc', 400)};
 
     @include dark {
-        --dd-content-bg: #{intent('zinc', 900)};
         --dd-content-border: #{intent('zinc', 800)};
 
         --dd-option-bg-hover: #{intent('zinc', 800)};
@@ -102,8 +103,6 @@
 
     min-width: max-content;
 
-    //z-index: 1000;
-
     padding-top: var(--dd-content-padding-y);
     padding-bottom: var(--dd-content-padding-y);
 
@@ -111,7 +110,6 @@
     border: 1px solid var(--dd-content-border);
 
     isolation: isolate;
-    //backdrop-filter: blur(12px);
 
     .#{$dropdown-prefix}__search-wrapper {
         padding: calc(var(--dd-search-padding-y) - var(--dd-content-padding-y)) var(--dd-search-padding-x) var(--dd-search-padding-y);
@@ -175,7 +173,7 @@
         padding-top: var(--dd-group-label-sticky-padding-y);
         padding-bottom: var(--dd-group-label-sticky-padding-y);
 
-        background-color: rgb(from var(--dd-content-bg) r g b / 0.85);
+        background-color: rgb(from var(--dd-group-label-bg) r g b / 0.85);
 
         backdrop-filter: blur(8px);
 

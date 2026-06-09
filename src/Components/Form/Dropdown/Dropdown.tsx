@@ -121,6 +121,10 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             openOnArrowKeys = true,
             modal = false,
 
+            onUnmount,
+            onAnimationEntered,
+            onReady,
+
             ...rest
         },
         ref,
@@ -170,16 +174,12 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             return options.filter((option) =>
                 (option.label ?? option.value).toLowerCase().trim().includes(normalized),
             );
-        }, [options, search, isSearchable]);
+        }, [options, search]);
 
         const selectedOption = useMemo(
             () => options.find((option) => option.value === selectedValue),
             [options, selectedValue],
         );
-
-        // console.log('selectedValue', selectedValue);
-        // console.log('options', options);
-        // console.log('selectedOption', selectedOption);
 
         const isOptionShown = (option: DropdownOptionData) => {
             const isInFiltered = filteredOptions.some((o) => o.id == option.id);
@@ -201,12 +201,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             if (optionFocused == null) return;
             optionRefs.current.get(optionFocused)?.scrollIntoView({ block: 'nearest' });
         }, [optionFocused]);
-
-        // useEffect(() => {
-        //     if (!opened && !modal) {
-        //         focusRelativeToElement(triggerRef.current, 1);
-        //     }
-        // }, [opened]);
 
         // ------------------------------------------------------------------
         // Typeahead
@@ -309,11 +303,11 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             [
                 modal,
                 opened,
-                setOpened,
+                // setOpened,
                 triggerRef,
                 panelRef,
                 isPanelHovered,
-                setIsPanelHovered,
+                // setIsPanelHovered,
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
@@ -322,9 +316,9 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                 invalid,
                 isInvalid,
                 isSearchable,
-                setIsSearchable,
+                // setIsSearchable,
                 search,
-                setSearch,
+                // setSearch,
                 searchInputRef,
                 focusableList,
                 selectedOption,
@@ -348,8 +342,6 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             <DropdownContext.Provider value={ctxValue}>
                 <Popover
                     modal={modal}
-                    // returnFocus={modal}
-                    returnFocus={true}
                     open={opened}
                     onOpenChange={(state) => {
                         onOpenChange?.(state);
@@ -359,12 +351,18 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     disabled={disabled}
                     onUnmount={() => {
                         if (search.length > 0) setSearch('');
+
+                        onUnmount?.();
                     }}
                     onAnimationEntered={() => {
                         flushOnEnteredCallbacks();
+
+                        onAnimationEntered?.();
                     }}
                     onReady={() => {
                         flushReadyCallbacks();
+
+                        onReady?.();
                     }}
                     keepMounted
                     role="listbox"
@@ -571,14 +569,10 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                     const isActive = !disabled ? opened || (ctx.modal && triggerActive) : undefined;
                     return (
                         <FieldRoot
-                            // focusVisibleOnly
                             invalid={isInvalid}
                             className={prefix('__trigger')}
-                            // active={(!disabled && (opened || triggerActive)) || undefined}
                             active={isActive}
-                            // active={!disabled && opened}
                             pseudoHovered={ctx.isPanelHovered}
-                            // pseudoHovered={true}
                             controls={
                                 <>
                                     {controls}
@@ -890,7 +884,6 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
 
         const {
             registerOption,
-            unregisterOption,
             disabled: ctxDisabled,
             selectedValue,
             focusableList,
@@ -902,7 +895,6 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
             opened,
             isOptionShown,
             triggerRef,
-            options,
             modal,
         } = useDropdownContext();
 
@@ -910,16 +902,12 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
 
         const {
             setRef,
-            setFocusedVisibleId,
             setFocusedId,
-            focusedVisibleId,
             focusNext,
             focusFirst,
             focusLast,
             lastFocusableId,
             firstFocusableId,
-            focusedId,
-            setFocuses,
         } = focusableList;
 
         const selected = value === selectedValue;
