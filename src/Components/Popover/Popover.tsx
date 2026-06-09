@@ -278,13 +278,24 @@ const Popover = ({
         onUnmount,
     });
 
-    const setOpened = (next: boolean) => {
-        if (!isControlled) {
-            setInternalOpen(next);
-        }
+    // const setOpened = (next: boolean) => {
+    //     if (!isControlled) {
+    //         setInternalOpen(next);
+    //     }
+    //
+    //     onOpenChange?.(next);
+    // };
 
-        onOpenChange?.(next);
-    };
+    const setOpened = useCallback(
+        (next: boolean) => {
+            if (!isControlled) {
+                setInternalOpen(next);
+            }
+
+            onOpenChange?.(next);
+        },
+        [isControlled, onOpenChange],
+    );
 
     const triggerId = useStableId('popover-trigger');
     const panelId = useStableId('popover-panel');
@@ -308,6 +319,13 @@ const Popover = ({
 
     const openTimeoutRef = useRef<number>();
     const closeTimeoutRef = useRef<number>();
+
+    useLayoutEffect(() => {
+        return () => {
+            clearTimeout(openTimeoutRef.current);
+            clearTimeout(closeTimeoutRef.current);
+        };
+    }, []);
 
     const handleHoverEnter = () => {
         clearTimeout(closeTimeoutRef.current);
@@ -452,8 +470,6 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             panelId,
 
             trigger,
-            openDelay,
-            closeDelay,
             handleHoverEnter,
             handleHoverLeave,
             placement,
@@ -525,7 +541,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             });
         }
 
-        const isLeftPlacement = placement.startsWith('left');
+        const isLeftPlacement = placement?.startsWith('left');
 
         const chevronIcon = (chevron == 'rotate' || chevron == 'fixed') && (
             <ChevronDownIcon
