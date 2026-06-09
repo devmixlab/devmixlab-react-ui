@@ -504,7 +504,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 onClick: (e: React.MouseEvent<HTMLElement>) => {
                     onClick?.(e);
 
-                    if (!disabled) {
+                    if (!disabled && trigger === 'click') {
                         setOpened(!opened);
                     }
                 },
