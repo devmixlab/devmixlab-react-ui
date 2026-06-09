@@ -578,7 +578,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 className={triggerClassName}
                 type="button"
                 disabled={disabled}
-                active={opened}
+                active={trigger === 'click' && opened}
                 {...btnProps}
                 // endIcon={chevronIcon}
                 startIcon={isLeftPlacement ? chevronIcon : btnProps?.startIcon}
