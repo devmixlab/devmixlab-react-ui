@@ -1,11 +1,3 @@
-//$sizes: (
-//    xs: (font-size: 0.65rem, padding-x: 0.35em, padding-y: 0.1em),
-//    sm: (font-size: 0.7rem, padding-x: 0.4em, padding-y: 0.12em),
-//    md: (font-size: 0.75rem, padding-x: 0.5em, padding-y: 0.15em),
-//    lg: (font-size: 0.85rem, padding-x: 0.6em, padding-y: 0.2em),
-//    xl: (font-size: 0.95rem, padding-x: 0.7em, padding-y: 0.25em),
-//);
-
 $sizes: (
     xs: (
         font-size: 0.65rem,
@@ -40,11 +32,6 @@ $sizes: (
 );
 
 $dot-scale: (
-    //xs: 0.45em,
-    //sm: 0.5em,
-    //md: 0.55em,
-    //lg: 0.6em,
-    //xl: 0.65em,
     xs: 0.50em,
     sm: 0.55em,
     md: 0.60em,

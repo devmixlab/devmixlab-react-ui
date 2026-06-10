@@ -7,11 +7,21 @@
 
 .#{$badge-prefix} {
 
-    border: 1px solid var(--border-color, transparent);
+    @each $size, $values in $sizes {
+        &[data-size='#{$size}'] {
+            --badge-padding-y: #{map.get($values, padding-y)};
+            --badge-padding-x: #{map.get($values, padding-x)};
+            --badge-font-size: #{map.get($values, font-size)};
+            --badge-gap: #{map.get($values, gap)};
+        }
+    }
+
+    border: 1px solid var(--badge-border-color, transparent);
 
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: var(--badge-gap);
 
     align-self: center;
 
@@ -19,10 +29,12 @@
     font-weight: 500;
     white-space: nowrap;
 
+    font-size: var(--badge-font-size);
+
     overflow: hidden;
 
-    background-color: var(--bg, transparent);
-    color: var(--text-color);
+    background-color: var(--badge-bg, transparent);
+    color: var(--badge-text-color);
 
     padding-left: var(--badge-padding-x);
     padding-right: var(--badge-padding-x);
@@ -56,9 +68,7 @@
         padding-right: var(--badge-padding-y);
     }
 
-    &[data-number-exceeds-max] {
-
-    }
+    &[data-number-exceeds-max] {}
 
     &[data-numeric] {
         min-width: 2ch;
@@ -70,14 +80,6 @@
             font-variant-numeric: tabular-nums;
         }
     }
-
-    //&--numeric {
-    //    min-width: 1.5em;
-    //
-    //    .#{$badge-prefix}--content {
-    //        font-variant-numeric: tabular-nums;
-    //    }
-    //}
 
     &[data-dot] {
         padding: 0;
@@ -91,15 +93,6 @@
                 width: $value;
                 height: $value;
             }
-        }
-    }
-
-    @each $size, $values in $sizes {
-        &[data-size='#{$size}'] {
-            --badge-padding-y: #{map.get($values, padding-y)};
-            --badge-padding-x: #{map.get($values, padding-x)};
-            font-size: map.get($values, font-size);
-            gap: map.get($values, gap);
         }
     }
 
