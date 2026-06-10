@@ -115,10 +115,6 @@
         padding: calc(var(--dd-search-padding-y) - var(--dd-content-padding-y)) var(--dd-search-padding-x) var(--dd-search-padding-y);
     }
 
-    .#{$dropdown-prefix}__search-results {
-
-    }
-
     .#{$dropdown-prefix}__list {
         min-width: max-content;
         max-height: calc(
@@ -136,8 +132,6 @@
     .#{$dropdown-prefix}__group {
         display: flex;
         flex-direction: column;
-
-        //padding-top: 4px;
 
         &:not(:first-child) {
             margin-top: 4px;
@@ -173,8 +167,8 @@
         padding-top: var(--dd-group-label-sticky-padding-y);
         padding-bottom: var(--dd-group-label-sticky-padding-y);
 
+        background-color: var(--dd-group-label-bg);
         background-color: rgb(from var(--dd-group-label-bg) r g b / 0.85);
-
         backdrop-filter: blur(8px);
 
         border-bottom: 1px solid var(--dd-content-border);
