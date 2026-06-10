@@ -1,13 +1,10 @@
-@use '../../functions' as functions;
-@use '../../mixins' as mixins;
-
-@use './file-upload-conf';
-
-@use '../../config' as cfg;
+@use '../../../Card/scss/card';
+@use '../../../../scss/functions/common' as *;
+@use '../../../../scss/mixins/mode' as *;
+@use './file-upload-conf' as *;
+@use './file-upload-keyframes' as *;
 @use 'sass:map';
 
-$p: cfg.$prefix;
-$file-upload-prefix: #{$p}--file-upload;
 
 $sizes: (
     sm: (previewWrapperHeight: 24px, cardHeight: 30px, galleryCardHeight: 150px),
@@ -33,14 +30,14 @@ $sizes: (
         //}
     }
 
-    --upload-card-bg: #{functions.intent-color('secondary', 200)};
-    --upload-card-bg-hover: #{functions.intent-color('secondary', 250)};
-    --upload-card-border: #{functions.intent-color('secondary', 500)};
+    --upload-card-bg: #{intent('secondary', 200)};
+    --upload-card-bg-hover: #{intent('secondary', 250)};
+    --upload-card-border: #{intent('secondary', 500)};
 
-    @include cfg.dark {
-        --upload-card-bg: #{functions.intent-color('secondary', 900)};
-        --upload-card-bg-hover: #{functions.intent-color('secondary', 850)};
-        --upload-card-border: #{functions.intent-color('secondary', 700)};
+    @include dark {
+        --upload-card-bg: #{intent('secondary', 900)};
+        --upload-card-bg-hover: #{intent('secondary', 850)};
+        --upload-card-border: #{intent('secondary', 700)};
     }
 
     .#{$p}--info-wrapper {
@@ -182,7 +179,7 @@ $sizes: (
 
             border-radius: 999px;
 
-            //background: #{functions.intent-color(primary, 500)};
+            //background: #{intent(primary, 500)};
             background: var(--#{$p}-accent-primary);
 
             opacity: 0.7;
@@ -236,37 +233,5 @@ $sizes: (
         );
 
         animation: file-upload-max-exceeded 2s ease;
-    }
-}
-
-@keyframes file-upload-loading {
-    0% {
-        left: -30%;
-    }
-
-    100% {
-        left: 100%;
-    }
-}
-
-@keyframes file-upload-max-exceeded {
-    0% {
-        outline-color: transparent;
-        background: transparent;
-    }
-
-    15% {
-        outline-color: var(--#{$p}-accent-danger);
-
-        background: color-mix(
-            in srgb,
-            var(--#{$p}-accent-danger) 8%,
-            transparent
-        );
-    }
-
-    100% {
-        outline-color: transparent;
-        background: transparent;
     }
 }

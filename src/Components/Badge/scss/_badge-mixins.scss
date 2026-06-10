@@ -1,0 +1,41 @@
+@use '../../../scss/functions/common' as *;
+
+@mixin solid($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --bg: #{intent($intent, 500)};
+        --text-color: #{intent($intent, 0)};
+    } @else {
+        --bg: #{intent($intent, 600)};
+        --text-color: #{intent($intent, 50)};
+    }
+}
+
+@mixin base($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --bg: #{intent($intent, 100)};
+        --text-color: #{intent($intent, 700)};
+        --border-color: #{intent($intent, 200)};
+    } @else {
+        --bg: #{intent($intent, 900)};
+        --text-color: #{intent($intent, 200)};
+        --border-color: #{intent($intent, 700)};
+    }
+}
+
+@mixin outlined($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --text-color: #{intent($intent, 600)};
+        --border-color: #{intent($intent, 300)};
+    } @else {
+        --text-color: #{intent($intent, 300)};
+        --border-color: #{intent($intent, 700)};
+    }
+}
+
+@mixin ghost($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --text-color: #{intent($intent, 600)};
+    } @else {
+        --text-color: #{intent($intent, 300)};
+    }
+}

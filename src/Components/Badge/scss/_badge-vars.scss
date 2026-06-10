@@ -1,0 +1,50 @@
+//$sizes: (
+//    xs: (font-size: 0.65rem, padding-x: 0.35em, padding-y: 0.1em),
+//    sm: (font-size: 0.7rem, padding-x: 0.4em, padding-y: 0.12em),
+//    md: (font-size: 0.75rem, padding-x: 0.5em, padding-y: 0.15em),
+//    lg: (font-size: 0.85rem, padding-x: 0.6em, padding-y: 0.2em),
+//    xl: (font-size: 0.95rem, padding-x: 0.7em, padding-y: 0.25em),
+//);
+
+$sizes: (
+    xs: (
+        font-size: 0.65rem,
+        padding-x: 0.35em,
+        padding-y: 0.10em,
+    ),
+    sm: (
+        font-size: 0.70rem,
+        padding-x: 0.42em, // NEW
+        padding-y: 0.12em,
+    ),
+    md: (
+        font-size: 0.75rem,
+        padding-x: 0.50em,
+        padding-y: 0.15em,
+    ),
+    lg: (
+        font-size: 0.85rem,
+        padding-x: 0.60em,
+        padding-y: 0.20em,
+    ),
+    xl: (
+        font-size: 0.95rem,
+        padding-x: 0.72em, // NEW
+        padding-y: 0.25em,
+    ),
+);
+
+$dot-scale: (
+    //xs: 0.45em,
+    //sm: 0.5em,
+    //md: 0.55em,
+    //lg: 0.6em,
+    //xl: 0.65em,
+    xs: 0.50em,
+    sm: 0.55em,
+    md: 0.60em,
+    lg: 0.65em,
+    xl: 0.70em,
+);
+
+$intents: (primary, secondary, info, warning, success, danger);

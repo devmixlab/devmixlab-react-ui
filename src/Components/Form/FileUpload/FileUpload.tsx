@@ -7,7 +7,7 @@ import {
 } from '../TagsInput/TagsInput';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { Size } from '../form.tokens';
-import { Badge } from '../../../Badge/Badge';
+import { Badge } from '../../Badge/Badge';
 import {
     Close as CloseIcon,
     IconWrapper as IconWrapper,
@@ -24,6 +24,8 @@ type ValidateFile = (file: File) => FileValidationResult;
 export type Layout = 'inline' | 'stacked' | 'grid' | 'compact' | 'gallery' | 'masonry';
 
 type Status = 'idle' | 'uploading' | 'success' | 'error';
+
+export type FileUploadTrigger = 'button' | 'tile' | 'both';
 
 type FileKind =
     | 'image'
@@ -71,7 +73,7 @@ type FileUploadProps = {
     defaultValue?: FileUploadItem[];
     onChange?: (files: FileUploadItem[]) => void;
 
-    uploadTrigger?: 'button' | 'tile' | 'both';
+    uploadTrigger?: FileUploadTrigger;
     maxFiles?: number;
     onMaxFilesExceeded?: (attempted: File[], current: FileUploadItem[]) => void;
     onMaxFilesReached?: (current: FileUploadItem[]) => void;

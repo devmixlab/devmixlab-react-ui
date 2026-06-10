@@ -1,8 +1,17 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Components/Box/Box';
-import { Size, Intent, Variant } from './badge.tokens';
-import { prefix } from './badge.helpers';
+import { Box, type BoxProps } from '../Box';
+import { classPrefix } from '../../utils/classPrefix';
+
+//------------------------------------------------------------
+// Types
+//------------------------------------------------------------
+
+export const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+export type Size = (typeof sizes)[number];
+
+export type Variant = 'solid' | 'base' | 'outlined' | 'ghost';
+export type Intent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
 
 export type BadgeProps = {
     children?: React.ReactNode;
@@ -17,6 +26,18 @@ export type BadgeProps = {
     dot?: boolean; // small dot __badge
     max?: number; // 99+
 };
+
+//------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------
+
+export const prefix = (name: string = '') => {
+    return classPrefix(`--badge${name}`);
+};
+
+//------------------------------------------------------------
+// Component
+//------------------------------------------------------------
 
 const Badge = ({
     children,

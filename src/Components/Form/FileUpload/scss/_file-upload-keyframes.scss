@@ -1,0 +1,33 @@
+@use './file-upload-conf' as *;
+
+@keyframes file-upload-loading {
+    0% {
+        left: -30%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes file-upload-max-exceeded {
+    0% {
+        outline-color: transparent;
+        background: transparent;
+    }
+
+    15% {
+        outline-color: var(--#{$p}-accent-danger);
+
+        background: color-mix(
+            in srgb,
+            var(--#{$p}-accent-danger) 8%,
+            transparent
+        );
+    }
+
+    100% {
+        outline-color: transparent;
+        background: transparent;
+    }
+}

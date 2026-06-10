@@ -1,0 +1,116 @@
+@use '../../../../scss/functions' as functions;
+@use '../../../../scss/mixins' as mixins;
+
+@use '../../../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$tags-input-prefix: #{$p}--tags-input;
+
+$sizes: (
+    sm: (height: 32px, spacingY: 6px, spacingTop: 8px),
+    md: (height: 40px, spacingY: 10px, spacingTop: 12px),
+    lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
+);
+
+.#{$tags-input-prefix} {
+    display: inline-flex;
+    flex-wrap: wrap;
+    --fr-slot-h: auto;
+    --fr-height: auto;
+    gap: var(--fr-gap);
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            --fr-min-height: #{map.get($value, height)};
+            --ti-top-offset: #{map.get($value, spacingTop)};
+            --ti-y-offset: #{map.get($value, spacingY)};
+        }
+    }
+
+    --fr-slot-pt: var(--ti-top-offset);
+    --fr-pl: calc(var(--fr-start-width) + var(--fr-spacing-x) + var(--fr-gap));
+    --fr-pr: calc(var(--fr-end-width) + var(--fr-spacing-x) + var(--fr-gap));
+    --fr-pt: var(--ti-y-offset);
+    --fr-pb: var(--ti-y-offset);
+
+    &[data-full-width]{
+        display: flex;
+    }
+
+    .#{$p}--field {
+        flex: 0 0 auto;   // force override
+        width: auto;      // CRITICAL
+        min-width: 20px;
+
+        max-width: 100%;
+
+        height: auto;
+        padding: 0;
+    }
+
+    .#{$p}--mirror {
+        position: absolute;
+        visibility: hidden;
+        white-space: pre;
+
+        font: inherit;         // 👈 VERY important
+        letter-spacing: inherit;
+
+        padding: 0;
+        margin: 0;
+    }
+
+    .#{$p}--tag-edit {
+        @include mixins.reset-input;
+
+        flex: 0 0 auto;
+        min-width: 20px;
+        max-width: 100%;
+        width: auto;
+
+        caret-color: currentColor;
+
+        height: auto;
+
+        // spacing to match chip
+        padding-inline: calc(var(--fr-gap) * 0.75);
+
+        // prevent layout shift
+        display: inline-flex;
+        align-items: center;
+    }
+
+    &[data-layout='grid'] {
+        .#{$p}--tag-edit {
+            display: flex;
+            flex: 1 1 auto;
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    .#{$p}--tag {
+        display: inline-flex;
+        &[data-disabled] {
+            pointer-events: none;
+        }
+        &[data-active] {
+            outline: none;
+        }
+    }
+
+    &[data-readonly] {
+        .#{$p}--tag{
+            pointer-events: none;
+        }
+    }
+
+    &[data-layout='stacked'] {
+        flex-direction: column;
+        align-items: stretch;
+        .#{$p}--tag {
+            width: 100%;
+        }
+    }
+}

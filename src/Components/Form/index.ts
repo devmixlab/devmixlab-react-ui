@@ -8,3 +8,5 @@ export * from './Switch';
 export * from './Select';
 export * from './Radio';
 export * from './Checkbox';
+export * from './FileUpload';
+export * from './TagsInput';
