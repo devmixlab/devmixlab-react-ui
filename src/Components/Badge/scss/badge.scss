@@ -21,6 +21,11 @@
     background-color: var(--bg, transparent);
     color: var(--text-color);
 
+    padding-left: var(--badge-padding-x);
+    padding-right: var(--badge-padding-x);
+    padding-top: var(--badge-padding-y);
+    padding-bottom: var(--badge-padding-y);
+
     .__content {
         display: inline-flex;
         align-items: center;
@@ -41,6 +46,11 @@
                 height: 100%;
             }
         }
+    }
+
+    &[data-icon-only] {
+        padding-left: var(--badge-padding-y);
+        padding-right: var(--badge-padding-y);
     }
 
     &--numeric {
@@ -74,8 +84,9 @@
 
     @each $size, $values in $sizes {
         &--size-#{$size} {
+            --badge-padding-y: #{map.get($values, padding-y)};
+            --badge-padding-x: #{map.get($values, padding-x)};
             font-size: map.get($values, font-size);
-            padding: map.get($values, padding-y) map.get($values, padding-x);
             gap: map.get($values, gap);
         }
     }

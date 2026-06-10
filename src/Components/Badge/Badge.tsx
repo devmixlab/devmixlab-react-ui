@@ -24,6 +24,7 @@ export type BadgeProps = {
 
     startIcon?: React.ReactNode;
     endIcon?: React.ReactNode;
+    iconOnly?: boolean;
 
     // special cases
     dot?: boolean; // small dot __badge
@@ -53,6 +54,7 @@ const Badge = ({
 
     startIcon,
     endIcon,
+    iconOnly = false,
 
     dot = false,
     max,
@@ -85,12 +87,16 @@ const Badge = ({
             data-intent={intent}
             data-variant={variant}
             data-size={size}
+            data-icon-only={iconOnly || undefined}
             {...props}
         >
             {/* START ICON */}
             {startIcon && <span className={prefix(`__icon`)}>{startIcon}</span>}
 
-            {!isDot && <span className={prefix('__content')}>{content}</span>}
+            {!isDot && !iconOnly && <span className={prefix('__content')}>{content}</span>}
+
+            {/* ICON ONLY */}
+            {iconOnly && <span className={prefix('__icon')}>{content}</span>}
 
             {/* END ICON */}
             {endIcon && <span className={prefix(`__icon`)}>{endIcon}</span>}
