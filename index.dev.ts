@@ -52,7 +52,7 @@ export { useNavbarMobileContext } from './src/Components/Navbar/Navbar.context';
 export { Warning as WarningIcon } from './src/Icon/Warning';
 
 export { Badge } from './src/Components/Badge/Badge';
-export { Chip } from './src/Chip/Chip';
+export { Chip } from './src/Components/Chip/Chip';
 export { Alert } from './src/Alert/Alert';
 export { Card } from './src/Components/Card';
 export { Heading, H1, H2, H3, H4, H5, H6 } from './src/Heading';

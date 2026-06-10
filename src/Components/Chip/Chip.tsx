@@ -1,13 +1,41 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Components/Box/Box';
-import { Size, Intent, Variant } from './chip.tokens';
+import { Box, type BoxProps } from '../Box/Box';
+// import { Size, Intent, Variant } from './chip.tokens';
 // import { prefix } from './chip.helpers';
-import { CLASS_PREFIX } from '../constants';
-import { classPrefix } from '../utils/classPrefix';
+// import { CLASS_PREFIX } from '../../constants';
+import { classPrefix } from '../../utils/classPrefix';
 
-export const prefix = (name: string = '') => {
-    return classPrefix(`--chip${name}`);
+//---------------------------------------------------------------
+// Types
+//---------------------------------------------------------------
+
+export const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+export type Size = (typeof sizes)[number];
+
+export type Variant = 'solid' | 'base' | 'outlined' | 'ghost';
+export type Intent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+
+export type OwnChipProps = {
+    // as?: React.ElementType;
+    // className?: string;
+    // children: React.ReactNode;
+    intent?: Intent;
+    variant?: Variant;
+    size?: Size;
+    disabled?: boolean;
+    selected?: boolean; // selected / current (pagination, tabs)
+    rounded?: BoxProps['rounded'];
+    startIcon?: React.ReactNode;
+    endIcon?: React.ReactNode;
+
+    focused?: boolean;
+
+    removable?: boolean;
+    onRemove?: () => void;
+
+    // href?: string;
+    // onClick?: React.MouseEventHandler<any>;
 };
 
 // export type ButtonProps = React.ButtonHTMLAttributes<HTMLElement> & {
@@ -36,6 +64,13 @@ export type ChipProps = {
     target?: React.HTMLAttributeAnchorTarget;
     rel?: string;
 } & BoxProps;
+
+//-----------------------------------------------------------
+// Helpers
+//-----------------------------------------------------------
+export const prefix = (name: string = '') => {
+    return classPrefix(`--chip${name}`);
+};
 
 const Chip = forwardRef(
     (

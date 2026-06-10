@@ -1,0 +1,286 @@
+@use '../../../scss/functions' as functions;
+@use '../../../scss/mixins' as mixins;
+
+@use '../../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$chip-prefix: #{$p}--chip;
+
+$sizes: (
+    sm: (font-size: 0.8rem,  padding-x: 0.4em, padding-y: 0.22em, gap: 0.25em),
+    md: (font-size: 0.9rem,  padding-x: 0.5em, padding-y: 0.26em, gap: 0.3em),
+    lg: (font-size: 1rem,    padding-x: 0.6em, padding-y: 0.3em,  gap: 0.35em),
+);
+
+.#{$chip-prefix} {
+
+    border: 1px solid transparent;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    align-self: center;
+
+    //gap: 0.4em;
+
+    line-height: 1;
+    font-weight: 500;
+    white-space: nowrap;
+
+    transition:
+        transform 0.08s ease,
+        filter 0.12s ease,
+        box-shadow 0.12s ease,
+        background-color 0.12s ease,
+        border-color 0.12s ease,
+        color 0.12s ease;
+
+    .#{$chip-prefix}__content {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    &[data-disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &[data-interactive]:not([data-disabled]):active {
+        transform: scale(0.97);
+    }
+
+    &[data-focused],
+    &:focus-visible {
+        outline: 2px solid var(--ring-color);
+        //outline: 2px solid red;
+        outline-offset: 2px;
+    }
+
+    @each $size, $values in $sizes {
+        &[data-size='#{$size}'] {
+            font-size: map-get($values, font-size);
+            padding: map-get($values, padding-y) map-get($values, padding-x);
+            gap: map-get($values, gap);
+        }
+    }
+
+    .#{$chip-prefix}__remove {
+        position: relative;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 1em;
+        height: 1em;
+
+        flex-shrink: 0;
+
+        &::before {
+            content: '';
+            position: absolute;
+
+            inset: -0.4em; // 👈 expand clickable area
+            border-radius: 50%;
+        }
+
+        .#{$chip-prefix}__remove-icon {
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            transform: translate(-50%, -50%) scale(1.6);
+
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        &:active {
+            transform: scale(0.9);
+        }
+    }
+
+    &[data-removable]{
+        cursor: default;
+    }
+
+    &[data-interactive]:not([data-disabled]) {
+        cursor: pointer;
+    }
+
+    .#{$chip-prefix}__icon {
+        display: inline-flex;
+        align-items: center;
+
+        > svg,
+        > .MuiSvgIcon-root {
+            width: 1em;
+            height: 1em;
+            font-size: 1em;
+            display: block;
+        }
+    }
+
+    &[data-selected] {
+        font-weight: 600;
+    }
+
+    $intents: (
+        'primary',
+        'secondary',
+        'info',
+        'warning',
+        'success',
+        'danger'
+    );
+
+    @each $intent in $intents {
+        &[data-intent='#{$intent}'] {
+            //@include intent-vars(map.get($intent-palette-map, $intent));
+
+            --ring-color: #{functions.intent-color($intent, 400)};
+
+            // SOLID (strong)
+            &[data-variant='solid'] {
+                background-color: #{functions.intent-color($intent, 500)};
+                color: white;
+
+                &[data-selected] {
+                    background-color: #{functions.intent-color($intent, 700)}; // stronger jump
+                }
+
+                &[data-interactive]:not([data-disabled]):hover {
+                    background-color: #{functions.intent-color($intent, 600)};
+                }
+            }
+
+            // BASE (default subtle)
+            &[data-variant='base'] {
+                background-color: #{functions.intent-color($intent, 100)};
+                color: #{functions.intent-color($intent, 700)};
+                border: 1px solid #{functions.intent-color($intent, 200)};
+
+                &[data-selected] {
+                    background-color: #{functions.intent-color($intent, 300)}; // stronger than 200
+                    border-color: #{functions.intent-color($intent, 400)};
+                    color: #{functions.intent-color($intent, 800)};
+                }
+
+                &[data-interactive]:not([data-disabled]):hover {
+                    background-color: #{functions.intent-color($intent, 200)};
+                    border-color: #{functions.intent-color($intent, 300)};
+                }
+            }
+
+            // OUTLINED
+            &[data-variant='outlined'] {
+                background-color: transparent;
+                color: #{functions.intent-color($intent, 600)};
+                border: #{1px solid functions.intent-color($intent, 300)};
+
+                &[data-selected] {
+                    background-color: #{functions.intent-color($intent, 200)}; // stronger fill
+                    border-color: #{functions.intent-color($intent, 500)};
+                    color: #{functions.intent-color($intent, 800)};
+                }
+
+                &[data-interactive]:not([data-disabled]):hover {
+                    background-color: #{functions.intent-color($intent, 100)};
+                    border-color: #{functions.intent-color($intent, 400)};
+                    color: #{functions.intent-color($intent, 700)};
+                }
+            }
+
+            // GHOST
+            &[data-variant='ghost'] {
+                background-color: transparent;
+                color: #{functions.intent-color($intent, 600)};
+
+                &[data-selected] {
+                    background-color: #{functions.intent-color($intent, 200)};
+                    color: #{functions.intent-color($intent, 800)};
+                }
+
+                &[data-interactive]:not([data-disabled]):hover {
+                    background-color: #{functions.intent-color($intent, 100)};
+                    color: #{functions.intent-color($intent, 700)};
+                }
+            }
+
+            @include cfg.dark {
+                --ring-color: #{functions.intent-color($intent, 300)};
+
+                // SOLID
+                &[data-variant='solid'] {
+                    background-color: #{functions.intent-color($intent, 600)};
+                    color: #{functions.intent-color($intent, 50)};
+
+                    &[data-selected] {
+                        background-color: #{functions.intent-color($intent, 700)};
+                        color: #{functions.intent-color($intent, 50)};
+                    }
+
+                    &[data-interactive]:not([data-disabled]):hover {
+                        background-color: #{functions.intent-color($intent, 500)};
+                    }
+                }
+
+                // BASE
+                &[data-variant='base'] {
+                    background-color: #{functions.intent-color($intent, 900)};
+                    color: #{functions.intent-color($intent, 200)};
+                    border: 1px solid #{functions.intent-color($intent, 700)};
+
+                    &[data-selected] {
+                        background-color: #{functions.intent-color($intent, 700)}; // stronger jump
+                        color: #{functions.intent-color($intent, 50)};
+                        border-color: #{functions.intent-color($intent, 500)};
+                    }
+
+                    &[data-interactive]:not([data-disabled]):hover {
+                        background-color: #{functions.intent-color($intent, 800)};
+                        border-color: #{functions.intent-color($intent, 600)};
+                    }
+                }
+
+                // OUTLINED
+                &[data-variant='outlined'] {
+                    background-color: transparent;
+                    color: #{functions.intent-color($intent, 300)};
+                    border: 1px solid #{functions.intent-color($intent, 700)};
+
+                    &[data-selected] {
+                        background-color: #{functions.intent-color($intent, 800)}; // stronger fill
+                        color: #{functions.intent-color($intent, 100)};
+                        border-color: #{functions.intent-color($intent, 400)};
+                    }
+
+                    &[data-interactive]:not([data-disabled]):hover {
+                        background-color: #{functions.intent-color($intent, 900)}; // subtle fill
+                        border-color: #{functions.intent-color($intent, 500)};
+                        color: #{functions.intent-color($intent, 200)};
+                    }
+                }
+
+                // GHOST
+                &[data-variant='ghost'] {
+                    background-color: transparent;
+                    color: #{functions.intent-color($intent, 300)};
+
+                    &[data-selected] {
+                        background-color: #{functions.intent-color($intent, 800)};
+                        color: #{functions.intent-color($intent, 100)};
+                    }
+
+                    &[data-interactive]:not([data-disabled]):hover {
+                        background-color: #{functions.intent-color($intent, 900)};
+                        color: #{functions.intent-color($intent, 200)};
+                    }
+                }
+            }
+        }
+    }
+}

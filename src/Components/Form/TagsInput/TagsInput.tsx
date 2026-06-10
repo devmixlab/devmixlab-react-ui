@@ -5,7 +5,7 @@ import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect, useMem
 import { type TextInputProps } from '../TextInput/TextInput';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
 import clsx from 'clsx';
-import { Chip } from '../../../Chip/Chip';
+import { Chip } from '../../Chip/Chip';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { Box, BoxProps } from '../../Box/Box';
 import { Size } from '../form.tokens';

@@ -12,3 +12,4 @@ export * from './src/Components/Container';
 export * from './src/Components/Form';
 
 export * from './src/Components/Badge';
+export * from './src/Components/Chip';
