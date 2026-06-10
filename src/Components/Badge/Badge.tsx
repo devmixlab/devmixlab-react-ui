@@ -22,6 +22,9 @@ export type BadgeProps = {
     size?: Size;
     rounded?: BoxProps['rounded'];
 
+    startIcon?: React.ReactNode;
+    endIcon?: React.ReactNode;
+
     // special cases
     dot?: boolean; // small dot __badge
     max?: number; // 99+
@@ -47,6 +50,9 @@ const Badge = ({
     variant = 'base',
     size = 'md',
     rounded = 'sm',
+
+    startIcon,
+    endIcon,
 
     dot = false,
     max,
@@ -81,7 +87,13 @@ const Badge = ({
             data-size={size}
             {...props}
         >
+            {/* START ICON */}
+            {startIcon && <span className={prefix(`__icon`)}>{startIcon}</span>}
+
             {!isDot && <span className={prefix('__content')}>{content}</span>}
+
+            {/* END ICON */}
+            {endIcon && <span className={prefix(`__icon`)}>{endIcon}</span>}
         </Box>
     );
 };
