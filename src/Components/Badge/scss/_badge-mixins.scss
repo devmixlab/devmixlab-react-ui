@@ -32,10 +32,12 @@
     }
 }
 
-@mixin ghost($intent, $mode: 'light') {
+@mixin dot($intent, $mode: 'light') {
     @if ($mode == 'light') {
-        --text-color: #{intent($intent, 600)};
+        --bg: #{intent($intent, 500)};
+        --border-color: transparent;
     } @else {
-        --text-color: #{intent($intent, 300)};
+        --bg: #{intent($intent, 400)};
+        --border-color: transparent;
     }
 }

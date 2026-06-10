@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box';
+import { Box, BoxComponentProps, type BoxProps } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
 
 //------------------------------------------------------------
@@ -10,17 +10,15 @@ import { classPrefix } from '../../utils/classPrefix';
 export const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 export type Size = (typeof sizes)[number];
 
-export type Variant = 'solid' | 'base' | 'outlined' | 'ghost';
+export type Variant = 'solid' | 'base' | 'outlined';
 export type Intent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
 
-export type BadgeProps = {
-    children?: React.ReactNode;
-    className?: string;
-
+export type OwnBadgeProps = {
     intent?: Intent;
     variant?: Variant;
     size?: Size;
-    rounded?: BoxProps['rounded'];
+
+    number?: number; // to format value as tabular-nums
 
     startIcon?: React.ReactNode;
     endIcon?: React.ReactNode;
@@ -30,6 +28,8 @@ export type BadgeProps = {
     dot?: boolean; // small dot __badge
     max?: number; // 99+
 };
+
+export type BadgeProps = Omit<BoxComponentProps<'div'>, 'size'> & OwnBadgeProps;
 
 //------------------------------------------------------------
 // Helpers
@@ -47,10 +47,14 @@ const Badge = ({
     children,
     className,
 
+    title,
+
     intent = 'primary',
     variant = 'base',
     size = 'md',
     rounded = 'sm',
+
+    number,
 
     startIcon,
     endIcon,
@@ -67,36 +71,62 @@ const Badge = ({
         console.warn('Badge: `dot` is true but `children` were provided.');
     }
 
-    const isExceedsMax = typeof children === 'number' && max != null && children > max;
+    if (iconOnly && (startIcon || endIcon)) {
+        console.warn('Badge: `iconOnly` cannot be used together with `startIcon` or `endIcon`.');
+    }
 
-    const content = isDot ? null : isExceedsMax ? `${max}+` : children;
+    if (number != null && children != null) {
+        console.warn('Badge: `number` and `children` cannot be used together.');
+    }
 
-    if (!isDot && content == null) return null;
+    if (iconOnly && number != null) {
+        console.warn('Badge: `iconOnly` and `number` cannot be used together.');
+    }
 
-    const cl = clsx(className, prefix(), prefix(`--${intent}`), prefix(`--size-${size}`), {
-        [prefix(`--${variant}`)]: !isDot,
-        [prefix('--dot')]: isDot,
-    });
+    if (
+        isDot &&
+        (children != null || number != null || startIcon != null || endIcon != null || iconOnly)
+    ) {
+        console.warn('Badge: `dot` cannot be combined with content, icons, or numbers.');
+    }
+
+    if (iconOnly && children == null) {
+        console.warn('Badge: `iconOnly` requires an icon as children.');
+    }
+
+    const isNumber = number != null;
+    const isNumberExceedsMax = isNumber && max != null && number > max;
+    const resolvedNumber = !isNumber ? null : isNumberExceedsMax ? `${max}+` : String(number);
+    const resolvedTitle = title ?? (isNumberExceedsMax ? String(number) : undefined);
+
+    const hasContent = isDot || isNumber || children != null;
+
+    if (!hasContent) return null;
 
     return (
         <Box
-            title={isExceedsMax ? String(children) : undefined}
-            className={cl}
+            title={resolvedTitle}
+            className={clsx(prefix(), className)}
             rounded={isDot ? undefined : rounded}
             aria-hidden={isDot ? true : undefined}
             data-intent={intent}
-            data-variant={variant}
+            data-variant={!isDot ? variant : undefined}
             data-size={size}
             data-icon-only={iconOnly || undefined}
+            data-dot={isDot || undefined}
+            data-numeric={isNumber || undefined}
+            data-number-exceeds-max={isNumberExceedsMax || undefined}
             {...props}
         >
             {/* START ICON */}
             {startIcon && <span className={prefix(`__icon`)}>{startIcon}</span>}
 
-            {!isDot && !iconOnly && <span className={prefix('__content')}>{content}</span>}
+            {!isDot && !iconOnly && (
+                <span className={prefix('__content')}>{isNumber ? resolvedNumber : children}</span>
+            )}
 
             {/* ICON ONLY */}
-            {iconOnly && <span className={prefix('__icon')}>{content}</span>}
+            {iconOnly && <span className={prefix('__icon')}>{children}</span>}
 
             {/* END ICON */}
             {endIcon && <span className={prefix(`__icon`)}>{endIcon}</span>}
