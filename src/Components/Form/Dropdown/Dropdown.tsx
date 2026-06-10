@@ -18,11 +18,8 @@ import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dro
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } from '../FieldRoot';
-import { TriangleDown as TriangleDownIcon, ChevronDown as ChevronDownIcon } from '../../../Icon';
-import { PopoverTriggerElementProps } from '../../Popover/Popover';
+import { ChevronDown as ChevronDownIcon } from '../../../Icon';
 import { splitProps } from '../../../utils/splitProps';
-import { capitalize } from '../../../utils/capitalize';
-import { focusRelativeToElement } from '../../../utils/focusRelativeToElement';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -181,14 +178,19 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             [options, selectedValue],
         );
 
-        const isOptionShown = (option: DropdownOptionData) => {
-            const isInFiltered = filteredOptions.some((o) => o.id == option.id);
-            return isInFiltered;
-        };
+        const isOptionShown = useCallback(
+            (option: DropdownOptionData) => {
+                return filteredOptions.some((o) => o.id === option.id);
+            },
+            [filteredOptions],
+        );
 
-        const isGroupShown = (group: GroupContextValue) => {
-            return filteredOptions.some((option) => option.group?.id === group.id);
-        };
+        const isGroupShown = useCallback(
+            (group: GroupContextValue) => {
+                return filteredOptions.some((option) => option.group?.id === group.id);
+            },
+            [filteredOptions],
+        );
 
         // ------------------------------------------------------------------
         // Focusable list (keyboard nav + focus tracking)
@@ -303,22 +305,17 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             [
                 modal,
                 opened,
-                // setOpened,
                 triggerRef,
                 panelRef,
                 isPanelHovered,
-                // setIsPanelHovered,
                 handleSelect,
                 focusByTypeahead,
                 isOptionShown,
                 isGroupShown,
                 disabled,
-                invalid,
                 isInvalid,
                 isSearchable,
-                // setIsSearchable,
                 search,
-                // setSearch,
                 searchInputRef,
                 focusableList,
                 selectedOption,
@@ -537,15 +534,10 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
         const ctxFormField = useFormFieldContext();
         const isInvalid = ctxFormField ? ctxFormField.hasError || ctx.invalid : ctx.invalid;
 
-        const {
-            // setOpened,
-            opened,
-        } = useDropdownContext();
-
         const [triggerActive, setTriggerActive] = useState(true);
 
         useEffect(() => {
-            if (opened) {
+            if (ctx.opened) {
                 setTriggerActive(true);
                 return;
             }
@@ -555,7 +547,7 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
             }, 300);
 
             return () => clearTimeout(timeout);
-        }, [opened]);
+        }, [ctx.opened]);
 
         return (
             <DropdownTrigger
