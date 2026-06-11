@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useCallback } from 'react';
+import React, { forwardRef, useState, useCallback, HTMLAttributes } from 'react';
 import {
     createPolymorphic,
     type PolymorphicComponent,
@@ -33,7 +33,7 @@ type OwnAlertProps = {
     onDismiss?: () => void;
 } & Omit<BoxProps, 'size'>;
 
-type ImplAlertProps<C extends React.ElementType = 'div'> = PolymorphicProps<C, OwnAlertProps>;
+type ImplAlertProps = OwnAlertProps & HTMLAttributes<HTMLDivElement>;
 
 // type AlertProps = {
 //     children: React.ReactNode;
@@ -56,7 +56,7 @@ const defaultIcons: Record<Intent, React.ReactNode> = {
     info: <Info />,
 };
 
-const AlertImpl = <C extends React.ElementType = 'div'>(
+const AlertImpl = (
     {
         children,
         className,
@@ -68,11 +68,9 @@ const AlertImpl = <C extends React.ElementType = 'div'>(
         rounded = 'md',
 
         icon,
-        dismissible,
-        ccc,
         onDismiss,
         ...rest
-    }: ImplAlertProps<'div'>,
+    }: ImplAlertProps,
     ref: React.Ref<any>,
 ) => {
     const [visible, setVisible] = useState(true);
