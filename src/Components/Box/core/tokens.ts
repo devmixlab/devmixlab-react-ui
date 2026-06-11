@@ -282,13 +282,3 @@ export const objectFits = ['contain', 'cover', 'fill', 'none', 'scale-down'] as 
 export const borderStyles = ['none', 'solid', 'dashed', 'dotted'] as const;
 
 export const selfAlignments = ['auto', 'start', 'center', 'end', 'stretch'] as const;
-
-export const booleanClassMap = {
-    appearanceNone: '--appearance-none',
-    resizeNone: '--resize-none',
-    truncate: '--truncate',
-    isolate: '--isolate',
-    scrollSmooth: '--scroll-smooth',
-    grow: '--grow',
-    shrink: '--shrink',
-} as const;

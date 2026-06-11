@@ -441,16 +441,39 @@ export const config: OriginPropConfig[] = [
         },
     },
 
-    // Truncate
-    {
-        key: 'truncate',
+    // Boolean tokens
+    ...(
+        [
+            ['truncate'],
+            ['isolate'],
+            ['grow'],
+            ['shrink'],
+            ['appearanceNone', 'appearance-none'],
+            ['resizeNone', 'resize-none'],
+            ['scrollSmooth', 'scroll-smooth'],
+        ] as const
+    ).map(([key, prefix]) => ({
+        key,
         useJustPrefix: true,
-        // setCssVars: [['--line-clamp', '{token}']],
-        // prefix: 'line-clamp',
-        isToken: (isT: () => boolean, value: PropValue): value is boolean => {
-            return typeof value === 'boolean';
+        prefix: prefix ?? key,
+        isToken: (isT: () => boolean, value: PropValue): value is true => {
+            return value === true;
         },
-    },
+    })),
+
+    ...(
+        [
+            ['grow', 'grow-0'],
+            ['shrink', 'shrink-0'],
+        ] as const
+    ).map(([key, prefix]) => ({
+        key,
+        useJustPrefix: true,
+        prefix: prefix ?? key,
+        isToken: (isT: () => boolean, value: PropValue): value is false => {
+            return value === false;
+        },
+    })),
 
     // Sizing
     ...(

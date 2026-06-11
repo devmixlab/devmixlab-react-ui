@@ -2,19 +2,22 @@ import React, { CSSProperties, forwardRef } from 'react';
 import { DerivedProps, BoxDerived } from './BoxDerived';
 import clsx from 'clsx';
 import { classPrefix } from '../../utils/classPrefix';
-import { hasKey, typedEntries } from '../../utils/ts';
+import { hasKey } from '../../utils/ts';
 import { configLookup, type PropValue } from './core/config';
 import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
-import { booleanClassMap } from './core/tokens';
 
 import { resolveResponsive, useBreakpoint, Responsiveify } from '../../utils/responsive';
 
 export type Props = {
-    appearanceNone?: boolean;
-    grow?: boolean | 0 | DerivedProps['grow'];
+    grow?: boolean | DerivedProps['grow'];
+    shrink?: boolean | DerivedProps['shrink'];
     lineClamp?: number;
     truncate?: boolean;
-} & Omit<DerivedProps, 'grow'>;
+    isolate?: boolean;
+    scrollSmooth?: boolean;
+    resizeNone?: boolean;
+    appearanceNone?: boolean;
+} & Omit<DerivedProps, 'grow' | 'shrink'>;
 
 type BoxProps = Responsiveify<Props>;
 
@@ -23,21 +26,23 @@ type BoxComponentProps<C extends React.ElementType = 'div', Props = {}> = Polymo
     Props & BoxProps
 >;
 
-type ImplProps = {
-    children?: React.ReactNode;
-    className?: string;
-} & Record<string, unknown>;
+type ImplProps<C extends React.ElementType = 'div'> = PolymorphicProps<C, BoxProps>;
 
-const normalizeCssVar = (name: string) => (name.startsWith('--') ? name : `--${name}`);
+const normalizeCssVar = (name: string): `--${string}` =>
+    (name.startsWith('--') ? name : `--${name}`) as `--${string}`;
 
-const BoxImpl = ({ className, style, ...rest }: ImplProps, ref: React.Ref<any>) => {
+const BoxImpl = <C extends React.ElementType = 'div'>(
+    { as, className, style, ...rest }: ImplProps<C>,
+    ref: React.Ref<any>,
+) => {
+    const asResolved: React.ElementType = as ?? 'div';
+
     const { breakpoint } = useBreakpoint();
 
     if (rest?.truncate && rest?.lineClamp != null) {
         console.warn('Box: `truncate` and `lineClamp` are mutually exclusive.');
     }
 
-    const booleanKeys = new Set(Object.keys(booleanClassMap));
     const restProps = rest;
 
     // Transition composition
@@ -58,12 +63,10 @@ const BoxImpl = ({ className, style, ...rest }: ImplProps, ref: React.Ref<any>) 
         }
     }
 
-    // const restEntries = typedEntries(rest);
-    const restEntries = typedEntries(restProps);
+    const restEntries = Object.entries(restProps) as [string, unknown][];
 
     const classes: string[] = [];
-    const cssVars: Record<string, string> = {};
-    // const cssVars: Record<string, string> = {};
+    const cssVars: Record<`--${string}`, string> = {};
     const locked = new Set<string>();
     const propsToPassNext: Partial<Record<keyof BoxProps, unknown>> = {};
 
@@ -71,24 +74,9 @@ const BoxImpl = ({ className, style, ...rest }: ImplProps, ref: React.Ref<any>) 
         propsToPassNext[key as keyof BoxProps] = val;
     };
 
-    Object.entries(booleanClassMap).forEach(([key, className]) => {
-        if (rest[key] === true) {
-            classes.push(classPrefix(className));
-            locked.add(key);
-        }
-    });
-
-    if (rest.grow === 0) classes.push(classPrefix(`--grow-0`));
-    if (rest.shrink === 0) classes.push(classPrefix(`--shrink-0`));
-
     restEntries.forEach(([rawKey, value]) => {
-        const key = rawKey as string;
+        const key = rawKey;
         if (locked.has(key)) return;
-
-        if (key == 'grow') return;
-
-        // prevent leaking boolean utility props
-        // if (booleanKeys.has(key)) return;
 
         const resolved = resolveResponsive(value, breakpoint);
 
@@ -132,7 +120,6 @@ const BoxImpl = ({ className, style, ...rest }: ImplProps, ref: React.Ref<any>) 
         }
 
         if (config.isToken && config.isToken(finalValue) && configCheck) {
-            // console.log(config.useJustPrefix);
             if (config.setCssVars) {
                 for (const [name, template] of config.setCssVars) {
                     cssVars[normalizeCssVar(name)] = template.replace(
@@ -155,21 +142,29 @@ const BoxImpl = ({ className, style, ...rest }: ImplProps, ref: React.Ref<any>) 
         }
     });
 
-    const mergedStyle =
+    // const mergedStyle =
+    //     Object.keys(cssVars).length > 0
+    //         ? {
+    //               ...style,
+    //               ...cssVars,
+    //           }
+    //         : style;
+
+    const mergedStyle: CSSProperties | undefined =
         Object.keys(cssVars).length > 0
             ? {
-                  ...(style as React.CSSProperties),
+                  ...(style as CSSProperties),
                   ...cssVars,
               }
-            : style;
+            : (style as CSSProperties | undefined);
 
     return (
         <BoxDerived
+            as={asResolved}
             ref={ref}
             {...(propsToPassNext as DerivedProps)}
             className={clsx(classes, className)}
-            style={mergedStyle as CSSProperties}
-            // style={style}
+            style={mergedStyle}
         />
     );
 };
