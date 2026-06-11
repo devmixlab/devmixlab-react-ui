@@ -1,4 +1,7 @@
 @use '../../../scss/functions/common' as *;
+@use './chip-vars' as *;
+@use 'sass:list';
+@use 'sass:color';
 
 @mixin solid($intent, $mode: 'light') {
     @if ($mode == 'light') {
@@ -135,8 +138,10 @@
 }
 
 @mixin ghost($intent, $mode: 'light') {
+    $is-dark-intent: list.index($dark-intents, $intent) != null;
+
     @if ($mode == 'light') {
-        --chip-bg: transparent;
+        --chip-bg: #{intent($intent, 50)};
         --chip-text-color: #{intent($intent, 700)};
         --chip-border-color: transparent;
 
@@ -156,7 +161,13 @@
 
         --chip-outline-focus: #{intent($intent, 600)};
     } @else {
-        --chip-bg: transparent;
+        @if($is-dark-intent) {
+            //--chip-bg: #{color.change(map.get($), $alpha: 0.5)};
+            --chip-bg: #{intent($intent, 925)};
+        } @else {
+            --chip-bg: #{intent($intent, 950)};
+        }
+        //--chip-bg: #{intent($intent, 950)};
         --chip-text-color: #{intent($intent, 300)};
         --chip-border-color: transparent;
 
@@ -170,9 +181,9 @@
         --chip-border-color-selected: transparent;
         --chip-text-color-selected: #{intent($intent, 50)};
 
-        --chip-bg-disabled: transparent;
+        --chip-bg-disabled: #{intent($intent, 950)};
         --chip-border-color-disabled: transparent;
-        --chip-text-color-disabled: #{intent($intent, 400)};
+        --chip-text-color-disabled: #{intent($intent, 700)};
 
         --chip-outline-focus: #{intent($intent, 400)};
     }
