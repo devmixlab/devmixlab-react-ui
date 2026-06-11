@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import { Box, type BoxProps } from '../Box';
 import clsx from 'clsx';
 import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
@@ -8,37 +8,45 @@ const prefix = (name: string = '') => {
     return classPrefix(`--text${name}`);
 };
 
-type Variant =
-    | 'display-lg'
-    | 'display-md'
-    | 'heading-lg'
-    | 'heading-md'
-    | 'body-lg'
-    | 'body-md'
-    | 'body-sm'
-    | 'caption'
-    | 'micro'
-    | (string & {});
+export const textVariants = [
+    'display-lg',
+    'display-md',
+    'heading-lg',
+    'heading-md',
+    'body-lg',
+    'body-md',
+    'body-sm',
+    'caption',
+    'micro',
+] as const;
 
-type Intent =
-    | 'default'
-    | 'secondary'
-    | 'primary'
-    | 'warning'
-    | 'danger'
-    | 'success'
-    | 'info'
-    | (string & {});
+export type TextVariant = (typeof textVariants)[number] | (string & {});
 
-type Emphasis = 'subtle' | 'muted' | 'base' | 'strong' | (string & {});
+export const textIntents = [
+    'default',
+    'secondary',
+    'primary',
+    'warning',
+    'danger',
+    'success',
+    'info',
+] as const;
+
+export type TextIntent = (typeof textIntents)[number] | (string & {});
+
+export const textEmphases = ['subtle', 'muted', 'base', 'strong'] as const;
+
+export type TextEmphasis = (typeof textEmphases)[number] | (string & {});
 
 export type BaseProps = {
-    intent?: Intent;
+    intent?: TextIntent;
     className?: string;
     inline?: boolean;
-    variant?: Variant;
-    emphasis?: Emphasis;
+    variant?: TextVariant;
+    emphasis?: TextEmphasis;
     mono?: boolean;
+    code?: boolean;
+    numeric?: boolean;
 } & BoxProps;
 
 export type OwnTextProps = BaseProps;
@@ -52,13 +60,16 @@ const TextImpl = <C extends React.ElementType = 'p'>(
         intent = 'default',
         className,
         inline,
-        variant = 'body-md',
+        variant,
         mono = false,
+        code = false,
+        numeric = false,
         ...rest
     }: ImplTextProps<C>,
     ref: React.Ref<any>,
 ) => {
-    const Component: React.ElementType = as ?? (inline ? 'span' : 'p');
+    const isMono = mono || code;
+    const Component: React.ElementType = as ?? (code ? 'code' : inline ? 'span' : 'p');
 
     return (
         <Box
@@ -69,7 +80,9 @@ const TextImpl = <C extends React.ElementType = 'p'>(
             data-variant={variant}
             data-emphasis={emphasis}
             data-intent={intent}
-            data-mono={mono || undefined}
+            data-mono={isMono || undefined}
+            data-code={code || undefined}
+            data-numeric={numeric || undefined}
         />
     );
 };
