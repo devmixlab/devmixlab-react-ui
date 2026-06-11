@@ -1,0 +1,4 @@
+@use '../../../scss/config' as cfg;
+
+$p: cfg.$prefix;
+$text-prefix: #{$p}--text;

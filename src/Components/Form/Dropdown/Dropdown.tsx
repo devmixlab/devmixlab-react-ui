@@ -4,7 +4,7 @@ import { useFormFieldContext } from '../FormField/FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useStableId } from '../../../utils/useStableId';
 import { SearchInput, SearchInputProps } from '../SearchInput';
-import { Text } from '../../../Text/Text';
+import { Text } from '../../Text/Text';
 import { useFocusableList, useTypeahead } from '../../../hooks';
 import {
     Popover,

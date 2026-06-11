@@ -1,0 +1,121 @@
+@use '../../../scss/functions/common' as *;
+@use '../../../scss/mixins/mode' as *;
+@use './text-vars' as *;
+@use './text-conf' as *;
+@use 'sass:map';
+
+.#{$text-prefix} {
+
+    @each $variant, $value in $variants {
+        &[data-variant='#{$variant}'] {
+            font-size: map.get($value, fontSize);
+            font-weight: map.get($value, fontWeight);
+            line-height: map.get($value, lineHeight);
+            letter-spacing: map.get($value, letterSpacing);
+        }
+    }
+
+    --text-color-current: var(--text-color-base);
+
+    color: var(--text-color-current, inherit);
+    margin: 0;
+
+    &[data-emphasis='subtle'] {
+        --text-color-current: var(--text-color-subtle);
+    }
+
+    &[data-emphasis='muted'] {
+        --text-color-current: var(--text-color-muted);
+    }
+
+    &[data-emphasis='strong'] {
+        --text-color-current: var(--text-color-strong);
+    }
+
+    // Truncate (single line)
+    &[data-truncate] {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // Clamp (multi-line)
+    &[data-clamp] {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+    }
+
+    &[data-mono] {
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            SF Mono,
+            Consolas,
+            Liberation Mono,
+            Menlo,
+            monospace;
+    }
+
+    @each $intent in $intents {
+        &[data-intent='#{$intent}'] {
+            --text-color-subtle: #{intent($intent, 500)};
+            --text-color-muted: #{intent($intent, 600)};
+            --text-color-base: #{intent($intent, 700)};
+            --text-color-strong: #{intent($intent, 900)};
+        }
+
+        @include dark {
+            &[data-intent='#{$intent}'] {
+                --text-color-subtle: #{intent($intent, 600)};
+                --text-color-muted: #{intent($intent, 500)};
+                --text-color-base: #{intent($intent, 300)};
+                --text-color-strong: #{intent($intent, 100)};
+            }
+        }
+    }
+
+    &[data-intent='secondary'] {
+        --text-color-subtle: #{intent('zinc', 500)};
+        --text-color-muted: #{intent('zinc', 600)};
+        --text-color-base: #{intent('zinc', 800)};
+        --text-color-strong: #{intent('zinc', 950)};
+    }
+
+    &[data-intent='default'] {
+        --text-color-subtle:
+            #{intent('zinc', 500)};
+
+        --text-color-muted:
+            #{intent('zinc', 700)};
+
+        --text-color-base:
+            inherit;
+
+        --text-color-strong:
+            #{intent('zinc', 950)};
+    }
+
+    @include dark {
+        &[data-intent='secondary'] {
+            --text-color-subtle: #{intent('zinc', 500)};
+            --text-color-muted: #{intent('zinc', 400)};
+            --text-color-base: #{intent('zinc', 200)};
+            --text-color-strong: #{intent('zinc', 50)};
+        }
+
+        &[data-intent='default'] {
+            --text-color-subtle:
+                #{intent('zinc', 500)};
+
+            --text-color-muted:
+                #{intent('zinc', 400)};
+
+            --text-color-base:
+                inherit;
+
+            --text-color-strong:
+                #{intent('zinc', 50)};
+        }
+    }
+}

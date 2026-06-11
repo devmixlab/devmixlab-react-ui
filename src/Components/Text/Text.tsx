@@ -1,8 +1,8 @@
 import React, { CSSProperties, forwardRef } from 'react';
-import { Box, type BoxProps } from '../Components/Box/Box';
+import { Box, type BoxProps } from '../Box';
 import clsx from 'clsx';
-import { createPolymorphic } from '../types/polymorphic';
-import { classPrefix } from '../utils/classPrefix';
+import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
+import { classPrefix } from '../../utils/classPrefix';
 
 const prefix = (name: string = '') => {
     return classPrefix(`--text${name}`);
@@ -17,12 +17,22 @@ type Variant =
     | 'body-md'
     | 'body-sm'
     | 'caption'
-    | 'micro';
-type Intent = 'default' | 'secondary' | 'primary' | 'warning' | 'danger' | 'success' | 'info';
-type Emphasis = 'subtle' | 'muted' | 'base' | 'strong';
+    | 'micro'
+    | (string & {});
+
+type Intent =
+    | 'default'
+    | 'secondary'
+    | 'primary'
+    | 'warning'
+    | 'danger'
+    | 'success'
+    | 'info'
+    | (string & {});
+
+type Emphasis = 'subtle' | 'muted' | 'base' | 'strong' | (string & {});
 
 export type BaseProps = {
-    as?: React.ElementType;
     intent?: Intent;
     className?: string;
     inline?: boolean;
@@ -35,9 +45,11 @@ type TextBehaviorProps =
     | { truncate?: boolean; lineClamp?: never }
     | { lineClamp?: number; truncate?: never };
 
-export type TextProps = TextBehaviorProps & BaseProps;
+export type OwnTextProps = TextBehaviorProps & BaseProps;
 
-const TextImpl = (
+type ImplTextProps<C extends React.ElementType = 'p'> = PolymorphicProps<C, OwnTextProps>;
+
+const TextImpl = <C extends React.ElementType = 'p'>(
     {
         as,
         emphasis = 'base',
@@ -49,10 +61,10 @@ const TextImpl = (
         variant = 'body-md',
         mono = false,
         ...rest
-    }: TextProps,
+    }: ImplTextProps<C>,
     ref: React.Ref<any>,
 ) => {
-    const Component = inline ? (as ?? 'span') : (as ?? 'p');
+    const Component: React.ElementType = as ?? (inline ? 'span' : 'p');
 
     const isClamped = typeof lineClamp === 'number' && lineClamp > 0;
     const isTruncated = !isClamped && truncate;
@@ -73,4 +85,4 @@ const TextImpl = (
     );
 };
 
-export const Text = createPolymorphic<TextProps, 'p'>(forwardRef(TextImpl), 'Text');
+export const Text = createPolymorphic<OwnTextProps, 'p'>(forwardRef(TextImpl), 'Text');
