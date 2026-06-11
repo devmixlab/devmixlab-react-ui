@@ -1,0 +1,193 @@
+@use '../../../scss/functions/common' as *;
+
+@mixin solid($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --chip-bg: #{intent($intent, 600)};
+        --chip-text-color: #{intent($intent, 0)};
+        --chip-border-color: #{intent($intent, 600)};
+
+        --chip-bg-hover: #{intent($intent, 700)};
+        --chip-border-color-hover: #{intent($intent, 700)};
+
+        --chip-bg-active: #{intent($intent, 700)};
+        --chip-border-color-active: #{intent($intent, 700)};
+
+        --chip-bg-selected: #{intent($intent, 650)};
+        --chip-border-color-selected: #{intent($intent, 650)};
+        --chip-text-color-selected: #{intent($intent, 0)};
+
+        --chip-bg-disabled: #{intent($intent, 250)};
+        --chip-border-color-disabled: #{intent($intent, 250)};
+        --chip-text-color-disabled: #{intent($intent, 0)};
+
+        --chip-outline-focus: #{intent($intent, 600)};
+    } @else {
+        --chip-bg: #{intent($intent, 600)};
+        --chip-text-color: #{intent($intent, 50)};
+        --chip-border-color: #{intent($intent, 600)};
+
+        --chip-bg-hover: #{intent($intent, 500)};
+        --chip-border-color-hover: #{intent($intent, 500)};
+
+        --chip-bg-active: #{intent($intent, 400)};
+        --chip-border-color-active: #{intent($intent, 400)};
+
+        --chip-bg-selected: #{intent($intent, 450)};
+        --chip-border-color-selected: #{intent($intent, 450)};
+        --chip-text-color-selected: #{intent($intent, 0)};
+
+        --chip-bg-disabled: #{intent($intent, 850)};
+        --chip-border-color-disabled: #{intent($intent, 850)};
+        --chip-text-color-disabled: #{intent($intent, 500)};
+
+        --chip-outline-focus: #{intent($intent, 400)};
+    }
+}
+
+@mixin base($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --chip-bg: #{intent($intent, 100)};
+        --chip-text-color: #{intent($intent, 700)};
+        --chip-border-color: #{intent($intent, 200)};
+
+        --chip-bg-hover: #{intent($intent, 200)};
+        --chip-border-color-hover: #{intent($intent, 300)};
+
+        --chip-bg-active: #{intent($intent, 300)};
+        --chip-border-color-active: #{intent($intent, 400)};
+
+        --chip-bg-selected: #{intent($intent, 200)};
+        --chip-border-color-selected: #{intent($intent, 350)};
+        --chip-text-color-selected: #{intent($intent, 800)};
+
+        --chip-bg-disabled: #{intent($intent, 50)};
+        --chip-border-color-disabled: #{intent($intent, 100)};
+        --chip-text-color-disabled: #{intent($intent, 400)};
+
+        --chip-outline-focus: #{intent($intent, 600)};
+    } @else {
+        --chip-bg: #{intent($intent, 900)};
+        --chip-text-color: #{intent($intent, 200)};
+        --chip-border-color: #{intent($intent, 700)};
+
+        --chip-bg-hover: #{intent($intent, 800)};
+        --chip-border-color-hover: #{intent($intent, 600)};
+
+        --chip-bg-active: #{intent($intent, 700)};
+        --chip-border-color-active: #{intent($intent, 500)};
+
+        --chip-bg-selected: #{intent($intent, 750)};
+        --chip-border-color-selected: #{intent($intent, 550)};
+        --chip-text-color-selected: #{intent($intent, 50)};
+
+        --chip-bg-disabled: #{intent($intent, 950)};
+        --chip-border-color-disabled: #{intent($intent, 900)};
+        --chip-text-color-disabled: #{intent($intent, 600)};
+
+        --chip-outline-focus: #{intent($intent, 400)};
+    }
+}
+
+@mixin outlined($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --chip-bg: transparent;
+        --chip-text-color: #{intent($intent, 700)};
+        --chip-border-color: #{intent($intent, 300)};
+
+        --chip-bg-hover: #{intent($intent, 50)};
+        --chip-border-color-hover: #{intent($intent, 350)};
+
+        --chip-bg-active: #{intent($intent, 150)};
+        --chip-border-color-active: #{intent($intent, 500)};
+
+        --chip-bg-selected: #{intent($intent, 100)};
+        --chip-border-color-selected: #{intent($intent, 450)};
+        --chip-text-color-selected: #{intent($intent, 800)};
+
+        --chip-bg-disabled: transparent;
+        --chip-border-color-disabled: #{intent($intent, 200)};
+        --chip-text-color-disabled: #{intent($intent, 400)};
+
+        --chip-outline-focus: #{intent($intent, 600)};
+    } @else {
+        --chip-bg: transparent;
+        --chip-text-color: #{intent($intent, 300)};
+        --chip-border-color: #{intent($intent, 700)};
+
+        --chip-bg-hover: #{intent($intent, 950)};
+        --chip-border-color-hover: #{intent($intent, 650)};
+
+        --chip-bg-active: #{intent($intent, 850)};
+        --chip-border-color-active: #{intent($intent, 500)};
+
+        --chip-bg-selected: #{intent($intent, 900)};
+        --chip-border-color-selected: #{intent($intent, 550)};
+        --chip-text-color-selected: #{intent($intent, 100)};
+
+        --chip-bg-disabled: transparent;
+        --chip-border-color-disabled: #{intent($intent, 800)};
+        --chip-text-color-disabled: #{intent($intent, 600)};
+
+        --chip-outline-focus: #{intent($intent, 400)};
+    }
+}
+
+@mixin ghost($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --chip-bg: transparent;
+        --chip-text-color: #{intent($intent, 700)};
+        --chip-border-color: transparent;
+
+        --chip-bg-hover: #{intent($intent, 100)};
+        --chip-bg-active: #{intent($intent, 150)};
+
+        --chip-text-color-hover: #{intent($intent, 750)};
+        --chip-text-color-active: #{intent($intent, 850)};
+
+        --chip-bg-selected: #{intent($intent, 100)};
+        --chip-border-color-selected: transparent;
+        --chip-text-color-selected: #{intent($intent, 850)};
+
+        --chip-bg-disabled: transparent;
+        --chip-border-color-disabled: transparent;
+        --chip-text-color-disabled: #{intent($intent, 500)};
+
+        --chip-outline-focus: #{intent($intent, 600)};
+    } @else {
+        --chip-bg: transparent;
+        --chip-text-color: #{intent($intent, 300)};
+        --chip-border-color: transparent;
+
+        --chip-bg-hover: #{intent($intent, 900)};
+        --chip-bg-active: #{intent($intent, 850)};
+
+        --chip-text-color-hover: #{intent($intent, 200)};
+        --chip-text-color-active: #{intent($intent, 100)};
+
+        --chip-bg-selected: #{intent($intent, 900)};
+        --chip-border-color-selected: transparent;
+        --chip-text-color-selected: #{intent($intent, 50)};
+
+        --chip-bg-disabled: transparent;
+        --chip-border-color-disabled: transparent;
+        --chip-text-color-disabled: #{intent($intent, 400)};
+
+        --chip-outline-focus: #{intent($intent, 400)};
+    }
+}
+
+@mixin icon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    > svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+}
