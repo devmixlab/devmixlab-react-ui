@@ -27,7 +27,19 @@ $p: cfg.$prefix;
     @return $string;
 }
 
+$default-line-clamp: 1;
+
 .#{$p} {
+
+    &--line-clamp {
+        overflow: hidden;
+
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: var(--line-clamp, #{$default-line-clamp});
+
+        line-clamp: var(--line-clamp, #{$default-line-clamp});
+    }
 
     // spacing
     @each $key, $value in $spacing {

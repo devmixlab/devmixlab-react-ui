@@ -41,11 +41,7 @@ export type BaseProps = {
     mono?: boolean;
 } & BoxProps;
 
-type TextBehaviorProps =
-    | { truncate?: boolean; lineClamp?: never }
-    | { lineClamp?: number; truncate?: never };
-
-export type OwnTextProps = TextBehaviorProps & BaseProps;
+export type OwnTextProps = BaseProps;
 
 type ImplTextProps<C extends React.ElementType = 'p'> = PolymorphicProps<C, OwnTextProps>;
 
@@ -54,8 +50,6 @@ const TextImpl = <C extends React.ElementType = 'p'>(
         as,
         emphasis = 'base',
         intent = 'default',
-        truncate = false,
-        lineClamp,
         className,
         inline,
         variant = 'body-md',
@@ -66,9 +60,6 @@ const TextImpl = <C extends React.ElementType = 'p'>(
 ) => {
     const Component: React.ElementType = as ?? (inline ? 'span' : 'p');
 
-    const isClamped = typeof lineClamp === 'number' && lineClamp > 0;
-    const isTruncated = !isClamped && truncate;
-
     return (
         <Box
             ref={ref}
@@ -78,8 +69,6 @@ const TextImpl = <C extends React.ElementType = 'p'>(
             data-variant={variant}
             data-emphasis={emphasis}
             data-intent={intent}
-            data-truncate={isTruncated || undefined}
-            data-clamp={isClamped || undefined}
             data-mono={mono || undefined}
         />
     );

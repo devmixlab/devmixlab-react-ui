@@ -52,7 +52,8 @@ import {
 import { Props } from '../Box';
 import { StyleAliasKey, stylePropToAliasMap } from './styleAliasMap';
 
-type Key = keyof Props;
+type customKey = 'lineClamp' | 'truncate';
+type Key = keyof Props | customKey;
 
 export type PropValue = boolean | number | string | undefined;
 
@@ -64,14 +65,18 @@ export type Check = {
     value: PropValue;
 };
 
+type CssVarTuple = readonly [string, string];
+
 export type OriginPropConfig = {
     key: Key;
     prefix?: string;
+    useJustPrefix?: boolean;
+    setCssVars?: readonly CssVarTuple[];
     map?: Record<string, string | number>;
     tokens?: readonly string[];
     check?: (props: Check) => boolean;
     resolveInStyle?: (props: ResolveInStyleProps) => string | number;
-    isToken?: (isT: () => boolean, value: PropValue) => value is string;
+    isToken?: (isT: () => boolean, value: PropValue) => value is PropValue;
     modifyValue?: (value: PropValue) => PropValue;
 };
 
@@ -425,6 +430,28 @@ export const config: OriginPropConfig[] = [
         },
     })),
 
+    // Line Clamp
+    {
+        key: 'lineClamp',
+        useJustPrefix: true,
+        setCssVars: [['--line-clamp', '{token}']],
+        prefix: 'line-clamp',
+        isToken: (isT: () => boolean, value: PropValue): value is number => {
+            return typeof value === 'number';
+        },
+    },
+
+    // Truncate
+    {
+        key: 'truncate',
+        useJustPrefix: true,
+        // setCssVars: [['--line-clamp', '{token}']],
+        // prefix: 'line-clamp',
+        isToken: (isT: () => boolean, value: PropValue): value is boolean => {
+            return typeof value === 'boolean';
+        },
+    },
+
     // Sizing
     ...(
         [
@@ -492,6 +519,8 @@ export const configLookup: Record<LookupKey, MapedPropConfig> = Object.fromEntri
         ({
             key,
             prefix,
+            useJustPrefix,
+            setCssVars,
             map,
             tokens,
             check,
@@ -504,9 +533,11 @@ export const configLookup: Record<LookupKey, MapedPropConfig> = Object.fromEntri
             const mappedProp: MapedPropConfig = Object.freeze({
                 key,
                 prefix: prefix ?? key,
+                useJustPrefix,
                 map,
                 check,
                 resolveInStyle,
+                setCssVars,
                 isToken: (value: PropValue): value is string => {
                     const isT = () => isToken(value, tokens);
                     return configIsToken ? configIsToken(isT, value) : isT();

@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { CSSProperties, forwardRef } from 'react';
 import { DerivedProps, BoxDerived } from './BoxDerived';
 import clsx from 'clsx';
 import { classPrefix } from '../../utils/classPrefix';
@@ -12,6 +12,8 @@ import { resolveResponsive, useBreakpoint, Responsiveify } from '../../utils/res
 export type Props = {
     appearanceNone?: boolean;
     grow?: boolean | 0 | DerivedProps['grow'];
+    lineClamp?: number;
+    truncate?: boolean;
 } & Omit<DerivedProps, 'grow'>;
 
 type BoxProps = Responsiveify<Props>;
@@ -26,8 +28,14 @@ type ImplProps = {
     className?: string;
 } & Record<string, unknown>;
 
-const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
+const normalizeCssVar = (name: string) => (name.startsWith('--') ? name : `--${name}`);
+
+const BoxImpl = ({ className, style, ...rest }: ImplProps, ref: React.Ref<any>) => {
     const { breakpoint } = useBreakpoint();
+
+    if (rest?.truncate && rest?.lineClamp != null) {
+        console.warn('Box: `truncate` and `lineClamp` are mutually exclusive.');
+    }
 
     const booleanKeys = new Set(Object.keys(booleanClassMap));
     const restProps = rest;
@@ -54,6 +62,8 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
     const restEntries = typedEntries(restProps);
 
     const classes: string[] = [];
+    const cssVars: Record<string, string> = {};
+    // const cssVars: Record<string, string> = {};
     const locked = new Set<string>();
     const propsToPassNext: Partial<Record<keyof BoxProps, unknown>> = {};
 
@@ -122,21 +132,44 @@ const BoxImpl = ({ className, ...rest }: ImplProps, ref: React.Ref<any>) => {
         }
 
         if (config.isToken && config.isToken(finalValue) && configCheck) {
-            const safeValue =
-                typeof finalValue === 'string'
-                    ? finalValue.replace(/^-/, 'neg-').replace(/\//g, '-')
-                    : finalValue;
-            classes.push(classPrefix(`--${config.prefix}-${safeValue}`));
+            // console.log(config.useJustPrefix);
+            if (config.setCssVars) {
+                for (const [name, template] of config.setCssVars) {
+                    cssVars[normalizeCssVar(name)] = template.replace(
+                        '{token}',
+                        String(finalValue),
+                    );
+                }
+            }
+            if (config.useJustPrefix) {
+                classes.push(classPrefix(`--${config.prefix}`));
+            } else {
+                const safeValue =
+                    typeof finalValue === 'string'
+                        ? finalValue.replace(/^-/, 'neg-').replace(/\//g, '-')
+                        : finalValue;
+                classes.push(classPrefix(`--${config.prefix}-${safeValue}`));
+            }
         } else {
             passNext(key, finalValue);
         }
     });
+
+    const mergedStyle =
+        Object.keys(cssVars).length > 0
+            ? {
+                  ...(style as React.CSSProperties),
+                  ...cssVars,
+              }
+            : style;
 
     return (
         <BoxDerived
             ref={ref}
             {...(propsToPassNext as DerivedProps)}
             className={clsx(classes, className)}
+            style={mergedStyle as CSSProperties}
+            // style={style}
         />
     );
 };
