@@ -1,31 +1,49 @@
-import React, { forwardRef, useState } from 'react';
-import { createPolymorphic, type PolymorphicComponent } from '../../types/polymorphic';
-import { type BoxProps } from '../Box/Box';
+import React, { forwardRef, useState, useCallback } from 'react';
+import {
+    createPolymorphic,
+    type PolymorphicComponent,
+    PolymorphicProps,
+} from '../../types/polymorphic';
 import { Card } from '../Card';
-import { type CardProps } from '../Card/Card';
-import { Box } from '../Box/Box';
-import { CLASS_PREFIX } from '../../constants';
+// import { type CardProps } from '../Card/Card';
+import { Box } from '../Box';
+import type { BoxProps } from '../Box';
 import clsx from 'clsx';
 import { Info, Warning, Success, Close } from '../../Icon';
-import { Density } from '../Card/card.tokens';
 import { sizeToDensityMap, Intent, Variant, Size } from './alert.tokens';
-import { Button } from '../Button/Button';
+import { Button } from '../Button';
+// import { OwnChipProps } from '../Chip';
+import { classPrefix } from '../../utils/classPrefix';
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--alert${name}`;
+    return classPrefix(`--alert${name}`);
 };
 
-type AlertProps = {
-    children: React.ReactNode;
+type OwnAlertProps = {
     intent?: Intent;
     variant?: Variant;
     size?: Size;
-    className?: string;
     icon?: boolean | React.ReactNode;
 
-    dismissible?: boolean;
+    accent?: 'left' | 'top';
+    actions?: React.ReactNode;
+
     onDismiss?: () => void;
-} & Omit<CardProps, 'size'>;
+} & Omit<BoxProps, 'size'>;
+
+type ImplAlertProps<C extends React.ElementType = 'div'> = PolymorphicProps<C, OwnAlertProps>;
+
+// type AlertProps = {
+//     children: React.ReactNode;
+//     intent?: Intent;
+//     variant?: Variant;
+//     size?: Size;
+//     className?: string;
+//     icon?: boolean | React.ReactNode;
+//
+//     dismissible?: boolean;
+//     onDismiss?: () => void;
+// } & Omit<BoxProps, 'size'>;
 
 const defaultIcons: Record<Intent, React.ReactNode> = {
     primary: null,
@@ -36,25 +54,28 @@ const defaultIcons: Record<Intent, React.ReactNode> = {
     info: <Info />,
 };
 
-const AlertImpl = (
+const AlertImpl = <C extends React.ElementType = 'div'>(
     {
         children,
+        className,
+
         intent = 'primary',
         variant = 'base',
         size = 'md',
-        className,
+
+        rounded = 'md',
+
         icon,
         dismissible,
+        custom,
         onDismiss,
         ...rest
-    }: AlertProps,
+    }: ImplAlertProps<C>,
     ref: React.Ref<any>,
 ) => {
     const [visible, setVisible] = useState(true);
 
-    const density = sizeToDensityMap[size];
-
-    const renderIcon = () => {
+    const renderIcon = useCallback(() => {
         if (!icon) return null;
 
         if (icon === true) {
@@ -62,7 +83,7 @@ const AlertImpl = (
         }
 
         return icon; // custom node
-    };
+    }, [icon, intent]);
 
     if (!visible) return null;
 
@@ -75,77 +96,21 @@ const AlertImpl = (
     const resolvedIcon = renderIcon();
 
     return (
-        <Card
+        <Box
+            {...rest}
             className={clsx(prefix(), className)}
-            density={density}
             direction="row"
-            rounded="md"
+            rounded={rounded}
             ref={ref}
             data-intent={intent}
             data-variant={variant}
             data-size={size}
-            {...rest}
         >
-            <Card.Section density="none" d="flex" gap={size} flex="1" px={size}>
-                {resolvedIcon != null && (
-                    // <Card.Media pl={2} mr={0} centerY justify="right">
-                    //     <Card.Media.Icon size="md" justify="right" w={30}>
-                    //         {resolvedIcon}
-                    //     </Card.Media.Icon>
-                    // </Card.Media>
-                    <Card.Section
-                        pt={size}
-                        pl={size}
-                        className={prefix(`__icon`)}
-                        density="none"
-                        centerX
-                    >
-                        <Box mt="2px">{resolvedIcon}</Box>
-                    </Card.Section>
-                )}
+            {resolvedIcon != null && <Box className={prefix(`__icon`)}>{resolvedIcon}</Box>}
 
-                {/*<Card.Body pos="relative">*/}
-                <Card.Section border="none" density="none" py={size} grow={1} flex={1}>
-                    {children}
-                </Card.Section>
-
-                {dismissible && (
-                    <Card.Section
-                        d="flex"
-                        justify="center"
-                        align="centner"
-                        pt={size}
-                        density="none"
-                    >
-                        <Button
-                            onClick={handleDismiss}
-                            variant="ghost"
-                            intent={intent}
-                            iconOnly
-                            size="xs"
-                        >
-                            <Close />
-                        </Button>
-                        {/*<Box mt="2px">*/}
-                        {/*    <Box*/}
-                        {/*        as="button"*/}
-                        {/*        rounded="xs"*/}
-                        {/*        // size={26}*/}
-                        {/*        onClick={handleDismiss}*/}
-                        {/*        aria-label="Close alert"*/}
-                        {/*        className={prefix('__dismiss-button')}*/}
-                        {/*    >*/}
-                        {/*        <span className={prefix('__dismiss-icon')}>*/}
-                        {/*            <Close />*/}
-                        {/*        </span>*/}
-                        {/*    </Box>*/}
-                        {/*</Box>*/}
-                    </Card.Section>
-                )}
-            </Card.Section>
-            {/*</Card.Body>*/}
-        </Card>
+            <Box className={prefix(`__content`)}>{children}</Box>
+        </Box>
     );
 };
 
-export const Alert = createPolymorphic<AlertProps, 'div'>(forwardRef(AlertImpl), 'Alert');
+export const Alert = createPolymorphic<OwnAlertProps, 'div'>(forwardRef(AlertImpl), 'Alert');
