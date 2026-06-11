@@ -21,6 +21,7 @@
         --chip-text-color-disabled: #{intent($intent, 0)};
 
         --chip-outline-focus: #{intent($intent, 600)};
+        --chip-remove-ring-color: #{intent($intent, 700)};
     } @else {
         --chip-bg: #{intent($intent, 600)};
         --chip-text-color: #{intent($intent, 50)};
@@ -41,6 +42,7 @@
         --chip-text-color-disabled: #{intent($intent, 500)};
 
         --chip-outline-focus: #{intent($intent, 400)};
+        --chip-remove-ring-color: #{intent($intent, 300)};
     }
 }
 

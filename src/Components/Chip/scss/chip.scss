@@ -7,6 +7,8 @@
 
 .#{$chip-prefix} {
 
+    --chip-scale-active: 0.97;
+
     @each $size, $values in $sizes {
         &[data-size='#{$size}'] {
             --chip-padding-y: #{map.get($values, padding-y)};
@@ -88,7 +90,7 @@
             }
 
             &:focus-visible{
-                outline: 2px solid var(--chip-ring-color);
+                outline: 2px solid var(--chip-remove-ring-color, var(--chip-ring-color));
             }
         }
     }
@@ -107,51 +109,10 @@
         color: var(--chip-text-color-disabled, var(--#{$p}-text-disabled));
     }
 
-    //&[data-interactive]:not([data-disabled]):active {
-    //    transform: scale(0.97);
-    //}
-
     &:focus-visible {
         outline: 2px solid var(--chip-ring-color);
         outline-offset: 2px;
     }
-
-    //.#{$chip-prefix}__remove {
-    //    position: relative;
-    //
-    //    display: inline-flex;
-    //    align-items: center;
-    //    justify-content: center;
-    //
-    //    width: 1em;
-    //    height: 1em;
-    //
-    //    flex-shrink: 0;
-    //
-    //    &::before {
-    //        content: '';
-    //        position: absolute;
-    //
-    //        inset: -0.4em; // 👈 expand clickable area
-    //        border-radius: 50%;
-    //    }
-    //
-    //    .#{$chip-prefix}__remove-icon {
-    //        position: absolute;
-    //
-    //        top: 50%;
-    //        left: 50%;
-    //
-    //        transform: translate(-50%, -50%) scale(1.6);
-    //
-    //        line-height: 1;
-    //        pointer-events: none;
-    //    }
-    //
-    //    &:active {
-    //        transform: scale(0.9);
-    //    }
-    //}
 
     &[data-removable]{
         cursor: default;
@@ -171,11 +132,6 @@
         }
     }
 
-    //&[data-icon-only] {
-    //    padding-left: var(--badge-padding-y);
-    //    padding-right: var(--badge-padding-y);
-    //}
-
     &[data-selected] {
         font-weight: var(--chip-font-weight-selected, 600);
         background-color: var(--chip-bg-selected); // stronger than 200
@@ -186,7 +142,7 @@
     @each $intent in $intents {
         &[data-intent='#{$intent}'] {
 
-            --chip-ring-color: #{intent($intent, 400)};
+            --chip-ring-color: #{intent($intent, 600)};
 
             // SOLID
             &[data-variant='solid'] {
@@ -209,7 +165,7 @@
             }
 
             @include dark {
-                --chip-ring-color: #{intent($intent, 500)};
+                --chip-ring-color: #{intent($intent, 400)};
 
                 // SOLID
                 &[data-variant='solid'] {
