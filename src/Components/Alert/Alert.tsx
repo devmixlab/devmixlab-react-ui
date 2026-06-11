@@ -67,6 +67,8 @@ const AlertImpl = (
 
         rounded = 'md',
 
+        accent,
+
         icon,
         onDismiss,
         ...rest

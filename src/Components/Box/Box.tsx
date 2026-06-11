@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef } from 'react';
+import React, { CSSProperties, forwardRef, HTMLAttributes } from 'react';
 import { DerivedProps, BoxDerived } from './BoxDerived';
 import clsx from 'clsx';
 import { classPrefix } from '../../utils/classPrefix';
@@ -26,15 +26,15 @@ type BoxComponentProps<C extends React.ElementType = 'div', Props = {}> = Polymo
     Props & BoxProps
 >;
 
-type ImplProps<C extends React.ElementType = 'div'> = PolymorphicProps<C, BoxProps>;
+type ImplProps = BoxProps &
+    HTMLAttributes<HTMLDivElement> & {
+        as?: React.ElementType;
+    };
 
 const normalizeCssVar = (name: string): `--${string}` =>
     (name.startsWith('--') ? name : `--${name}`) as `--${string}`;
 
-const BoxImpl = <C extends React.ElementType = 'div'>(
-    { as, className, style, ...rest }: ImplProps<C>,
-    ref: React.Ref<any>,
-) => {
+const BoxImpl = ({ as, className, style, ...rest }: ImplProps, ref: React.Ref<any>) => {
     const asResolved: React.ElementType = as ?? 'div';
 
     const { breakpoint } = useBreakpoint();
@@ -63,7 +63,7 @@ const BoxImpl = <C extends React.ElementType = 'div'>(
         }
     }
 
-    const restEntries = Object.entries(restProps) as [string, unknown][];
+    const restEntries = Object.entries(restProps);
 
     const classes: string[] = [];
     const cssVars: Record<`--${string}`, string> = {};
