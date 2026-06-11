@@ -20,6 +20,8 @@ export const prefix = (name: string = '') => {
 };
 
 type OwnAlertProps = {
+    children?: React.ReactNode;
+
     intent?: Intent;
     variant?: Variant;
     size?: Size;
@@ -67,10 +69,10 @@ const AlertImpl = <C extends React.ElementType = 'div'>(
 
         icon,
         dismissible,
-        custom,
+        ccc,
         onDismiss,
         ...rest
-    }: ImplAlertProps<C>,
+    }: ImplAlertProps<'div'>,
     ref: React.Ref<any>,
 ) => {
     const [visible, setVisible] = useState(true);
@@ -97,7 +99,7 @@ const AlertImpl = <C extends React.ElementType = 'div'>(
 
     return (
         <Box
-            {...rest}
+            {...(rest as BoxProps)}
             className={clsx(prefix(), className)}
             direction="row"
             rounded={rounded}
