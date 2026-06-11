@@ -1,0 +1,1165 @@
+@use '../../scss/functions' as functions;
+@use '../../scss/mixins' as mixins;
+
+@use '../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$alert-prefix: #{$p}--alert;
+
+$alert-sizes: (
+    sm: (
+        icon-size: 1.05em,
+        dismiss-button-inset: -.2em,
+    ),
+    md: (
+        icon-size: 1.125em,
+        dismiss-button-inset: -.4em,
+    ),
+    lg: (
+        icon-size: 1.2em,
+        dismiss-button-inset: -.6em,
+    ),
+);
+
+$intents: (primary, secondary, success, warning, info, danger);
+
+.#{$alert-prefix} {
+    --dru--alert__dismiss-button--bg: transparent;
+    --dru--alert__dismiss-button--bg-hover: rgba(0, 0, 0, 0.05);
+    --dru--alert__dismiss-button--color: var(--dru-icon-color);
+
+    @each $size, $value in $alert-sizes {
+        &--size-#{$size} {
+            --icon-size: #{map.get($value, icon-size)};
+
+            .#{$alert-prefix}__dismiss-button::before {
+                inset: #{map.get($value, dismiss-button-inset)};
+                //inset: -2em;
+            }
+        }
+    }
+
+    //&__dismiss-button {
+    //    display: flex;
+    //    align-items: center;
+    //    justify-content: center;
+    //    position: relative;
+    //
+    //    flex-shrink: 0;
+    //
+    //    &::before {
+    //        content: '';
+    //        position: absolute;
+    //
+    //        inset: 0; // 🔥 important so it has size
+    //        border-radius: inherit;
+    //
+    //        background: transparent;
+    //        transition: background-color 200ms ease;
+    //    }
+    //
+    //    .#{$alert-prefix}__dismiss-icon {
+    //
+    //        position: relative;
+    //        //top: 50%;
+    //        //left: 50%;
+    //        //transform: translate(-50%, -50%);
+    //
+    //        background: var(--dru--alert__dismiss-button--bg);
+    //        transition: background-color 200ms ease, color 200ms ease;
+    //        border: none;
+    //        cursor: pointer;
+    //        //font-size: 26px;
+    //        line-height: 1;
+    //        padding: 0;
+    //        color: var(--dru--alert__dismiss-button--color);
+    //
+    //    }
+    //
+    //    &:hover {
+    //        &::before {
+    //            background: var(--dru--alert__dismiss-button--bg-hover);
+    //        }
+    //    }
+    //}
+}
+
+
+.#{$p}--card.#{$alert-prefix} {
+    @each $intent in $intents {
+        &[data-intent='#{$intent}'] {
+            --accent: var(--#{$p}-accent-#{$intent}-strong);
+            --accent-subtle: var(--#{$p}-accent-#{$intent}-subtle);
+            --ring: var(--#{$p}-accent-primary);
+
+            &[data-variant='base'] {
+                // softer progression
+                --surface-light: #{functions.intent-color($intent, 100)};
+                --surface-raised-light: #{functions.intent-color($intent, 200)};
+                --surface-hover-light: #{functions.intent-color($intent, 200)};
+                --surface-raised-hover-light: #{functions.intent-color($intent, 300)};
+
+                --accent-light: var(--accent);
+                --accent-disabled-light: var(--accent-subtle);
+
+                // subtle border
+                --border-light: #{functions.intent-color($intent, 300)};
+                --dru-card--border-section: transparent;
+
+                --ring-light: var(--ring);
+                --dru-icon-color: #{functions.intent-color($intent, 700)};
+            }
+
+            &[data-variant='solid'] {
+                // lighter surface
+                --surface-light: #{functions.intent-color($intent, 600)};
+                --surface-raised-light: #{functions.intent-color($intent, 600)};
+
+                // pressed / hover
+                --surface-hover-light: #{functions.intent-color($intent, 700)};
+                --surface-raised-hover-light: #{functions.intent-color($intent, 800)};
+
+                // text
+                --text-light: white;
+                --text-muted-light: rgb(255 255 255 / 85%);
+
+                --dru-card--border-section: transparent;
+                --border-light: #{functions.intent-color($intent, 800)};
+                --border: var(--accent);
+
+                --accent-light: #{functions.intent-color($intent, 800)};
+                --ring-light: var(--ring);
+
+                --dru-icon-color: white;
+            }
+        }
+    }
+}
+
+
+
+//$intents: (primary, secondary, success, warning, info, danger);
+
+.dru--card.dru--alert {
+
+    /* PRIMARY Alert */
+    &--primary {
+        $accent: #2563eb;
+        $accent-disabled: #93c5fd;
+        $ring: rgba(37, 99, 235, 0.6);
+
+        &-base {
+            // 👇 softer progression
+            --surface-light: #dbeafe;
+            --surface-raised-light: #bfdbfe;
+            --surface-hover-light: #bfdbfe;
+            --surface-raised-hover-light: #a5c9ff;
+
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
+
+            // subtle border
+            --border-light: #93c5fd;
+            --dru-card--border-section: transparent;
+
+            --ring-light: #{$ring};
+            --dru-icon-color: #2563eb;
+        }
+
+        &-solid {
+            // 👇 lighter surface
+            --surface-light: #3b82f6;
+            --surface-raised-light: #3b82f6;
+
+            // darker hover (still feels “press”)
+            --surface-hover-light: #2f6fe0;
+            --surface-raised-hover-light: #2563eb;
+
+            // text stays clean
+            --text-light: #fff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
+
+            --dru-card--border-section: transparent;
+            --border-light: #1d4ed8;
+
+            --accent-light: #1d4ed8;
+            --ring-light: #{$ring};
+            --dru-icon-color: #ffffff;
+        }
+
+        &-outlined {
+            // no fill, very subtle surface
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
+
+            --surface-hover-light: rgba(37, 99, 235, 0.04);
+            --surface-raised-hover-light: rgba(37, 99, 235, 0.08);
+
+            // accent drives everything
+            --accent-light: #{$accent};
+
+            // border becomes primary visual
+            --border-light: #{$accent};
+            --dru-card--border-section: transparent;
+
+            // text uses accent
+            --text-light: #1d4ed8; // slightly darker for readability
+            --text-muted-light: rgba(29, 78, 216, 0.7);
+
+            --ring-light: #{$ring};
+
+            // icon follows accent
+            --dru-icon-color: #{$accent};
+        }
+
+        &-subtle {
+            // very soft background
+            --surface-light: rgba(37, 99, 235, 0.06);
+            --surface-raised-light: rgba(37, 99, 235, 0.08);
+
+            --surface-hover-light: rgba(37, 99, 235, 0.10);
+            --surface-raised-hover-light: rgba(37, 99, 235, 0.12);
+
+            // no border
+            --border-light: transparent;
+            --dru-card--border-section: transparent;
+
+            // still keep accent for system consistency
+            --accent-light: #{$accent};
+
+            // softer text than outlined
+            --text-light: #1e40af; // blue-800
+            --text-muted-light: rgba(30, 64, 175, 0.7);
+
+            --ring-light: #{$ring};
+
+            // icon slightly toned down
+            --dru-icon-color: #2563eb;
+        }
+    }
+
+    @include cfg.dark {
+        &--primary {
+            $accent: #60a5fa;
+            $accent-disabled: #1d4ed8;
+            $ring: rgba(96, 165, 250, 0.6);
+
+            &-base {
+                // 👇 dark subtle background
+                --dru-card--surface-dark: #172554;
+                --dru-card--surface-raised-dark: #1e3a8a;
+                --dru-card--surface-hover-dark: #223c95;
+                --dru-card--surface-raised-hover-dark: #2c5fe8;
+
+                --dru-card--accent-dark: #{$accent};
+                --dru-card--accent-disabled-dark: #{$accent-disabled};
+
+                --dru-card--border-dark: #1e40af;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-icon-color: #60a5fa;
+
+                --dru-card--ring-dark: #{$ring};
+            }
+
+            &-solid {
+                // lighter surface (critical!)
+                --dru-card--surface-dark: #60a5fa;
+                --dru-card--surface-raised-dark: #60a5fa;
+
+                // darker hover (press feel)
+                --dru-card--surface-hover-dark: #3b82f6;
+                --dru-card--surface-raised-hover-dark: #3b82f6;
+
+                // dark text for contrast
+                --dru-card--text-dark: #0b1220;
+                --dru-card--text-muted-dark: rgba(11, 18, 32, 0.7);
+
+                --dru-card--border-section-dark: transparent;
+                --dru-card--border-dark: #3b82f6;
+
+                --dru-card--accent-dark: #bfdbfe;
+                --dru-icon-color: #0b1220;
+
+                --dru-card--ring-dark: #{$ring};
+            }
+
+            &-outlined {
+                --dru-card--surface-dark: transparent;
+                --dru-card--surface-raised-dark: transparent;
+
+                --dru-card--surface-hover-dark: rgba(96, 165, 250, 0.08);
+                --dru-card--surface-raised-hover-dark: rgba(96, 165, 250, 0.12);
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--border-dark: #{$accent};
+                --dru-card--border-section-dark: transparent;
+
+                // lighter text for dark bg
+                --dru-card--text-dark: #93c5fd;
+                --dru-card--text-muted-dark: rgba(147, 197, 253, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #{$accent};
+            }
+
+            &-subtle {
+                --dru-card--surface-dark: rgba(96, 165, 250, 0.10);
+                --dru-card--surface-raised-dark: rgba(96, 165, 250, 0.14);
+
+                --dru-card--surface-hover-dark: rgba(96, 165, 250, 0.18);
+                --dru-card--surface-raised-hover-dark: rgba(96, 165, 250, 0.22);
+
+                --dru-card--border-dark: transparent;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--text-dark: #bfdbfe; // soft light blue
+                --dru-card--text-muted-dark: rgba(191, 219, 254, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #60a5fa;
+            }
+        }
+    }
+
+    /* SECONDARY Alert */
+    &--secondary {
+        $accent: #4b5563; // gray-600
+        $accent-disabled: #d1d5db;
+        $ring: rgba(75, 85, 99, 0.5);
+
+        &-base {
+            // neutral gray (not near-white)
+            --surface-light: #f3f4f6; // gray-100
+            --surface-raised-light: #e5e7eb; // gray-200
+            --surface-hover-light: #e5e7eb;
+            --surface-raised-hover-light: #d1d5db;
+
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
+
+            --border-light: #e5e7eb;
+            --dru-card--border-section: transparent;
+
+            --ring-light: #{$ring};
+            --dru-icon-color: #4b5563;
+        }
+
+        &-solid {
+            --surface-light: #6b7280; // gray-500
+            --surface-raised-light: #6b7280;
+
+            --surface-hover-light: #4b5563; // gray-600
+            --surface-raised-hover-light: #4b5563;
+
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
+
+            --dru-card--border-section: transparent;
+            --border-light: #4b5563;
+
+            --accent-light: #374151; // gray-700
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #ffffff;
+        }
+
+        &-outlined {
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
+
+            --surface-hover-light: rgba(75, 85, 99, 0.04);
+            --surface-raised-hover-light: rgba(75, 85, 99, 0.08);
+
+            --accent-light: #{$accent};
+
+            --border-light: #{$accent};
+            --dru-card--border-section: transparent;
+
+            --text-light: #374151;
+            --text-muted-light: rgba(55, 65, 81, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #{$accent};
+        }
+
+        &-subtle {
+            --surface-light: rgba(75, 85, 99, 0.06);
+            --surface-raised-light: rgba(75, 85, 99, 0.08);
+
+            --surface-hover-light: rgba(75, 85, 99, 0.10);
+            --surface-raised-hover-light: rgba(75, 85, 99, 0.12);
+
+            --border-light: transparent;
+            --dru-card--border-section: transparent;
+
+            --accent-light: #{$accent};
+
+            --text-light: #1f2937; // gray-800
+            --text-muted-light: rgba(31, 41, 55, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #4b5563;
+        }
+    }
+
+    @include cfg.dark {
+        &--secondary {
+            $accent: #9ca3af; // gray-400
+            $accent-disabled: #374151;
+            $ring: rgba(156, 163, 175, 0.5);
+
+            &-base {
+                // neutral dark (no blue tint)
+                --dru-card--surface-dark: #111827; // gray-900
+                --dru-card--surface-raised-dark: #1f2937; // gray-800
+                --dru-card--surface-hover-dark: #273244;
+                --dru-card--surface-raised-hover-dark: #374151;
+
+                --dru-card--accent-dark: #{$accent};
+                --dru-card--accent-disabled-dark: #{$accent-disabled};
+
+                --dru-card--border-dark: #1f2937;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--ring-dark: #{$ring};
+                --dru-icon-color: #9ca3af;
+            }
+
+            &-solid {
+                --dru-card--surface-dark: #9ca3af; // gray-400
+                --dru-card--surface-raised-dark: #9ca3af;
+
+                --dru-card--surface-hover-dark: #6b7280;
+                --dru-card--surface-raised-hover-dark: #6b7280;
+
+                --dru-card--text-dark: #0b1220;
+                --dru-card--text-muted-dark: rgba(11, 18, 32, 0.7);
+
+                --dru-card--border-section-dark: transparent;
+                --dru-card--border-dark: #6b7280;
+
+                --dru-card--accent-dark: #e5e7eb;
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #0b1220;
+            }
+
+            &-outlined {
+                --dru-card--surface-dark: transparent;
+                --dru-card--surface-raised-dark: transparent;
+
+                --dru-card--surface-hover-dark: rgba(156, 163, 175, 0.08);
+                --dru-card--surface-raised-hover-dark: rgba(156, 163, 175, 0.12);
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--border-dark: #{$accent};
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--text-dark: #d1d5db;
+                --dru-card--text-muted-dark: rgba(209, 213, 219, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #{$accent};
+            }
+
+            &-subtle {
+                --dru-card--surface-dark: rgba(156, 163, 175, 0.10);
+                --dru-card--surface-raised-dark: rgba(156, 163, 175, 0.14);
+
+                --dru-card--surface-hover-dark: rgba(156, 163, 175, 0.18);
+                --dru-card--surface-raised-hover-dark: rgba(156, 163, 175, 0.22);
+
+                --dru-card--border-dark: transparent;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--text-dark: #e5e7eb;
+                --dru-card--text-muted-dark: rgba(229, 231, 235, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #9ca3af;
+            }
+        }
+    }
+
+    /* INFO Alert */
+    &--info {
+        $accent: #0891b2; // cyan-600
+        $accent-disabled: #a5f3fc;
+        $ring: rgba(8, 145, 178, 0.5);
+
+        &-base {
+            --surface-light: #ecfeff; // cyan-50
+            --surface-raised-light: #cffafe; // cyan-100
+            --surface-hover-light: #cffafe;
+            --surface-raised-hover-light: #a5f3fc;
+
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
+
+            --border-light: #cffafe;
+            --dru-card--border-section: transparent;
+
+            --ring-light: #{$ring};
+            --dru-icon-color: #0891b2;
+        }
+
+        &-solid {
+            --surface-light: #06b6d4; // cyan-500
+            --surface-raised-light: #06b6d4;
+
+            --surface-hover-light: #0891b2; // cyan-600
+            --surface-raised-hover-light: #0891b2;
+
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
+
+            --dru-card--border-section: transparent;
+            --border-light: #0e7490;
+
+            --accent-light: #0e7490;
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #ffffff;
+        }
+
+        &-outlined {
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
+
+            --surface-hover-light: rgba(8, 145, 178, 0.04);
+            --surface-raised-hover-light: rgba(8, 145, 178, 0.08);
+
+            --accent-light: #{$accent};
+
+            --border-light: #{$accent};
+            --dru-card--border-section: transparent;
+
+            --text-light: #0e7490; // cyan-700
+            --text-muted-light: rgba(14, 116, 144, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #{$accent};
+        }
+
+        &-subtle {
+            --surface-light: rgba(8, 145, 178, 0.06);
+            --surface-raised-light: rgba(8, 145, 178, 0.08);
+
+            --surface-hover-light: rgba(8, 145, 178, 0.10);
+            --surface-raised-hover-light: rgba(8, 145, 178, 0.12);
+
+            --border-light: transparent;
+            --dru-card--border-section: transparent;
+
+            --accent-light: #{$accent};
+
+            --text-light: #164e63; // cyan-900
+            --text-muted-light: rgba(22, 78, 99, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #0891b2;
+        }
+    }
+
+    @include cfg.dark {
+        &--info {
+            $accent: #22d3ee; // cyan-400
+            $accent-disabled: #0e7490;
+            $ring: rgba(34, 211, 238, 0.5);
+
+            &-base {
+                --dru-card--surface-dark: #083344; // cyan-950
+                --dru-card--surface-raised-dark: #164e63; // cyan-900
+                --dru-card--surface-hover-dark: #1e6a82;
+                --dru-card--surface-raised-hover-dark: #0891b2;
+
+                --dru-card--accent-dark: #{$accent};
+                --dru-card--accent-disabled-dark: #{$accent-disabled};
+
+                --dru-card--border-dark: #164e63;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--ring-dark: #{$ring};
+                --dru-icon-color: #22d3ee;
+            }
+
+            &-solid {
+                --dru-card--surface-dark: #22d3ee; // cyan-400
+                --dru-card--surface-raised-dark: #22d3ee;
+
+                --dru-card--surface-hover-dark: #06b6d4;
+                --dru-card--surface-raised-hover-dark: #06b6d4;
+
+                --dru-card--text-dark: #0b1220;
+                --dru-card--text-muted-dark: rgba(11, 18, 32, 0.7);
+
+                --dru-card--border-section-dark: transparent;
+                --dru-card--border-dark: #06b6d4;
+
+                --dru-card--accent-dark: #cffafe;
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #0b1220;
+            }
+
+            &-outlined {
+                --dru-card--surface-dark: transparent;
+                --dru-card--surface-raised-dark: transparent;
+
+                --dru-card--surface-hover-dark: rgba(34, 211, 238, 0.08);
+                --dru-card--surface-raised-hover-dark: rgba(34, 211, 238, 0.12);
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--border-dark: #{$accent};
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--text-dark: #a5f3fc;
+                --dru-card--text-muted-dark: rgba(165, 243, 252, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #{$accent};
+            }
+
+            &-subtle {
+                --dru-card--surface-dark: rgba(34, 211, 238, 0.10);
+                --dru-card--surface-raised-dark: rgba(34, 211, 238, 0.14);
+
+                --dru-card--surface-hover-dark: rgba(34, 211, 238, 0.18);
+                --dru-card--surface-raised-hover-dark: rgba(34, 211, 238, 0.22);
+
+                --dru-card--border-dark: transparent;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--text-dark: #cffafe;
+                --dru-card--text-muted-dark: rgba(207, 250, 254, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #22d3ee;
+            }
+        }
+    }
+
+    /* SUCCESS Alert */
+    &--success {
+        $accent: #16a34a; // green-600
+        $accent-disabled: #bbf7d0;
+        $ring: rgba(22, 163, 74, 0.5);
+
+        &-base {
+            // soft success background
+            --surface-light: #f0fdf4; // green-50
+            --surface-raised-light: #dcfce7; // green-100
+            --surface-hover-light: #dcfce7;
+            --surface-raised-hover-light: #bbf7d0;
+
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
+
+            --border-light: #dcfce7;
+            --dru-card--border-section: transparent;
+
+            --ring-light: #{$ring};
+            --dru-icon-color: #16a34a;
+        }
+
+        &-solid {
+            --surface-light: #22c55e; // green-500
+            --surface-raised-light: #22c55e;
+
+            --surface-hover-light: #16a34a; // green-600
+            --surface-raised-hover-light: #16a34a;
+
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
+
+            --dru-card--border-section: transparent;
+            --border-light: #15803d; // green-700
+
+            --accent-light: #15803d;
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #ffffff;
+        }
+
+        &-outlined {
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
+
+            --surface-hover-light: rgba(22, 163, 74, 0.04);
+            --surface-raised-hover-light: rgba(22, 163, 74, 0.08);
+
+            --accent-light: #{$accent};
+
+            --border-light: #{$accent};
+            --dru-card--border-section: transparent;
+
+            --text-light: #166534; // green-800
+            --text-muted-light: rgba(22, 101, 52, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #{$accent};
+        }
+
+        &-subtle {
+            --surface-light: rgba(22, 163, 74, 0.06);
+            --surface-raised-light: rgba(22, 163, 74, 0.08);
+
+            --surface-hover-light: rgba(22, 163, 74, 0.10);
+            --surface-raised-hover-light: rgba(22, 163, 74, 0.12);
+
+            --border-light: transparent;
+            --dru-card--border-section: transparent;
+
+            --accent-light: #{$accent};
+
+            --text-light: #14532d; // green-900
+            --text-muted-light: rgba(20, 83, 45, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #16a34a;
+        }
+    }
+
+    @include cfg.dark {
+        &--success {
+            $accent: #4ade80; // green-400
+            $accent-disabled: #166534;
+            $ring: rgba(74, 222, 128, 0.5);
+
+            &-base {
+                --dru-card--surface-dark: #052e16; // green-950
+                --dru-card--surface-raised-dark: #064e3b; // green-900
+                --dru-card--surface-hover-dark: #065f46;
+                --dru-card--surface-raised-hover-dark: #16a34a;
+
+                --dru-card--accent-dark: #{$accent};
+                --dru-card--accent-disabled-dark: #{$accent-disabled};
+
+                --dru-card--border-dark: #064e3b;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--ring-dark: #{$ring};
+                --dru-icon-color: #4ade80;
+            }
+
+            &-solid {
+                --dru-card--surface-dark: #4ade80; // green-400
+                --dru-card--surface-raised-dark: #4ade80;
+
+                --dru-card--surface-hover-dark: #22c55e;
+                --dru-card--surface-raised-hover-dark: #22c55e;
+
+                --dru-card--text-dark: #0b1220;
+                --dru-card--text-muted-dark: rgba(11, 18, 32, 0.7);
+
+                --dru-card--border-section-dark: transparent;
+                --dru-card--border-dark: #22c55e;
+
+                --dru-card--accent-dark: #dcfce7;
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #0b1220;
+            }
+
+            &-outlined {
+                --dru-card--surface-dark: transparent;
+                --dru-card--surface-raised-dark: transparent;
+
+                --dru-card--surface-hover-dark: rgba(74, 222, 128, 0.08);
+                --dru-card--surface-raised-hover-dark: rgba(74, 222, 128, 0.12);
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--border-dark: #{$accent};
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--text-dark: #bbf7d0;
+                --dru-card--text-muted-dark: rgba(187, 247, 208, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #{$accent};
+            }
+
+            &-subtle {
+                --dru-card--surface-dark: rgba(74, 222, 128, 0.10);
+                --dru-card--surface-raised-dark: rgba(74, 222, 128, 0.14);
+
+                --dru-card--surface-hover-dark: rgba(74, 222, 128, 0.18);
+                --dru-card--surface-raised-hover-dark: rgba(74, 222, 128, 0.22);
+
+                --dru-card--border-dark: transparent;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--text-dark: #dcfce7;
+                --dru-card--text-muted-dark: rgba(220, 252, 231, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #4ade80;
+            }
+        }
+    }
+
+    /* WARNING Alert */
+    &--warning {
+        $accent: #d97706; // amber-600
+        $accent-disabled: #fde68a;
+        $ring: rgba(217, 119, 6, 0.5);
+
+        &-base {
+            --surface-light: #fffbeb; // amber-50
+            --surface-raised-light: #fef3c7; // amber-100
+            --surface-hover-light: #fef3c7;
+            --surface-raised-hover-light: #fde68a;
+
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
+
+            --border-light: #fef3c7;
+            --dru-card--border-section: transparent;
+
+            --ring-light: #{$ring};
+
+            // darker for readability
+            --dru-icon-color: #b45309; // amber-700
+        }
+
+        &-solid {
+            --surface-light: #f59e0b; // amber-500
+            --surface-raised-light: #f59e0b;
+
+            --surface-hover-light: #d97706; // amber-600
+            --surface-raised-hover-light: #d97706;
+
+            // ⚠️ IMPORTANT: dark text
+            --text-light: #0b1220;
+            --text-muted-light: rgba(11, 18, 32, 0.7);
+
+            --dru-card--border-section: transparent;
+            --border-light: #d97706;
+
+            --accent-light: #b45309;
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #0b1220;
+        }
+
+        &-outlined {
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
+
+            --surface-hover-light: rgba(217, 119, 6, 0.04);
+            --surface-raised-hover-light: rgba(217, 119, 6, 0.08);
+
+            --accent-light: #{$accent};
+
+            --border-light: #{$accent};
+            --dru-card--border-section: transparent;
+
+            --text-light: #92400e; // amber-800
+            --text-muted-light: rgba(146, 64, 14, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #{$accent};
+        }
+
+        &-subtle {
+            --surface-light: rgba(217, 119, 6, 0.06);
+            --surface-raised-light: rgba(217, 119, 6, 0.08);
+
+            --surface-hover-light: rgba(217, 119, 6, 0.10);
+            --surface-raised-hover-light: rgba(217, 119, 6, 0.12);
+
+            --border-light: transparent;
+            --dru-card--border-section: transparent;
+
+            --accent-light: #{$accent};
+
+            --text-light: #78350f; // amber-900
+            --text-muted-light: rgba(120, 53, 15, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #d97706;
+        }
+    }
+
+    @include cfg.dark {
+        &--warning {
+            $accent: #fbbf24; // amber-400
+            $accent-disabled: #92400e;
+            $ring: rgba(251, 191, 36, 0.5);
+
+            &-base {
+                --dru-card--surface-dark: #451a03; // amber-950
+                --dru-card--surface-raised-dark: #78350f; // amber-900
+                --dru-card--surface-hover-dark: #92400e;
+                --dru-card--surface-raised-hover-dark: #d97706;
+
+                --dru-card--accent-dark: #{$accent};
+                --dru-card--accent-disabled-dark: #{$accent-disabled};
+
+                --dru-card--border-dark: #78350f;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--ring-dark: #{$ring};
+                --dru-icon-color: #fbbf24;
+            }
+
+            &-solid {
+                --dru-card--surface-dark: #fbbf24; // amber-400
+                --dru-card--surface-raised-dark: #fbbf24;
+
+                --dru-card--surface-hover-dark: #f59e0b;
+                --dru-card--surface-raised-hover-dark: #f59e0b;
+
+                // ⚠️ dark text again
+                --dru-card--text-dark: #0b1220;
+                --dru-card--text-muted-dark: rgba(11, 18, 32, 0.7);
+
+                --dru-card--border-section-dark: transparent;
+                --dru-card--border-dark: #f59e0b;
+
+                --dru-card--accent-dark: #fef3c7;
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #0b1220;
+            }
+
+            &-outlined {
+                --dru-card--surface-dark: transparent;
+                --dru-card--surface-raised-dark: transparent;
+
+                --dru-card--surface-hover-dark: rgba(251, 191, 36, 0.08);
+                --dru-card--surface-raised-hover-dark: rgba(251, 191, 36, 0.12);
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--border-dark: #{$accent};
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--text-dark: #fde68a;
+                --dru-card--text-muted-dark: rgba(253, 230, 138, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #{$accent};
+            }
+
+            &-subtle {
+                --dru-card--surface-dark: rgba(251, 191, 36, 0.10);
+                --dru-card--surface-raised-dark: rgba(251, 191, 36, 0.14);
+
+                --dru-card--surface-hover-dark: rgba(251, 191, 36, 0.18);
+                --dru-card--surface-raised-hover-dark: rgba(251, 191, 36, 0.22);
+
+                --dru-card--border-dark: transparent;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--text-dark: #fef3c7;
+                --dru-card--text-muted-dark: rgba(254, 243, 199, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #fbbf24;
+            }
+        }
+    }
+
+    /* DANGER Alert */
+    &--danger {
+        $accent: #dc2626; // red-600
+        $accent-disabled: #fecaca;
+        $ring: rgba(220, 38, 38, 0.5);
+
+        &-base {
+            --surface-light: #fef2f2; // red-50
+            --surface-raised-light: #fee2e2; // red-100
+            --surface-hover-light: #fee2e2;
+            --surface-raised-hover-light: #fecaca;
+
+            --accent-light: #{$accent};
+            --accent-disabled-light: #{$accent-disabled};
+
+            --border-light: #fee2e2;
+            --dru-card--border-section: transparent;
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #dc2626;
+        }
+
+        &-solid {
+            --surface-light: #ef4444; // red-500
+            --surface-raised-light: #ef4444;
+
+            --surface-hover-light: #dc2626; // red-600
+            --surface-raised-hover-light: #dc2626;
+
+            // ✔ white works for red
+            --text-light: #ffffff;
+            --text-muted-light: rgba(255, 255, 255, 0.85);
+
+            --dru-card--border-section: transparent;
+            --border-light: #b91c1c; // red-700
+
+            --accent-light: #b91c1c;
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #ffffff;
+        }
+
+        &-outlined {
+            --surface-light: transparent;
+            --surface-raised-light: transparent;
+
+            --surface-hover-light: rgba(220, 38, 38, 0.04);
+            --surface-raised-hover-light: rgba(220, 38, 38, 0.08);
+
+            --accent-light: #{$accent};
+
+            --border-light: #{$accent};
+            --dru-card--border-section: transparent;
+
+            --text-light: #991b1b; // red-800
+            --text-muted-light: rgba(153, 27, 27, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #{$accent};
+        }
+
+        &-subtle {
+            --surface-light: rgba(220, 38, 38, 0.06);
+            --surface-raised-light: rgba(220, 38, 38, 0.08);
+
+            --surface-hover-light: rgba(220, 38, 38, 0.10);
+            --surface-raised-hover-light: rgba(220, 38, 38, 0.12);
+
+            --border-light: transparent;
+            --dru-card--border-section: transparent;
+
+            --accent-light: #{$accent};
+
+            --text-light: #7f1d1d; // red-900
+            --text-muted-light: rgba(127, 29, 29, 0.7);
+
+            --ring-light: #{$ring};
+
+            --dru-icon-color: #dc2626;
+        }
+    }
+
+    @include cfg.dark {
+        &--danger {
+            $accent: #f87171; // red-400
+            $accent-disabled: #7f1d1d;
+            $ring: rgba(248, 113, 113, 0.5);
+
+            &-base {
+                --dru-card--surface-dark: #450a0a; // red-950
+                --dru-card--surface-raised-dark: #7f1d1d; // red-900
+                --dru-card--surface-hover-dark: #991b1b;
+                --dru-card--surface-raised-hover-dark: #dc2626;
+
+                --dru-card--accent-dark: #{$accent};
+                --dru-card--accent-disabled-dark: #{$accent-disabled};
+
+                --dru-card--border-dark: #7f1d1d;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #f87171;
+            }
+
+            &-solid {
+                --dru-card--surface-dark: #f87171; // red-400
+                --dru-card--surface-raised-dark: #f87171;
+
+                --dru-card--surface-hover-dark: #ef4444;
+                --dru-card--surface-raised-hover-dark: #ef4444;
+
+                --dru-card--text-dark: #0b1220;
+                --dru-card--text-muted-dark: rgba(11, 18, 32, 0.7);
+
+                --dru-card--border-section-dark: transparent;
+                --dru-card--border-dark: #ef4444;
+
+                --dru-card--accent-dark: #fee2e2;
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #0b1220;
+            }
+
+            &-outlined {
+                --dru-card--surface-dark: transparent;
+                --dru-card--surface-raised-dark: transparent;
+
+                --dru-card--surface-hover-dark: rgba(248, 113, 113, 0.08);
+                --dru-card--surface-raised-hover-dark: rgba(248, 113, 113, 0.12);
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--border-dark: #{$accent};
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--text-dark: #fecaca;
+                --dru-card--text-muted-dark: rgba(254, 202, 202, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #{$accent};
+            }
+
+            &-subtle {
+                --dru-card--surface-dark: rgba(248, 113, 113, 0.10);
+                --dru-card--surface-raised-dark: rgba(248, 113, 113, 0.14);
+
+                --dru-card--surface-hover-dark: rgba(248, 113, 113, 0.18);
+                --dru-card--surface-raised-hover-dark: rgba(248, 113, 113, 0.22);
+
+                --dru-card--border-dark: transparent;
+                --dru-card--border-section-dark: transparent;
+
+                --dru-card--accent-dark: #{$accent};
+
+                --dru-card--text-dark: #fee2e2;
+                --dru-card--text-muted-dark: rgba(254, 226, 226, 0.7);
+
+                --dru-card--ring-dark: #{$ring};
+
+                --dru-icon-color: #f87171;
+            }
+        }
+    }
+}

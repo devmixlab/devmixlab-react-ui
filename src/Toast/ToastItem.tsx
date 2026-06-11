@@ -4,7 +4,7 @@ import { ToastRecord, useToastContext } from './Toast.context';
 
 import { classPrefix } from '../utils/classPrefix';
 
-import { Alert } from '../Alert/Alert';
+import { Alert } from '../Components/Alert/Alert';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
