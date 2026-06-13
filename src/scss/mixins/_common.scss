@@ -10,9 +10,25 @@
     border: 0;
 }
 
-@mixin icon {
-    width: 1.2em;
-    height: 1.2em;
-    font-size: 1.2em;
-    display: block;
+//@mixin icon {
+//    width: 1.2em;
+//    height: 1.2em;
+//    font-size: 1.2em;
+//    display: block;
+//}
+
+@mixin icon($size: 1em) {
+    width: $size;
+    height: $size;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    > svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
 }

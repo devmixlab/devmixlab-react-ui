@@ -8,10 +8,10 @@
 
     @each $variant, $value in $variants {
         &[data-variant='#{$variant}'] {
-            --text-fs: map.get($value, fontSize);
-            --text-fw: map.get($value, fontWeight);
-            --text-lh: map.get($value, lineHeight);
-            --text-ls: map.get($value, letterSpacing);
+            --text-fs: #{map.get($value, fontSize)};
+            --text-fw: #{map.get($value, fontWeight)};
+            --text-lh: #{map.get($value, lineHeight)};
+            --text-ls: #{map.get($value, letterSpacing)};
         }
     }
 

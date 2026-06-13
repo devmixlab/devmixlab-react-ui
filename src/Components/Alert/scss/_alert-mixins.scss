@@ -1,0 +1,151 @@
+@use '../../../scss/functions/common' as *;
+
+@mixin solid($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --alert-bg: #{intent($intent, 700)};
+
+        --alert-border-top-color: #{intent($intent, 700)};
+        --alert-border-right-color: #{intent($intent, 700)};
+        --alert-border-bottom-color: #{intent($intent, 700)};
+        --alert-border-left-color: #{intent($intent, 700)};
+
+        //&[data-accent='left'] {
+        //    --alert-border-left-color: #{intent($intent, 800)};
+        //}
+        //
+        //&[data-accent='top'] {
+        //    --alert-border-top-color: #{intent($intent, 800)};
+        //}
+
+        --alert-text: #{intent($intent, 50)};
+        --alert-title-text: #{intent($intent, 50)};
+        --alert-description-text: #{intent($intent, 100)};
+
+        --alert-dismiss-btn-color: #{intent($intent, 50)};
+        --alert-dismiss-btn-bg-hover: #{intent($intent, 600)};
+        --alert-dismiss-btn-bg-focus: #{intent($intent, 600)};
+    } @else {
+        --alert-bg: #{intent($intent, 700)};
+
+        --alert-border-top-color: #{intent($intent, 700)};
+        --alert-border-right-color: #{intent($intent, 700)};
+        --alert-border-bottom-color: #{intent($intent, 700)};
+        --alert-border-left-color: #{intent($intent, 700)};
+
+        //&[data-accent='left'] {
+        //    --alert-border-left-color: #{intent($intent, 800)};
+        //}
+        //
+        //&[data-accent='top'] {
+        //    --alert-border-top-color: #{intent($intent, 800)};
+        //}
+
+        --alert-text: #{intent($intent, 50)};
+        --alert-title-text: #{intent($intent, 50)};
+        --alert-description-text: #{intent($intent, 100)};
+
+        --alert-dismiss-btn-color: #{intent($intent, 50)};
+        --alert-dismiss-btn-bg-hover: #{intent($intent, 600)};
+        --alert-dismiss-btn-bg-focus: #{intent($intent, 600)};
+    }
+}
+
+@mixin subtle($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --alert-bg: #{intent($intent, 50)};
+
+        --alert-border-top-color: #{intent($intent, 100)};
+        --alert-border-right-color: #{intent($intent, 100)};
+        --alert-border-bottom-color: #{intent($intent, 100)};
+        --alert-border-left-color: #{intent($intent, 100)};
+
+        &[data-accent='left'] {
+            --alert-border-left-color: #{intent($intent, 500)};
+        }
+
+        &[data-accent='top'] {
+            --alert-border-top-color: #{intent($intent, 500)};
+        }
+
+        --alert-text: #{intent($intent, 800)};
+        --alert-title-text: #{intent($intent, 900)};
+        --alert-description-text: #{intent($intent, 700)};
+
+        --alert-dismiss-btn-color: #{intent($intent, 700)};
+        --alert-dismiss-btn-bg-hover: #{intent($intent, 100)};
+        --alert-dismiss-btn-bg-focus: #{intent($intent, 100)};
+    } @else {
+        --alert-bg: #{intent($intent, 950)};
+
+        --alert-border-top-color: #{intent($intent, 900)};
+        --alert-border-right-color: #{intent($intent, 900)};
+        --alert-border-bottom-color: #{intent($intent, 900)};
+        --alert-border-left-color: #{intent($intent, 900)};
+
+        &[data-accent='left'] {
+            --alert-border-left-color: #{intent($intent, 500)};
+        }
+
+        &[data-accent='top'] {
+            --alert-border-top-color: #{intent($intent, 500)};
+        }
+
+        --alert-text: #{intent($intent, 100)};
+        --alert-title-text: #{intent($intent, 50)};
+        --alert-description-text: #{intent($intent, 200)};
+
+        --alert-dismiss-btn-color: #{intent($intent, 100)};
+        --alert-dismiss-btn-bg-hover: #{intent($intent, 900)};
+        --alert-dismiss-btn-bg-focus: #{intent($intent, 900)};
+    }
+}
+
+@mixin outlined($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --alert-bg: transparent;
+
+        --alert-border-top-color: #{intent($intent, 300)};
+        --alert-border-right-color: #{intent($intent, 300)};
+        --alert-border-bottom-color: #{intent($intent, 300)};
+        --alert-border-left-color: #{intent($intent, 300)};
+
+        &[data-accent='left'] {
+            --alert-border-left-color: #{intent($intent, 500)};
+        }
+
+        &[data-accent='top'] {
+            --alert-border-top-color: #{intent($intent, 500)};
+        }
+
+        --alert-text: #{intent($intent, 800)};
+        --alert-title-text: #{intent($intent, 900)};
+        --alert-description-text: #{intent($intent, 700)};
+
+        --alert-dismiss-btn-color: #{intent($intent, 700)};
+        --alert-dismiss-btn-bg-hover: #{intent($intent, 50)};
+        --alert-dismiss-btn-bg-focus: #{intent($intent, 50)};
+    } @else {
+        --alert-bg: transparent;
+
+        --alert-border-top-color: #{intent($intent, 600)};
+        --alert-border-right-color: #{intent($intent, 600)};
+        --alert-border-bottom-color: #{intent($intent, 600)};
+        --alert-border-left-color: #{intent($intent, 600)};
+
+        &[data-accent='left'] {
+            --alert-border-left-color: #{intent($intent, 500)};
+        }
+
+        &[data-accent='top'] {
+            --alert-border-top-color: #{intent($intent, 500)};
+        }
+
+        --alert-text: #{intent($intent, 100)};
+        --alert-title-text: #{intent($intent, 50)};
+        --alert-description-text: #{intent($intent, 200)};
+
+        --alert-dismiss-btn-color: #{intent($intent, 100)};
+        --alert-dismiss-btn-bg-hover: #{intent($intent, 900)};
+        --alert-dismiss-btn-bg-focus: #{intent($intent, 900)};
+    }
+}

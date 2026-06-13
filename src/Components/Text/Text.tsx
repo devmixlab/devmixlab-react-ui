@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, HTMLAttributes } from 'react';
 import { Box, type BoxProps } from '../Box';
 import clsx from 'clsx';
 import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
@@ -8,7 +8,11 @@ const prefix = (name: string = '') => {
     return classPrefix(`--text${name}`);
 };
 
-export const textVariants = [
+//---------------------------------------------------------------
+// Types
+//---------------------------------------------------------------
+
+const textVariants = [
     'display-lg',
     'display-md',
     'heading-lg',
@@ -20,9 +24,9 @@ export const textVariants = [
     'micro',
 ] as const;
 
-export type TextVariant = (typeof textVariants)[number] | (string & {});
+type TextVariant = (typeof textVariants)[number] | (string & {});
 
-export const textIntents = [
+const textIntents = [
     'default',
     'secondary',
     'primary',
@@ -32,13 +36,13 @@ export const textIntents = [
     'info',
 ] as const;
 
-export type TextIntent = (typeof textIntents)[number] | (string & {});
+type TextIntent = (typeof textIntents)[number] | (string & {});
 
-export const textEmphases = ['subtle', 'muted', 'base', 'strong'] as const;
+const textEmphases = ['subtle', 'muted', 'base', 'strong'] as const;
 
-export type TextEmphasis = (typeof textEmphases)[number] | (string & {});
+type TextEmphasis = (typeof textEmphases)[number] | (string & {});
 
-export type BaseProps = {
+type OwnTextProps = {
     intent?: TextIntent;
     className?: string;
     inline?: boolean;
@@ -47,13 +51,13 @@ export type BaseProps = {
     mono?: boolean;
     code?: boolean;
     numeric?: boolean;
-} & BoxProps;
+};
 
-export type OwnTextProps = BaseProps;
+type TextProps = OwnTextProps & BoxProps;
 
-type ImplTextProps<C extends React.ElementType = 'p'> = PolymorphicProps<C, OwnTextProps>;
+type ImplTextProps = PolymorphicProps<'p', OwnTextProps>;
 
-const TextImpl = <C extends React.ElementType = 'p'>(
+const TextImpl = (
     {
         as,
         emphasis = 'base',
@@ -65,7 +69,7 @@ const TextImpl = <C extends React.ElementType = 'p'>(
         code = false,
         numeric = false,
         ...rest
-    }: ImplTextProps<C>,
+    }: ImplTextProps,
     ref: React.Ref<any>,
 ) => {
     const isMono = mono || code;
@@ -87,4 +91,10 @@ const TextImpl = <C extends React.ElementType = 'p'>(
     );
 };
 
-export const Text = createPolymorphic<OwnTextProps, 'p'>(forwardRef(TextImpl), 'Text');
+const Text = createPolymorphic<TextProps, 'p'>(forwardRef(TextImpl), 'Text');
+
+export { Text };
+
+export type { TextVariant, TextIntent, TextEmphasis, OwnTextProps, TextProps };
+
+export { textVariants, textIntents, textEmphases };
