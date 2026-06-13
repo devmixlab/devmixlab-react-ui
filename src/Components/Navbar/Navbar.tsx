@@ -30,7 +30,7 @@ import {
 } from './Navbar.types';
 import { useStableId } from '../../utils/useStableId';
 import { breakpointOrder, useBreakpoint } from '../../utils/responsive';
-import { Collapse } from '../../Collapse/Collapse';
+import { Collapse } from '../Collapse/Collapse';
 import { mergeRefs } from '../../utils/mergeRefs';
 import {
     useFocusTrap,

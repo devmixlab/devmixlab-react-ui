@@ -1,10 +1,17 @@
-import React, { CSSProperties, forwardRef, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+    CSSProperties,
+    forwardRef,
+    HTMLAttributes,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
 
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps } from '../Components/Box/Box';
-import { usePresence, useReducedMotion } from '../hooks';
-import { classPrefix } from '../utils/classPrefix';
+import { Box, BoxProps } from '../Box';
+import { usePresence, useReducedMotion } from '../../hooks';
+import { classPrefix } from '../../utils/classPrefix';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -18,41 +25,40 @@ const prefix = (name = '') => classPrefix(`--collapse${name}`);
 
 type CollapseEffect = 'none' | 'height';
 
-export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
-    {
-        /**
-         * Whether collapse is open.
-         */
-        open?: boolean;
+type OwnCollapseProps = {
+    /**
+     * Whether collapse is open.
+     */
+    open?: boolean;
 
-        /**
-         * Transition duration (ms)
-         */
-        enterDuration?: number;
-        exitDuration?: number;
+    /**
+     * Transition duration (ms)
+     */
+    enterDuration?: number;
+    exitDuration?: number;
 
-        /**
-         * Transition easing.
-         */
-        easing?: string;
+    /**
+     * Transition easing.
+     */
+    easing?: string;
 
-        /**
-         * Keep mounted after exit.
-         */
-        keepMounted?: boolean;
+    /**
+     * Keep mounted after exit.
+     */
+    keepMounted?: boolean;
 
-        /**
-         * Animation effect.
-         */
-        effect?: CollapseEffect;
+    /**
+     * Animation effect.
+     */
+    effect?: CollapseEffect;
 
-        onMount?: () => void;
-        onUnmount?: () => void;
-        onEntered?: () => void;
-        onExited?: () => void;
-    }
->;
+    onMount?: () => void;
+    onUnmount?: () => void;
+    onEntered?: () => void;
+    onExited?: () => void;
+};
+
+type CollapseProps = OwnCollapseProps & BoxProps & HTMLAttributes<HTMLDivElement>;
 
 // -----------------------------------------------------------------------------
 // Collapse
@@ -61,6 +67,10 @@ export type CollapseProps<C extends React.ElementType = 'div'> = BoxComponentPro
 const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
     (
         {
+            children,
+            className,
+            style,
+
             open = false,
             enterDuration = 200,
             exitDuration = 200,
@@ -73,8 +83,6 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
             onEntered,
             onExited,
 
-            children,
-            className,
             ...rest
         },
         ref,
@@ -195,6 +203,8 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
                 {...rest}
                 style={
                     {
+                        ...style,
+
                         '--collapse-enter-duration': `${shouldAnimate ? enterDuration : 0}ms`,
                         '--collapse-exit-duration': `${shouldAnimate ? exitDuration : 0}ms`,
                         '--collapse-easing': easing,
@@ -216,3 +226,5 @@ Collapse.displayName = 'Collapse';
 // -----------------------------------------------------------------------------
 
 export { Collapse };
+
+export type { CollapseProps, CollapseEffect };

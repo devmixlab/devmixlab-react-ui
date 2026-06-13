@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { clsx } from 'clsx';
 import { Box, BoxComponentProps } from '../Components/Box/Box';
-import { Collapse, CollapseProps } from '../Collapse/Collapse';
+import { Collapse, CollapseProps } from '../Components/Collapse/Collapse';
 import { classPrefix } from '../utils/classPrefix';
 import {
     AccordionContextValue,

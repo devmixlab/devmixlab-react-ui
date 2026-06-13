@@ -15,3 +15,4 @@ export * from './src/Components/Badge';
 export * from './src/Components/Chip';
 export * from './src/Components/Text';
 export * from './src/Components/Alert';
+export * from './src/Components/Collapse';

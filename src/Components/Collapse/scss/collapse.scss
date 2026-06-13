@@ -1,4 +1,4 @@
-@use '../scss/config' as cfg;
+@use '../../../scss/config' as cfg;
 
 $p: cfg.$prefix;
 $collapse-prefix: #{$p}--collapse;
