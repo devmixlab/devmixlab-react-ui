@@ -1,9 +1,7 @@
 import React, {
     forwardRef,
     useState,
-    useRef,
     useImperativeHandle,
-    useCallback,
     HTMLAttributes,
     CSSProperties,
 } from 'react';
@@ -37,8 +35,6 @@ const alertAttentions = [
     'pop',
     'tilt',
     'compress',
-
-    //new
     'nudge',
     'breathe',
     'lift',
@@ -48,9 +44,9 @@ const alertAttentions = [
 
 type AlertAttention = (typeof alertAttentions)[number];
 
-type AlertControlRef = {
+interface AlertControlRef {
     runAttention(attention?: AlertAttention): void;
-};
+}
 
 const attentionDurations: Record<AlertAttention, number> = {
     shake: 500,
@@ -63,7 +59,6 @@ const attentionDurations: Record<AlertAttention, number> = {
     'rubber-band': 750,
     swing: 700,
     tada: 900,
-    // new
     blink: 400,
     flicker: 600,
     vibrate: 400,
@@ -71,7 +66,7 @@ const attentionDurations: Record<AlertAttention, number> = {
     tilt: 600,
     compress: 500,
     nudge: 500,
-    breathe: 1200, // slow — it's a calm animation
+    breathe: 1200,
     lift: 550,
     rock: 700,
     throb: 650,
@@ -229,9 +224,8 @@ const AlertImpl = (
 
         ...rest
     }: ImplAlertProps,
-    ref: React.Ref<any>,
+    ref: React.Ref<HTMLDivElement>,
 ) => {
-    // const rootRef = useRef<HTMLDivElement>(null);
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
 
     const [runningAttention, setRunningAttention] = useState<AlertAttention | undefined>();
@@ -239,7 +233,6 @@ const AlertImpl = (
     const isControlled = open !== undefined;
     const visible = isControlled ? open : internalOpen;
 
-    // const isDismissible = onDismiss !== undefined || onOpenChange !== undefined || !isControlled;
     const isDismissible = onDismiss !== undefined || onOpenChange !== undefined;
 
     const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
