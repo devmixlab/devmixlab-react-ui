@@ -172,6 +172,16 @@
     }
 }
 
+@mixin animation-transform-origin($animation) {
+    @if $animation == slide-down {
+        transform-origin: top center;
+    } @else if $animation == slide-up {
+        transform-origin: bottom center;
+    } @else {
+        transform-origin: center center;
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Attention Mixin
 // ---------------------------------------------------------------------------
@@ -179,7 +189,17 @@
 @mixin attention($name) {
     animation:
         alert-#{$name}
-        var(--running-attention-duration, var(--animation-attention-duration, 600ms))
+        var(--running-attention-duration, var(--animation-enter-duration, 600ms))
         ease-out
         forwards;
+}
+
+@mixin attention-transform-origin($attention) {
+    @if $attention == swing {
+        transform-origin: top center;
+    } @else if $attention == lift or $attention == rock or $attention == tilt {
+        transform-origin: bottom center;
+    } @else {
+        transform-origin: center center;
+    }
 }
