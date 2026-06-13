@@ -9,6 +9,7 @@
 @use '../../../scss/mixins' as mixins;
 @use '../../../scss/mixins/mode' as *;
 @use './alert-mixins' as *;
+@use './alert-keyframes' as *;
 
 @use 'sass:map';
 
@@ -207,6 +208,148 @@
                     @include solid($intent, 'dark');
                 }
             }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Animations
+// ---------------------------------------------------------------------------
+
+$alert-animations:
+    fade,
+    slide-down,
+    slide-up,
+    slide-left,
+    slide-right,
+    scale,
+    scale-fade;
+
+.#{$alert-prefix} {
+    transform-origin: top center;
+
+    &[data-animation-state='exiting'] {
+        pointer-events: none;
+    }
+
+    &[data-animation-state='entering'],
+    &[data-animation-state='exiting'] {
+        will-change: transform, opacity;
+    }
+
+    @each $animation in $alert-animations {
+        &[data-animation='#{$animation}'] {
+            &[data-animation-state='entering'] {
+                @include animation($animation, 'entering');
+            }
+
+            &[data-animation-state='exiting'] {
+                @include animation($animation, 'exiting');
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Attentions
+// ---------------------------------------------------------------------------
+
+$alert-attentions:
+    shake,
+    pulse,
+    bounce,
+    wiggle,
+    flash,
+    heartbeat,
+    jello,
+    rubber-band,
+    swing,
+    tada;
+
+.#{$alert-prefix} {
+
+    @each $attention in $alert-attentions {
+        &[data-attention='#{$attention}'] {
+            &[data-animation-state='entering'] {
+                @include attention($attention);
+            }
+
+            &[data-animation-state='exiting'] {
+                // default
+                @include animation(scale-fade, exiting);
+            }
+        }
+    }
+
+    @each $animation in $alert-animations {
+        &[data-attention][data-animation-state='exiting'][data-attention-exit='#{$animation}'] {
+            @include animation($animation, exiting);
+        }
+    }
+
+    &[data-attention='shake'] {
+        &[data-animation-state='entering'] {
+            animation: alert-shake 500ms ease-out;
+        }
+        &[data-animation-state='exiting'] {
+            &[data-attention-exit] {
+
+            }
+        }
+    }
+
+    &[data-attention='pulse'] {
+        &[data-animation-state='entering'] {
+            animation: alert-pulse 500ms ease-out;
+        }
+    }
+
+    &[data-attention='bounce'] {
+        &[data-animation-state='entering'] {
+            animation: alert-bounce 500ms ease-out;
+        }
+    }
+
+    &[data-attention='wiggle'] {
+        &[data-animation-state='entering'] {
+            animation: alert-wiggle 500ms ease-out;
+        }
+    }
+
+    &[data-attention='flash'] {
+        &[data-animation-state='entering'] {
+            animation: alert-flash 500ms ease-out;
+        }
+    }
+
+    &[data-attention='heartbeat'] {
+        &[data-animation-state='entering'] {
+            animation: alert-heartbeat 700ms ease-out;
+        }
+    }
+
+    &[data-attention='jello'] {
+        &[data-animation-state='entering'] {
+            animation: alert-jello 700ms ease-out;
+        }
+    }
+
+    &[data-attention='rubber-band'] {
+        &[data-animation-state='entering'] {
+            animation: alert-rubber-band 700ms ease-out;
+        }
+    }
+
+    &[data-attention='swing'] {
+        &[data-animation-state='entering'] {
+            transform-origin: top center;
+            animation: alert-swing 700ms ease-out;
+        }
+    }
+
+    &[data-attention='tada'] {
+        &[data-animation-state='entering'] {
+            animation: alert-tada 800ms ease-out;
         }
     }
 }

@@ -149,3 +149,37 @@
         --alert-dismiss-btn-bg-focus: #{intent($intent, 900)};
     }
 }
+
+// ---------------------------------------------------------------------------
+// Animation Mixin
+// ---------------------------------------------------------------------------
+
+@mixin animation($name, $state) {
+    @if $state == entering {
+        animation:
+            alert-#{$name}-in
+            var(--animation-enter-duration)
+            var(--animation-enter-easing)
+            forwards;
+    } @else if $state == exiting {
+        animation:
+            alert-#{$name}-out
+            var(--animation-exit-duration)
+            var(--animation-exit-easing)
+            forwards;
+    } @else {
+        @error "Unknown animation state '#{$state}'. Expected entering or exiting.";
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Attention Mixin
+// ---------------------------------------------------------------------------
+
+@mixin attention($name) {
+    animation:
+        alert-#{$name}
+        var(--animation-attention-duration, 600ms)
+        ease-out
+        forwards;
+}
