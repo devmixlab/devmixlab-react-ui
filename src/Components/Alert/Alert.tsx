@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { Info, Warning, Success, Close } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { TextProps, Text } from '../Text';
+import { usePresence } from '../../hooks';
 
 //-----------------------------------------------------------
 // Types
@@ -35,6 +36,10 @@ type OwnAlertProps = {
     icon?: boolean | React.ReactNode;
 
     accent?: AlertAccent;
+
+    open?: boolean;
+    defaultOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
 
     onDismiss?: () => void;
 };
@@ -86,26 +91,40 @@ const AlertImpl = (
         accent,
 
         icon,
+
+        open,
+        defaultOpen = true,
+        onOpenChange,
         onDismiss,
+
         ...rest
     }: ImplAlertProps,
     ref: React.Ref<any>,
 ) => {
-    const [visible, setVisible] = useState(true);
+    const [internalOpen, setInternalOpen] = useState(defaultOpen);
 
-    const isDismissible = !!onDismiss;
+    const isControlled = open !== undefined;
+    const visible = isControlled ? open : internalOpen;
+
+    const isDismissible = onDismiss !== undefined || onOpenChange !== undefined || !isControlled;
 
     const resolvedIcon =
         icon === true
             ? (defaultIcons[intent as keyof typeof defaultIcons] ?? null)
             : (icon ?? null);
 
-    if (!visible) return null;
-
     const handleDismiss = () => {
-        setVisible(false);
+        if (!isControlled) {
+            setInternalOpen(false);
+        }
+
+        onOpenChange?.(false);
         onDismiss?.();
     };
+
+    if (!visible) {
+        return null;
+    }
 
     return (
         <Box
@@ -119,16 +138,16 @@ const AlertImpl = (
             data-accent={accent ?? undefined}
             data-has-icon={!!resolvedIcon || undefined}
         >
-            {resolvedIcon != null && <Box className={prefix(`__icon`)}>{resolvedIcon}</Box>}
+            {resolvedIcon != null && <Box className={prefix('__icon')}>{resolvedIcon}</Box>}
 
-            <Box className={prefix(`__content`)}>{children}</Box>
+            <Box className={prefix('__content')}>{children}</Box>
 
             {isDismissible && (
-                <Box className={prefix(`__dismiss`)}>
+                <Box className={prefix('__dismiss')}>
                     <Box
                         as="button"
                         type="button"
-                        className={prefix(`__dismiss-button`)}
+                        className={prefix('__dismiss-button')}
                         onClick={handleDismiss}
                     >
                         <Close />
