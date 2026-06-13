@@ -179,7 +179,7 @@
 @mixin attention($name) {
     animation:
         alert-#{$name}
-        var(--animation-attention-duration, 600ms)
+        var(--running-attention-duration, var(--animation-attention-duration, 600ms))
         ease-out
         forwards;
 }

@@ -287,69 +287,77 @@ $alert-attentions:
         }
     }
 
-    &[data-attention='shake'] {
-        &[data-animation-state='entering'] {
-            animation: alert-shake 500ms ease-out;
-        }
-        &[data-animation-state='exiting'] {
-            &[data-attention-exit] {
-
-            }
+    @each $attention in $alert-attentions {
+        &[data-running-attention='#{$attention}'] {
+            @include attention($attention);
         }
     }
 
-    &[data-attention='pulse'] {
-        &[data-animation-state='entering'] {
-            animation: alert-pulse 500ms ease-out;
-        }
-    }
+    //data-running-attention
 
-    &[data-attention='bounce'] {
-        &[data-animation-state='entering'] {
-            animation: alert-bounce 500ms ease-out;
-        }
-    }
-
-    &[data-attention='wiggle'] {
-        &[data-animation-state='entering'] {
-            animation: alert-wiggle 500ms ease-out;
-        }
-    }
-
-    &[data-attention='flash'] {
-        &[data-animation-state='entering'] {
-            animation: alert-flash 500ms ease-out;
-        }
-    }
-
-    &[data-attention='heartbeat'] {
-        &[data-animation-state='entering'] {
-            animation: alert-heartbeat 700ms ease-out;
-        }
-    }
-
-    &[data-attention='jello'] {
-        &[data-animation-state='entering'] {
-            animation: alert-jello 700ms ease-out;
-        }
-    }
-
-    &[data-attention='rubber-band'] {
-        &[data-animation-state='entering'] {
-            animation: alert-rubber-band 700ms ease-out;
-        }
-    }
-
-    &[data-attention='swing'] {
-        &[data-animation-state='entering'] {
-            transform-origin: top center;
-            animation: alert-swing 700ms ease-out;
-        }
-    }
-
-    &[data-attention='tada'] {
-        &[data-animation-state='entering'] {
-            animation: alert-tada 800ms ease-out;
-        }
-    }
+    //&[data-attention='shake'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-shake 500ms ease-out;
+    //    }
+    //    &[data-animation-state='exiting'] {
+    //        &[data-attention-exit] {
+    //
+    //        }
+    //    }
+    //}
+    //
+    //&[data-attention='pulse'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-pulse 500ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='bounce'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-bounce 500ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='wiggle'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-wiggle 500ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='flash'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-flash 500ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='heartbeat'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-heartbeat 700ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='jello'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-jello 700ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='rubber-band'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-rubber-band 700ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='swing'] {
+    //    &[data-animation-state='entering'] {
+    //        transform-origin: top center;
+    //        animation: alert-swing 700ms ease-out;
+    //    }
+    //}
+    //
+    //&[data-attention='tada'] {
+    //    &[data-animation-state='entering'] {
+    //        animation: alert-tada 800ms ease-out;
+    //    }
+    //}
 }

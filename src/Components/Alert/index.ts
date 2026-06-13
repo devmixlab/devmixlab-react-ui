@@ -1,6 +1,7 @@
 export { Alert } from './Alert';
 
 export type {
+    AlertRef,
     SemanticAlertIntent,
     AlertAnimation,
     AlertAttention,

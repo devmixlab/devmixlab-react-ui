@@ -1,4 +1,12 @@
-import React, { forwardRef, useState, useCallback, HTMLAttributes, CSSProperties } from 'react';
+import React, {
+    forwardRef,
+    useState,
+    useRef,
+    useImperativeHandle,
+    useCallback,
+    HTMLAttributes,
+    CSSProperties,
+} from 'react';
 import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
 import { Box } from '../Box';
 import type { BoxProps } from '../Box';
@@ -11,6 +19,10 @@ import { usePresence } from '../../hooks';
 //-----------------------------------------------------------
 // Types
 //-----------------------------------------------------------
+
+// interface AlertRef {
+//     runAttention(attention?: AlertAttention): void;
+// }
 
 const alertAttentions = [
     'shake',
@@ -26,6 +38,10 @@ const alertAttentions = [
 ] as const;
 
 type AlertAttention = (typeof alertAttentions)[number];
+
+type AlertRef = {
+    runAttention: (attention?: AlertAttention) => void;
+};
 
 const attentionDurations: Record<AlertAttention, number> = {
     shake: 500,
@@ -188,9 +204,13 @@ const AlertImpl = (
 
         ...rest
     }: ImplAlertProps,
-    ref: React.Ref<any>,
+    // ref: React.Ref<any>,
+    ref: React.Ref<AlertRef>,
 ) => {
+    const rootRef = useRef<HTMLDivElement>(null);
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
+
+    const [runningAttention, setRunningAttention] = useState<AlertAttention | undefined>();
 
     const isControlled = open !== undefined;
     const visible = isControlled ? open : internalOpen;
@@ -200,6 +220,26 @@ const AlertImpl = (
     const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
 
     const animationEnterDuration = animationEnterDurationProp ?? defaultEnterDuration;
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            runAttention(nextAttention) {
+                const resolvedAttention = nextAttention ?? attention;
+
+                if (!resolvedAttention) {
+                    return;
+                }
+
+                setRunningAttention(undefined);
+
+                requestAnimationFrame(() => {
+                    setRunningAttention(resolvedAttention);
+                });
+            },
+        }),
+        [attention],
+    );
 
     const resolvedIcon =
         icon === true
@@ -232,7 +272,7 @@ const AlertImpl = (
     return (
         <Box
             {...rest}
-            ref={ref}
+            ref={rootRef}
             className={clsx(prefix(), className)}
             rounded={rounded}
             data-intent={intent}
@@ -243,6 +283,7 @@ const AlertImpl = (
             data-animation={animation && !attention ? animation : undefined}
             data-attention={attention ?? undefined}
             data-attention-exit={attentionExit ?? undefined}
+            data-running-attention={runningAttention}
             data-animation-state={animationState}
             style={
                 {
@@ -251,8 +292,22 @@ const AlertImpl = (
                     '--animation-exit-duration': `${animationExitDuration}ms`,
                     '--animation-enter-easing': enterAnimationEasing,
                     '--animation-exit-easing': exitAnimationEasing,
+
+                    '--running-attention-duration': runningAttention
+                        ? `${attentionDurations[runningAttention]}ms`
+                        : undefined,
                 } as CSSProperties
             }
+            onAnimationEnd={(e) => {
+                // console.log('animation finished');
+                if (!e.animationName.startsWith('alert-')) {
+                    return;
+                }
+
+                if (runningAttention) {
+                    setRunningAttention(undefined);
+                }
+            }}
         >
             {resolvedIcon != null && <Box className={prefix('__icon')}>{resolvedIcon}</Box>}
 
@@ -324,6 +379,7 @@ Alert.Actions = AlertActions;
 export { Alert };
 
 export type {
+    AlertRef,
     SemanticAlertIntent,
     AlertAnimation,
     AlertAttention,
