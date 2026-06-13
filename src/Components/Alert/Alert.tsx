@@ -20,10 +20,6 @@ import { usePresence } from '../../hooks';
 // Types
 //-----------------------------------------------------------
 
-// interface AlertRef {
-//     runAttention(attention?: AlertAttention): void;
-// }
-
 const alertAttentions = [
     'shake',
     'pulse',
@@ -35,12 +31,25 @@ const alertAttentions = [
     'rubber-band',
     'swing',
     'tada',
+    'blink',
+    'flicker',
+    'vibrate',
+    'pop',
+    'tilt',
+    'compress',
+
+    //new
+    'nudge',
+    'breathe',
+    'lift',
+    'rock',
+    'throb',
 ] as const;
 
 type AlertAttention = (typeof alertAttentions)[number];
 
-type AlertRef = {
-    runAttention: (attention?: AlertAttention) => void;
+type AlertControlRef = {
+    runAttention(attention?: AlertAttention): void;
 };
 
 const attentionDurations: Record<AlertAttention, number> = {
@@ -49,11 +58,23 @@ const attentionDurations: Record<AlertAttention, number> = {
     bounce: 500,
     wiggle: 500,
     flash: 500,
-    heartbeat: 700,
-    jello: 700,
-    'rubber-band': 700,
+    heartbeat: 900,
+    jello: 800,
+    'rubber-band': 750,
     swing: 700,
-    tada: 800,
+    tada: 900,
+    // new
+    blink: 400,
+    flicker: 600,
+    vibrate: 400,
+    pop: 400,
+    tilt: 600,
+    compress: 500,
+    nudge: 500,
+    breathe: 1200, // slow — it's a calm animation
+    lift: 550,
+    rock: 700,
+    throb: 650,
 };
 
 const alertAnimations = [
@@ -89,6 +110,8 @@ const alertAccents = ['left', 'top'] as const;
 type AlertAccent = (typeof alertAccents)[number];
 
 type OwnAlertProps = {
+    controlRef?: React.Ref<AlertControlRef>;
+
     intent?: AlertIntent;
     variant?: AlertVariant;
     size?: AlertSize;
@@ -172,6 +195,8 @@ const AlertImpl = (
         className,
         style,
 
+        controlRef,
+
         intent = 'danger',
         variant = 'solid',
         size = 'md',
@@ -204,10 +229,9 @@ const AlertImpl = (
 
         ...rest
     }: ImplAlertProps,
-    // ref: React.Ref<any>,
-    ref: React.Ref<AlertRef>,
+    ref: React.Ref<any>,
 ) => {
-    const rootRef = useRef<HTMLDivElement>(null);
+    // const rootRef = useRef<HTMLDivElement>(null);
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
 
     const [runningAttention, setRunningAttention] = useState<AlertAttention | undefined>();
@@ -215,14 +239,15 @@ const AlertImpl = (
     const isControlled = open !== undefined;
     const visible = isControlled ? open : internalOpen;
 
-    const isDismissible = onDismiss !== undefined || onOpenChange !== undefined || !isControlled;
+    // const isDismissible = onDismiss !== undefined || onOpenChange !== undefined || !isControlled;
+    const isDismissible = onDismiss !== undefined || onOpenChange !== undefined;
 
     const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
 
     const animationEnterDuration = animationEnterDurationProp ?? defaultEnterDuration;
 
     useImperativeHandle(
-        ref,
+        controlRef,
         () => ({
             runAttention(nextAttention) {
                 const resolvedAttention = nextAttention ?? attention;
@@ -272,7 +297,7 @@ const AlertImpl = (
     return (
         <Box
             {...rest}
-            ref={rootRef}
+            ref={ref}
             className={clsx(prefix(), className)}
             rounded={rounded}
             data-intent={intent}
@@ -299,12 +324,7 @@ const AlertImpl = (
                 } as CSSProperties
             }
             onAnimationEnd={(e) => {
-                // console.log('animation finished');
-                if (!e.animationName.startsWith('alert-')) {
-                    return;
-                }
-
-                if (runningAttention) {
+                if (runningAttention && e.animationName === `alert-${runningAttention}`) {
                     setRunningAttention(undefined);
                 }
             }}
@@ -379,7 +399,7 @@ Alert.Actions = AlertActions;
 export { Alert };
 
 export type {
-    AlertRef,
+    AlertControlRef,
     SemanticAlertIntent,
     AlertAnimation,
     AlertAttention,

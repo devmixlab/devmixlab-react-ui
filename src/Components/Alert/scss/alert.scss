@@ -131,9 +131,8 @@
                 @include reset.button;
                 @include icon;
 
-                transition:
-                    background-color var(--alert-dismiss-transition),
-                    transform var(--alert-dismiss-transition);
+                transition: background-color var(--alert-dismiss-transition),
+                transform var(--alert-dismiss-transition);
 
                 color: var(--alert-text);
 
@@ -167,7 +166,7 @@
         }
     }
 
-    &[data-variant='solid']{
+    &[data-variant='solid'] {
         &[data-accent='left'], &[data-accent='top'] {
             border-left-width: 1px;
         }
@@ -216,14 +215,13 @@
 // Animations
 // ---------------------------------------------------------------------------
 
-$alert-animations:
-    fade,
-    slide-down,
-    slide-up,
-    slide-left,
-    slide-right,
-    scale,
-    scale-fade;
+$alert-animations: fade,
+slide-down,
+slide-up,
+slide-left,
+slide-right,
+scale,
+scale-fade;
 
 .#{$alert-prefix} {
     transform-origin: top center;
@@ -254,8 +252,7 @@ $alert-animations:
 // Attentions
 // ---------------------------------------------------------------------------
 
-$alert-attentions:
-    shake,
+$alert-attentions: shake,
     pulse,
     bounce,
     wiggle,
@@ -264,7 +261,19 @@ $alert-attentions:
     jello,
     rubber-band,
     swing,
-    tada;
+    tada,
+    blink,
+    flicker,
+    vibrate,
+    pop,
+    tilt,
+    compress,
+    //new
+    nudge,
+    breathe,
+    lift,
+    rock,
+    throb;
 
 .#{$alert-prefix} {
 

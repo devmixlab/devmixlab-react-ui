@@ -52,9 +52,11 @@
 // ---------------------------------------------------------------------------
 
 @keyframes alert-flash {
-    0%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0.25; }
-    50% { opacity: 1; }
+    0%, 100%        { opacity: 1; }
+    20%             { opacity: 0.15; }
+    40%             { opacity: 1; }
+    60%             { opacity: 0.15; }
+    80%             { opacity: 1; }
 }
 
 // ---------------------------------------------------------------------------
@@ -62,11 +64,11 @@
 // ---------------------------------------------------------------------------
 
 @keyframes alert-heartbeat {
-    0%, 100% { transform: scale(1); }
-    14% { transform: scale(1.08); }
-    28% { transform: scale(1); }
-    42% { transform: scale(1.12); }
-    70% { transform: scale(1); }
+    0%, 100%        { transform: scale(1); }
+    10%             { transform: scale(1.10); }   // lub
+    20%             { transform: scale(1); }
+    30%             { transform: scale(1.16); }   // dub (stronger)
+    45%, 100%       { transform: scale(1); }      // rest — short, not 28% dead air
 }
 
 // ---------------------------------------------------------------------------
@@ -74,21 +76,12 @@
 // ---------------------------------------------------------------------------
 
 @keyframes alert-jello {
-    0%, 100% {
-        transform: skewX(0deg) skewY(0deg);
-    }
-
-    25% {
-        transform: skewX(-12deg) skewY(-6deg);
-    }
-
-    50% {
-        transform: skewX(8deg) skewY(4deg);
-    }
-
-    75% {
-        transform: skewX(-4deg) skewY(-2deg);
-    }
+    0%, 100%        { transform: skewX(0deg)   skewY(0deg); }
+    20%             { transform: skewX(-14deg) skewY(-7deg); }
+    35%             { transform: skewX(10deg)  skewY(5deg); }
+    50%             { transform: skewX(-6deg)  skewY(-3deg); }
+    65%             { transform: skewX(3deg)   skewY(1.5deg); }
+    80%             { transform: skewX(-1deg)  skewY(-0.5deg); }
 }
 
 // ---------------------------------------------------------------------------
@@ -96,25 +89,12 @@
 // ---------------------------------------------------------------------------
 
 @keyframes alert-rubber-band {
-    0%, 100% {
-        transform: scale3d(1, 1, 1);
-    }
-
-    30% {
-        transform: scale3d(1.25, 0.75, 1);
-    }
-
-    40% {
-        transform: scale3d(0.75, 1.25, 1);
-    }
-
-    60% {
-        transform: scale3d(1.15, 0.85, 1);
-    }
-
-    75% {
-        transform: scale3d(0.95, 1.05, 1);
-    }
+    0%, 100%        { transform: scale3d(1,    1,    1); }
+    25%             { transform: scale3d(1,    1,    1); }  // hold before snap
+    40%             { transform: scale3d(1.3,  0.7,  1); }  // stretch
+    55%             { transform: scale3d(0.8,  1.2,  1); }  // squash
+    70%             { transform: scale3d(1.12, 0.88, 1); }  // settle
+    82%             { transform: scale3d(0.97, 1.03, 1); }  // micro-bounce
 }
 
 // ---------------------------------------------------------------------------
@@ -152,15 +132,153 @@
         transform: scale(1) rotate(0deg);
     }
 
-    10%, 20% {
-        transform: scale(0.95) rotate(-3deg);
+    8%, 16% {
+        transform: scale(0.94) rotate(-3deg);
     }
 
-    30%, 50%, 70%, 90% {
-        transform: scale(1.08) rotate(3deg);
+    28%, 52%, 76% {
+        transform: scale(1.06) rotate(3deg);
     }
 
-    40%, 60%, 80% {
-        transform: scale(1.08) rotate(-3deg);
+    40%, 64%, 88% {
+        transform: scale(1.06) rotate(-3deg);
     }
+}
+
+// ---------------------------------------------------------------------------
+// Blink — hard cut, no fade, urgent
+// ---------------------------------------------------------------------------
+
+@keyframes alert-blink {
+    0%, 100%        { opacity: 1; }
+    25%             { opacity: 0; }
+    50%             { opacity: 1; }
+    75%             { opacity: 0; }
+}
+
+// ---------------------------------------------------------------------------
+// Flicker — irregular pattern, failing-light feel
+// ---------------------------------------------------------------------------
+
+@keyframes alert-flicker {
+    0%, 100%        { opacity: 1; }
+    8%              { opacity: 0; }
+    12%             { opacity: 1; }
+    20%             { opacity: 0; }
+    24%             { opacity: 1; }
+    40%             { opacity: 0.4; }
+    48%             { opacity: 1; }
+    60%             { opacity: 0; }
+    65%             { opacity: 1; }
+    80%             { opacity: 0.3; }
+    88%             { opacity: 1; }
+}
+
+// ---------------------------------------------------------------------------
+// Vibrate — phone-buzz, tiny high-frequency lateral tremor
+// ---------------------------------------------------------------------------
+
+@keyframes alert-vibrate {
+    0%, 100%        { transform: translateX(0); }
+    10%             { transform: translateX(-2px); }
+    20%             { transform: translateX(2px); }
+    30%             { transform: translateX(-2px); }
+    40%             { transform: translateX(2px); }
+    50%             { transform: translateX(-2px); }
+    60%             { transform: translateX(2px); }
+    70%             { transform: translateX(-2px); }
+    80%             { transform: translateX(2px); }
+    90%             { transform: translateX(-1px); }
+}
+
+// ---------------------------------------------------------------------------
+// Pop — snappy scale overshoot, notification-arrived feel
+// ---------------------------------------------------------------------------
+
+@keyframes alert-pop {
+    0%              { transform: scale(1); }
+    40%             { transform: scale(1.18); }
+    65%             { transform: scale(0.94); }
+    85%             { transform: scale(1.04); }
+    100%            { transform: scale(1); }
+}
+
+// ---------------------------------------------------------------------------
+// Tilt — slow lean and return, subtle attention pull
+// ---------------------------------------------------------------------------
+
+@keyframes alert-tilt {
+    0%, 100%        { transform: rotate(0deg); }
+    25%             { transform: rotate(6deg); }
+    75%             { transform: rotate(-4deg); }
+}
+
+// ---------------------------------------------------------------------------
+// Compress — squash on Y, spring back up
+// ---------------------------------------------------------------------------
+
+@keyframes alert-compress {
+    0%, 100%        { transform: scaleY(1); }
+    25%             { transform: scaleY(0.7); }
+    50%             { transform: scaleY(1.12); }
+    70%             { transform: scaleY(0.96); }
+    85%             { transform: scaleY(1.04); }
+}
+
+// ---------------------------------------------------------------------------
+// Nudge — left pull with a clean return
+// ---------------------------------------------------------------------------
+
+@keyframes alert-nudge {
+    0%, 100%    { transform: translateX(0); }
+    20%         { transform: translateX(-6px); }
+    45%         { transform: translateX(3px); }
+    70%         { transform: translateX(-1px); }
+}
+
+// ---------------------------------------------------------------------------
+// Breathe — calm, slow expand
+// ---------------------------------------------------------------------------
+
+@keyframes alert-breathe {
+    0%, 100%    { transform: scale(1); }
+    50%         { transform: scale(1.03); }
+}
+
+// ---------------------------------------------------------------------------
+// Lift — rises with a soft landing overshoot
+// ---------------------------------------------------------------------------
+
+@keyframes alert-lift {
+    0%, 100%    { transform: translateY(0); }
+    30%         { transform: translateY(-8px); }
+    60%         { transform: translateY(2px); }
+    80%         { transform: translateY(-1px); }
+}
+
+// ---------------------------------------------------------------------------
+// Glow — skipped; box-shadow color is theme-dependent,
+// implement with a CSS variable on the consuming component
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Rock — even pivot, symmetric left/right
+// ---------------------------------------------------------------------------
+
+@keyframes alert-rock {
+    0%, 100%    { transform: rotate(0deg); }
+    20%         { transform: rotate(3deg); }
+    50%         { transform: rotate(-3deg); }
+    80%         { transform: rotate(3deg); }
+}
+
+// ---------------------------------------------------------------------------
+// Throb — single strong pulse with slight undershoot
+// ---------------------------------------------------------------------------
+
+@keyframes alert-throb {
+    0%, 100%    { transform: scale(1); }
+    35%         { transform: scale(1.12); }
+    60%         { transform: scale(0.97); }
+    80%         { transform: scale(1.03); }
 }
