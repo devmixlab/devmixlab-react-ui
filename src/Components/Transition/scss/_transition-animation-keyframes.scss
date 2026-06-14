@@ -19,7 +19,7 @@
 @keyframes transition-slide-down-in {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(var(--transition-slide-offset, -8px));
     }
 
     to {
@@ -36,7 +36,7 @@
 
     to {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(var(--transition-slide-offset, -8px));
     }
 }
 
@@ -47,7 +47,7 @@
 @keyframes transition-slide-up-in {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(var(--transition-slide-offset, 8px));
     }
 
     to {
@@ -64,7 +64,7 @@
 
     to {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(var(--transition-slide-offset, 8px));
     }
 }
 
@@ -75,7 +75,7 @@
 @keyframes transition-slide-left-in {
     from {
         opacity: 0;
-        transform: translateX(8px);
+        transform: translateX(var(--transition-slide-offset, 8px));
     }
 
     to {
@@ -92,7 +92,7 @@
 
     to {
         opacity: 0;
-        transform: translateX(8px);
+        transform: translateX(var(--transition-slide-offset, 8px));
     }
 }
 
@@ -103,7 +103,7 @@
 @keyframes transition-slide-right-in {
     from {
         opacity: 0;
-        transform: translateX(-8px);
+        transform: translateX(var(--transition-slide-offset, -8px));
     }
 
     to {
@@ -120,7 +120,7 @@
 
     to {
         opacity: 0;
-        transform: translateX(-8px);
+        transform: translateX(var(--transition-slide-offset, -8px));
     }
 }
 
@@ -131,7 +131,7 @@
 @keyframes transition-scale-in {
     from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(var(--transition-scale-from, 0.95));
     }
 
     to {
@@ -148,7 +148,7 @@
 
     to {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(var(--transition-scale-from, 0.95));
     }
 }
 
@@ -159,7 +159,7 @@
 @keyframes transition-scale-fade-in {
     from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(var(--transition-scale-from, 0.95));
     }
 
     to {
@@ -176,6 +176,6 @@
 
     to {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(var(--transition-scale-from, 0.95));
     }
 }

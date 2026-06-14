@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { Info, Warning, Success, Close } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { TextProps, Text } from '../Text';
+import { TransitionProps, Transition } from '../Transition';
 
 //-----------------------------------------------------------
 // Types
@@ -39,7 +40,7 @@ type OwnAlertProps = {
     onDismiss?: () => void;
 };
 
-type AlertProps = OwnAlertProps & Omit<BoxProps, 'size'>;
+type AlertProps = OwnAlertProps & TransitionProps & Omit<BoxProps, 'size'>;
 
 type ImplAlertProps = PolymorphicProps<'div', AlertProps>;
 
@@ -98,8 +99,9 @@ const AlertImpl = (
             : (icon ?? null);
 
     return (
-        <Box
+        <Transition
             {...rest}
+            as={Box}
             ref={ref}
             className={clsx(prefix(), className)}
             rounded={rounded}
@@ -125,7 +127,7 @@ const AlertImpl = (
                     </Box>
                 </Box>
             )}
-        </Box>
+        </Transition>
     );
 };
 

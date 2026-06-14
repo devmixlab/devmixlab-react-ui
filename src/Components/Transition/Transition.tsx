@@ -6,15 +6,13 @@ import React, {
     useState,
     useEffect,
     useRef,
-    useCallback,
 } from 'react';
 
 import clsx from 'clsx';
 import { classPrefix } from '../../utils/classPrefix';
 import { Box, BoxProps } from '../Box';
 import { usePresence } from '../../hooks';
-import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
-import { AlertAnimation, AlertAttention, AlertControlRef } from '../Alert/____Alert';
+import { createPolymorphic } from '../../types/polymorphic';
 
 //-----------------------------------------------------------
 // Types
@@ -50,7 +48,7 @@ interface TransitionControlRef {
     runAttention(attention?: TransitionAttention): void;
 }
 
-const attentionDurations: Record<AlertAttention, number> = {
+const attentionDurations: Record<TransitionAttention, number> = {
     shake: 500,
     pulse: 500,
     bounce: 500,
@@ -88,14 +86,14 @@ const transitionAnimations = [
 type TransitionAnimation = (typeof transitionAnimations)[number];
 
 type OwnTransitionProps = {
-    controlRef?: React.Ref<AlertControlRef>;
+    controlRef?: React.Ref<TransitionControlRef>;
 
-    open: boolean;
+    visible: boolean;
     animateOnMount?: boolean;
 
     animation?: TransitionAnimation;
     attention?: TransitionAttention;
-    attentionExit?: AlertAnimation;
+    attentionExit?: TransitionAnimation;
 
     enterDuration?: number;
     exitDuration?: number;
@@ -110,6 +108,9 @@ type OwnTransitionProps = {
 
     onMount?: () => void;
     onUnmount?: () => void;
+
+    slideOffset?: string | number;
+    scaleFrom?: number;
 };
 
 type TransitionProps = OwnTransitionProps;
@@ -137,7 +138,7 @@ const ImplTransition = (
 
         controlRef,
 
-        open,
+        visible,
         animateOnMount = true,
 
         animation: animationProp = 'scale-fade',
@@ -158,14 +159,17 @@ const ImplTransition = (
         onMount,
         onUnmount,
 
+        slideOffset,
+        scaleFrom,
+
         ...rest
     }: ImplTransitionProps,
-    ref: React.Ref<any>,
+    ref: React.Ref<HTMLDivElement>,
 ) => {
     const initialRender = useRef(true);
     const [runningAttention, setRunningAttention] = useState<TransitionAttention | undefined>();
 
-    const visible = open;
+    // const visible = open;
 
     const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
 
@@ -241,6 +245,10 @@ const ImplTransition = (
                     '--running-attention-duration': runningAttention
                         ? `${attentionDurations[runningAttention]}ms`
                         : undefined,
+
+                    '--transition-slide-offset':
+                        typeof slideOffset === 'number' ? `${slideOffset}px` : slideOffset,
+                    '--transition-scale-from': scaleFrom,
                 } as CSSProperties
             }
             onAnimationEnd={(e) => {
