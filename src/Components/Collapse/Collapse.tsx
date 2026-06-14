@@ -72,8 +72,8 @@ const Collapse = forwardRef<HTMLDivElement, CollapseProps>(
             style,
 
             open = false,
-            enterDuration = 200,
-            exitDuration = 200,
+            enterDuration = 250,
+            exitDuration = 250,
             easing = 'ease',
             keepMounted = false,
             effect = 'height',

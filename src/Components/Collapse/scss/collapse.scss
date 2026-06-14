@@ -14,8 +14,7 @@ $collapse-prefix: #{$p}--collapse;
     transition-duration: var(--collapse-enter-duration, 200ms);
 }
 
-.#{$collapse-prefix}[data-state='exiting'],
-.#{$collapse-prefix}[data-state='exited'] {
+.#{$collapse-prefix}[data-state='exiting'] {
     transition-duration: var(--collapse-exit-duration, 200ms);
 }
 
