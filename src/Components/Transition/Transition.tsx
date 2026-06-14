@@ -5,6 +5,8 @@ import React, {
     useImperativeHandle,
     useState,
     useEffect,
+    useRef,
+    useCallback,
 } from 'react';
 
 import clsx from 'clsx';
@@ -88,9 +90,8 @@ type TransitionAnimation = (typeof transitionAnimations)[number];
 type OwnTransitionProps = {
     controlRef?: React.Ref<AlertControlRef>;
 
-    open?: boolean;
-    defaultOpen?: boolean;
-    onOpenChange?: (open: boolean) => void;
+    open: boolean;
+    animateOnMount?: boolean;
 
     animation?: TransitionAnimation;
     attention?: TransitionAttention;
@@ -137,10 +138,9 @@ const ImplTransition = (
         controlRef,
 
         open,
-        defaultOpen = true,
-        onOpenChange,
+        animateOnMount = true,
 
-        animation = 'scale-fade',
+        animation: animationProp = 'scale-fade',
         attention,
         attentionExit,
 
@@ -162,16 +162,16 @@ const ImplTransition = (
     }: ImplTransitionProps,
     ref: React.Ref<any>,
 ) => {
-    const [internalOpen, setInternalOpen] = useState(defaultOpen);
-
+    const initialRender = useRef(true);
     const [runningAttention, setRunningAttention] = useState<TransitionAttention | undefined>();
 
-    const isControlled = open !== undefined;
-    const visible = isControlled ? open : internalOpen;
+    const visible = open;
 
     const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
 
     const enterDuration = enterDurationProp ?? defaultEnterDuration;
+
+    const animation = initialRender.current && !animateOnMount ? 'none' : animationProp;
 
     useEffect(() => {
         setRunningAttention(undefined);
@@ -201,7 +201,13 @@ const ImplTransition = (
         present: visible,
         enterDuration: animation === 'none' ? 0 : enterDuration,
         exitDuration: animation === 'none' ? 0 : exitDuration,
-        onEntered,
+        onEntered: () => {
+            onEntered?.();
+
+            if (initialRender.current) {
+                initialRender.current = false;
+            }
+        },
         onExited,
         onMount,
         onUnmount,
@@ -231,6 +237,10 @@ const ImplTransition = (
                     '--animation-exit-duration': `${exitDuration}ms`,
                     '--animation-enter-easing': enterEasing,
                     '--animation-exit-easing': exitEasing,
+
+                    '--running-attention-duration': runningAttention
+                        ? `${attentionDurations[runningAttention]}ms`
+                        : undefined,
                 } as CSSProperties
             }
             onAnimationEnd={(e) => {
