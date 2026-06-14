@@ -1,0 +1,434 @@
+@use '../../../scss/functions' as functions;
+@use '../../../scss/mixins' as mixins;
+
+@use '../../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$modal-prefix: #{$p}--modal;
+
+$sizes: (
+    xs: (
+        wrapperPadding: 1rem,
+        headerPaddingX: 1rem,
+        headerPaddingY: 0.75rem,
+        bodyPaddingX: 1rem,
+        bodyPaddingY: 0.75rem,
+        footerPaddingX: 1rem,
+        footerPaddingY: 0.75rem,
+        gap: 0.75rem,
+        borderRadius: 0.75rem,
+    ),
+    sm: (
+        wrapperPadding: 1.25rem,
+        headerPaddingX: 1.25rem,
+        headerPaddingY: 0.875rem,
+        bodyPaddingX: 1.25rem,
+        bodyPaddingY: 0.875rem,
+        footerPaddingX: 1.25rem,
+        footerPaddingY: 0.875rem,
+        gap: 1rem,
+        borderRadius: 0.875rem,
+    ),
+    md: (
+        wrapperPadding: 1.5rem,
+        headerPaddingX: 1.5rem,
+        headerPaddingY: 1rem,
+        bodyPaddingX: 1.5rem,
+        bodyPaddingY: 1rem,
+        footerPaddingX: 1.5rem,
+        footerPaddingY: 1rem,
+        gap: 1rem,
+        borderRadius: 1rem,
+    ),
+    lg: (
+        wrapperPadding: 1.75rem,
+        headerPaddingX: 1.75rem,
+        headerPaddingY: 1.125rem,
+        bodyPaddingX: 1.75rem,
+        bodyPaddingY: 1rem,
+        footerPaddingX: 1.75rem,
+        footerPaddingY: 1.125rem,
+        gap: 1.25rem,
+        borderRadius: 1rem,
+    ),
+    xl: (
+        wrapperPadding: 2rem,
+        headerPaddingX: 2rem,
+        headerPaddingY: 1.25rem,
+        bodyPaddingX: 2rem,
+        bodyPaddingY: 1.25rem,
+        footerPaddingX: 2rem,
+        footerPaddingY: 1.25rem,
+        gap: 1.5rem,
+        borderRadius: 1.25rem,
+    ),
+    '2xl': (
+        wrapperPadding: 2rem,
+        headerPaddingX: 2rem,
+        headerPaddingY: 1.25rem,
+        bodyPaddingX: 2rem,
+        bodyPaddingY: 1.25rem,
+        footerPaddingX: 2rem,
+        footerPaddingY: 1.25rem,
+        gap: 1.5rem,
+        borderRadius: 1.25rem,
+    ),
+    full: (
+        wrapperPadding: 1rem,
+        headerPaddingX: 2rem,
+        headerPaddingY: 1.25rem,
+        bodyPaddingX: 2rem,
+        bodyPaddingY: 1.25rem,
+        footerPaddingX: 2rem,
+        footerPaddingY: 1.25rem,
+        gap: 1.5rem,
+        borderRadius: 1.25rem,
+    ),
+    fullscreen: (
+        wrapperPadding: 0,
+        headerPaddingX: 2rem,
+        headerPaddingY: 1.5rem,
+        bodyPaddingX: 2rem,
+        bodyPaddingY: 1.5rem,
+        footerPaddingX: 2rem,
+        footerPaddingY: 1.5rem,
+        gap: 1.5rem,
+        borderRadius: 0,
+    ),
+);
+
+// Animation timing — keep in sync with animationDuration prop (default 200ms).
+$animation-duration: 200ms;
+$animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+.#{$modal-prefix} {
+    isolation: isolate;
+
+    --close-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+    --content-wrapper-align-items: center;
+
+    --focus-ring-color: var(--#{$p}-accent-primary);
+
+    --section-border-color: #{functions.intent-color(zinc, 200)};
+    --content-bg: #{functions.intent-color(zinc, 0)};
+    --overlay-bg: rgb(0 0 0 / 48%);
+    --close-color: #{functions.intent-color(zinc, 600)};
+    --close-bg-hover: #{functions.intent-color(zinc, 100)};
+
+    @include cfg.dark {
+        --section-border-color: #{functions.intent-color(zinc, 800)};
+        --content-bg: #{functions.intent-color(zinc, 900)};
+        --overlay-bg: rgb(0 0 0 / 72%);
+        --close-color: #{functions.intent-color(zinc, 400)};
+        --close-bg-hover: #{functions.intent-color(zinc, 800)};
+    }
+
+    @each $size, $value in $sizes {
+        &[data-size='#{$size}'] {
+            --wrapper-padding: #{map.get($value, wrapperPadding)};
+
+            --header-padding-x: #{map.get($value, headerPaddingX)};
+            --header-padding-y: #{map.get($value, headerPaddingY)};
+
+            --body-padding-x: #{map.get($value, bodyPaddingX)};
+            --body-padding-y: #{map.get($value, bodyPaddingY)};
+
+            --footer-padding-x: #{map.get($value, footerPaddingX)};
+            --footer-padding-y: #{map.get($value, footerPaddingY)};
+
+            --content-gap: #{map.get($value, gap)};
+            --content-border-radius: #{map.get($value, borderRadius)};
+        }
+    }
+
+    &[data-placement='center'] {
+        --content-wrapper-align-items: center;
+    }
+
+    &[data-placement='top'] {
+        --content-wrapper-align-items: flex-start;
+    }
+
+    &[data-separated] {
+        .#{$modal-prefix}__header {
+            border-bottom: 1px solid var(--section-border-color);
+        }
+
+        .#{$modal-prefix}__footer {
+            border-top: 1px solid var(--section-border-color);
+        }
+    }
+
+    // ── Overlay ────────────────────────────────────────────────────────────
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+
+        background: var(--overlay-bg);
+        backdrop-filter: blur(4px);
+
+        // Transition is always present so it fires in both directions.
+        transition: opacity $animation-duration $animation-easing;
+
+        // Initial / exit state
+        &[data-animation-state='entering'],
+        &[data-animation-state='exiting'],
+        &[data-animation-state='exited'] {
+            opacity: 0;
+        }
+
+        // Resting state
+        &[data-animation-state='entered'] {
+            opacity: 1;
+        }
+
+
+    }
+
+    // ── Content wrapper ────────────────────────────────────────────────────
+    &__content-wrapper {
+        position: relative;
+        z-index: 1;
+
+        display: flex;
+        align-items: var(--content-wrapper-align-items);
+        justify-content: center;
+
+        width: 100%;
+        height: 100%;
+
+        padding: var(--wrapper-padding);
+
+        overflow: auto;
+
+        //overscroll-behavior: contain;
+    }
+
+    // ── Content panel ──────────────────────────────────────────────────────
+    &__content {
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+
+        border-radius: var(--content-border-radius);
+
+        background-color: var(--content-bg);
+
+        overflow: hidden;
+
+        // Transition is always present so it fires in both directions.
+        //transition:
+        //    opacity $animation-duration $animation-easing,
+        //    transform $animation-duration $animation-easing;
+
+        &[data-animation-state='entering'],
+        &[data-animation-state='entered'] {
+            transition:
+                opacity 180ms $animation-easing,
+                transform 180ms $animation-easing;
+        }
+
+        &[data-animation-state='exiting'] {
+            transition:
+                opacity 120ms $animation-easing,
+                transform 120ms $animation-easing;
+        }
+
+        // Initial / exit state
+        //&[data-animation-state='entering'],
+        //&[data-animation-state='exiting'],
+        //&[data-animation-state='exited'] {
+        //    opacity: 0;
+        //    transform: translateY(8px) scale(0.98);
+        //}
+        //
+        //// Resting state
+        //&[data-animation-state='entered'] {
+        //    opacity: 1;
+        //    transform: translateY(0) scale(1);
+        //}
+
+        // ── None ───────────────────────────────────────────────────────────────
+        .#{$modal-prefix}[data-animation='none'] & {
+            transition: none !important;
+            animation: none !important;
+
+            &[data-animation-state='entering'],
+            &[data-animation-state='entered'],
+            &[data-animation-state='exiting'],
+            &[data-animation-state='exited'] {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        // ── Fade ───────────────────────────────────────────────────────────────
+        .#{$modal-prefix}[data-animation='fade'] & {
+            &[data-animation-state='entering'],
+            &[data-animation-state='exiting'],
+            &[data-animation-state='exited'] {
+                opacity: 0;
+                transform: none;
+            }
+
+            &[data-animation-state='entered'] {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        // ── Scale ──────────────────────────────────────────────────────────────
+        .#{$modal-prefix}[data-animation='scale'] & {
+            &[data-animation-state='entering'],
+            &[data-animation-state='exiting'],
+            &[data-animation-state='exited'] {
+                opacity: 0;
+                transform: scale(0.4);
+            }
+
+            &[data-animation-state='entered'] {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        // ── Slide top ──────────────────────────────────────────────────────────
+        .#{$modal-prefix}[data-animation='slide-top'] & {
+            &[data-animation-state='entering'],
+            &[data-animation-state='exiting'],
+            &[data-animation-state='exited'] {
+                opacity: 0;
+                transform: translateY(-100vh);
+            }
+
+            &[data-animation-state='entered'] {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        // ── Slide bottom ───────────────────────────────────────────────────────
+        .#{$modal-prefix}[data-animation='slide-bottom'] & {
+            &[data-animation-state='entering'],
+            &[data-animation-state='exiting'],
+            &[data-animation-state='exited'] {
+                opacity: 0;
+                transform: translateY(224px);
+            }
+
+            &[data-animation-state='entered'] {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--focus-ring-color);
+            outline-offset: -2px;
+        }
+    }
+
+    // ── Header ─────────────────────────────────────────────────────────────
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        gap: var(--content-gap);
+
+        padding: var(--header-padding-y) var(--header-padding-x);
+
+        flex-shrink: 0;
+    }
+
+    &__header-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+    // ── Close button ───────────────────────────────────────────────────────
+    &__close {
+        @include mixins.icon;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border: 0;
+        border-radius: 3px;
+
+        background: transparent;
+
+        color: var(--close-color);
+
+        cursor: pointer;
+
+        opacity: 0.72;
+
+        transition:
+            background-color var(--close-transition),
+            opacity var(--close-transition),
+            transform var(--close-transition);
+
+        &:hover {
+            opacity: 1;
+            background-color: var(--close-bg-hover);
+        }
+
+        &:active {
+            transform: scale(0.96);
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:focus-visible {
+            opacity: 1;
+            background-color: var(--close-bg-hover);
+            box-shadow: 0 0 0 2px var(--focus-ring-color);
+        }
+    }
+
+    // ── Body ───────────────────────────────────────────────────────────────
+    &__body {
+        flex: 1;
+        overflow: auto;
+        overscroll-behavior: contain;
+        padding: var(--body-padding-y) var(--body-padding-x);
+    }
+
+    // ── Footer ─────────────────────────────────────────────────────────────
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: var(--content-gap);
+
+        padding: var(--footer-padding-y) var(--footer-padding-x);
+
+        flex-shrink: 0;
+    }
+}
+
+// The old modal-enter keyframe is no longer needed — animation is now handled
+// entirely by CSS transitions driven by [data-animation-state].
+
+@media (prefers-reduced-motion: reduce) {
+    .#{$modal-prefix}__overlay,
+    .#{$modal-prefix}__content-wrapper,
+    .#{$modal-prefix}__content {
+        transition: none !important;
+        animation: none !important;
+    }
+}

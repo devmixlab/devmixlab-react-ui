@@ -31,7 +31,7 @@ export { RadioGroup } from './src/Components/Form/Radio/RadioGroup';
 export { FileUpload } from './src/Components/Form/FileUpload/FileUpload';
 export { FormField } from './src/Components/Form/FormField';
 
-export { Modal } from './src/Modal/Modal';
+export { Modal } from './src/Components/Modal/Modal';
 export { Popover } from './src/Components/Popover';
 export { Collapse } from './src/Components/Collapse/Collapse';
 export { Accordion } from './src/Accordion/Accordion';

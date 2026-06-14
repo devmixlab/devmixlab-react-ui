@@ -1,42 +1,62 @@
-import React, { forwardRef, useEffect, useState, useRef } from 'react';
+import React, {
+    forwardRef,
+    useEffect,
+    useState,
+    useRef,
+    HTMLAttributes,
+    CSSProperties,
+} from 'react';
 import { createPortal } from 'react-dom';
-import { Box, BoxProps } from '../Components/Box/Box';
-import { classPrefix } from '../utils/classPrefix';
+import { Box, BoxProps } from '../Box';
+import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
 import { ModalContext, useModalContext } from './Modal.context';
-import { Close as CloseIcon } from '../Icon';
-import { useStableId } from '../utils/useStableId';
-import { getNextZIndex } from '../utils/zIndex';
+import { Close as CloseIcon } from '../../Icon';
+import { useStableId } from '../../utils/useStableId';
+import { getNextZIndex } from '../../utils/zIndex';
 import { modalManager } from './Modal.manager';
-import { usePresence } from '../hooks/usePresence';
-import { useFocusTrap } from '../hooks/useFocusTrap';
-import { mergeRefs } from '../utils/mergeRefs';
+import { usePresence, useFocusTrap } from '../../hooks';
+// import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { mergeRefs } from '../../utils/mergeRefs';
 import { maxWidths, widths, maxHeights, heights } from './Modal.constants';
 
-export type { PresenceState as AnimationState } from '../hooks/usePresence';
+//----------------------------------------------------------------------
+// Types
+//----------------------------------------------------------------------
 
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | 'fullscreen';
+// export type { PresenceState as AnimationState } from '../../hooks/usePresence';
 
-type ModalAnimation = 'none' | 'fade' | 'scale' | 'slide-top' | 'slide-bottom';
+const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] as const;
 
-export type ModalProps = {
-    children?: React.ReactNode;
-    id?: string;
-    size?: Size;
+type ModalSize = (typeof modalSizes)[number];
+
+const modalAnimations = ['none', 'fade', 'scale', 'slide-top', 'slide-bottom'] as const;
+
+type ModalAnimation = (typeof modalAnimations)[number];
+
+type OwnModalProps = {
+    size?: ModalSize;
     placement?: 'top' | 'center';
     separated?: boolean;
     opened?: boolean;
     onClose?: () => void;
     closeOnOverlayClick?: boolean;
-    className?: string;
     zIndex?: number;
+
     /**
-     * Duration (ms) of the enter and exit animations.
+     * Duration (ms) of the enter animations.
+     */
+    animationEnterDuration?: number;
+    /**
+     * Duration (ms) of the exit animations.
      * The modal stays mounted for this long after `opened` becomes false so the
      * exit animation can finish before the DOM node is removed.
-     * @default 200
      */
-    animationDuration?: number;
+    animationExitDuration?: number;
+
+    enterAnimationEasing?: string;
+    exitAnimationEasing?: string;
+
     /** Called when the modal has fully entered (animation complete). */
     onAnimationEntered?: () => void;
     /** Called when the modal has fully exited (animation complete, just before unmount). */
@@ -54,6 +74,8 @@ export type ModalProps = {
     animation?: ModalAnimation;
 };
 
+type ModalProps = OwnModalProps & HTMLAttributes<HTMLDivElement>;
+
 type ModalComponent = React.ForwardRefExoticComponent<
     ModalProps & React.RefAttributes<HTMLDivElement>
 > & {
@@ -62,8 +84,15 @@ type ModalComponent = React.ForwardRefExoticComponent<
     Footer: typeof ModalFooter;
 };
 
+//----------------------------------------------------------------------
+// Helpers
+//----------------------------------------------------------------------
+
 const prefix = (name: string = '') => classPrefix(`--modal${name}`);
 
+//----------------------------------------------------------------------
+// Modal component
+//----------------------------------------------------------------------
 const Modal = forwardRef<HTMLDivElement, ModalProps>(
     (
         {
@@ -77,7 +106,10 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             closeOnOverlayClick = true,
             className,
             zIndex,
-            animationDuration = 200,
+            animationEnterDuration = 120,
+            animationExitDuration = 120,
+            enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+            exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
             onAnimationEntered,
             onAnimationExited,
             closeOnEscape = true,
@@ -106,8 +138,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         // ── Presence ─────────────────────────────────────────────────────────
         const { isMounted, state: animationState } = usePresence({
             present: opened,
-            enterDuration: 100,
-            exitDuration: animationDuration,
+            enterDuration: animationEnterDuration,
+            exitDuration: animationExitDuration,
             onEntered: onAnimationEntered,
             onExited: onAnimationExited,
         });
@@ -196,6 +228,15 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             aria-describedby={hasBody ? bodyId : undefined}
                             data-animation-state={animationState}
                             data-animation={animation}
+                            style={
+                                {
+                                    // ...style,
+                                    '--animation-enter-duration': `${animationEnterDuration}ms`,
+                                    '--animation-exit-duration': `${animationExitDuration}ms`,
+                                    '--animation-enter-easing': enterAnimationEasing,
+                                    '--animation-exit-easing': exitAnimationEasing,
+                                } as CSSProperties
+                            }
                         >
                             {children}
                         </Box>
@@ -209,7 +250,9 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
 Modal.displayName = 'Modal';
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+//----------------------------------------------------------------------
+// ModalHeader subcomponent
+//----------------------------------------------------------------------
 
 type ModalSectionProps = {
     children?: React.ReactNode;
@@ -244,7 +287,12 @@ const ModalHeader = ({ children, className, closeButton = false }: ModalSectionP
         </div>
     );
 };
+
 ModalHeader.displayName = 'ModalHeader';
+
+//----------------------------------------------------------------------
+// ModalBody subcomponent
+//----------------------------------------------------------------------
 
 const ModalBody = ({ children, className }: ModalSectionProps) => {
     const ctx = useModalContext();
@@ -263,15 +311,29 @@ const ModalBody = ({ children, className }: ModalSectionProps) => {
         </div>
     );
 };
+
 ModalBody.displayName = 'ModalBody';
+
+//----------------------------------------------------------------------
+// ModalFooter subcomponent
+//----------------------------------------------------------------------
 
 const ModalFooter = ({ children, className }: ModalSectionProps) => {
     return <div className={clsx(prefix('__footer'), className)}>{children}</div>;
 };
+
 ModalFooter.displayName = 'ModalFooter';
 
 Modal.Header = ModalHeader;
 Modal.Body = ModalBody;
 Modal.Footer = ModalFooter;
 
+//----------------------------------------------------------------------
+// Exports
+//----------------------------------------------------------------------
+
 export { Modal };
+
+export type { ModalSize, ModalAnimation, OwnModalProps, ModalProps, ModalComponent };
+
+export { modalSizes, modalAnimations };

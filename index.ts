@@ -16,3 +16,4 @@ export * from './src/Components/Chip';
 export * from './src/Components/Text';
 export * from './src/Components/Alert';
 export * from './src/Components/Collapse';
+export * from './src/Components/Modal';
