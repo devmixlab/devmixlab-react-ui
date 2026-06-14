@@ -1,5 +1,10 @@
 export { Transition } from './Transition';
 
-export type { TransitionProps, TransitionAnimation } from './Transition';
+export type {
+    TransitionProps,
+    TransitionAnimation,
+    TransitionAttention,
+    TransitionControlRef,
+} from './Transition';
 
-export { transitionAnimations } from './Transition';
+export { transitionAttentions, transitionAnimations } from './Transition';

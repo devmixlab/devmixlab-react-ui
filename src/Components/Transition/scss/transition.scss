@@ -1,0 +1,104 @@
+@use 'transition-conf' as *;
+@use 'transition-mixins' as *;
+@use 'transition-keyframes' as *;
+
+// ---------------------------------------------------------------------------
+// Animations
+// ---------------------------------------------------------------------------
+
+$transition-animations: fade,
+slide-down,
+slide-up,
+slide-left,
+slide-right,
+scale,
+scale-fade;
+
+.#{$transition-prefix} {
+
+    &[data-animation-state='exiting'] {
+        pointer-events: none;
+    }
+
+    &[data-animation-state='entering'],
+    &[data-animation-state='exiting'] {
+        will-change: transform, opacity;
+    }
+
+    @each $animation in $transition-animations {
+        &[data-animation='#{$animation}'] {
+            @include animation-transform-origin($animation);
+
+            &[data-animation-state='entering'] {
+                @include animation($animation, 'entering');
+            }
+
+            &[data-animation-state='exiting'] {
+                @include animation($animation, 'exiting');
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Attentions
+// ---------------------------------------------------------------------------
+
+$transition-attentions: shake,
+    pulse,
+    bounce,
+    wiggle,
+    flash,
+    heartbeat,
+    jello,
+    rubber-band,
+    swing,
+    tada,
+    blink,
+    flicker,
+    vibrate,
+    pop,
+    tilt,
+    compress,
+    //new
+    nudge,
+    breathe,
+    lift,
+    rock,
+    throb;
+
+.#{$transition-prefix} {
+
+    @each $attention in $transition-attentions {
+        &[data-attention='#{$attention}'] {
+            &:not([data-running-attention]) {
+                @include attention-transform-origin($attention);
+            }
+
+            &[data-animation-state='entering'] {
+                @include attention($attention);
+            }
+
+            &[data-animation-state='exiting'] {
+                // default
+                @include animation(scale-fade, exiting);
+            }
+        }
+        &[data-running-attention='#{$attention}'] {
+            @include attention-transform-origin($attention);
+        }
+    }
+
+    @each $animation in $transition-animations {
+        &[data-attention][data-animation-state='exiting'][data-attention-exit='#{$animation}'] {
+            @include animation-transform-origin($animation);
+            @include animation($animation, exiting);
+        }
+    }
+
+    @each $attention in $transition-attentions {
+        &[data-running-attention='#{$attention}'] {
+            @include attention($attention);
+        }
+    }
+}

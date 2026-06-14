@@ -1,10 +1,4 @@
-import React, {
-    forwardRef,
-    useState,
-    useImperativeHandle,
-    HTMLAttributes,
-    CSSProperties,
-} from 'react';
+import React, { forwardRef, HTMLAttributes } from 'react';
 import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
 import { Box } from '../Box';
 import type { BoxProps } from '../Box';
@@ -12,79 +6,10 @@ import clsx from 'clsx';
 import { Info, Warning, Success, Close } from '../../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { TextProps, Text } from '../Text';
-import { usePresence } from '../../hooks';
 
 //-----------------------------------------------------------
 // Types
 //-----------------------------------------------------------
-
-const alertAttentions = [
-    'shake',
-    'pulse',
-    'bounce',
-    'wiggle',
-    'flash',
-    'heartbeat',
-    'jello',
-    'rubber-band',
-    'swing',
-    'tada',
-    'blink',
-    'flicker',
-    'vibrate',
-    'pop',
-    'tilt',
-    'compress',
-    'nudge',
-    'breathe',
-    'lift',
-    'rock',
-    'throb',
-] as const;
-
-type AlertAttention = (typeof alertAttentions)[number];
-
-interface AlertControlRef {
-    runAttention(attention?: AlertAttention): void;
-}
-
-const attentionDurations: Record<AlertAttention, number> = {
-    shake: 500,
-    pulse: 500,
-    bounce: 500,
-    wiggle: 500,
-    flash: 500,
-    heartbeat: 900,
-    jello: 800,
-    'rubber-band': 750,
-    swing: 700,
-    tada: 900,
-    blink: 400,
-    flicker: 600,
-    vibrate: 400,
-    pop: 400,
-    tilt: 600,
-    compress: 500,
-    nudge: 500,
-    breathe: 1200,
-    lift: 550,
-    rock: 700,
-    throb: 650,
-};
-
-const alertAnimations = [
-    'none',
-    'fade',
-    'slide-down',
-    'slide-up',
-    'slide-left',
-    'slide-right',
-    'scale',
-    'scale-fade',
-    'collapse',
-] as const;
-
-type AlertAnimation = (typeof alertAnimations)[number];
 
 const alertIntents = ['primary', 'secondary', 'success', 'warning', 'danger', 'info'] as const;
 
@@ -105,46 +30,11 @@ const alertAccents = ['left', 'top'] as const;
 type AlertAccent = (typeof alertAccents)[number];
 
 type OwnAlertProps = {
-    controlRef?: React.Ref<AlertControlRef>;
-
     intent?: AlertIntent;
     variant?: AlertVariant;
     size?: AlertSize;
     icon?: boolean | React.ReactNode;
-
     accent?: AlertAccent;
-
-    open?: boolean;
-    defaultOpen?: boolean;
-    onOpenChange?: (open: boolean) => void;
-
-    animation?: AlertAnimation;
-    attention?: AlertAttention;
-    attentionExit?: AlertAnimation;
-
-    /**
-     * Duration (ms) of the enter animations.
-     * @default 200
-     */
-    animationEnterDuration?: number;
-    /**
-     * Duration (ms) of the exit animations.
-     * The modal stays mounted for this long after `opened` becomes false so the
-     * exit animation can finish before the DOM node is removed.
-     * @default 200
-     */
-    animationExitDuration?: number;
-
-    enterAnimationEasing?: string;
-    exitAnimationEasing?: string;
-
-    /** Called when the modal has fully entered (animation complete). */
-    onAnimationEntered?: () => void;
-    /** Called when the modal has fully exited (animation complete, just before unmount). */
-    onAnimationExited?: () => void;
-
-    onMount?: () => void;
-    onUnmount?: () => void;
 
     onDismiss?: () => void;
 };
@@ -179,8 +69,6 @@ const defaultIcons: Record<SemanticAlertIntent, React.ReactNode> = {
     info: <Info />,
 };
 
-const DEFAULT_ENTER_DURATION = 120;
-
 //-----------------------------------------------------------
 // Implementation of component
 //-----------------------------------------------------------
@@ -188,104 +76,26 @@ const AlertImpl = (
     {
         children,
         className,
-        style,
-
-        controlRef,
+        rounded = 'md',
 
         intent = 'danger',
         variant = 'solid',
         size = 'md',
-
-        rounded = 'md',
-
+        icon,
         accent,
 
-        icon,
-
-        open,
-        defaultOpen = true,
-        onOpenChange,
         onDismiss,
-
-        animation = 'scale-fade',
-        attention,
-        attentionExit,
-
-        animationEnterDuration: animationEnterDurationProp,
-        animationExitDuration = 120,
-        enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
-        exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
-
-        onAnimationEntered,
-        onAnimationExited,
-
-        onMount,
-        onUnmount,
 
         ...rest
     }: ImplAlertProps,
     ref: React.Ref<HTMLDivElement>,
 ) => {
-    const [internalOpen, setInternalOpen] = useState(defaultOpen);
-
-    const [runningAttention, setRunningAttention] = useState<AlertAttention | undefined>();
-
-    const isControlled = open !== undefined;
-    const visible = isControlled ? open : internalOpen;
-
-    const isDismissible = onDismiss !== undefined || onOpenChange !== undefined;
-
-    const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
-
-    const animationEnterDuration = animationEnterDurationProp ?? defaultEnterDuration;
-
-    useImperativeHandle(
-        controlRef,
-        () => ({
-            runAttention(nextAttention) {
-                const resolvedAttention = nextAttention ?? attention;
-
-                if (!resolvedAttention) {
-                    return;
-                }
-
-                setRunningAttention(undefined);
-
-                requestAnimationFrame(() => {
-                    setRunningAttention(resolvedAttention);
-                });
-            },
-        }),
-        [attention],
-    );
+    const isDismissible = onDismiss !== undefined;
 
     const resolvedIcon =
         icon === true
             ? (defaultIcons[intent as keyof typeof defaultIcons] ?? null)
             : (icon ?? null);
-
-    const handleDismiss = () => {
-        if (!isControlled) {
-            setInternalOpen(false);
-        }
-
-        onOpenChange?.(false);
-        onDismiss?.();
-    };
-
-    const { isMounted, state: animationState } = usePresence({
-        present: visible,
-        enterDuration: animation === 'none' ? 0 : animationEnterDuration,
-        exitDuration: animation === 'none' ? 0 : animationExitDuration,
-        onEntered: onAnimationEntered,
-        onExited: onAnimationExited,
-        onMount,
-        onUnmount,
-    });
-
-    if (!isMounted) {
-        return null;
-    }
 
     return (
         <Box
@@ -298,29 +108,6 @@ const AlertImpl = (
             data-size={size}
             data-accent={accent ?? undefined}
             data-has-icon={!!resolvedIcon || undefined}
-            data-animation={animation && !attention ? animation : undefined}
-            data-attention={attention ?? undefined}
-            data-attention-exit={attentionExit ?? undefined}
-            data-running-attention={runningAttention}
-            data-animation-state={animationState}
-            style={
-                {
-                    ...style,
-                    '--animation-enter-duration': `${animationEnterDuration}ms`,
-                    '--animation-exit-duration': `${animationExitDuration}ms`,
-                    '--animation-enter-easing': enterAnimationEasing,
-                    '--animation-exit-easing': exitAnimationEasing,
-
-                    '--running-attention-duration': runningAttention
-                        ? `${attentionDurations[runningAttention]}ms`
-                        : undefined,
-                } as CSSProperties
-            }
-            onAnimationEnd={(e) => {
-                if (runningAttention && e.animationName === `alert-${runningAttention}`) {
-                    setRunningAttention(undefined);
-                }
-            }}
         >
             {resolvedIcon != null && <Box className={prefix('__icon')}>{resolvedIcon}</Box>}
 
@@ -332,7 +119,7 @@ const AlertImpl = (
                         as="button"
                         type="button"
                         className={prefix('__dismiss-button')}
-                        onClick={handleDismiss}
+                        onClick={onDismiss}
                     >
                         <Close />
                     </Box>
@@ -392,10 +179,7 @@ Alert.Actions = AlertActions;
 export { Alert };
 
 export type {
-    AlertControlRef,
     SemanticAlertIntent,
-    AlertAnimation,
-    AlertAttention,
     AlertIntent,
     AlertVariant,
     AlertSize,
@@ -404,4 +188,4 @@ export type {
     AlertProps,
 };
 
-export { alertAttentions, alertAnimations, alertIntents, alertVariants, alertSizes, alertAccents };
+export { alertIntents, alertVariants, alertSizes, alertAccents };

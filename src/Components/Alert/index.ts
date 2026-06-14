@@ -1,10 +1,7 @@
 export { Alert } from './Alert';
 
 export type {
-    AlertControlRef,
     SemanticAlertIntent,
-    AlertAnimation,
-    AlertAttention,
     AlertIntent,
     AlertVariant,
     AlertSize,
@@ -13,11 +10,4 @@ export type {
     AlertProps,
 } from './Alert';
 
-export {
-    alertAttentions,
-    alertAnimations,
-    alertIntents,
-    alertVariants,
-    alertSizes,
-    alertAccents,
-} from './Alert';
+export { alertIntents, alertVariants, alertSizes, alertAccents } from './Alert';
