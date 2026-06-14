@@ -9,20 +9,8 @@
 @use '../../../scss/mixins' as mixins;
 @use '../../../scss/mixins/mode' as *;
 @use './alert-mixins' as *;
-@use './alert-keyframes' as *;
 
 @use 'sass:map';
-
-//@each $size, $value in $alert-sizes {
-//    &--size-#{$size} {
-//        --icon-size: #{map.get($value, icon-size)};
-//
-//        .#{$alert-prefix}__dismiss-button::before {
-//            inset: #{map.get($value, dismiss-button-inset)};
-//            //inset: -2em;
-//        }
-//    }
-//}
 
 .#{$alert-prefix} {
 
@@ -207,107 +195,6 @@
                     @include solid($intent, 'dark');
                 }
             }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Animations
-// ---------------------------------------------------------------------------
-
-$alert-animations: fade,
-slide-down,
-slide-up,
-slide-left,
-slide-right,
-scale,
-scale-fade;
-
-.#{$alert-prefix} {
-
-    &[data-animation-state='exiting'] {
-        pointer-events: none;
-    }
-
-    &[data-animation-state='entering'],
-    &[data-animation-state='exiting'] {
-        will-change: transform, opacity;
-    }
-
-    @each $animation in $alert-animations {
-        &[data-animation='#{$animation}'] {
-            @include animation-transform-origin($animation);
-
-            &[data-animation-state='entering'] {
-                @include animation($animation, 'entering');
-            }
-
-            &[data-animation-state='exiting'] {
-                @include animation($animation, 'exiting');
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Attentions
-// ---------------------------------------------------------------------------
-
-$alert-attentions: shake,
-    pulse,
-    bounce,
-    wiggle,
-    flash,
-    heartbeat,
-    jello,
-    rubber-band,
-    swing,
-    tada,
-    blink,
-    flicker,
-    vibrate,
-    pop,
-    tilt,
-    compress,
-    //new
-    nudge,
-    breathe,
-    lift,
-    rock,
-    throb;
-
-.#{$alert-prefix} {
-
-    @each $attention in $alert-attentions {
-        &[data-attention='#{$attention}'] {
-            &:not([data-running-attention]) {
-                @include attention-transform-origin($attention);
-            }
-
-            &[data-animation-state='entering'] {
-                @include attention($attention);
-            }
-
-            &[data-animation-state='exiting'] {
-                // default
-                @include animation(scale-fade, exiting);
-            }
-        }
-        &[data-running-attention='#{$attention}'] {
-            @include attention-transform-origin($attention);
-        }
-    }
-
-    @each $animation in $alert-animations {
-        &[data-attention][data-animation-state='exiting'][data-attention-exit='#{$animation}'] {
-            @include animation-transform-origin($animation);
-            @include animation($animation, exiting);
-        }
-    }
-
-    @each $attention in $alert-attentions {
-        &[data-running-attention='#{$attention}'] {
-            @include attention($attention);
         }
     }
 }
