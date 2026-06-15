@@ -12,7 +12,10 @@ slide-up,
 slide-left,
 slide-right,
 scale,
-scale-fade;
+scale-fade,
+blur,
+blur-fade,
+scale-blur;
 
 .#{$transition-prefix} {
 
@@ -45,27 +48,27 @@ scale-fade;
 // ---------------------------------------------------------------------------
 
 $transition-attentions: shake,
-    pulse,
-    bounce,
-    wiggle,
-    flash,
-    heartbeat,
-    jello,
-    rubber-band,
-    swing,
-    tada,
-    blink,
-    flicker,
-    vibrate,
-    pop,
-    tilt,
-    compress,
+pulse,
+bounce,
+wiggle,
+flash,
+heartbeat,
+jello,
+rubber-band,
+swing,
+tada,
+blink,
+flicker,
+vibrate,
+pop,
+tilt,
+compress,
     //new
-    nudge,
-    breathe,
-    lift,
-    rock,
-    throb;
+nudge,
+breathe,
+lift,
+rock,
+throb;
 
 .#{$transition-prefix} {
 

@@ -179,3 +179,91 @@
         transform: scale(var(--transition-scale-from, 0.95));
     }
 }
+
+// ---------------------------------------------------------------------------
+// Blur
+// ---------------------------------------------------------------------------
+
+@keyframes transition-blur-in {
+    from {
+        opacity: 0;
+        filter: blur(var(--transition-blur-from, 8px));
+    }
+
+    to {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+@keyframes transition-blur-out {
+    from {
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    to {
+        opacity: 0;
+        filter: blur(var(--transition-blur-from, 8px));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Blur Fade
+// ---------------------------------------------------------------------------
+
+@keyframes transition-blur-fade-in {
+    from {
+        opacity: 0;
+        filter: blur(var(--transition-blur-from, 8px));
+    }
+
+    to {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+@keyframes transition-blur-fade-out {
+    from {
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    to {
+        opacity: 0;
+        filter: blur(var(--transition-blur-from, 8px));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Scale Blur
+// ---------------------------------------------------------------------------
+
+@keyframes transition-scale-blur-in {
+    from {
+        opacity: 0;
+        filter: blur(var(--transition-blur-from, 8px));
+        transform: scale(var(--transition-scale-from, 0.95));
+    }
+
+    to {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+}
+
+@keyframes transition-scale-blur-out {
+    from {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        filter: blur(var(--transition-blur-from, 8px));
+        transform: scale(var(--transition-scale-from, 0.95));
+    }
+}

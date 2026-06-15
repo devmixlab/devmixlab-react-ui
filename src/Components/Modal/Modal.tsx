@@ -107,23 +107,28 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             closeOnOverlayClick = true,
             className,
             zIndex,
+
+            animation = 'scale',
             animationEnterDuration = 120,
             animationExitDuration = 120,
             enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
             exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
             onAnimationEntered,
             onAnimationExited,
+
             closeOnEscape = true,
             initialFocus,
             portalContainer,
+
+            // Box props
             height,
             maxHeight,
             width,
             maxWidth,
-            animation = 'scale',
         },
         forwardedRef,
     ) => {
+        const [mounted, setMounted] = useState(false);
         const [hasHeader, setHasHeader] = useState(false);
         const [hasBody, setHasBody] = useState(false);
 
@@ -161,10 +166,14 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             }
         }, [opened]);
 
+        useEffect(() => {
+            console.log(mounted);
+        }, [mounted]);
+
         // ── Focus trap ───────────────────────────────────────────────────────
         useFocusTrap({
             // active: isMounted,
-            active: opened,
+            active: mounted,
             containerRef: contentRef,
             onEscape: onClose,
             isActive: () => modalManager.isTop(modalIdRef.current),
@@ -189,10 +198,14 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 <Transition
                     as={Box}
                     visible={opened}
-                    animation="none"
+                    animation="fade"
                     // attention="tada"
                     enterDuration={200}
                     exitDuration={150}
+                    onExited={() => {
+                        setMounted(false);
+                        // console.log('onExited');
+                    }}
                     className={prefix()}
                     position="fixed"
                     inset={0}
@@ -226,11 +239,28 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             as={Box}
                             visible={opened}
                             animation="scale-fade"
-                            slideOffset={-60}
+                            // slideOffset={-60}
                             enterDuration={200}
                             exitDuration={150}
                             enterEasing="cubic-bezier(0.4, 0, 0.2, 1)"
                             exitEasing="cubic-bezier(0.4, 0, 1, 1)"
+                            onEntered={() => {
+                                // console.log('onEntered');
+                                setMounted(true);
+                            }}
+                            // onExited={() => {
+                            //     console.log('onExited');
+                            // }}
+                            // onMount={() => {
+                            //     console.log('onMount');
+                            //     // setMounted(true);
+                            // }}
+                            // onUnmount={() => {
+                            //     console.log('onUnmount');
+                            //
+                            //     // setMounted(false);
+                            // }}
+                            keepMounted
                             ref={mergedContentRef}
                             h={resolvedHeight}
                             maxH={resolvedMaxHeight}

@@ -81,9 +81,42 @@ const transitionAnimations = [
     'slide-right',
     'scale',
     'scale-fade',
+
+    'blur',
+    'blur-fade',
+    'scale-blur',
 ] as const;
 
 type TransitionAnimation = (typeof transitionAnimations)[number];
+
+type SharedTransitionProps = {
+    controlRef?: React.Ref<TransitionControlRef>;
+
+    visible: boolean;
+    animateOnMount?: boolean;
+
+    animation?: TransitionAnimation;
+    attention?: TransitionAttention;
+    attentionExit?: TransitionAnimation;
+
+    enterDuration?: number;
+    exitDuration?: number;
+
+    enterEasing?: string;
+    exitEasing?: string;
+
+    keepMounted?: boolean;
+
+    onEntered?: () => void;
+    onExited?: () => void;
+
+    onMount?: () => void;
+    onUnmount?: () => void;
+
+    slideOffset?: string | number;
+    scaleFrom?: number;
+    blurFrom?: string | number;
+};
 
 type OwnTransitionProps = {
     controlRef?: React.Ref<TransitionControlRef>;
@@ -111,6 +144,7 @@ type OwnTransitionProps = {
 
     slideOffset?: string | number;
     scaleFrom?: number;
+    blurFrom?: string | number;
 };
 
 type TransitionProps = OwnTransitionProps;
@@ -161,6 +195,7 @@ const ImplTransition = (
 
         slideOffset,
         scaleFrom,
+        blurFrom,
 
         ...rest
     }: ImplTransitionProps,
@@ -249,6 +284,8 @@ const ImplTransition = (
                     '--transition-slide-offset':
                         typeof slideOffset === 'number' ? `${slideOffset}px` : slideOffset,
                     '--transition-scale-from': scaleFrom,
+                    '--transition-blur-from':
+                        typeof blurFrom === 'number' ? `${blurFrom}px` : blurFrom,
                 } as CSSProperties
             }
             onAnimationEnd={(e) => {
