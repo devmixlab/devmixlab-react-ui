@@ -19,6 +19,7 @@ import { usePresence, useFocusTrap } from '../../hooks';
 // import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { maxWidths, widths, maxHeights, heights } from './Modal.constants';
+import { TransitionProps, Transition } from '../Transition';
 
 //----------------------------------------------------------------------
 // Types
@@ -135,15 +136,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
         const modalIdRef = useRef(Math.random());
 
-        // ── Presence ─────────────────────────────────────────────────────────
-        const { isMounted, state: animationState } = usePresence({
-            present: opened,
-            enterDuration: animationEnterDuration,
-            exitDuration: animationExitDuration,
-            onEntered: onAnimationEntered,
-            onExited: onAnimationExited,
-        });
-
         // ── Modal stack ──────────────────────────────────────────────────────
         useEffect(() => {
             if (!opened) return;
@@ -171,7 +163,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
         // ── Focus trap ───────────────────────────────────────────────────────
         useFocusTrap({
-            active: isMounted,
+            // active: isMounted,
+            active: opened,
             containerRef: contentRef,
             onEscape: onClose,
             isActive: () => modalManager.isTop(modalIdRef.current),
@@ -187,13 +180,19 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const headerId = `${modalId}-header`;
         const bodyId = `${modalId}-body`;
 
-        if (!isMounted) return null;
+        // if (!isMounted) return null;
 
         return createPortal(
             <ModalContext.Provider
                 value={{ onClose, headerId, bodyId, hasHeader, setHasHeader, hasBody, setHasBody }}
             >
-                <Box
+                <Transition
+                    as={Box}
+                    visible={opened}
+                    animation="none"
+                    // attention="tada"
+                    enterDuration={200}
+                    exitDuration={150}
                     className={prefix()}
                     position="fixed"
                     inset={0}
@@ -201,20 +200,37 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     data-size={size}
                     data-placement={placement}
                     data-separated={separated || undefined}
-                    data-animation-state={animationState}
-                    data-animation={animation}
+                    // data-animation-state={animationState}
+                    // data-animation={animation}
                 >
-                    <div className={prefix('__overlay')} data-animation-state={animationState} />
+                    <Transition
+                        visible={opened}
+                        animation="fade"
+                        enterDuration={200}
+                        exitDuration={150}
+                        enterEasing="cubic-bezier(0.4, 0, 0.2, 1)"
+                        exitEasing="cubic-bezier(0.4, 0, 1, 1)"
+                        className={prefix('__overlay')}
+                        // data-animation-state={animationState}
+                    />
 
                     <div
                         className={prefix('__content-wrapper')}
-                        data-animation-state={animationState}
+                        // data-animation-state={animationState}
                         onClick={(e) => {
                             if (!closeOnOverlayClick) return;
                             if (e.target === e.currentTarget) onClose?.();
                         }}
                     >
-                        <Box
+                        <Transition
+                            as={Box}
+                            visible={opened}
+                            animation="scale-fade"
+                            slideOffset={-60}
+                            enterDuration={200}
+                            exitDuration={150}
+                            enterEasing="cubic-bezier(0.4, 0, 0.2, 1)"
+                            exitEasing="cubic-bezier(0.4, 0, 1, 1)"
                             ref={mergedContentRef}
                             h={resolvedHeight}
                             maxH={resolvedMaxHeight}
@@ -226,22 +242,11 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             aria-modal="true"
                             aria-labelledby={hasHeader ? headerId : undefined}
                             aria-describedby={hasBody ? bodyId : undefined}
-                            data-animation-state={animationState}
-                            data-animation={animation}
-                            style={
-                                {
-                                    // ...style,
-                                    '--animation-enter-duration': `${animationEnterDuration}ms`,
-                                    '--animation-exit-duration': `${animationExitDuration}ms`,
-                                    '--animation-enter-easing': enterAnimationEasing,
-                                    '--animation-exit-easing': exitAnimationEasing,
-                                } as CSSProperties
-                            }
                         >
                             {children}
-                        </Box>
+                        </Transition>
                     </div>
-                </Box>
+                </Transition>
             </ModalContext.Provider>,
             portalContainer != null ? portalContainer : document.body,
         );

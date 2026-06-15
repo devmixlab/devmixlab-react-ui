@@ -1,6 +1,8 @@
 @use '../../../scss/functions' as functions;
 @use '../../../scss/mixins' as mixins;
 
+@use './modal-vars' as *;
+
 @use '../../../scss/config' as cfg;
 @use 'sass:map';
 
@@ -168,23 +170,6 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         background: var(--overlay-bg);
         backdrop-filter: blur(4px);
-
-        // Transition is always present so it fires in both directions.
-        transition: opacity $animation-duration $animation-easing;
-
-        // Initial / exit state
-        &[data-animation-state='entering'],
-        &[data-animation-state='exiting'],
-        &[data-animation-state='exited'] {
-            opacity: 0;
-        }
-
-        // Resting state
-        &[data-animation-state='entered'] {
-            opacity: 1;
-        }
-
-
     }
 
     // ── Content wrapper ────────────────────────────────────────────────────
@@ -212,118 +197,10 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         display: flex;
         flex-direction: column;
-
-        border-radius: var(--content-border-radius);
-
-        background-color: var(--content-bg);
-
         overflow: hidden;
 
-        // Transition is always present so it fires in both directions.
-        //transition:
-        //    opacity $animation-duration $animation-easing,
-        //    transform $animation-duration $animation-easing;
-
-        &[data-animation-state='entering'],
-        &[data-animation-state='entered'] {
-            transition:
-                opacity 180ms $animation-easing,
-                transform 180ms $animation-easing;
-        }
-
-        &[data-animation-state='exiting'] {
-            transition:
-                opacity 120ms $animation-easing,
-                transform 120ms $animation-easing;
-        }
-
-        // Initial / exit state
-        //&[data-animation-state='entering'],
-        //&[data-animation-state='exiting'],
-        //&[data-animation-state='exited'] {
-        //    opacity: 0;
-        //    transform: translateY(8px) scale(0.98);
-        //}
-        //
-        //// Resting state
-        //&[data-animation-state='entered'] {
-        //    opacity: 1;
-        //    transform: translateY(0) scale(1);
-        //}
-
-        // ── None ───────────────────────────────────────────────────────────────
-        .#{$modal-prefix}[data-animation='none'] & {
-            transition: none !important;
-            animation: none !important;
-
-            &[data-animation-state='entering'],
-            &[data-animation-state='entered'],
-            &[data-animation-state='exiting'],
-            &[data-animation-state='exited'] {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        // ── Fade ───────────────────────────────────────────────────────────────
-        .#{$modal-prefix}[data-animation='fade'] & {
-            &[data-animation-state='entering'],
-            &[data-animation-state='exiting'],
-            &[data-animation-state='exited'] {
-                opacity: 0;
-                transform: none;
-            }
-
-            &[data-animation-state='entered'] {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        // ── Scale ──────────────────────────────────────────────────────────────
-        .#{$modal-prefix}[data-animation='scale'] & {
-            &[data-animation-state='entering'],
-            &[data-animation-state='exiting'],
-            &[data-animation-state='exited'] {
-                opacity: 0;
-                transform: scale(0.4);
-            }
-
-            &[data-animation-state='entered'] {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        // ── Slide top ──────────────────────────────────────────────────────────
-        .#{$modal-prefix}[data-animation='slide-top'] & {
-            &[data-animation-state='entering'],
-            &[data-animation-state='exiting'],
-            &[data-animation-state='exited'] {
-                opacity: 0;
-                transform: translateY(-100vh);
-            }
-
-            &[data-animation-state='entered'] {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        // ── Slide bottom ───────────────────────────────────────────────────────
-        .#{$modal-prefix}[data-animation='slide-bottom'] & {
-            &[data-animation-state='entering'],
-            &[data-animation-state='exiting'],
-            &[data-animation-state='exited'] {
-                opacity: 0;
-                transform: translateY(224px);
-            }
-
-            &[data-animation-state='entered'] {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        border-radius: var(--content-border-radius);
+        background-color: var(--content-bg);
 
         &:focus {
             outline: none;
