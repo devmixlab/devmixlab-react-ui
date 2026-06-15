@@ -17,20 +17,31 @@ import { getNextZIndex } from '../../utils/zIndex';
 import { modalManager } from './Modal.manager';
 import { useFocusTrap } from '../../hooks';
 import { mergeRefs } from '../../utils/mergeRefs';
-import { maxWidths, widths, maxHeights, heights } from './Modal.constants';
+import { maxWidths, widths } from './Modal.constants';
 import { sharedTransitionProps, SharedTransitionProps, Transition } from '../Transition';
 import { splitProps } from '../../utils/splitProps';
+import {
+    resolveResponsive,
+    useBreakpoint,
+    Responsiveify,
+    Responsive,
+} from '../../utils/responsive';
 
 //----------------------------------------------------------------------
 // Types
 //----------------------------------------------------------------------
 
-const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] as const;
+const modalSideSpaces = ['xs', 'sm', 'md'] as const;
+type ModalSideSpace = (typeof modalSideSpaces)[number];
 
+const modalWidthPresets = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full'] as const;
+type ModalWidthPreset = (typeof modalWidthPresets)[number];
+const modalWidthPresetSet = new Set<ModalWidthPreset>(modalWidthPresets);
+
+const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] as const;
 type ModalSize = (typeof modalSizes)[number];
 
 const modalOverlayStyles = ['blur', 'dim', 'none'] as const;
-
 type ModalOverlayStyle = (typeof modalOverlayStyles)[number];
 
 type OwnModalProps = {
@@ -46,15 +57,29 @@ type OwnModalProps = {
     initialFocus?: React.RefObject<HTMLElement>;
     portalContainer?: HTMLElement;
     overlayStyle?: ModalOverlayStyle;
+
+    width?: BoxProps['width'] | Responsive<ModalWidthPreset>;
+    w?: BoxProps['w'] | Responsive<ModalWidthPreset>;
+    maxW?: BoxProps['maxW'] | Responsive<ModalWidthPreset>;
+    maxWidth?: BoxProps['maxWidth'] | Responsive<ModalWidthPreset>;
+
+    sideSpace?: Responsive<ModalSideSpace>;
 };
 
-type BoxModalProps = {
-    height?: BoxProps['height'];
-    maxHeight?: BoxProps['maxHeight'];
-    width?: BoxProps['width'];
-    maxWidth?: BoxProps['maxWidth'];
-    shadow?: BoxProps['shadow'];
-};
+type BoxModalProps = Pick<
+    BoxProps,
+    | 'height'
+    | 'h'
+    | 'maxHeight'
+    | 'maxH'
+    // | 'width'
+    // | 'maxWidth'
+    | 'shadow'
+    | 'marginTop'
+    | 'marginBottom'
+    | 'mt'
+    | 'mb'
+>;
 
 type ModalProps = OwnModalProps &
     BoxModalProps &
@@ -74,6 +99,37 @@ type ModalComponent = React.ForwardRefExoticComponent<
 //----------------------------------------------------------------------
 
 const prefix = (name: string = '') => classPrefix(`--modal${name}`);
+
+const isModalWidthPreset = (value: unknown): value is ModalWidthPreset => {
+    return typeof value === 'string' && modalWidthPresetSet.has(value as ModalWidthPreset);
+};
+
+const resolveModalWidthPreset = (value: string | number | undefined) => {
+    return isModalWidthPreset(value) ? modalWidthPresetMap[value] : value;
+};
+
+//----------------------------------------------------------------------
+// Maps
+//----------------------------------------------------------------------
+
+const modalWidthPresetMap: Record<ModalWidthPreset, string> = {
+    '2xs': '22.5rem', // 360px
+    xs: '30rem', // 480px
+    sm: '40rem', // 640px
+    md: '48rem', // 768px
+    lg: '64rem', // 1024px
+    xl: '80rem', // 1280px
+    '2xl': '96rem', // 1536px
+
+    full: '100%',
+    // fullscreen: '100vw',
+} as const;
+
+const modalSidesSpacesMap: Record<ModalSideSpace, string> = {
+    xs: '1rem', // 16px
+    sm: '1.5rem', // 24px
+    md: '2rem', // 32px
+} as const;
 
 //----------------------------------------------------------------------
 // Modal component
@@ -109,16 +165,26 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             onEntered: onAnimationEntered,
 
             // Box props
-            height,
-            maxHeight,
+            // height,
+            // maxHeight = '100%',
             width,
+            w,
             maxWidth,
+            maxW,
             shadow = 'xl',
+            // marginTop,
+            // marginBottom,
+            // mt,
+            // mb,
+
+            sideSpace = { base: 'xs', md: 'sm', xl: 'md' },
 
             ...rest
         },
         forwardedRef,
     ) => {
+        const { breakpoint } = useBreakpoint();
+
         const [fullyVisible, setFullyVisible] = useState(false);
         const [hasHeader, setHasHeader] = useState(false);
         const [hasBody, setHasBody] = useState(false);
@@ -128,10 +194,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             sharedTransitionProps,
         );
 
-        const resolvedHeight = height ?? heights[size];
-        const resolvedMaxHeight = maxHeight ?? maxHeights[size];
-        const resolvedWidth = width ?? widths[size];
-        const resolvedMaxWidth = maxWidth ?? maxWidths[size];
+        const resolvedWidth = resolveResponsive(width || w, breakpoint);
+        const resolvedMaxWidth = resolveResponsive(maxWidth || maxW, breakpoint);
+        const resolvedSideSpace = resolveResponsive(sideSpace, breakpoint);
+
+        const finalWidth = resolveModalWidthPreset(resolvedWidth || '100%');
+        const finalMaxWidth = resolveModalWidthPreset(resolvedMaxWidth || 'md');
 
         const contentRef = useRef<HTMLDivElement | null>(null);
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
@@ -200,6 +268,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     data-size={size}
                     data-placement={placement}
                     data-separated={separated || undefined}
+                    data-side-space={resolvedSideSpace}
                 >
                     <Transition
                         visible={opened}
@@ -221,6 +290,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     >
                         <Transition
                             {...transitionProps}
+                            {...restWithoutTransitionProps}
                             as={Box}
                             visible={opened}
                             animation={animation}
@@ -236,10 +306,10 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             }}
                             ref={mergedContentRef}
                             shadow={shadow}
-                            h={resolvedHeight}
-                            maxH={resolvedMaxHeight}
-                            w={resolvedWidth}
-                            maxW={resolvedMaxWidth}
+                            // h={resolvedHeight}
+                            // maxH={resolvedMaxHeight}
+                            w={finalWidth}
+                            maxW={finalMaxWidth}
                             tabIndex={-1}
                             className={clsx(prefix('__content'), className)}
                             role="dialog"
