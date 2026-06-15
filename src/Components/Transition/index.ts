@@ -5,6 +5,7 @@ export type {
     TransitionAnimation,
     TransitionAttention,
     TransitionControlRef,
+    SharedTransitionProps,
 } from './Transition';
 
-export { transitionAttentions, transitionAnimations } from './Transition';
+export { transitionAttentions, transitionAnimations, sharedTransitionProps } from './Transition';

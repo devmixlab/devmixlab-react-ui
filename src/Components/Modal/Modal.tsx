@@ -15,25 +15,19 @@ import { Close as CloseIcon } from '../../Icon';
 import { useStableId } from '../../utils/useStableId';
 import { getNextZIndex } from '../../utils/zIndex';
 import { modalManager } from './Modal.manager';
-import { usePresence, useFocusTrap } from '../../hooks';
-// import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { useFocusTrap } from '../../hooks';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { maxWidths, widths, maxHeights, heights } from './Modal.constants';
-import { TransitionProps, Transition } from '../Transition';
+import { sharedTransitionProps, SharedTransitionProps, Transition } from '../Transition';
+import { splitProps } from '../../utils/splitProps';
 
 //----------------------------------------------------------------------
 // Types
 //----------------------------------------------------------------------
 
-// export type { PresenceState as AnimationState } from '../../hooks/usePresence';
-
 const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] as const;
 
 type ModalSize = (typeof modalSizes)[number];
-
-const modalAnimations = ['none', 'fade', 'scale', 'slide-top', 'slide-bottom'] as const;
-
-type ModalAnimation = (typeof modalAnimations)[number];
 
 type OwnModalProps = {
     size?: ModalSize;
@@ -44,38 +38,22 @@ type OwnModalProps = {
     closeOnOverlayClick?: boolean;
     zIndex?: number;
 
-    /**
-     * Duration (ms) of the enter animations.
-     */
-    animationEnterDuration?: number;
-    /**
-     * Duration (ms) of the exit animations.
-     * The modal stays mounted for this long after `opened` becomes false so the
-     * exit animation can finish before the DOM node is removed.
-     */
-    animationExitDuration?: number;
-
-    enterAnimationEasing?: string;
-    exitAnimationEasing?: string;
-
-    /** Called when the modal has fully entered (animation complete). */
-    onAnimationEntered?: () => void;
-    /** Called when the modal has fully exited (animation complete, just before unmount). */
-    onAnimationExited?: () => void;
-
     closeOnEscape?: boolean;
     initialFocus?: React.RefObject<HTMLElement>;
     portalContainer?: HTMLElement;
+};
 
+type BoxModalProps = {
     height?: BoxProps['height'];
     maxHeight?: BoxProps['maxHeight'];
     width?: BoxProps['width'];
     maxWidth?: BoxProps['maxWidth'];
-
-    animation?: ModalAnimation;
 };
 
-type ModalProps = OwnModalProps & HTMLAttributes<HTMLDivElement>;
+type ModalProps = OwnModalProps &
+    BoxModalProps &
+    SharedTransitionProps &
+    HTMLAttributes<HTMLDivElement>;
 
 type ModalComponent = React.ForwardRefExoticComponent<
     ModalProps & React.RefAttributes<HTMLDivElement>
@@ -97,40 +75,50 @@ const prefix = (name: string = '') => classPrefix(`--modal${name}`);
 const Modal = forwardRef<HTMLDivElement, ModalProps>(
     (
         {
+            // Element props
+            className,
             children,
             id,
+
+            // Own props
             size = 'md',
             placement = 'center',
             opened = false,
             separated = true,
             onClose,
             closeOnOverlayClick = true,
-            className,
             zIndex,
-
-            animation = 'scale',
-            animationEnterDuration = 120,
-            animationExitDuration = 120,
-            enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
-            exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
-            onAnimationEntered,
-            onAnimationExited,
-
             closeOnEscape = true,
             initialFocus,
             portalContainer,
+
+            // Animation props
+            animation = 'scale-fade',
+            respectAttentionDuration = true,
+            enterDuration: animationEnterDuration = 200,
+            exitDuration: animationExitDuration = 150,
+            enterEasing: enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+            exitEasing: exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+            onEntered: onAnimationEntered,
 
             // Box props
             height,
             maxHeight,
             width,
             maxWidth,
+
+            ...rest
         },
         forwardedRef,
     ) => {
-        const [mounted, setMounted] = useState(false);
+        const [fullyVisible, setFullyVisible] = useState(false);
         const [hasHeader, setHasHeader] = useState(false);
         const [hasBody, setHasBody] = useState(false);
+
+        const [transitionProps, restWithoutTransitionProps] = splitProps(
+            rest,
+            sharedTransitionProps,
+        );
 
         const resolvedHeight = height ?? heights[size];
         const resolvedMaxHeight = maxHeight ?? maxHeights[size];
@@ -166,14 +154,9 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             }
         }, [opened]);
 
-        useEffect(() => {
-            console.log(mounted);
-        }, [mounted]);
-
         // ── Focus trap ───────────────────────────────────────────────────────
         useFocusTrap({
-            // active: isMounted,
-            active: mounted,
+            active: fullyVisible,
             containerRef: contentRef,
             onEscape: onClose,
             isActive: () => modalManager.isTop(modalIdRef.current),
@@ -189,8 +172,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const headerId = `${modalId}-header`;
         const bodyId = `${modalId}-body`;
 
-        // if (!isMounted) return null;
-
         return createPortal(
             <ModalContext.Provider
                 value={{ onClose, headerId, bodyId, hasHeader, setHasHeader, hasBody, setHasBody }}
@@ -199,12 +180,10 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     as={Box}
                     visible={opened}
                     animation="fade"
-                    // attention="tada"
-                    enterDuration={200}
-                    exitDuration={150}
+                    enterDuration={animationEnterDuration}
+                    exitDuration={animationExitDuration}
                     onExited={() => {
-                        setMounted(false);
-                        // console.log('onExited');
+                        setFullyVisible(false);
                     }}
                     className={prefix()}
                     position="fixed"
@@ -213,54 +192,39 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     data-size={size}
                     data-placement={placement}
                     data-separated={separated || undefined}
-                    // data-animation-state={animationState}
-                    // data-animation={animation}
                 >
                     <Transition
                         visible={opened}
                         animation="fade"
-                        enterDuration={200}
-                        exitDuration={150}
-                        enterEasing="cubic-bezier(0.4, 0, 0.2, 1)"
-                        exitEasing="cubic-bezier(0.4, 0, 1, 1)"
+                        enterDuration={animationEnterDuration}
+                        exitDuration={animationExitDuration}
+                        enterEasing={enterAnimationEasing}
+                        exitEasing={exitAnimationEasing}
                         className={prefix('__overlay')}
-                        // data-animation-state={animationState}
                     />
 
                     <div
                         className={prefix('__content-wrapper')}
-                        // data-animation-state={animationState}
                         onClick={(e) => {
                             if (!closeOnOverlayClick) return;
                             if (e.target === e.currentTarget) onClose?.();
                         }}
                     >
                         <Transition
+                            {...transitionProps}
                             as={Box}
                             visible={opened}
-                            animation="scale-fade"
+                            animation={animation}
                             // slideOffset={-60}
-                            enterDuration={200}
-                            exitDuration={150}
-                            enterEasing="cubic-bezier(0.4, 0, 0.2, 1)"
-                            exitEasing="cubic-bezier(0.4, 0, 1, 1)"
+                            respectAttentionDuration={respectAttentionDuration}
+                            enterDuration={animationEnterDuration}
+                            exitDuration={animationExitDuration}
+                            enterEasing={enterAnimationEasing}
+                            exitEasing={exitAnimationEasing}
                             onEntered={() => {
-                                // console.log('onEntered');
-                                setMounted(true);
+                                onAnimationEntered?.();
+                                setFullyVisible(true);
                             }}
-                            // onExited={() => {
-                            //     console.log('onExited');
-                            // }}
-                            // onMount={() => {
-                            //     console.log('onMount');
-                            //     // setMounted(true);
-                            // }}
-                            // onUnmount={() => {
-                            //     console.log('onUnmount');
-                            //
-                            //     // setMounted(false);
-                            // }}
-                            keepMounted
                             ref={mergedContentRef}
                             h={resolvedHeight}
                             maxH={resolvedMaxHeight}
@@ -369,6 +333,6 @@ Modal.Footer = ModalFooter;
 
 export { Modal };
 
-export type { ModalSize, ModalAnimation, OwnModalProps, ModalProps, ModalComponent };
+export type { ModalSize, OwnModalProps, ModalProps, ModalComponent };
 
-export { modalSizes, modalAnimations };
+export { modalSizes };

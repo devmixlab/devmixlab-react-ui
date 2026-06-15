@@ -13,6 +13,8 @@ import { classPrefix } from '../../utils/classPrefix';
 import { Box, BoxProps } from '../Box';
 import { usePresence } from '../../hooks';
 import { createPolymorphic } from '../../types/polymorphic';
+import { defineExactKeys } from '../../types/tuple';
+import { SharedFieldRootProps } from '../Form/FieldRoot';
 
 //-----------------------------------------------------------
 // Types
@@ -92,12 +94,14 @@ type TransitionAnimation = (typeof transitionAnimations)[number];
 type SharedTransitionProps = {
     controlRef?: React.Ref<TransitionControlRef>;
 
-    visible: boolean;
+    // visible: boolean;
     animateOnMount?: boolean;
 
     animation?: TransitionAnimation;
     attention?: TransitionAttention;
     attentionExit?: TransitionAnimation;
+
+    respectAttentionDuration?: boolean;
 
     enterDuration?: number;
     exitDuration?: number;
@@ -117,35 +121,31 @@ type SharedTransitionProps = {
     scaleFrom?: number;
     blurFrom?: string | number;
 };
+
+const sharedTransitionProps = defineExactKeys<SharedTransitionProps>()([
+    'controlRef',
+    'animateOnMount',
+    'animation',
+    'attention',
+    'attentionExit',
+    'respectAttentionDuration',
+    'enterDuration',
+    'exitDuration',
+    'enterEasing',
+    'exitEasing',
+    'keepMounted',
+    'onEntered',
+    'onExited',
+    'onMount',
+    'onUnmount',
+    'slideOffset',
+    'scaleFrom',
+    'blurFrom',
+]);
 
 type OwnTransitionProps = {
-    controlRef?: React.Ref<TransitionControlRef>;
-
     visible: boolean;
-    animateOnMount?: boolean;
-
-    animation?: TransitionAnimation;
-    attention?: TransitionAttention;
-    attentionExit?: TransitionAnimation;
-
-    enterDuration?: number;
-    exitDuration?: number;
-
-    enterEasing?: string;
-    exitEasing?: string;
-
-    keepMounted?: boolean;
-
-    onEntered?: () => void;
-    onExited?: () => void;
-
-    onMount?: () => void;
-    onUnmount?: () => void;
-
-    slideOffset?: string | number;
-    scaleFrom?: number;
-    blurFrom?: string | number;
-};
+} & SharedTransitionProps;
 
 type TransitionProps = OwnTransitionProps;
 
@@ -182,6 +182,8 @@ const ImplTransition = (
         enterDuration: enterDurationProp,
         exitDuration = 120,
 
+        respectAttentionDuration,
+
         enterEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
         exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
 
@@ -206,9 +208,16 @@ const ImplTransition = (
 
     // const visible = open;
 
+    // const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
+    //
+    // const enterDuration = enterDurationProp ?? defaultEnterDuration;
+
     const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
 
-    const enterDuration = enterDurationProp ?? defaultEnterDuration;
+    const enterDuration =
+        attention && respectAttentionDuration
+            ? attentionDurations[attention]
+            : (enterDurationProp ?? defaultEnterDuration);
 
     const animation = initialRender.current && !animateOnMount ? 'none' : animationProp;
 
@@ -310,6 +319,12 @@ const Transition = createPolymorphic<TransitionProps, 'div'>(
 
 export { Transition };
 
-export type { TransitionProps, TransitionAnimation, TransitionAttention, TransitionControlRef };
+export type {
+    TransitionProps,
+    TransitionAnimation,
+    TransitionAttention,
+    TransitionControlRef,
+    SharedTransitionProps,
+};
 
-export { transitionAttentions, transitionAnimations };
+export { transitionAttentions, transitionAnimations, sharedTransitionProps };
