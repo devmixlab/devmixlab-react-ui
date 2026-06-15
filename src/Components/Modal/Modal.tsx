@@ -29,6 +29,10 @@ const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] a
 
 type ModalSize = (typeof modalSizes)[number];
 
+const modalOverlayStyles = ['blur', 'dim', 'none'] as const;
+
+type ModalOverlayStyle = (typeof modalOverlayStyles)[number];
+
 type OwnModalProps = {
     size?: ModalSize;
     placement?: 'top' | 'center';
@@ -41,6 +45,7 @@ type OwnModalProps = {
     closeOnEscape?: boolean;
     initialFocus?: React.RefObject<HTMLElement>;
     portalContainer?: HTMLElement;
+    overlayStyle?: ModalOverlayStyle;
 };
 
 type BoxModalProps = {
@@ -48,6 +53,7 @@ type BoxModalProps = {
     maxHeight?: BoxProps['maxHeight'];
     width?: BoxProps['width'];
     maxWidth?: BoxProps['maxWidth'];
+    shadow?: BoxProps['shadow'];
 };
 
 type ModalProps = OwnModalProps &
@@ -91,6 +97,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             closeOnEscape = true,
             initialFocus,
             portalContainer,
+            overlayStyle = 'dim',
 
             // Animation props
             animation = 'scale-fade',
@@ -106,6 +113,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             maxHeight,
             width,
             maxWidth,
+            shadow = 'xl',
 
             ...rest
         },
@@ -201,6 +209,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                         enterEasing={enterAnimationEasing}
                         exitEasing={exitAnimationEasing}
                         className={prefix('__overlay')}
+                        data-style={overlayStyle}
                     />
 
                     <div
@@ -226,6 +235,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                                 setFullyVisible(true);
                             }}
                             ref={mergedContentRef}
+                            shadow={shadow}
                             h={resolvedHeight}
                             maxH={resolvedMaxHeight}
                             w={resolvedWidth}
