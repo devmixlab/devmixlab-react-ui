@@ -1,13 +1,6 @@
-import React, {
-    forwardRef,
-    useEffect,
-    useState,
-    useRef,
-    HTMLAttributes,
-    CSSProperties,
-} from 'react';
+import React, { forwardRef, useEffect, useState, useRef, HTMLAttributes } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, BoxProps } from '../Box';
+import { Box, BoxProps, DerivedProps, BoxDerived } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
 import { ModalContext, useModalContext } from './Modal.context';
@@ -17,15 +10,9 @@ import { getNextZIndex } from '../../utils/zIndex';
 import { modalManager } from './Modal.manager';
 import { useFocusTrap } from '../../hooks';
 import { mergeRefs } from '../../utils/mergeRefs';
-import { maxWidths, widths } from './Modal.constants';
 import { sharedTransitionProps, SharedTransitionProps, Transition } from '../Transition';
 import { splitProps } from '../../utils/splitProps';
-import {
-    resolveResponsive,
-    useBreakpoint,
-    Responsiveify,
-    Responsive,
-} from '../../utils/responsive';
+import { resolveResponsive, useBreakpoint, Responsive } from '../../utils/responsive';
 
 //----------------------------------------------------------------------
 // Types
@@ -44,14 +31,14 @@ const modalWidthPresets = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full'] a
 type ModalWidthPreset = (typeof modalWidthPresets)[number];
 const modalWidthPresetSet = new Set<ModalWidthPreset>(modalWidthPresets);
 
-const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] as const;
-type ModalSize = (typeof modalSizes)[number];
+// const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] as const;
+// type ModalSize = (typeof modalSizes)[number];
 
 const modalOverlayStyles = ['blur', 'dim', 'none'] as const;
 type ModalOverlayStyle = (typeof modalOverlayStyles)[number];
 
 type OwnModalProps = {
-    size?: ModalSize;
+    // size?: ModalSize;
     placement?: 'top' | 'center';
     separated?: boolean;
     opened?: boolean;
@@ -80,8 +67,6 @@ type BoxModalProps = Pick<
     | 'h'
     | 'maxHeight'
     | 'maxH'
-    // | 'width'
-    // | 'maxWidth'
     | 'shadow'
     | 'marginTop'
     | 'marginBottom'
@@ -131,15 +116,6 @@ const modalWidthPresetMap: Record<ModalWidthPreset, string> = {
     '2xl': '96rem', // 1536px
 
     full: '100%',
-    // fullscreen: '100vw',
-} as const;
-
-const modalSidesSpacesMap: Record<ModalSideSpace, string> = {
-    none: '0',
-
-    xs: '1rem', // 16px
-    sm: '1.5rem', // 24px
-    md: '2rem', // 32px
 } as const;
 
 const fullModeProps = {
@@ -155,7 +131,7 @@ const fullModeProps = {
     marginBottom: 0,
     mt: 0,
     mb: 0,
-};
+} as const;
 
 //----------------------------------------------------------------------
 // Modal component
@@ -191,18 +167,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             onEntered: onAnimationEntered,
 
             // Box props
-            // height,
-            // maxHeight = '100%',
             width,
             w,
             maxWidth,
             maxW,
             shadow = 'xl',
             rounded = 'xl',
-            // marginTop,
-            // marginBottom,
-            // mt,
-            // mb,
 
             sideSpace = { base: 'xs', md: 'sm', xl: 'md' },
             mode = 'normal',
@@ -235,9 +205,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const finalWidth = resolveModalWidthPreset(resolvedWidth || '100%');
         const finalMaxWidth = resolveModalWidthPreset(resolvedMaxWidth || 'md');
         const finalSideSpace = isFullscreenMode ? 'none' : resolvedSideSpace;
-
-        // const finalWidth = mode === 'normal' ? presetWidth : '100%';
-        // const finalMaxWidth = mode === 'normal' ? presetMaxWidth : '100%';
 
         const contentRef = useRef<HTMLDivElement | null>(null);
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
@@ -341,7 +308,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             as={Box}
                             visible={opened}
                             animation={animation}
-                            // slideOffset={-60}
                             respectAttentionDuration={respectAttentionDuration}
                             enterDuration={animationEnterDuration}
                             exitDuration={animationExitDuration}
@@ -354,10 +320,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             ref={mergedContentRef}
                             shadow={shadow}
                             rounded={isFullscreenMode ? undefined : rounded}
-                            // h={resolvedHeight}
-                            // maxH={resolvedMaxHeight}
-                            // w={finalWidth}
-                            // maxW={finalMaxWidth}
                             tabIndex={-1}
                             className={clsx(prefix('__content'), className)}
                             role="dialog"
@@ -382,13 +344,12 @@ Modal.displayName = 'Modal';
 // ModalHeader subcomponent
 //----------------------------------------------------------------------
 
-type ModalSectionProps = {
-    children?: React.ReactNode;
-    className?: string;
+type ModalHeaderProps = {
     closeButton?: boolean;
-};
+} & DerivedProps &
+    HTMLAttributes<HTMLDivElement>;
 
-const ModalHeader = ({ children, className, closeButton = false }: ModalSectionProps) => {
+const ModalHeader = ({ children, className, closeButton = false, ...rest }: ModalHeaderProps) => {
     const ctx = useModalContext();
 
     useEffect(() => {
@@ -400,7 +361,7 @@ const ModalHeader = ({ children, className, closeButton = false }: ModalSectionP
     }, [ctx]);
 
     return (
-        <div id={ctx?.headerId} className={clsx(prefix('__header'), className)}>
+        <BoxDerived {...rest} id={ctx?.headerId} className={clsx(prefix('__header'), className)}>
             <div className={prefix('__header-content')}>{children}</div>
             {closeButton && ctx?.onClose && (
                 <button
@@ -412,7 +373,7 @@ const ModalHeader = ({ children, className, closeButton = false }: ModalSectionP
                     <CloseIcon />
                 </button>
             )}
-        </div>
+        </BoxDerived>
     );
 };
 
@@ -422,7 +383,9 @@ ModalHeader.displayName = 'ModalHeader';
 // ModalBody subcomponent
 //----------------------------------------------------------------------
 
-const ModalBody = ({ children, className }: ModalSectionProps) => {
+type ModalBodyProps = DerivedProps & HTMLAttributes<HTMLDivElement>;
+
+const ModalBody = ({ children, className, ...rest }: ModalBodyProps) => {
     const ctx = useModalContext();
 
     useEffect(() => {
@@ -434,9 +397,9 @@ const ModalBody = ({ children, className }: ModalSectionProps) => {
     }, [ctx]);
 
     return (
-        <div id={ctx?.bodyId} className={clsx(prefix('__body'), className)}>
+        <BoxDerived {...rest} id={ctx?.bodyId} className={clsx(prefix('__body'), className)}>
             {children}
-        </div>
+        </BoxDerived>
     );
 };
 
@@ -446,8 +409,14 @@ ModalBody.displayName = 'ModalBody';
 // ModalFooter subcomponent
 //----------------------------------------------------------------------
 
-const ModalFooter = ({ children, className }: ModalSectionProps) => {
-    return <div className={clsx(prefix('__footer'), className)}>{children}</div>;
+type ModalFooterProps = DerivedProps & HTMLAttributes<HTMLDivElement>;
+
+const ModalFooter = ({ children, className, ...rest }: ModalFooterProps) => {
+    return (
+        <BoxDerived {...rest} className={clsx(prefix('__footer'), className)}>
+            {children}
+        </BoxDerived>
+    );
 };
 
 ModalFooter.displayName = 'ModalFooter';
@@ -462,6 +431,15 @@ Modal.Footer = ModalFooter;
 
 export { Modal };
 
-export type { ModalSize, OwnModalProps, ModalProps, ModalComponent };
+export type {
+    ModalSize,
+    OwnModalProps,
+    ModalProps,
+    ModalComponent,
+    ModalDensity,
+    ModalMode,
+    ModalSideSpace,
+    ModalWidthPreset,
+};
 
 export { modalSizes };

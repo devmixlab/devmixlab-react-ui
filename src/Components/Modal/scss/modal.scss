@@ -201,7 +201,11 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         gap: var(--content-gap);
 
-        padding: var(--header-padding-y) var(--header-padding-x);
+        padding-top: var(--header-padding-y);
+        padding-bottom: var(--header-padding-y);
+        padding-left: var(--header-padding-x);
+        padding-right: var(--header-padding-x);
+        //padding: var(--header-padding-y) var(--header-padding-x);
 
         flex-shrink: 0;
     }
