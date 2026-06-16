@@ -264,10 +264,75 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
     // ── Body ───────────────────────────────────────────────────────────────
     &__body {
         flex: 1;
-        overflow: auto;
-        overscroll-behavior: contain;
-        padding: var(--body-padding-y) var(--body-padding-x);
+        overflow: hidden;
+        //overscroll-behavior: contain;
+        position: relative;
+
+        //padding: var(--body-padding-y) var(--body-padding-x);
+
+        &-content {
+            flex: 1;
+            overflow: auto;
+            height: 100%;
+            overscroll-behavior: contain;
+            //position: relative;
+
+            padding: var(--body-padding-y) var(--body-padding-x);
+        }
+
+        &::before,
+        &::after {
+            content: '';
+            position: sticky;
+            left: 0;
+            right: 8px;
+            display: block;
+
+            //height: 1rem;
+            height: 20px;
+            pointer-events: none;
+            z-index: 1;
+
+            //opacity: 0;
+            transition: opacity 120ms ease;
+        }
+
+        &::before {
+            position: absolute;
+            top: 0;
+
+            background: linear-gradient(
+                to bottom,
+                var(--content-bg),
+                transparent
+            );
+        }
+
+        &::after {
+            bottom: 0;
+            margin-bottom: calc(-1 * var(--body-padding-y));
+
+            background: linear-gradient(
+                to top,
+                var(--content-bg),
+                transparent
+            );
+        }
+
+        &[data-show-top]::before {
+            opacity: 1;
+        }
+
+        &[data-show-bottom]::after {
+            opacity: 1;
+        }
     }
+    //&__body {
+    //    flex: 1;
+    //    overflow: auto;
+    //    overscroll-behavior: contain;
+    //    padding: var(--body-padding-y) var(--body-padding-x);
+    //}
 
     // ── Footer ─────────────────────────────────────────────────────────────
     &__footer {

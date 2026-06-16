@@ -382,6 +382,17 @@ type ModalBodyProps = DerivedProps & HTMLAttributes<HTMLDivElement>;
 const ModalBody = ({ children, className, ...rest }: ModalBodyProps) => {
     const ctx = useModalContext();
 
+    const [showTop, setShowTop] = useState(false);
+    const [showBottom, setShowBottom] = useState(false);
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const el = e.currentTarget;
+
+        setShowTop(el.scrollTop > 0);
+
+        setShowBottom(el.scrollTop < el.scrollHeight - el.clientHeight - 1);
+    };
+
     useEffect(() => {
         ctx?.setHasBody(true);
 
@@ -390,9 +401,32 @@ const ModalBody = ({ children, className, ...rest }: ModalBodyProps) => {
         };
     }, [ctx]);
 
+    // return (
+    //     <div
+    //         className={prefix('__body-wrapper')}
+    //         data-show-top={showTop || undefined}
+    //         data-show-bottom={showBottom || undefined}
+    //     >
+    //         <BoxDerived
+    //             {...rest}
+    //             id={ctx?.bodyId}
+    //             className={clsx(prefix('__body'), className)}
+    //             onScroll={handleScroll}
+    //         >
+    //             {children}
+    //         </BoxDerived>
+    //     </div>
+    // );
+
     return (
-        <BoxDerived {...rest} id={ctx?.bodyId} className={clsx(prefix('__body'), className)}>
-            {children}
+        <BoxDerived
+            {...rest}
+            id={ctx?.bodyId}
+            className={clsx(prefix('__body'), className)}
+            data-show-top={showTop || undefined}
+            data-show-bottom={showBottom || undefined}
+        >
+            <div className={prefix('__body-content')}>{children}</div>
         </BoxDerived>
     );
 };
