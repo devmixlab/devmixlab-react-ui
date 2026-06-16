@@ -20,27 +20,27 @@ $heights: (
 
 .#{$offcanvas-prefix} {
 
-    --close-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+    --modal-close-btn-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
 
     //--transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
     --ring: var(--#{$p}-accent-primary);
 
-    --section-border-color: #{functions.intent-color(zinc, 200)};
-    --content-bg: #{functions.intent-color(zinc, 0)};
+    --modal-section-border-color: #{functions.intent-color(zinc, 200)};
+    --modal-content-bg: #{functions.intent-color(zinc, 0)};
     --dim-overlay-bg: rgb(0 0 0 / 0.25);
     --blur-overlay-bg: rgb(0 0 0 / 0.15);
     --glass-overlay-bg: rgb(255 255 255 / 0.04);
-    --close-color: #{functions.intent-color(zinc, 600)};
-    --close-bg-hover: #{functions.intent-color(zinc, 100)};
+    --modal-close-color: #{functions.intent-color(zinc, 600)};
+    --modal-close-bg-hover: #{functions.intent-color(zinc, 100)};
 
     @include cfg.dark {
-        --section-border-color: #{functions.intent-color(zinc, 800)};
-        --content-bg: #{functions.intent-color(zinc, 900)};
+        --modal-section-border-color: #{functions.intent-color(zinc, 800)};
+        --modal-content-bg: #{functions.intent-color(zinc, 900)};
         --dim-overlay-bg: rgb(0 0 0 / 0.25);
         --blur-overlay-bg: rgb(0 0 0 / 0.15);
         --glass-overlay-bg: rgb(255 255 255 / 0.04);
-        --close-color: #{functions.intent-color(zinc, 400)};
-        --close-bg-hover: #{functions.intent-color(zinc, 800)};
+        --modal-close-color: #{functions.intent-color(zinc, 400)};
+        --modal-close-bg-hover: #{functions.intent-color(zinc, 800)};
     }
 
 
@@ -78,7 +78,7 @@ $heights: (
         display: flex;
         flex-direction: column;
 
-        background: var(--content-bg);
+        background: var(--modal-content-bg);
 
         box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
         0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -252,11 +252,11 @@ $heights: (
 
     &__panel[data-separated='true'] {
         .#{$offcanvas-prefix}__header {
-            border-bottom: 1px solid var(--section-border-color);
+            border-bottom: 1px solid var(--modal-section-border-color);
         }
 
         .#{$offcanvas-prefix}__footer {
-            border-top: 1px solid var(--section-border-color);
+            border-top: 1px solid var(--modal-section-border-color);
         }
     }
 
@@ -290,20 +290,20 @@ $heights: (
 
         background: transparent;
 
-        color: var(--close-color);
+        color: var(--modal-close-color);
 
         cursor: pointer;
 
         opacity: 0.72;
 
         transition:
-            background-color var(--close-transition),
-            opacity var(--close-transition),
-            transform var(--close-transition);
+            background-color var(--modal-close-btn-transition),
+            opacity var(--modal-close-btn-transition),
+            transform var(--modal-close-btn-transition);
 
         &:hover {
             opacity: 1;
-            background-color: var(--close-bg-hover);
+            background-color: var(--modal-close-bg-hover);
         }
 
         &:active {
@@ -316,7 +316,7 @@ $heights: (
 
         &:focus-visible {
             opacity: 1;
-            background-color: var(--close-bg-hover);
+            background-color: var(--modal-close-bg-hover);
             box-shadow: 0 0 0 2px currentColor;
         }
     }

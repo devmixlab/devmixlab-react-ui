@@ -105,39 +105,39 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 .#{$modal-prefix} {
     isolation: isolate;
 
-    --close-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+    --modal-close-btn-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
     --content-wrapper-align-items: center;
 
-    --focus-ring-color: var(--#{$p}-accent-primary);
+    --modal-focus-ring-color: var(--#{$p}-accent-primary);
 
-    --section-border-color: #{functions.intent-color(zinc, 200)};
-    --content-bg: #{functions.intent-color(zinc, 0)};
+    --modal-section-border-color: #{functions.intent-color(zinc, 200)};
+    --modal-content-bg: #{functions.intent-color(zinc, 0)};
     --overlay-bg: rgb(0 0 0 / 48%);
-    --close-color: #{functions.intent-color(zinc, 600)};
-    --close-bg-hover: #{functions.intent-color(zinc, 100)};
+    --modal-close-color: #{functions.intent-color(zinc, 600)};
+    --modal-close-bg-hover: #{functions.intent-color(zinc, 100)};
 
     @include cfg.dark {
-        --section-border-color: #{functions.intent-color(zinc, 800)};
-        --content-bg: #{functions.intent-color(zinc, 900)};
+        --modal-section-border-color: #{functions.intent-color(zinc, 800)};
+        --modal-content-bg: #{functions.intent-color(zinc, 900)};
         --overlay-bg: rgb(0 0 0 / 72%);
-        --close-color: #{functions.intent-color(zinc, 400)};
-        --close-bg-hover: #{functions.intent-color(zinc, 800)};
+        --modal-close-color: #{functions.intent-color(zinc, 400)};
+        --modal-close-bg-hover: #{functions.intent-color(zinc, 800)};
     }
 
     @each $size, $value in $sizes {
         &[data-size='#{$size}'] {
             --wrapper-padding: #{map.get($value, wrapperPadding)};
 
-            --header-padding-x: #{map.get($value, headerPaddingX)};
-            --header-padding-y: #{map.get($value, headerPaddingY)};
+            --modal-header-px: #{map.get($value, headerPaddingX)};
+            --modal-header-py: #{map.get($value, headerPaddingY)};
 
-            --body-padding-x: #{map.get($value, bodyPaddingX)};
-            --body-padding-y: #{map.get($value, bodyPaddingY)};
+            --modal-body-px: #{map.get($value, bodyPaddingX)};
+            --modal-body-py: #{map.get($value, bodyPaddingY)};
 
-            --footer-padding-x: #{map.get($value, footerPaddingX)};
-            --footer-padding-y: #{map.get($value, footerPaddingY)};
+            --modal-footer-px: #{map.get($value, footerPaddingX)};
+            --modal-footer-py: #{map.get($value, footerPaddingY)};
 
-            --content-gap: #{map.get($value, gap)};
+            --modal-content-gap: #{map.get($value, gap)};
             --content-border-radius: #{map.get($value, borderRadius)};
         }
     }
@@ -152,11 +152,11 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     &[data-separated] {
         .#{$modal-prefix}__header {
-            border-bottom: 1px solid var(--section-border-color);
+            border-bottom: 1px solid var(--modal-section-border-color);
         }
 
         .#{$modal-prefix}__footer {
-            border-top: 1px solid var(--section-border-color);
+            border-top: 1px solid var(--modal-section-border-color);
         }
     }
 
@@ -215,7 +215,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         border-radius: var(--content-border-radius);
 
-        background-color: var(--content-bg);
+        background-color: var(--modal-content-bg);
 
         overflow: hidden;
 
@@ -330,7 +330,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         &:focus-visible {
-            outline: 2px solid var(--focus-ring-color);
+            outline: 2px solid var(--modal-focus-ring-color);
             outline-offset: -2px;
         }
     }
@@ -341,9 +341,9 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         align-items: flex-start;
         justify-content: space-between;
 
-        gap: var(--content-gap);
+        gap: var(--modal-content-gap);
 
-        padding: var(--header-padding-y) var(--header-padding-x);
+        padding: var(--modal-header-py) var(--modal-header-px);
 
         flex-shrink: 0;
     }
@@ -368,20 +368,20 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         background: transparent;
 
-        color: var(--close-color);
+        color: var(--modal-close-color);
 
         cursor: pointer;
 
         opacity: 0.72;
 
         transition:
-            background-color var(--close-transition),
-            opacity var(--close-transition),
-            transform var(--close-transition);
+            background-color var(--modal-close-btn-transition),
+            opacity var(--modal-close-btn-transition),
+            transform var(--modal-close-btn-transition);
 
         &:hover {
             opacity: 1;
-            background-color: var(--close-bg-hover);
+            background-color: var(--modal-close-bg-hover);
         }
 
         &:active {
@@ -394,8 +394,8 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         &:focus-visible {
             opacity: 1;
-            background-color: var(--close-bg-hover);
-            box-shadow: 0 0 0 2px var(--focus-ring-color);
+            background-color: var(--modal-close-bg-hover);
+            box-shadow: 0 0 0 2px var(--modal-focus-ring-color);
         }
     }
 
@@ -404,7 +404,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         flex: 1;
         overflow: auto;
         overscroll-behavior: contain;
-        padding: var(--body-padding-y) var(--body-padding-x);
+        padding: var(--modal-body-py) var(--modal-body-px);
     }
 
     // ── Footer ─────────────────────────────────────────────────────────────
@@ -413,9 +413,9 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         align-items: center;
         justify-content: flex-end;
 
-        gap: var(--content-gap);
+        gap: var(--modal-content-gap);
 
-        padding: var(--footer-padding-y) var(--footer-padding-x);
+        padding: var(--modal-footer-py) var(--modal-footer-px);
 
         flex-shrink: 0;
     }

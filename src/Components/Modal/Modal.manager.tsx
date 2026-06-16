@@ -30,6 +30,7 @@ class ModalManager {
     private stack: number[] = [];
 
     push(id: number): void {
+        this.remove(id);
         this.stack.push(id);
     }
 
@@ -95,10 +96,26 @@ class ModalManager {
         this.focusMap.delete(id);
 
         requestAnimationFrame(() => {
-            if (target && document.contains(target)) {
+            if (target && document.contains(target) && typeof target.focus === 'function') {
                 target.focus();
             }
         });
+    }
+
+    // ── Development / testing ────────────────────────────────────────────
+
+    /** For tests and Storybook only. */
+    reset(): void {
+        this.stack = [];
+        this.openCount = 0;
+
+        this.focusMap.clear();
+
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        this.originalBodyOverflow = '';
+        this.originalBodyPaddingRight = '';
     }
 }
 

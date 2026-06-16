@@ -1,89 +1,35 @@
-@use '../../../scss/functions' as functions;
-@use '../../../scss/mixins' as mixins;
+@use '../../../scss/functions/common' as *;
 @use '../../../scss/mixins/common' as *;
-
+@use '../../../scss/mixins/mode' as *;
 @use './modal-vars' as *;
-
-@use '../../../scss/config' as cfg;
+@use './modal-conf' as *;
 @use 'sass:map';
 
-$p: cfg.$prefix;
-$modal-prefix: #{$p}--modal;
-
-$density: (
-    '2xs': (
-        paddingX: 0.75rem,
-        paddingY: 0.5rem,
-        gap: 0.5rem,
-    ),
-    xs: (
-        paddingX: 1rem,
-        paddingY: 0.75rem,
-        gap: 0.75rem,
-    ),
-    sm: (
-        paddingX: 1.25rem,
-        paddingY: 0.875rem,
-        gap: 1rem,
-    ),
-    md: (
-        paddingX: 1.5rem,
-        paddingY: 1rem,
-        gap: 1rem,
-    ),
-    lg: (
-        paddingX: 1.75rem,
-        paddingY: 1.125rem,
-        gap: 1.25rem,
-    ),
-    xl: (
-        paddingX: 2rem,
-        paddingY: 1.25rem,
-        gap: 1.5rem,
-    ),
-    '2xl': (
-        paddingX: 2.5rem,
-        paddingY: 1.5rem,
-        gap: 2rem,
-    ),
-);
-
-$sides-spaces: (
-    none: 0,
-
-    xs: 1rem,   // 16px
-    sm: 1.5rem, // 24px
-    md: 2rem,   // 32px
-);
-
-// Animation timing — keep in sync with animationDuration prop (default 200ms).
-$animation-duration: 200ms;
-$animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
 .#{$modal-prefix} {
     isolation: isolate;
 
-    --close-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
-    --content-wrapper-align-items: center;
+    --modal-close-btn-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-standard);
+    --modal-focus-ring-color: var(--#{$p}-accent-primary);
+    --modal-content-wrapper-align-items: center;
 
-    --focus-ring-color: var(--#{$p}-accent-primary);
-
-    --section-border-color: #{functions.intent-color(zinc, 200)};
-    --content-bg: #{functions.intent-color(zinc, 0)};
-    --overlay-bg: rgb(0 0 0 / 48%);
-    --close-color: #{functions.intent-color(zinc, 600)};
-    --close-bg-hover: #{functions.intent-color(zinc, 100)};
+    --modal-section-border-color: #{intent(zinc, 200)};
+    --modal-content-bg: #{intent(zinc, 0)};
+    --modal-close-color: #{intent(zinc, 600)};
+    --modal-close-color-hover: #{intent(zinc, 800)};
+    --modal-close-bg: transparent;
+    --modal-close-bg-hover: #{intent(zinc, 100)};
 
     --modal-dim-overlay-bg: rgb(0 0 0 / 0.25);
     --modal-blur-overlay-bg: rgb(0 0 0 / 0.15);
     --modal-glass-overlay-bg: rgb(255 255 255 / 0.04);
 
-    @include cfg.dark {
-        --section-border-color: #{functions.intent-color(zinc, 800)};
-        --content-bg: #{functions.intent-color(zinc, 900)};
-        --overlay-bg: rgb(0 0 0 / 72%);
-        --close-color: #{functions.intent-color(zinc, 400)};
-        --close-bg-hover: #{functions.intent-color(zinc, 800)};
+    @include dark {
+        --modal-section-border-color: #{intent(zinc, 800)};
+        --modal-content-bg: #{intent(zinc, 900)};
+        --modal-close-color: #{intent(zinc, 400)};
+        --modal-close-color-hover: #{intent(zinc, 200)};
+        --modal-close-bg-hover: #{intent(zinc, 800)};
 
         --modal-dim-overlay-bg: rgb(0 0 0 / 0.25);
         --modal-blur-overlay-bg: rgb(0 0 0 / 0.15);
@@ -98,34 +44,34 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     @each $d, $value in $density {
         &[data-density='#{$d}'] {
-            --header-padding-x: #{map.get($value, paddingX)};
-            --header-padding-y: #{map.get($value, paddingY)};
+            --modal-header-px: #{map.get($value, paddingX)};
+            --modal-header-py: #{map.get($value, paddingY)};
 
-            --body-padding-x: #{map.get($value, paddingX)};
-            --body-padding-y: #{map.get($value, paddingY)};
+            --modal-body-px: #{map.get($value, paddingX)};
+            --modal-body-py: #{map.get($value, paddingY)};
 
-            --footer-padding-x: #{map.get($value, paddingX)};
-            --footer-padding-y: #{map.get($value, paddingY)};
+            --modal-footer-px: #{map.get($value, paddingX)};
+            --modal-footer-py: #{map.get($value, paddingY)};
 
-            --content-gap: #{map.get($value, gap)};
+            --modal-content-gap: #{map.get($value, gap)};
         }
     }
 
     &[data-placement='center'] {
-        --content-wrapper-align-items: center;
+        --modal-content-wrapper-align-items: center;
     }
 
     &[data-placement='top'] {
-        --content-wrapper-align-items: flex-start;
+        --modal-content-wrapper-align-items: flex-start;
     }
 
     &[data-separated] {
         .#{$modal-prefix}__header {
-            border-bottom: 1px solid var(--section-border-color);
+            border-bottom: 1px solid var(--modal-section-border-color);
         }
 
         .#{$modal-prefix}__footer {
-            border-top: 1px solid var(--section-border-color);
+            border-top: 1px solid var(--modal-section-border-color);
         }
     }
 
@@ -134,9 +80,6 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         position: absolute;
         inset: 0;
         z-index: 0;
-
-        //background: var(--overlay-bg);
-        //backdrop-filter: blur(4px);
 
         &[data-style='dim'] {
             background: var(--modal-dim-overlay-bg);
@@ -161,7 +104,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1;
 
         display: flex;
-        align-items: var(--content-wrapper-align-items);
+        align-items: var(--modal-content-wrapper-align-items);
         justify-content: center;
 
         width: 100%;
@@ -182,14 +125,14 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         flex-direction: column;
         overflow: hidden;
 
-        background-color: var(--content-bg);
+        background-color: var(--modal-content-bg);
 
         &:focus {
             outline: none;
         }
 
         &:focus-visible {
-            outline: 2px solid var(--focus-ring-color);
+            outline: 2px solid var(--modal-focus-ring-color);
             outline-offset: -2px;
         }
     }
@@ -200,12 +143,12 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         align-items: center;
         justify-content: space-between;
 
-        gap: var(--content-gap);
+        gap: var(--modal-content-gap);
 
-        padding-top: var(--header-padding-y);
-        padding-bottom: var(--header-padding-y);
-        padding-left: var(--header-padding-x);
-        padding-right: var(--header-padding-x);
+        padding-top: var(--modal-header-py);
+        padding-bottom: var(--modal-header-py);
+        padding-left: var(--modal-header-px);
+        padding-right: var(--modal-header-px);
         //padding: var(--header-padding-y) var(--header-padding-x);
 
         flex-shrink: 0;
@@ -248,14 +191,15 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
 
             border: 0;
-            background: transparent;
-            color: var(--close-color);
+            background: var(--modal-close-bg);
+            color: var(--modal-close-color);
 
             cursor: pointer;
 
-            transition: background-color var(--close-transition),
-            opacity var(--close-transition),
-            transform var(--close-transition);
+            transition: background-color var(--modal-close-btn-transition),
+            opacity var(--modal-close-btn-transition),
+            color var(--modal-close-btn-transition),
+            transform var(--modal-close-btn-transition);
 
             &-icon {
                 @include icon(1.125em);
@@ -263,7 +207,8 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
             &:hover {
                 opacity: 1;
-                background-color: var(--close-bg-hover);
+                background-color: var(--modal-close-bg-hover);
+                color: var(--modal-close-color-hover);
             }
 
             &:active {
@@ -275,7 +220,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             &:focus-visible {
-                outline: 2px solid var(--focus-ring-color);
+                outline: 2px solid var(--modal-focus-ring-color);
                 outline-offset: 2px;
             }
         }
@@ -294,7 +239,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
             height: 100%;
             overscroll-behavior: contain;
 
-            padding: var(--body-padding-y) var(--body-padding-x);
+            padding: var(--modal-body-py) var(--modal-body-px);
         }
 
         &::before,
@@ -304,7 +249,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
             left: 0;
             right: 8px;
 
-            height: var(--body-padding-y);
+            height: var(--modal-body-py);
             pointer-events: none;
             z-index: 1;
 
@@ -317,7 +262,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
             background: linear-gradient(
                 to bottom,
-                var(--content-bg),
+                var(--modal-content-bg),
                 transparent
             );
         }
@@ -327,7 +272,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
             background: linear-gradient(
                 to top,
-                var(--content-bg),
+                var(--modal-content-bg),
                 transparent
             );
         }
@@ -347,22 +292,10 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         align-items: center;
         justify-content: flex-end;
 
-        gap: var(--content-gap);
+        gap: var(--modal-content-gap);
 
-        padding: var(--footer-padding-y) var(--footer-padding-x);
+        padding: var(--modal-footer-py) var(--modal-footer-px);
 
         flex-shrink: 0;
-    }
-}
-
-// The old modal-enter keyframe is no longer needed — animation is now handled
-// entirely by CSS transitions driven by [data-animation-state].
-
-@media (prefers-reduced-motion: reduce) {
-    .#{$modal-prefix}__overlay,
-    .#{$modal-prefix}__content-wrapper,
-    .#{$modal-prefix}__content {
-        transition: none !important;
-        animation: none !important;
     }
 }
