@@ -31,14 +31,10 @@ const modalWidthPresets = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full'] a
 type ModalWidthPreset = (typeof modalWidthPresets)[number];
 const modalWidthPresetSet = new Set<ModalWidthPreset>(modalWidthPresets);
 
-// const modalSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full', 'fullscreen'] as const;
-// type ModalSize = (typeof modalSizes)[number];
-
 const modalOverlayStyles = ['blur', 'dim', 'none'] as const;
 type ModalOverlayStyle = (typeof modalOverlayStyles)[number];
 
 type OwnModalProps = {
-    // size?: ModalSize;
     placement?: 'top' | 'center';
     separated?: boolean;
     opened?: boolean;
@@ -145,7 +141,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             id,
 
             // Own props
-            size = 'md',
             placement = 'center',
             opened = false,
             separated = true,
@@ -278,7 +273,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     position="fixed"
                     inset={0}
                     zIndex={zIndexRef.current}
-                    data-size={size}
                     data-placement={placement}
                     data-separated={separated || undefined}
                     data-side-space={finalSideSpace}
@@ -432,7 +426,6 @@ Modal.Footer = ModalFooter;
 export { Modal };
 
 export type {
-    ModalSize,
     OwnModalProps,
     ModalProps,
     ModalComponent,
@@ -442,4 +435,4 @@ export type {
     ModalWidthPreset,
 };
 
-export { modalSizes };
+export { modalDensities, modalSideSpaces, modalWidthPresets, modalOverlayStyles };

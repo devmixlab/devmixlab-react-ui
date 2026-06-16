@@ -1,5 +1,13 @@
 export { Modal } from './Modal';
 
-export type { ModalSize, OwnModalProps, ModalProps, ModalComponent } from './Modal';
+export type {
+    OwnModalProps,
+    ModalProps,
+    ModalComponent,
+    ModalDensity,
+    ModalMode,
+    ModalSideSpace,
+    ModalWidthPreset,
+} from './Modal';
 
-export { modalSizes } from './Modal';
+export { modalDensities, modalSideSpaces, modalWidthPresets, modalOverlayStyles } from './Modal';
