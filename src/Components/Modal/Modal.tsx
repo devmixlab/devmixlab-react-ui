@@ -35,7 +35,7 @@ const modalOverlayStyles = ['blur', 'dim', 'none'] as const;
 type ModalOverlayStyle = (typeof modalOverlayStyles)[number];
 
 type OwnModalProps = {
-    placement?: 'top' | 'center';
+    placement?: 'top' | 'center' | (string & {});
     separated?: boolean;
     opened?: boolean;
     onClose?: () => void;
@@ -269,7 +269,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     onExited={() => {
                         setFullyVisible(false);
                     }}
-                    className={prefix()}
+                    className={clsx(prefix(), className)}
                     position="fixed"
                     inset={0}
                     zIndex={zIndexRef.current}
@@ -315,7 +315,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             shadow={shadow}
                             rounded={isFullscreenMode ? undefined : rounded}
                             tabIndex={-1}
-                            className={clsx(prefix('__content'), className)}
+                            className={clsx(prefix('__content'))}
                             role="dialog"
                             aria-modal="true"
                             aria-labelledby={hasHeader ? headerId : undefined}
@@ -451,7 +451,7 @@ Modal.Footer = ModalFooter;
 // Exports
 //----------------------------------------------------------------------
 
-export { Modal };
+export { Modal, ModalHeader, ModalBody, ModalFooter };
 
 export type {
     OwnModalProps,

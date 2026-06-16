@@ -1,4 +1,4 @@
-export { Modal } from './Modal';
+export { Modal, ModalHeader, ModalBody, ModalFooter } from './Modal';
 
 export type {
     OwnModalProps,

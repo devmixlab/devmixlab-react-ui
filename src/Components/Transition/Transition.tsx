@@ -44,7 +44,7 @@ const transitionAttentions = [
     'throb',
 ] as const;
 
-type TransitionAttention = (typeof transitionAttentions)[number];
+type TransitionAttention = (typeof transitionAttentions)[number] | (string & {});
 
 interface TransitionControlRef {
     runAttention(attention?: TransitionAttention, force?: boolean): void;
@@ -88,7 +88,7 @@ const transitionAnimations = [
     'scale-blur',
 ] as const;
 
-type TransitionAnimation = (typeof transitionAnimations)[number];
+type TransitionAnimation = (typeof transitionAnimations)[number] | (string & {});
 
 type SharedTransitionProps = {
     controlRef?: React.Ref<TransitionControlRef>;

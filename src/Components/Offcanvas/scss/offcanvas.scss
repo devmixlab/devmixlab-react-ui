@@ -1,0 +1,46 @@
+@use '../../../scss/functions' as functions;
+@use '../../../scss/mixins' as mixins;
+
+@use '../../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$modal-prefix: #{$p}--modal;
+$offcanvas-prefix: #{$p}--offcanvas;
+
+$widths: ( 2xs: 280px, xs: 320px, sm: 400px, md: 480px, lg: 640px, xl: 800px, 2xl: 960px, );
+$heights: (
+    2xs: 10vh,
+    xs: 15vh,
+    sm: 25vh,
+    md: 35vh,
+    lg: 50vh,
+    xl: 65vh,
+    2xl: 80vh,
+);
+
+.#{$modal-prefix}.#{$offcanvas-prefix} {
+    &[data-placement='left'] {
+        --offcanvas-content-wrapper-align-items: flex-start;
+        --offcanvas-content-wrapper-justify-content: start;
+
+        --offcanvas-transform-from: translateX(-100%);
+
+        //--offcanvas-content-height: 100%;
+    }
+
+    .#{$modal-prefix} {
+
+        // ── Content wrapper ────────────────────────────────────────────────────
+        &__content-wrapper {
+            align-items: var(--offcanvas-content-wrapper-align-items);
+            justify-content: var(--offcanvas-content-wrapper-justify-content);
+
+        }
+
+        &__content {
+            //height: var(--offcanvas-content-height);
+            //width: var(--offcanvas-content-width, 200px);
+        }
+    }
+}
