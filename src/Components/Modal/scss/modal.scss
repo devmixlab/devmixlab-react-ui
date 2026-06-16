@@ -1,5 +1,6 @@
 @use '../../../scss/functions' as functions;
 @use '../../../scss/mixins' as mixins;
+@use '../../../scss/mixins/common' as *;
 
 @use './modal-vars' as *;
 
@@ -196,7 +197,7 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
     // ── Header ─────────────────────────────────────────────────────────────
     &__header {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
 
         gap: var(--content-gap);
@@ -217,47 +218,66 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     // ── Close button ───────────────────────────────────────────────────────
     &__close {
-        @include mixins.icon;
+        position: relative;
+        flex-shrink: 0;
 
         display: inline-flex;
         align-items: center;
         justify-content: center;
 
-        flex-shrink: 0;
+        width: 1em;
+        height: 1em;
 
-        border: 0;
-        border-radius: 3px;
+        pointer-events: none;
 
-        background: transparent;
+        &-button {
+            pointer-events: auto;
 
-        color: var(--close-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
 
-        cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(25%, -25%);
 
-        opacity: 0.72;
+            min-width: 1.75em;
+            min-height: 1.75em;
 
-        transition:
-            background-color var(--close-transition),
+            flex-shrink: 0;
+
+            border: 0;
+            background: transparent;
+            color: var(--close-color);
+
+            cursor: pointer;
+
+            transition: background-color var(--close-transition),
             opacity var(--close-transition),
             transform var(--close-transition);
 
-        &:hover {
-            opacity: 1;
-            background-color: var(--close-bg-hover);
-        }
+            &-icon {
+                @include icon(1.125em);
+            }
 
-        &:active {
-            transform: scale(0.96);
-        }
+            &:hover {
+                opacity: 1;
+                background-color: var(--close-bg-hover);
+            }
 
-        &:focus {
-            outline: none;
-        }
+            &:active {
+                transform: translate(25%, -25%) scale(0.96);
+            }
 
-        &:focus-visible {
-            opacity: 1;
-            background-color: var(--close-bg-hover);
-            box-shadow: 0 0 0 2px var(--focus-ring-color);
+            &:focus:not(:focus-visible) {
+                outline: none;
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--focus-ring-color);
+                outline-offset: 2px;
+            }
         }
     }
 
@@ -265,17 +285,14 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
     &__body {
         flex: 1;
         overflow: hidden;
-        //overscroll-behavior: contain;
         position: relative;
-
-        //padding: var(--body-padding-y) var(--body-padding-x);
+        min-height: 0;
 
         &-content {
             flex: 1;
             overflow: auto;
             height: 100%;
             overscroll-behavior: contain;
-            //position: relative;
 
             padding: var(--body-padding-y) var(--body-padding-x);
         }
@@ -283,22 +300,19 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
         &::before,
         &::after {
             content: '';
-            position: sticky;
+            position: absolute;
             left: 0;
             right: 8px;
-            display: block;
 
-            //height: 1rem;
-            height: 20px;
+            height: var(--body-padding-y);
             pointer-events: none;
             z-index: 1;
 
-            //opacity: 0;
+            opacity: 0;
             transition: opacity 120ms ease;
         }
 
         &::before {
-            position: absolute;
             top: 0;
 
             background: linear-gradient(
@@ -310,7 +324,6 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
         &::after {
             bottom: 0;
-            margin-bottom: calc(-1 * var(--body-padding-y));
 
             background: linear-gradient(
                 to top,
@@ -327,12 +340,6 @@ $animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 1;
         }
     }
-    //&__body {
-    //    flex: 1;
-    //    overflow: auto;
-    //    overscroll-behavior: contain;
-    //    padding: var(--body-padding-y) var(--body-padding-x);
-    //}
 
     // ── Footer ─────────────────────────────────────────────────────────────
     &__footer {

@@ -32,3 +32,29 @@
         display: block;
     }
 }
+
+@mixin scrollbar(
+    $size: 8px,
+    $thumb: rgba(0, 0, 0, 0.3),
+    $track: transparent
+) {
+    @if $size <= 8px {
+        scrollbar-width: thin;
+    } @else {
+        scrollbar-width: auto;
+    }
+
+    &::-webkit-scrollbar {
+        width: $size;
+        height: $size;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $track;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $thumb;
+        border-radius: 999px;
+    }
+}

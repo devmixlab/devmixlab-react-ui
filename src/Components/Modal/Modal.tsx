@@ -358,14 +358,20 @@ const ModalHeader = ({ children, className, closeButton = false, ...rest }: Moda
         <BoxDerived {...rest} id={ctx?.headerId} className={clsx(prefix('__header'), className)}>
             <div className={prefix('__header-content')}>{children}</div>
             {closeButton && ctx?.onClose && (
-                <button
-                    type="button"
-                    className={prefix('__close')}
-                    onClick={ctx.onClose}
-                    aria-label="Close modal"
-                >
-                    <CloseIcon />
-                </button>
+                <div className={prefix('__close')}>
+                    <Box
+                        as="button"
+                        rounded="sm"
+                        type="button"
+                        className={prefix('__close-button')}
+                        onClick={ctx.onClose}
+                        aria-label="Close modal"
+                    >
+                        <div className={prefix('__close-button-icon')}>
+                            <CloseIcon />
+                        </div>
+                    </Box>
+                </div>
             )}
         </BoxDerived>
     );
@@ -377,9 +383,12 @@ ModalHeader.displayName = 'ModalHeader';
 // ModalBody subcomponent
 //----------------------------------------------------------------------
 
-type ModalBodyProps = DerivedProps & HTMLAttributes<HTMLDivElement>;
+type ModalBodyProps = {
+    fadeEdges?: boolean;
+} & DerivedProps &
+    HTMLAttributes<HTMLDivElement>;
 
-const ModalBody = ({ children, className, ...rest }: ModalBodyProps) => {
+const ModalBody = ({ children, className, fadeEdges = true, ...rest }: ModalBodyProps) => {
     const ctx = useModalContext();
 
     const [showTop, setShowTop] = useState(false);
@@ -401,32 +410,17 @@ const ModalBody = ({ children, className, ...rest }: ModalBodyProps) => {
         };
     }, [ctx]);
 
-    // return (
-    //     <div
-    //         className={prefix('__body-wrapper')}
-    //         data-show-top={showTop || undefined}
-    //         data-show-bottom={showBottom || undefined}
-    //     >
-    //         <BoxDerived
-    //             {...rest}
-    //             id={ctx?.bodyId}
-    //             className={clsx(prefix('__body'), className)}
-    //             onScroll={handleScroll}
-    //         >
-    //             {children}
-    //         </BoxDerived>
-    //     </div>
-    // );
-
     return (
         <BoxDerived
             {...rest}
             id={ctx?.bodyId}
             className={clsx(prefix('__body'), className)}
-            data-show-top={showTop || undefined}
-            data-show-bottom={showBottom || undefined}
+            data-show-top={fadeEdges && showTop ? true : undefined}
+            data-show-bottom={fadeEdges && showBottom ? true : undefined}
         >
-            <div className={prefix('__body-content')}>{children}</div>
+            <div onScroll={handleScroll} className={prefix('__body-content')}>
+                {children}
+            </div>
         </BoxDerived>
     );
 };
