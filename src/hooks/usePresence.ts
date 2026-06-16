@@ -142,11 +142,27 @@ export function usePresence({
                 onMountRef.current?.();
             }
 
+            // if (motionReduced) {
+            //     if (state !== 'entered') {
+            //         setState('entered');
+            //         onEnteredRef.current?.();
+            //     }
+            //
+            //     return;
+            // }
+
             if (motionReduced) {
-                if (state !== 'entered') {
-                    setState('entered');
+                setIsMounted(true);
+
+                setState((current) => {
+                    if (current === 'entered') {
+                        return current;
+                    }
+
                     onEnteredRef.current?.();
-                }
+
+                    return 'entered';
+                });
 
                 return;
             }
@@ -176,14 +192,31 @@ export function usePresence({
                 });
             });
         } else {
+            // if (motionReduced) {
+            //     if (state !== 'exited') {
+            //         setState('exited');
+            //         setIsMounted(false);
+            //
+            //         onExitedRef.current?.();
+            //         onUnmountRef.current?.();
+            //     }
+            //
+            //     return;
+            // }
+
             if (motionReduced) {
-                if (state !== 'exited') {
-                    setState('exited');
-                    setIsMounted(false);
+                setState((current) => {
+                    if (current === 'exited') {
+                        return current;
+                    }
 
                     onExitedRef.current?.();
                     onUnmountRef.current?.();
-                }
+
+                    return 'exited';
+                });
+
+                setIsMounted(false);
 
                 return;
             }
@@ -209,15 +242,7 @@ export function usePresence({
         }
 
         return cancelPending;
-    }, [
-        present,
-        state,
-        isMounted,
-        motionReduced,
-        finalEnterDuration,
-        finalExitDuration,
-        cancelPending,
-    ]);
+    }, [present, isMounted, motionReduced, finalEnterDuration, finalExitDuration, cancelPending]);
 
     return {
         isMounted,

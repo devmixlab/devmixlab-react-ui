@@ -263,7 +263,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 <Transition
                     as={Box}
                     visible={opened}
-                    animation="fade"
+                    animation="none"
                     enterDuration={animationEnterDuration}
                     exitDuration={animationExitDuration}
                     onExited={() => {

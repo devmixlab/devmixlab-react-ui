@@ -103,6 +103,23 @@ type SharedTransitionProps = {
 
     reduceMotion?: boolean;
 
+    /**
+     * Enables only presence lifecycle management.
+     *
+     * The component still transitions through:
+     * entering → entered → exiting → exited
+     *
+     * but Transition will not apply visual animations,
+     * attention effects, or motion-related behavior.
+     *
+     * Useful when a parent component provides its own
+     * animation system and only needs mount/unmount
+     * coordination from Transition.
+     *
+     * @default false
+     */
+    onlyPresence?: boolean;
+
     enterDuration?: number;
     exitDuration?: number;
 
@@ -130,6 +147,7 @@ const sharedTransitionProps = defineExactKeys<SharedTransitionProps>()([
     'attentionExit',
     'respectAttentionDuration',
     'reduceMotion',
+    'onlyPresence',
     'enterDuration',
     'exitDuration',
     'enterEasing',

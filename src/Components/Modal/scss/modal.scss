@@ -120,6 +120,7 @@
     // ── Content panel ──────────────────────────────────────────────────────
     &__content {
         position: relative;
+        max-height: 100%;
 
         display: flex;
         flex-direction: column;
@@ -149,7 +150,6 @@
         padding-bottom: var(--modal-header-py);
         padding-left: var(--modal-header-px);
         padding-right: var(--modal-header-px);
-        //padding: var(--header-padding-y) var(--header-padding-x);
 
         flex-shrink: 0;
     }
@@ -232,11 +232,13 @@
         overflow: hidden;
         position: relative;
         min-height: 0;
+        display: flex;
+        flex-direction: column;
+
 
         &-content {
             flex: 1;
             overflow: auto;
-            height: 100%;
             overscroll-behavior: contain;
 
             padding: var(--modal-body-py) var(--modal-body-px);
