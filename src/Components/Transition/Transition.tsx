@@ -47,7 +47,7 @@ const transitionAttentions = [
 type TransitionAttention = (typeof transitionAttentions)[number];
 
 interface TransitionControlRef {
-    runAttention(attention?: TransitionAttention, respectReduceMotion?: boolean): void;
+    runAttention(attention?: TransitionAttention, force?: boolean): void;
 }
 
 const attentionDurations: Record<TransitionAttention, number> = {
@@ -228,8 +228,8 @@ const ImplTransition = (
     useImperativeHandle(
         controlRef,
         () => ({
-            runAttention(nextAttention, respectReduceMotion = true) {
-                if (reduceMotion && respectReduceMotion) {
+            runAttention(nextAttention, force = false) {
+                if (reduceMotion && !force) {
                     return;
                 }
 
@@ -279,7 +279,7 @@ const ImplTransition = (
             data-animation-state={state}
             data-attention={attention && !reduceMotion ? attention : undefined}
             data-attention-exit={attentionExit ?? undefined}
-            data-running-attention={runningAttention}
+            data-running-attention={runningAttention ?? undefined}
             aria-hidden={state === 'exited'}
             inert={state === 'exited' ? true : undefined}
             style={
