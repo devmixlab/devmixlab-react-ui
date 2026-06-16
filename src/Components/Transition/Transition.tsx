@@ -14,7 +14,7 @@ import { Box, BoxProps } from '../Box';
 import { usePresence } from '../../hooks';
 import { createPolymorphic } from '../../types/polymorphic';
 import { defineExactKeys } from '../../types/tuple';
-import { SharedFieldRootProps } from '../Form/FieldRoot';
+import { useReducedMotion } from '../../hooks';
 
 //-----------------------------------------------------------
 // Types
@@ -47,7 +47,7 @@ const transitionAttentions = [
 type TransitionAttention = (typeof transitionAttentions)[number];
 
 interface TransitionControlRef {
-    runAttention(attention?: TransitionAttention): void;
+    runAttention(attention?: TransitionAttention, respectReduceMotion?: boolean): void;
 }
 
 const attentionDurations: Record<TransitionAttention, number> = {
@@ -75,7 +75,6 @@ const attentionDurations: Record<TransitionAttention, number> = {
 };
 
 const transitionAnimations = [
-    'none',
     'fade',
     'slide-down',
     'slide-up',
@@ -94,7 +93,6 @@ type TransitionAnimation = (typeof transitionAnimations)[number];
 type SharedTransitionProps = {
     controlRef?: React.Ref<TransitionControlRef>;
 
-    // visible: boolean;
     animateOnMount?: boolean;
 
     animation?: TransitionAnimation;
@@ -102,6 +100,8 @@ type SharedTransitionProps = {
     attentionExit?: TransitionAnimation;
 
     respectAttentionDuration?: boolean;
+
+    reduceMotion?: boolean;
 
     enterDuration?: number;
     exitDuration?: number;
@@ -129,6 +129,7 @@ const sharedTransitionProps = defineExactKeys<SharedTransitionProps>()([
     'attention',
     'attentionExit',
     'respectAttentionDuration',
+    'reduceMotion',
     'enterDuration',
     'exitDuration',
     'enterEasing',
@@ -175,7 +176,7 @@ const ImplTransition = (
         visible,
         animateOnMount = true,
 
-        animation: animationProp = 'scale-fade',
+        animation = 'scale-fade',
         attention,
         attentionExit,
 
@@ -183,6 +184,7 @@ const ImplTransition = (
         exitDuration = 120,
 
         respectAttentionDuration,
+        reduceMotion: reduceMotionProp,
 
         enterEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
         exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
@@ -203,14 +205,9 @@ const ImplTransition = (
     }: ImplTransitionProps,
     ref: React.Ref<HTMLDivElement>,
 ) => {
+    const prefersReducedMotion = useReducedMotion();
     const initialRender = useRef(true);
     const [runningAttention, setRunningAttention] = useState<TransitionAttention | undefined>();
-
-    // const visible = open;
-
-    // const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
-    //
-    // const enterDuration = enterDurationProp ?? defaultEnterDuration;
 
     const defaultEnterDuration = attention ? attentionDurations[attention] : DEFAULT_ENTER_DURATION;
 
@@ -219,7 +216,10 @@ const ImplTransition = (
             ? attentionDurations[attention]
             : (enterDurationProp ?? defaultEnterDuration);
 
-    const animation = initialRender.current && !animateOnMount ? 'none' : animationProp;
+    const reduceMotion =
+        initialRender.current && !animateOnMount
+            ? true
+            : (reduceMotionProp ?? prefersReducedMotion);
 
     useEffect(() => {
         setRunningAttention(undefined);
@@ -228,7 +228,11 @@ const ImplTransition = (
     useImperativeHandle(
         controlRef,
         () => ({
-            runAttention(nextAttention) {
+            runAttention(nextAttention, respectReduceMotion = true) {
+                if (reduceMotion && respectReduceMotion) {
+                    return;
+                }
+
                 const resolvedAttention = nextAttention ?? attention;
 
                 if (!resolvedAttention) {
@@ -242,13 +246,14 @@ const ImplTransition = (
                 });
             },
         }),
-        [attention],
+        [attention, reduceMotion],
     );
 
     const { isMounted, state } = usePresence({
         present: visible,
-        enterDuration: animation === 'none' ? 0 : enterDuration,
-        exitDuration: animation === 'none' ? 0 : exitDuration,
+        reduceMotion,
+        enterDuration,
+        exitDuration,
         onEntered: () => {
             onEntered?.();
 
@@ -272,7 +277,7 @@ const ImplTransition = (
             className={clsx(prefix(), className)}
             data-animation={animation}
             data-animation-state={state}
-            data-attention={attention ?? undefined}
+            data-attention={attention && !reduceMotion ? attention : undefined}
             data-attention-exit={attentionExit ?? undefined}
             data-running-attention={runningAttention}
             aria-hidden={state === 'exited'}

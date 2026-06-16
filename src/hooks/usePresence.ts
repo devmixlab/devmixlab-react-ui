@@ -10,6 +10,21 @@ export type UsePresenceOptions = {
     present: boolean;
 
     /**
+     * Disables enter and exit animations regardless of the user's
+     * operating-system "prefers-reduced-motion" setting.
+     *
+     * When enabled, transition durations are treated as `0ms` and
+     * the element moves immediately between presence states.
+     *
+     * Useful for tests, Storybook, performance-sensitive views,
+     * or when motion should be disabled for a specific component
+     * without affecting the rest of the application.
+     *
+     * @default false
+     */
+    reduceMotion?: boolean;
+
+    /**
      * Delay (ms) before the element transitions from
      * 'entering' → 'entered'.
      *
@@ -56,6 +71,8 @@ export type UsePresenceResult = {
 export function usePresence({
     present,
 
+    reduceMotion,
+
     enterDuration = 0,
     exitDuration = 80,
 
@@ -96,8 +113,10 @@ export function usePresence({
 
     const prefersReducedMotion = useReducedMotion();
 
-    const finalEnterDuration = prefersReducedMotion ? 0 : enterDuration;
-    const finalExitDuration = prefersReducedMotion ? 0 : exitDuration;
+    const motionReduced = reduceMotion ?? prefersReducedMotion;
+
+    const finalEnterDuration = motionReduced ? 0 : enterDuration;
+    const finalExitDuration = motionReduced ? 0 : exitDuration;
 
     const cancelPending = useCallback(() => {
         if (rafRef.current !== null) {
@@ -121,6 +140,20 @@ export function usePresence({
 
             if (!wasMounted) {
                 onMountRef.current?.();
+            }
+
+            if (motionReduced) {
+                setState((current) => {
+                    if (current === 'entered') {
+                        return current;
+                    }
+
+                    onEnteredRef.current?.();
+
+                    return 'entered';
+                });
+
+                return;
             }
 
             setState((current) => {
@@ -148,6 +181,23 @@ export function usePresence({
                 });
             });
         } else {
+            if (motionReduced) {
+                setState((current) => {
+                    if (current === 'exited') {
+                        return current;
+                    }
+
+                    onExitedRef.current?.();
+                    onUnmountRef.current?.();
+
+                    return 'exited';
+                });
+
+                setIsMounted(false);
+
+                return;
+            }
+
             setState((current) => {
                 // Already gone.
                 if (current === 'exited' || current === 'exiting') {
@@ -169,7 +219,7 @@ export function usePresence({
         }
 
         return cancelPending;
-    }, [present, isMounted, finalEnterDuration, finalExitDuration, cancelPending]);
+    }, [present, isMounted, motionReduced, finalEnterDuration, finalExitDuration, cancelPending]);
 
     return {
         isMounted,
