@@ -31,7 +31,13 @@ import {
 // Types
 //----------------------------------------------------------------------
 
-const modalSideSpaces = ['xs', 'sm', 'md'] as const;
+const modalDensities = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const;
+
+type ModalDensity = (typeof modalDensities)[number];
+
+type ModalMode = 'normal' | 'full' | 'fullscreen';
+
+const modalSideSpaces = ['xs', 'sm', 'md', 'none'] as const;
 type ModalSideSpace = (typeof modalSideSpaces)[number];
 
 const modalWidthPresets = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full'] as const;
@@ -64,6 +70,8 @@ type OwnModalProps = {
     maxWidth?: BoxProps['maxWidth'] | Responsive<ModalWidthPreset>;
 
     sideSpace?: Responsive<ModalSideSpace>;
+    mode?: Responsive<ModalMode>;
+    density?: Responsive<ModalDensity>;
 };
 
 type BoxModalProps = Pick<
@@ -79,6 +87,7 @@ type BoxModalProps = Pick<
     | 'marginBottom'
     | 'mt'
     | 'mb'
+    | 'rounded'
 >;
 
 type ModalProps = OwnModalProps &
@@ -126,10 +135,27 @@ const modalWidthPresetMap: Record<ModalWidthPreset, string> = {
 } as const;
 
 const modalSidesSpacesMap: Record<ModalSideSpace, string> = {
+    none: '0',
+
     xs: '1rem', // 16px
     sm: '1.5rem', // 24px
     md: '2rem', // 32px
 } as const;
+
+const fullModeProps = {
+    height: '100%',
+    h: '100%',
+    width: '100%',
+    w: '100%',
+    maxHeight: '100%',
+    maxH: '100%',
+    maxWidth: '100%',
+    maxW: '100%',
+    marginTop: 0,
+    marginBottom: 0,
+    mt: 0,
+    mb: 0,
+};
 
 //----------------------------------------------------------------------
 // Modal component
@@ -172,12 +198,15 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
             maxWidth,
             maxW,
             shadow = 'xl',
+            rounded = 'xl',
             // marginTop,
             // marginBottom,
             // mt,
             // mb,
 
             sideSpace = { base: 'xs', md: 'sm', xl: 'md' },
+            mode = 'normal',
+            density = 'md',
 
             ...rest
         },
@@ -197,9 +226,18 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const resolvedWidth = resolveResponsive(width || w, breakpoint);
         const resolvedMaxWidth = resolveResponsive(maxWidth || maxW, breakpoint);
         const resolvedSideSpace = resolveResponsive(sideSpace, breakpoint);
+        const resolvedMode = resolveResponsive(mode, breakpoint);
+        const resolvedDensity = resolveResponsive(density, breakpoint);
+
+        const isFullMode = resolvedMode === 'full';
+        const isFullscreenMode = resolvedMode === 'fullscreen';
 
         const finalWidth = resolveModalWidthPreset(resolvedWidth || '100%');
         const finalMaxWidth = resolveModalWidthPreset(resolvedMaxWidth || 'md');
+        const finalSideSpace = isFullscreenMode ? 'none' : resolvedSideSpace;
+
+        // const finalWidth = mode === 'normal' ? presetWidth : '100%';
+        // const finalMaxWidth = mode === 'normal' ? presetMaxWidth : '100%';
 
         const contentRef = useRef<HTMLDivElement | null>(null);
         const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
@@ -248,6 +286,14 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         const headerId = `${modalId}-header`;
         const bodyId = `${modalId}-body`;
 
+        const sizingProps =
+            isFullMode || isFullscreenMode
+                ? fullModeProps
+                : {
+                      w: finalWidth,
+                      maxW: finalMaxWidth,
+                  };
+
         return createPortal(
             <ModalContext.Provider
                 value={{ onClose, headerId, bodyId, hasHeader, setHasHeader, hasBody, setHasBody }}
@@ -268,7 +314,8 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     data-size={size}
                     data-placement={placement}
                     data-separated={separated || undefined}
-                    data-side-space={resolvedSideSpace}
+                    data-side-space={finalSideSpace}
+                    data-density={resolvedDensity}
                 >
                     <Transition
                         visible={opened}
@@ -306,16 +353,18 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                             }}
                             ref={mergedContentRef}
                             shadow={shadow}
+                            rounded={isFullscreenMode ? undefined : rounded}
                             // h={resolvedHeight}
                             // maxH={resolvedMaxHeight}
-                            w={finalWidth}
-                            maxW={finalMaxWidth}
+                            // w={finalWidth}
+                            // maxW={finalMaxWidth}
                             tabIndex={-1}
                             className={clsx(prefix('__content'), className)}
                             role="dialog"
                             aria-modal="true"
                             aria-labelledby={hasHeader ? headerId : undefined}
                             aria-describedby={hasBody ? bodyId : undefined}
+                            {...sizingProps}
                         >
                             {children}
                         </Transition>
