@@ -202,7 +202,7 @@
 
     opacity: 0.8;
 
-    transition: var(--accordion-icon-transition);
+    transition: transform var(--accordion-chevron-duration) var(--accordion-chevron-easing);
 
     &[data-state='open'] {
         transform: var(--accordion-icon-transform);

@@ -12,7 +12,7 @@ type AccordionContextValue = {
     focusable: FocusableListResult;
     registerFocusable: (item: FocusableItem) => void;
     unregisterFocusable: (id: string) => void;
-} & Omit<Required<OwnCollapseProps>, 'open' | 'onMount' | 'onUnmount' | 'onEntered' | 'onExited'>;
+};
 
 const AccordionContext = createContext<AccordionContextValue | null>(null);
 

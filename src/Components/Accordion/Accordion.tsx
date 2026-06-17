@@ -1,16 +1,19 @@
-import React, { forwardRef, useEffect, useMemo, useState, useCallback } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState, useCallback, CSSProperties } from 'react';
 import { clsx } from 'clsx';
-import { Box, BoxComponentProps } from '../Box/Box';
-import { Collapse, CollapseProps } from '../Collapse/Collapse';
+import { Box, BoxComponentProps } from '../Box';
+import { Collapse, CollapseProps, OwnCollapseProps } from '../Collapse';
 import { classPrefix } from '../../utils/classPrefix';
+import { AccordionContextValue, AccordionContext, useAccordionContext } from './Accordion.context';
 import {
-    AccordionContextValue,
-    AccordionContext,
-    useAccordionContext,
     AccordionItemContextValue,
     AccordionItemContext,
     useAccordionItemContext,
-} from './Accordion.context';
+} from './AccordionItem.context';
+import {
+    AccordionCollapseContextValue,
+    AccordionCollapseContext,
+    useAccordionCollapseContext,
+} from './AccordionCollapse.context';
 import { useStableId } from '../../utils/useStableId';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { useFocusableList, FocusableItem } from '../../hooks/useFocusableList';
@@ -22,40 +25,57 @@ import { useFocusableList, FocusableItem } from '../../hooks/useFocusableList';
 const prefix = (name = '') => classPrefix(`--accordion${name}`);
 
 // -----------------------------------------------------------------------------
-// Root
+// Types
 // -----------------------------------------------------------------------------
 
-type AccordionCollapseProps = {
+type OwnAccordionProps = {
     chevronDuration: number;
     chevronEasing: string;
-} & Pick<
-    CollapseProps,
-    'enterDuration' | 'exitDuration' | 'enterEasing' | 'exitEasing' | 'keepMounted'
+    multiple?: boolean;
+    collapsible?: boolean;
+    defaultValue?: string[];
+    value?: string[];
+    onValueChange?: (value: string[]) => void;
+};
+
+type AccordionCollapseProps = Omit<
+    OwnCollapseProps,
+    'open' | 'onMount' | 'onUnmount' | 'onEntered' | 'onExited'
 >;
 
 export type AccordionProps = BoxComponentProps<
     'div',
-    {
-        multiple?: boolean;
-        collapsible?: boolean;
-        defaultValue?: string[];
-        value?: string[];
-        onValueChange?: (value: string[]) => void;
-    } & AccordionCollapseProps
+    OwnAccordionProps & AccordionCollapseContextValue
 >;
+
+// -----------------------------------------------------------------------------
+// Root component
+// -----------------------------------------------------------------------------
 
 const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
     (
         {
+            children,
+            className,
+
             multiple = false,
             collapsible = true,
             defaultValue = [],
             value: valueProp,
             onValueChange,
-            children,
-            className,
+
+            enterDuration = 200,
+            exitDuration = 150,
+            enterEasing = 'cubic-bezier(0.25, 1, 0.5, 1)',
+            exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+            keepMounted,
+            reduceMotion,
+            chevronDuration = 150,
+            chevronEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+
             rounded = 'md',
             shadow = 'none',
+
             ...rest
         },
         ref,
@@ -123,7 +143,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             onValueChange?.(nextValue);
         };
 
-        const context = useMemo(
+        const context: AccordionContextValue = useMemo(
             () => ({
                 value,
                 toggle,
@@ -145,17 +165,42 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             ],
         );
 
+        const collapseContext: AccordionCollapseContextValue = useMemo(
+            () => ({
+                enterDuration,
+                exitDuration,
+                enterEasing,
+                exitEasing,
+                keepMounted,
+                reduceMotion,
+                chevronDuration,
+                chevronEasing,
+            }),
+            [
+                enterDuration,
+                exitDuration,
+                enterEasing,
+                exitEasing,
+                keepMounted,
+                reduceMotion,
+                chevronDuration,
+                chevronEasing,
+            ],
+        );
+
         return (
             <AccordionContext.Provider value={context}>
-                <Box
-                    ref={ref}
-                    className={clsx(prefix(), className)}
-                    rounded={rounded}
-                    shadow={shadow}
-                    {...rest}
-                >
-                    {children}
-                </Box>
+                <AccordionCollapseContext.Provider value={collapseContext}>
+                    <Box
+                        ref={ref}
+                        className={clsx(prefix(), className)}
+                        rounded={rounded}
+                        shadow={shadow}
+                        {...rest}
+                    >
+                        {children}
+                    </Box>
+                </AccordionCollapseContext.Provider>
             </AccordionContext.Provider>
         );
     },
@@ -165,8 +210,8 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
 // Item
 // -----------------------------------------------------------------------------
 
-export type AccordionItemProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
+export type AccordionItemProps = BoxComponentProps<
+    'div',
     {
         value: string;
         disabled?: boolean;
@@ -174,7 +219,7 @@ export type AccordionItemProps<C extends React.ElementType = 'div'> = BoxCompone
 >;
 
 const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
-    ({ value, id, disabled = false, children, className, ...rest }, ref) => {
+    ({ children, className, value, id, disabled = false, ...rest }, ref) => {
         const context = useAccordionContext();
 
         const finalId = id ?? value;
@@ -184,22 +229,25 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 
         const open = context.value.includes(value);
 
+        const itemContext: AccordionItemContextValue = useMemo(
+            () => ({
+                value,
+                open,
+                disabled,
+                triggerId,
+                contentId,
+            }),
+            [value, open, disabled, triggerId, contentId],
+        );
+
         return (
-            <AccordionItemContext.Provider
-                value={{
-                    value,
-                    open,
-                    disabled,
-                    triggerId,
-                    contentId,
-                }}
-            >
+            <AccordionItemContext.Provider value={itemContext}>
                 <Box
+                    {...rest}
                     ref={ref}
                     className={clsx(prefix('__item'), className)}
                     data-state={open ? 'open' : 'closed'}
                     data-disabled={disabled ? '' : undefined}
-                    {...rest}
                 >
                     {children}
                 </Box>
@@ -212,25 +260,52 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 // Trigger
 // -----------------------------------------------------------------------------
 
-export type AccordionTriggerProps<C extends React.ElementType = 'button'> = BoxComponentProps<C>;
+export type AccordionTriggerProps = {
+    chevronDuration: number;
+    chevronEasing: string;
+} & BoxComponentProps<'button'>;
 
 const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-    ({ children, className, onClick, onKeyDown, onFocus, ...rest }, ref) => {
-        const accordion = useAccordionContext();
+    (
+        {
+            children,
+            className,
+            onClick,
+            onKeyDown,
+            onFocus,
+            chevronDuration: chevronDurationProp,
+            chevronEasing: chevronEasingProp,
+            ...rest
+        },
+        ref,
+    ) => {
+        const ctxCollapse = useAccordionCollapseContext();
+        const ctxAccordion = useAccordionContext();
         const item = useAccordionItemContext();
 
-        const notClosable = !accordion.collapsible && item.open && accordion.value.length === 1;
+        const chevronDuration = ctxCollapse?.reduceMotion
+            ? 0
+            : (chevronDurationProp ?? ctxCollapse?.chevronDuration);
+        const chevronEasing = chevronEasingProp ?? ctxCollapse?.chevronEasing;
+
+        const notClosable =
+            !ctxAccordion.collapsible && item.open && ctxAccordion.value.length === 1;
 
         useEffect(() => {
-            accordion.registerFocusable({
+            ctxAccordion.registerFocusable({
                 id: item.value,
                 disabled: item.disabled,
             });
 
             return () => {
-                accordion.unregisterFocusable(item.value);
+                ctxAccordion.unregisterFocusable(item.value);
             };
-        }, [accordion.registerFocusable, accordion.unregisterFocusable, item.value, item.disabled]);
+        }, [
+            ctxAccordion.registerFocusable,
+            ctxAccordion.unregisterFocusable,
+            item.value,
+            item.disabled,
+        ]);
 
         return (
             <Box
@@ -239,7 +314,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                 tabIndex={item.disabled ? -1 : 0}
                 // ref={ref}
                 ref={(node) => {
-                    accordion.focusable.setRef(item.value)(node);
+                    ctxAccordion.focusable.setRef(item.value)(node);
 
                     if (typeof ref === 'function') {
                         ref(node);
@@ -262,11 +337,11 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                         return;
                     }
 
-                    accordion.toggle(item.value);
+                    ctxAccordion.toggle(item.value);
                 }}
                 onFocus={(e) => {
                     onFocus?.(e);
-                    accordion.focusable.setFocusedId(item.value);
+                    ctxAccordion.focusable.setFocusedId(item.value);
                 }}
                 onKeyDown={(event) => {
                     onKeyDown?.(event);
@@ -279,23 +354,23 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                         case 'ArrowDown':
                         case 'PageDown':
                             event.preventDefault();
-                            accordion.focusable.focusNext(1);
+                            ctxAccordion.focusable.focusNext(1);
                             break;
 
                         case 'ArrowUp':
                         case 'PageUp':
                             event.preventDefault();
-                            accordion.focusable.focusNext(-1);
+                            ctxAccordion.focusable.focusNext(-1);
                             break;
 
                         case 'Home':
                             event.preventDefault();
-                            accordion.focusable.focusFirst();
+                            ctxAccordion.focusable.focusFirst();
                             break;
 
                         case 'End':
                             event.preventDefault();
-                            accordion.focusable.focusLast();
+                            ctxAccordion.focusable.focusLast();
                             break;
                     }
                 }}
@@ -306,6 +381,12 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                     className={prefix('__chevron')}
                     data-state={item.open ? 'open' : 'closed'}
                     aria-hidden
+                    style={
+                        {
+                            '--accordion-chevron-duration': `${chevronDuration}ms`,
+                            '--accordion-chevron-easing': chevronEasing,
+                        } as CSSProperties
+                    }
                 />
             </Box>
         );
@@ -316,9 +397,9 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
 // Content
 // -----------------------------------------------------------------------------
 
-export type AccordionContentProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
-    AccordionCollapseProps
+export type AccordionContentProps = BoxComponentProps<
+    'div',
+    AccordionCollapseProps & Omit<CollapseProps, 'open'>
 >;
 
 const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
@@ -326,27 +407,49 @@ const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
         {
             children,
             className,
-            enterDuration = 200,
-            exitDuration = 150,
-            enterEasing = 'cubic-bezier(0.25, 1, 0.5, 1)',
-            exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+
+            enterDuration: enterDurationProp,
+            exitDuration: exitDurationProp,
+            enterEasing: enterEasingProp,
+            exitEasing: exitEasingProp,
+            keepMounted: keepMountedProp,
+            reduceMotion: reduceMotionProp,
+
+            onMount,
+            onUnmount,
+            onEntered,
+            onExited,
 
             ...rest
         },
         ref,
     ) => {
-        const item = useAccordionItemContext();
+        const ctxItem = useAccordionItemContext();
+        const ctxCollapse = useAccordionCollapseContext();
+
+        const collapseProps = {
+            enterDuration: enterDurationProp ?? ctxCollapse?.enterDuration,
+            exitDuration: exitDurationProp ?? ctxCollapse?.exitDuration,
+            enterEasing: enterEasingProp ?? ctxCollapse?.enterEasing,
+            exitEasing: exitEasingProp ?? ctxCollapse?.exitEasing,
+            keepMounted: keepMountedProp ?? ctxCollapse?.keepMounted,
+            reduceMotion: reduceMotionProp ?? ctxCollapse?.reduceMotion,
+            onMount,
+            onUnmount,
+            onEntered,
+            onExited,
+        };
 
         return (
-            <Collapse open={item.open} enterDuration={enterDuration} exitDuration={exitDuration}>
+            <Collapse open={ctxItem.open} {...collapseProps}>
                 <Box
-                    ref={ref}
-                    id={item.contentId}
-                    role="region"
-                    aria-labelledby={item.triggerId}
-                    className={clsx(prefix('__content'), className)}
-                    data-state={item.open ? 'open' : 'closed'}
                     {...rest}
+                    ref={ref}
+                    id={ctxItem.contentId}
+                    role="region"
+                    aria-labelledby={ctxItem.triggerId}
+                    className={clsx(prefix('__content'), className)}
+                    data-state={ctxItem.open ? 'open' : 'closed'}
                 >
                     {children}
                 </Box>
