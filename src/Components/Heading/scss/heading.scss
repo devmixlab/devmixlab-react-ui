@@ -1,4 +1,11 @@
-$dru-heading-sizes: (
+@use '../../../scss/config' as cfg;
+@use 'sass:map';
+
+$p: cfg.$prefix;
+$heading-prefix: #{$p}--heading;
+
+
+$sizes: (
     h1: (
         font-size: 32px,
         line-height: 40px,
@@ -30,14 +37,19 @@ $dru-heading-sizes: (
     ),
 );
 
-.dru--heading {
+.#{$heading-prefix} {
     margin: 0;
+    font-weight: 600;
 
-    @each $key, $styles in $dru-heading-sizes {
-        &--#{$key} {
-            @each $prop, $value in $styles {
-                #{$prop}: $value;
-            }
+    @each $key, $conf in $sizes {
+        &[data-level='#{$key}'] {
+            font-size: #{map.get($conf, font-size)};
+            line-height: #{map.get($conf, line-height)};
         }
+    }
+
+    &[data-level='h1'],
+    &[data-level='h2'] {
+        letter-spacing: -0.02em;
     }
 }

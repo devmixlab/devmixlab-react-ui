@@ -55,7 +55,7 @@ export { Badge } from './src/Components/Badge/Badge';
 export { Chip } from './src/Components/Chip/Chip';
 export { Alert } from './src/Components/Alert/Alert';
 export { Card } from './src/Components/Card';
-export { Heading, H1, H2, H3, H4, H5, H6 } from './src/Heading';
+export { Heading, H1, H2, H3, H4, H5, H6 } from './src/Components/Heading';
 export { Text } from './src/Components/Text/Text';
 
 export { BoxStyled } from './src/Components/Box/BoxStyled';

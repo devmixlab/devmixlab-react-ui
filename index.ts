@@ -18,5 +18,6 @@ export * from './src/Components/Alert';
 export * from './src/Components/Collapse';
 export * from './src/Components/Modal';
 export * from './src/Components/Offcanvas';
+export * from './src/Components/Heading';
 
 export * from './src/Components/Transition';
