@@ -4,7 +4,7 @@ import { Box, BoxComponentProps, type BoxProps } from '../Box/Box';
 import { createPolymorphic } from '../../types/polymorphic';
 import { LoadingPosition, Size, Intent, Variant } from './Button.tokens';
 import { isLongNumber, prefix } from './Button.helpers';
-import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
+import { DefaultSpinner } from '../Spinner/DefaultSpinner';
 
 type OwnButtonProps = {
     className?: string;

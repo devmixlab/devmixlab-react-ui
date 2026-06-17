@@ -1,5 +1,5 @@
 @use 'sass:map';
-@use '../../../scss/comps/spinner';
+@use '../../Spinner/scss/spinner';
 @use 'config' as *;
 
 $button-sizes: (

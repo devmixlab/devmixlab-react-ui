@@ -3,7 +3,7 @@ import { TextInput, type TextInputProps } from '../TextInput';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { Search as SearchIcon } from '../../Icon/Search';
 import { mergeRefs } from '../../../utils/mergeRefs';
-import { DefaultSpinner } from '../../../Spinner/DefaultSpinner';
+import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
 
 type SearchInputProps = Omit<TextInputProps, 'type'> & {
     searchIcon?: React.ReactNode;
