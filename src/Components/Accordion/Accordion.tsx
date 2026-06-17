@@ -1,8 +1,8 @@
 import React, { forwardRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { clsx } from 'clsx';
-import { Box, BoxComponentProps } from '../Components/Box/Box';
-import { Collapse, CollapseProps } from '../Components/Collapse/Collapse';
-import { classPrefix } from '../utils/classPrefix';
+import { Box, BoxComponentProps } from '../Box/Box';
+import { Collapse, CollapseProps } from '../Collapse/Collapse';
+import { classPrefix } from '../../utils/classPrefix';
 import {
     AccordionContextValue,
     AccordionContext,
@@ -11,9 +11,9 @@ import {
     AccordionItemContext,
     useAccordionItemContext,
 } from './Accordion.context';
-import { useStableId } from '../utils/useStableId';
-import { ChevronDown as ChevronDownIcon } from '../Components/Icon';
-import { useFocusableList, FocusableItem } from '../hooks/useFocusableList';
+import { useStableId } from '../../utils/useStableId';
+import { ChevronDown as ChevronDownIcon } from '../Icon';
+import { useFocusableList, FocusableItem } from '../../hooks/useFocusableList';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -25,13 +25,16 @@ const prefix = (name = '') => classPrefix(`--accordion${name}`);
 // Root
 // -----------------------------------------------------------------------------
 
-type AccordionCollapseProps = Pick<
+type AccordionCollapseProps = {
+    chevronDuration: number;
+    chevronEasing: string;
+} & Pick<
     CollapseProps,
-    'enterDuration' | 'exitDuration' | 'easing' | 'keepMounted'
+    'enterDuration' | 'exitDuration' | 'enterEasing' | 'exitEasing' | 'keepMounted'
 >;
 
-export type AccordionProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
+export type AccordionProps = BoxComponentProps<
+    'div',
     {
         multiple?: boolean;
         collapsible?: boolean;
@@ -319,7 +322,19 @@ export type AccordionContentProps<C extends React.ElementType = 'div'> = BoxComp
 >;
 
 const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
-    ({ children, className, enterDuration = 200, exitDuration = 200, ...rest }, ref) => {
+    (
+        {
+            children,
+            className,
+            enterDuration = 200,
+            exitDuration = 150,
+            enterEasing = 'cubic-bezier(0.25, 1, 0.5, 1)',
+            exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+
+            ...rest
+        },
+        ref,
+    ) => {
         const item = useAccordionItemContext();
 
         return (
@@ -340,14 +355,14 @@ const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
     },
 );
 
-// -----------------------------------------------------------------------------
-// Export
-// -----------------------------------------------------------------------------
-
 const Accordion = Object.assign(AccordionRoot, {
     Item: AccordionItem,
     Trigger: AccordionTrigger,
     Content: AccordionContent,
 });
+
+// -----------------------------------------------------------------------------
+// Export
+// -----------------------------------------------------------------------------
 
 export { Accordion };

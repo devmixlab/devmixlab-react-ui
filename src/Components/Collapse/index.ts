@@ -1,3 +1,3 @@
 export { Collapse } from './Collapse';
 
-export type { CollapseProps, CollapseEffect } from './Collapse';
+export type { CollapseProps, OwnCollapseProps } from './Collapse';

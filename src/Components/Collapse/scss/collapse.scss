@@ -6,18 +6,19 @@ $collapse-prefix: #{$p}--collapse;
 .#{$collapse-prefix} {
     overflow: hidden;
     transition-property: height;
-    transition-timing-function: var(--collapse-easing, ease);
-}
+    //transition-timing-function: var(--collapse-easing, ease);
 
-.#{$collapse-prefix}[data-state='entering'],
-.#{$collapse-prefix}[data-state='entered'] {
-    transition-duration: var(--collapse-enter-duration, 200ms);
-}
+    &[data-state='entering'] {
+        transition-duration: var(--collapse-enter-duration, 200ms);
+        transition-timing-function: var(--collapse-enter-easing, ease);
+    }
 
-.#{$collapse-prefix}[data-state='exiting'] {
-    transition-duration: var(--collapse-exit-duration, 200ms);
-}
+    &[data-state='exiting'] {
+        transition-duration: var(--collapse-exit-duration, 200ms);
+        transition-timing-function: var(--collapse-exit-easing, ease);
+    }
 
-.#{$collapse-prefix}[data-state='exited'] {
-    pointer-events: none;
+    &[data-state='exited'] {
+        pointer-events: none;
+    }
 }

@@ -1,16 +1,8 @@
-@use '../scss/functions' as functions;
-@use '../scss/mixins' as mixins;
-
-@use '../scss/config' as cfg;
-@use 'sass:map';
-
-$p: cfg.$prefix;
-$accordion-prefix: #{$p}--accordion;
+@use './accordion-conf' as *;
+@use '../../../scss/mixins/mode' as *;
+@use '../../../scss/functions/common' as *;
 
 .#{$accordion-prefix} {
-    // -------------------------------------------------------------------------
-    // Spacing
-    // -------------------------------------------------------------------------
 
     --accordion-padding-y: 1rem;
     --accordion-padding-x: 1.25rem;
@@ -21,53 +13,44 @@ $accordion-prefix: #{$p}--accordion;
     --accordion-trigger-padding-y: var(--accordion-padding-y);
     --accordion-trigger-padding-x: var(--accordion-padding-x);
 
+    --accordion-border-width: 1px;
+    --accordion-ring: var(--#{$p}-accent-primary);
+
     // -------------------------------------------------------------------------
     // Colors
     // -------------------------------------------------------------------------
 
-    --accordion-color: #{functions.intent-color(gray, 900)};
+    --accordion-color: #{intent(gray, 900)};
     --accordion-bg: transparent;
 
-    --accordion-border-color: #{functions.intent-color(gray, 300)};
+    --accordion-border-color: #{intent(gray, 300)};
 
     --accordion-trigger-color: var(--accordion-color);
-    --accordion-trigger-bg: #{functions.intent-color(gray, 100)};
-    --accordion-trigger-hover-bg: #{functions.intent-color(gray, 200)};
+    --accordion-trigger-bg: #{intent(gray, 100)};
+    --accordion-trigger-hover-bg: #{intent(gray, 200)};
 
-    --accordion-trigger-active-bg: #{functions.intent-color(primary, 200)};
-    --accordion-trigger-active-color: #{functions.intent-color(primary, 800)};
+    --accordion-trigger-active-bg: #{intent(primary, 200)};
+    --accordion-trigger-active-color: #{intent(primary, 800)};
 
     --accordion-content-bg: transparent;
     --accordion-content-color: var(--accordion-color);
 
-    @include cfg.dark {
-        --accordion-color: #{functions.intent-color(gray, 100)};
+    @include dark {
+        --accordion-color: #{intent(gray, 100)};
         --accordion-bg: transparent;
 
-        --accordion-border-color: #{functions.intent-color(gray, 800)};
+        --accordion-border-color: #{intent(gray, 800)};
 
         --accordion-trigger-color: var(--accordion-color);
-        --accordion-trigger-bg: #{functions.intent-color(gray, 900)};
-        --accordion-trigger-hover-bg: #{functions.intent-color(gray, 800)};
+        --accordion-trigger-bg: #{intent(gray, 900)};
+        --accordion-trigger-hover-bg: #{intent(gray, 800)};
 
-        --accordion-trigger-active-bg: #{functions.intent-color(primary, 800)};
-        --accordion-trigger-active-color: #{functions.intent-color(primary, 0)};
+        --accordion-trigger-active-bg: #{intent(primary, 800)};
+        --accordion-trigger-active-color: #{intent(primary, 0)};
 
         --accordion-content-bg: transparent;
         --accordion-content-color: var(--accordion-color);
     }
-
-    // -------------------------------------------------------------------------
-    // Borders / Radius
-    // -------------------------------------------------------------------------
-
-    --accordion-border-width: 1px;
-
-    // -------------------------------------------------------------------------
-    // Focus
-    // -------------------------------------------------------------------------
-
-    --accordion-ring: var(--#{$p}-accent-primary);
 
     // -------------------------------------------------------------------------
     // Motion
