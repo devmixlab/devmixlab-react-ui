@@ -49,7 +49,7 @@ export { ToastContext, useToastContext } from './src/Toast/Toast.context';
 export { Navbar } from './src/Components/Navbar/Navbar';
 export { useNavbarMobileContext } from './src/Components/Navbar/Navbar.context';
 
-export { Warning as WarningIcon } from './src/Icon/Warning';
+export { Warning as WarningIcon } from './src/Components/Icon/Warning';
 
 export { Badge } from './src/Components/Badge/Badge';
 export { Chip } from './src/Components/Chip/Chip';
@@ -64,5 +64,5 @@ export { BoxDerived } from './src/Components/Box/BoxDerived';
 // export { Grid } from './src/Box/Grid';
 // export { Col } from './src/Box/Col';
 export { Box } from './src/Components/Box/Box';
-export { Icon } from './src/Icon/Icon';
-export { IconWrapper } from './src/Icon/IconWrapper';
+export { Icon } from './src/Components/Icon/Icon';
+export { IconWrapper } from './src/Components/Icon/IconWrapper';

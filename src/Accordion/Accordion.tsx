@@ -12,7 +12,7 @@ import {
     useAccordionItemContext,
 } from './Accordion.context';
 import { useStableId } from '../utils/useStableId';
-import { ChevronDown as ChevronDownIcon } from '../Icon';
+import { ChevronDown as ChevronDownIcon } from '../Components/Icon';
 import { useFocusableList, FocusableItem } from '../hooks/useFocusableList';
 
 // -----------------------------------------------------------------------------

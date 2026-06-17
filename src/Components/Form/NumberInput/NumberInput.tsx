@@ -3,7 +3,7 @@ import { TextInput, type TextInputProps } from '../TextInput';
 import { renderGroupItem } from '../FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useFormFieldContext } from '../FormField/FormField.context';
-import { ChevronUp, ChevronDown } from '../../../Icon';
+import { ChevronUp, ChevronDown } from '../../Icon';
 import Decimal from 'decimal.js';
 import clsx from 'clsx';
 import {

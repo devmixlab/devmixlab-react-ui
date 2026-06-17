@@ -5,7 +5,7 @@ import { Box } from '../../Box';
 import { FieldRoot, SharedFieldRootProps } from '../FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/FormField.context';
-import { Close, IconWrapper } from '../../../Icon';
+import { Close, IconWrapper } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 import { FieldLayoutProps, fieldRootPropKeys } from '../FieldRoot';
 import { splitProps } from '../../../utils/splitProps';

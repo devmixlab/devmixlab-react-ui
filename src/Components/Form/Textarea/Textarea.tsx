@@ -5,7 +5,7 @@ import { Size } from '../form.tokens';
 import { Variant } from '../FieldRoot/FieldRoot';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { useFormFieldContext } from '../FormField/FormField.context';
-import { IconWrapper, Close } from '../../../Icon';
+import { IconWrapper, Close } from '../../Icon';
 import { FieldRoot, SharedFieldRootProps } from '../FieldRoot';
 import { classPrefix } from '../../../utils/classPrefix';
 import { FieldLayoutProps, fieldRootPropKeys } from '../FieldRoot';

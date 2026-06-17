@@ -4,7 +4,7 @@ import { Box, BoxProps, DerivedProps, BoxDerived } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
 import { ModalContext, useModalContext } from './Modal.context';
-import { Close as CloseIcon } from '../../Icon';
+import { Close as CloseIcon } from '../Icon';
 import { useStableId } from '../../utils/useStableId';
 import { getNextZIndex } from '../../utils/zIndex';
 import { modalManager } from './Modal.manager';

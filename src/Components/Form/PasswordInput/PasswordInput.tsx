@@ -1,7 +1,7 @@
 import React, { forwardRef, useState } from 'react';
 import { TextInput, type TextInputProps } from '../TextInput';
 import { useFormFieldContext } from '../FormField/FormField.context';
-import { Eye, EyeOff } from '../../../Icon';
+import { Eye, EyeOff } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 
 type PasswordInputProps = Omit<TextInputProps, 'type'> & {

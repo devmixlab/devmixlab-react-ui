@@ -8,11 +8,7 @@ import {
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { Size } from '../form.tokens';
 import { Badge } from '../../Badge/Badge';
-import {
-    Close as CloseIcon,
-    IconWrapper as IconWrapper,
-    Upload as UploadIcon,
-} from '../../../Icon';
+import { Close as CloseIcon, IconWrapper as IconWrapper, Upload as UploadIcon } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 import { Card } from '../../Card';
 import { Box, BoxProps } from '../../Box/Box';

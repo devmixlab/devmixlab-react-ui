@@ -10,8 +10,8 @@ import { mergeRefs } from '../../../utils/mergeRefs';
 import { Box, BoxProps } from '../../Box/Box';
 import { Size } from '../form.tokens';
 import { Variant } from '../FieldRoot/FieldRoot';
-import { Close } from '../../../Icon/Close';
-import { IconWrapper } from '../../../Icon';
+import { Close } from '../../Icon/Close';
+import { IconWrapper } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 
 export type BaseTagItem = {

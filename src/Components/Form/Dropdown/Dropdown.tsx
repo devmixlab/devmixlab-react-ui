@@ -18,7 +18,7 @@ import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dro
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } from '../FieldRoot';
-import { ChevronDown as ChevronDownIcon } from '../../../Icon';
+import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { splitProps } from '../../../utils/splitProps';
 
 // ---------------------------------------------------------------------------

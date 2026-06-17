@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import { Box, BoxComponentProps } from '../Box/Box';
 import { classPrefix } from '../../utils/classPrefix';
 import { Button, ButtonProps } from '../Button/Button';
-import { ChevronDown as ChevronDownIcon } from '../../Icon';
+import { ChevronDown as ChevronDownIcon } from '../Icon';
 import {
     NavbarContext,
     useNavbarContext,
@@ -41,7 +41,7 @@ import {
     useNestedLayers,
 } from '../../hooks';
 
-import { Burger as BurgerIcon } from '../../Icon';
+import { Burger as BurgerIcon } from '../Icon';
 
 import { Card } from '../Card';
 

@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { Box, type BoxProps } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
 import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
-import { Close as CloseIcon } from '../../Icon';
+import { Close as CloseIcon } from '../Icon';
 
 //---------------------------------------------------------------
 // Types

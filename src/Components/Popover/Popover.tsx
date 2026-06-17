@@ -27,7 +27,7 @@ import { usePopoverAccessibilityContext } from './PopoverAccessibility.context';
 import { usePopoverConfigContext } from './PopoverConfig.context';
 import { PopoverProviders } from './PopoverProviders';
 import { Button, ButtonProps } from '../Button';
-import { ChevronDown as ChevronDownIcon } from '../../Icon';
+import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { clsx } from 'clsx';
 
 export const BUTTON_ICON_SLOT_WIDTHS = {

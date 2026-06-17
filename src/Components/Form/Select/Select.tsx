@@ -2,7 +2,7 @@ import React, { forwardRef, useRef } from 'react';
 import clsx from 'clsx';
 import { Box } from '../../Box';
 import { useFormFieldContext } from '../FormField/FormField.context';
-import { TriangleDown as TriangleDownIcon } from '../../../Icon';
+import { TriangleDown as TriangleDownIcon } from '../../Icon';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import {
     FieldRoot,

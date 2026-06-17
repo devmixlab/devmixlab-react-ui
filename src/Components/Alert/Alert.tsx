@@ -3,7 +3,7 @@ import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
 import { Box } from '../Box';
 import type { BoxProps } from '../Box';
 import clsx from 'clsx';
-import { Info, Warning, Success, Close } from '../../Icon';
+import { Info, Warning, Success, Close } from '../Icon';
 import { classPrefix } from '../../utils/classPrefix';
 import { TextProps, Text } from '../Text';
 import { TransitionProps, Transition } from '../Transition';
