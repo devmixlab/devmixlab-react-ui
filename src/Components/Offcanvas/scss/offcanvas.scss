@@ -1,6 +1,4 @@
-@use '../../../scss/functions' as functions;
-@use '../../../scss/mixins' as mixins;
-
+@use '../../Modal/scss/modal';
 @use '../../../scss/config' as cfg;
 @use 'sass:map';
 
@@ -8,25 +6,33 @@ $p: cfg.$prefix;
 $modal-prefix: #{$p}--modal;
 $offcanvas-prefix: #{$p}--offcanvas;
 
-$widths: ( 2xs: 280px, xs: 320px, sm: 400px, md: 480px, lg: 640px, xl: 800px, 2xl: 960px, );
-$heights: (
-    2xs: 10vh,
-    xs: 15vh,
-    sm: 25vh,
-    md: 35vh,
-    lg: 50vh,
-    xl: 65vh,
-    2xl: 80vh,
-);
-
 .#{$modal-prefix}.#{$offcanvas-prefix} {
     &[data-placement='left'] {
         --offcanvas-content-wrapper-align-items: flex-start;
-        --offcanvas-content-wrapper-justify-content: start;
+        --offcanvas-content-wrapper-justify-content: flex-start;
 
         --offcanvas-transform-from: translateX(-100%);
+    }
 
-        //--offcanvas-content-height: 100%;
+    &[data-placement='right'] {
+        --offcanvas-content-wrapper-align-items: flex-start;
+        --offcanvas-content-wrapper-justify-content: flex-end;
+
+        --offcanvas-transform-from: translateX(100%);
+    }
+
+    &[data-placement='top'] {
+        --offcanvas-content-wrapper-align-items: flex-start;
+        --offcanvas-content-wrapper-justify-content: flex-start;
+
+        --offcanvas-transform-from: translateY(-100%);
+    }
+
+    &[data-placement='bottom'] {
+        --offcanvas-content-wrapper-align-items: flex-end;
+        --offcanvas-content-wrapper-justify-content: flex-start;
+
+        --offcanvas-transform-from: translateY(100%);
     }
 
     .#{$modal-prefix} {
@@ -39,8 +45,38 @@ $heights: (
         }
 
         &__content {
-            //height: var(--offcanvas-content-height);
-            //width: var(--offcanvas-content-width, 200px);
+            &[data-animation='offcanvas-slide'] {
+                &[data-animation-state='entering'] {
+                    animation: #{$offcanvas-prefix}--slide-enter var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+                }
+
+                &[data-animation-state='exiting'] {
+                    animation: #{$offcanvas-prefix}--slide-exit var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+                }
+            }
         }
+    }
+}
+
+/*
+ * Slide
+ */
+@keyframes #{$offcanvas-prefix}--slide-enter {
+    from {
+        transform: var(--offcanvas-transform-from);
+    }
+
+    to {
+        transform: translate(0);
+    }
+}
+
+@keyframes #{$offcanvas-prefix}--slide-exit {
+    from {
+        transform: translate(0);
+    }
+
+    to {
+        transform: var(--offcanvas-transform-from);
     }
 }

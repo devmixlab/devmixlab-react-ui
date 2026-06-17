@@ -40,7 +40,7 @@ export { Carousel } from './src/Carousel/Carousel';
 export { Container } from './src/Components/Container/Container';
 export { ContainerProvider } from './src/Components/Container/ContainerProvider';
 
-export { Offcanvas } from './src/Offcanvas/Offcanvas';
+// export { Offcanvas } from './src/Offcanvas/Offcanvas';
 
 export { ToastProvider, useToast } from './src/Toast';
 export { ToastContext, useToastContext } from './src/Toast/Toast.context';
