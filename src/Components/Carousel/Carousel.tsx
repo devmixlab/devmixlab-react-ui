@@ -26,6 +26,8 @@ import { useCarouselAutoplay } from './useCarouselAutoplay';
 import { useCarouselKeyboard } from './useCarouselKeyboard';
 import { useCarouselVisibility } from './useCarouselVisibility';
 import { CarouselContextValue, CarouselContext, useCarouselContext } from './Carousel.context';
+import { ChevronLeft } from '../Icon';
+import { Button, ButtonProps } from '../Button';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -33,12 +35,16 @@ import { CarouselContextValue, CarouselContext, useCarouselContext } from './Car
 
 const prefix = (name = '') => classPrefix(`--carousel${name}`);
 
+const controlDefaultProps = {
+    rounded: 'full',
+    intent: 'secondary',
+    // position: 'absolute',
+    // top: '-50%',
+};
+
 // -----------------------------------------------------------------------------
 // Types
 // -----------------------------------------------------------------------------
-
-export type CarouselControlVariant = 'solid' | 'subtle' | 'outline' | 'ghost';
-export type CarouselControlSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type CarouselHandle = {
     sync: () => void;
@@ -53,8 +59,7 @@ type OwnCarouselProps = {
 
     gap?: number;
 
-    controlVariant?: CarouselControlVariant;
-    controlSize?: CarouselControlSize;
+    controlProps?: ButtonProps;
 
     slidesPerView?: number;
     slidesPerScroll?: number;
@@ -115,8 +120,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
 
             gap = 4,
 
-            controlVariant = 'subtle',
-            controlSize = 'md',
+            controlProps,
 
             slidesPerView = 1,
             slidesPerScroll = 1,
@@ -509,8 +513,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 slidesPerView,
                 slidesPerScroll,
                 gap,
-                controlVariant,
-                controlSize,
+                controlProps,
                 activeIndex,
                 pageCount,
                 scrollTo,
@@ -535,8 +538,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 slidesPerView,
                 slidesPerScroll,
                 gap,
-                controlVariant,
-                controlSize,
+                controlProps,
                 activeIndex,
                 pageCount,
                 scrollTo,
@@ -742,7 +744,7 @@ const CarouselItem = forwardRef<HTMLDivElement, CarouselItemProps>(
 // Prev
 // -----------------------------------------------------------------------------
 
-type CarouselButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<C>;
+type CarouselButtonProps = {} & ButtonProps;
 
 const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Prev', ...rest }, ref) => {
@@ -754,9 +756,17 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
             pageCount,
             activeIndex,
             loop,
-            controlVariant,
-            controlSize,
+            controlProps,
         } = useCarouselContext();
+
+        const mergedProps = {
+            ...controlDefaultProps,
+            ...{
+                left: 0,
+            },
+            ...controlProps,
+            ...rest,
+        };
 
         const { handleKeyDown } = useCarouselKeyboard({
             activeIndex,
@@ -766,21 +776,19 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
         });
 
         return (
-            <Box
-                {...rest}
-                as="button"
+            <Button
+                {...mergedProps}
                 ref={ref}
-                className={clsx(prefix('__control'), prefix('__control-prev'), className)}
+                className={clsx(prefix('__control'), className)}
                 type="button"
                 onClick={scrollPrev}
                 onKeyDown={handleKeyDown}
                 disabled={!canScrollPrev}
                 aria-label="Previous slide"
-                data-control-variant={controlVariant}
-                data-control-size={controlSize}
+                data-control-direction="prev"
             >
                 {children}
-            </Box>
+            </Button>
         );
     },
 );
@@ -791,16 +799,17 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Next', ...rest }, ref) => {
-        const {
-            scrollNext,
-            canScrollNext,
-            scrollTo,
-            pageCount,
-            activeIndex,
-            loop,
-            controlVariant,
-            controlSize,
-        } = useCarouselContext();
+        const { scrollNext, canScrollNext, scrollTo, pageCount, activeIndex, loop, controlProps } =
+            useCarouselContext();
+
+        const mergedProps = {
+            ...controlDefaultProps,
+            ...{
+                right: 0,
+            },
+            ...controlProps,
+            ...rest,
+        };
 
         const { handleKeyDown } = useCarouselKeyboard({
             activeIndex,
@@ -810,21 +819,21 @@ const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
         });
 
         return (
-            <Box
-                {...rest}
-                as="button"
+            <Button
+                {...mergedProps}
                 ref={ref}
-                className={clsx(prefix('__control'), prefix('__control-next'), className)}
+                rounded="full"
+                intent="secondary"
+                className={clsx(prefix('__control'), className)}
                 type="button"
                 onClick={scrollNext}
                 onKeyDown={handleKeyDown}
                 disabled={!canScrollNext}
                 aria-label="Next slide"
-                data-control-variant={controlVariant}
-                data-control-size={controlSize}
+                data-control-direction="next"
             >
                 {children}
-            </Box>
+            </Button>
         );
     },
 );

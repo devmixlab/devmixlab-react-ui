@@ -1,6 +1,6 @@
 import React, { useEffect, useState, forwardRef } from 'react';
 import clsx from 'clsx';
-import { Box, BoxComponentProps, type BoxProps } from '../Box/Box';
+import { Box, BoxComponentProps, type BoxProps } from '../Box';
 import { createPolymorphic } from '../../types/polymorphic';
 import { LoadingPosition, Size, Intent, Variant } from './Button.tokens';
 import { isLongNumber, prefix } from './Button.helpers';
@@ -27,39 +27,10 @@ type OwnButtonProps = {
     iconSlotWidth?: number | string;
 };
 
-type ButtonProps<C extends React.ElementType = 'button'> = Omit<BoxComponentProps<C>, 'size'> &
-    OwnButtonProps;
-
-// type ButtonProps<C extends React.ElementType = 'button'> = BoxComponentProps<
-//     C,
-//     {
-//         className?: string;
-//         children?: React.ReactNode;
-//         intent?: Intent;
-//         variant?: Variant;
-//         size?: Size;
-//         number?: number; // to format value as tabular-nums
-//         disabled?: boolean;
-//         active?: boolean; // selected / current (pagination, tabs)
-//         noInteraction?: boolean; // removes hover/active interaction styles
-//         rounded?: BoxProps['rounded'];
-//         iconOnly?: boolean;
-//         startIcon?: React.ReactNode;
-//         endIcon?: React.ReactNode;
-//         loading?: boolean;
-//         loadingPosition?: LoadingPosition;
-//         spinnerDelay?: number;
-//         loadingComponent?: React.ReactNode;
-//         iconSlotWidth?: number | string;
-//     }
-// >;
+type ButtonProps = Omit<BoxComponentProps<'button'>, 'size'> & OwnButtonProps;
 
 type ButtonImplProps = ButtonProps & {
     as?: React.ElementType;
-    type?: 'button' | 'submit' | 'reset';
-} & {
-    onClick?: React.MouseEventHandler<any>;
-    onKeyDown?: React.KeyboardEventHandler<any>;
 };
 
 const ButtonImpl = (
