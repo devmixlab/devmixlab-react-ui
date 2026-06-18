@@ -4,6 +4,10 @@
 
 .#{$accordion-prefix} {
 
+    // -------------------------------------------------------------------------
+    // Base variables
+    // -------------------------------------------------------------------------
+
     --accordion-padding-y: 1rem;
     --accordion-padding-x: 1.25rem;
 
@@ -15,6 +19,9 @@
 
     --accordion-border-width: 1px;
     --accordion-ring: var(--#{$p}-accent-primary);
+
+    --accordion-icon-size: 1.2em;
+    --accordion-icon-transform: rotate(-180deg);
 
     // -------------------------------------------------------------------------
     // Colors
@@ -35,6 +42,9 @@
     --accordion-content-bg: transparent;
     --accordion-content-color: var(--accordion-color);
 
+    --accordion-icon-color: var(--accordion-color);
+    --accordion-icon-active-color: var(--accordion-trigger-active-color);
+
     @include dark {
         --accordion-color: #{intent(gray, 100)};
         --accordion-bg: transparent;
@@ -53,42 +63,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // Motion
-    // -------------------------------------------------------------------------
-
-    --accordion-transition-duration: var(--#{$p}-duration-normal);
-    --accordion-transition-easing: var(--#{$p}-ease-standard);
-
-    --accordion-transition:
-        background-color var(--accordion-transition-duration)
-        var(--accordion-transition-easing),
-        color var(--accordion-transition-duration)
-        var(--accordion-transition-easing),
-        border-color var(--accordion-transition-duration)
-        var(--accordion-transition-easing),
-        transform var(--accordion-transition-duration)
-        var(--accordion-transition-easing);
-
-    // -------------------------------------------------------------------------
-    // Icon
-    // -------------------------------------------------------------------------
-
-    --accordion-icon-size: 1.2em;
-
-    --accordion-icon-color: var(--accordion-color);
-
-    --accordion-icon-active-color: var(--accordion-trigger-active-color);
-
-    --accordion-icon-transition:
-        transform var(--accordion-transition-duration)
-        var(--accordion-transition-easing),
-        opacity var(--accordion-transition-duration)
-        var(--accordion-transition-easing);
-
-    --accordion-icon-transform: rotate(-180deg);
-
-    // -------------------------------------------------------------------------
-    // Base
+    // Base properties
     // -------------------------------------------------------------------------
 
     display: flex;
@@ -103,121 +78,126 @@
         var(--accordion-border-color);
 
     overflow: hidden;
-}
 
-.#{$accordion-prefix}__item {
-    //border-radius: inherit;
-    border-bottom:
-        var(--accordion-border-width)
-        solid
-        var(--accordion-border-color);
+    // -------------------------------------------------------------------------
+    // Subtags
+    // -------------------------------------------------------------------------
 
-    &:last-child {
-        border-bottom: none;
-    }
+    .#{$accordion-prefix} {
+        &__item {
+            //border-radius: inherit;
+            border-bottom:
+                var(--accordion-border-width)
+                solid
+                var(--accordion-border-color);
 
-    &[data-state='open'] {
-        .#{$accordion-prefix}__trigger {
-            background-color: var(--accordion-trigger-active-bg);
-            color: var(--accordion-trigger-active-color);
+            &:last-child {
+                border-bottom: none;
+            }
 
-            border-top-left-radius: inherit;
-            border-top-right-radius: inherit;
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
+            &[data-state='open'] {
+                .#{$accordion-prefix}__trigger {
+                    background-color: var(--accordion-trigger-active-bg);
+                    color: var(--accordion-trigger-active-color);
+
+                    border-top-left-radius: inherit;
+                    border-top-right-radius: inherit;
+                    border-bottom-left-radius: 0;
+                    border-bottom-right-radius: 0;
+                }
+            }
+
+            &:first-child {
+                border-top-left-radius: inherit;
+                border-top-right-radius: inherit;
+            }
+
+            &:last-child {
+                border-bottom-left-radius: inherit;
+                border-bottom-right-radius: inherit;
+
+                overflow: hidden;
+            }
+            &[data-disabled] {
+                opacity: 0.6;
+            }
+        }
+
+        &__trigger {
+            border-radius: inherit;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            width: 100%;
+
+            cursor: pointer;
+
+            background-color: var(--accordion-trigger-bg);
+            color: var(--accordion-trigger-color);
+
+            border: none;
+            outline: none;
+
+            text-align: left;
+
+            padding:
+                var(--accordion-trigger-padding-y)
+                var(--accordion-trigger-padding-x);
+
+            transition: var(--accordion-transition);
+
+            &:not([data-disabled]):not([data-not-closable]):hover {
+                background-color: var(--accordion-trigger-hover-bg);
+            }
+
+            &:not([data-disabled]):focus-visible {
+                outline: 2px solid var(--accordion-ring);
+                outline-offset: -2px;
+            }
+
+            &[data-disabled] {
+                cursor: not-allowed;
+            }
+
+            &[data-not-closable] {
+                cursor: default;
+                .#{$accordion-prefix}__chevron {
+                    opacity: 0.6;
+                }
+            }
+        }
+
+        &__chevron {
+            flex-shrink: 0;
+
+            width: var(--accordion-icon-size);
+            height: var(--accordion-icon-size);
+            font-size: var(--accordion-icon-size);
+
+            color: var(--accordion-icon-color);
+
+            opacity: 0.8;
+
+            transition: transform var(--accordion-chevron-duration) var(--accordion-chevron-easing);
+
+            &[data-state='open'] {
+                transform: var(--accordion-icon-transform);
+                opacity: 1;
+                color: var(--accordion-icon-active-color);
+            }
+        }
+
+        &__content {
+            overflow: hidden;
+
+            background-color: var(--accordion-content-bg);
+            color: var(--accordion-content-color);
+
+            padding:
+                var(--accordion-body-padding-y)
+                var(--accordion-body-padding-x);
         }
     }
-}
-
-.#{$accordion-prefix}__item:first-child {
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
-}
-
-.#{$accordion-prefix}__item:last-child {
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-
-    overflow: hidden;
-}
-
-.#{$accordion-prefix}__trigger {
-    border-radius: inherit;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-
-    cursor: pointer;
-
-    background-color: var(--accordion-trigger-bg);
-    color: var(--accordion-trigger-color);
-
-    border: none;
-    outline: none;
-
-    text-align: left;
-
-    padding:
-        var(--accordion-trigger-padding-y)
-        var(--accordion-trigger-padding-x);
-
-    transition: var(--accordion-transition);
-
-    &:not([data-disabled]):not([data-not-closable]):hover {
-        background-color: var(--accordion-trigger-hover-bg);
-    }
-
-    &:not([data-disabled]):focus-visible {
-        outline: 2px solid var(--accordion-ring);
-        outline-offset: -2px;
-    }
-}
-
-.#{$accordion-prefix}__item[data-disabled] {
-    opacity: 0.6;
-}
-
-.#{$accordion-prefix}__trigger[data-disabled] {
-    cursor: not-allowed;
-}
-
-.#{$accordion-prefix}__trigger[data-not-closable] {
-    cursor: default;
-    .#{$accordion-prefix}__chevron {
-        opacity: 0.6;
-    }
-}
-
-.#{$accordion-prefix}__chevron {
-    flex-shrink: 0;
-
-    width: var(--accordion-icon-size);
-    height: var(--accordion-icon-size);
-    font-size: var(--accordion-icon-size);
-
-    color: var(--accordion-icon-color);
-
-    opacity: 0.8;
-
-    transition: transform var(--accordion-chevron-duration) var(--accordion-chevron-easing);
-
-    &[data-state='open'] {
-        transform: var(--accordion-icon-transform);
-        opacity: 1;
-        color: var(--accordion-icon-active-color);
-    }
-}
-
-.#{$accordion-prefix}__content {
-    overflow: hidden;
-
-    background-color: var(--accordion-content-bg);
-    color: var(--accordion-content-color);
-
-    padding:
-        var(--accordion-body-padding-y)
-        var(--accordion-body-padding-x);
 }
