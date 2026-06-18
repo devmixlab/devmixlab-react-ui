@@ -65,6 +65,7 @@ type OwnCarouselProps = {
     disableMotion?: boolean;
 
     dragThreshold?: number;
+    minMomentumVelocity?: number;
 
     loop?: boolean;
 
@@ -124,6 +125,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             disableMotion = false,
 
             dragThreshold = 6,
+            minMomentumVelocity = 2,
 
             loop = false,
 
@@ -172,6 +174,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             trackRef,
             draggable,
             dragThreshold,
+            minMomentumVelocity,
             prefersReducedMotion,
             onDragStart,
             onDragEnd,
@@ -504,6 +507,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 draggable,
                 prefersReducedMotion,
                 dragThreshold,
+                dragVelocity: minMomentumVelocity,
                 loop,
                 onDragStart,
                 onDragEnd,
@@ -527,6 +531,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 draggable,
                 prefersReducedMotion,
                 dragThreshold,
+                minMomentumVelocity,
                 loop,
                 onDragStart,
                 onDragEnd,

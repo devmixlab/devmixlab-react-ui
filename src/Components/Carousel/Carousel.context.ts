@@ -27,6 +27,7 @@ export type CarouselContextValue = {
     draggable: boolean;
     prefersReducedMotion: boolean;
     dragThreshold: number;
+    dragVelocity: number;
 
     loop: boolean;
 

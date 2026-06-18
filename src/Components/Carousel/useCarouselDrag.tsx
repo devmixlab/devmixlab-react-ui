@@ -10,6 +10,13 @@ export type UseCarouselDragOptions = {
     /** Minimum pixel movement before a drag is registered. */
     dragThreshold?: number;
 
+    /**
+     * Minimum momentum velocity applied after release.
+     * Flick gestures slower than this value will be boosted
+     * to maintain a responsive feel.
+     */
+    minMomentumVelocity?: number;
+
     /** Skip momentum scrolling when true. */
     prefersReducedMotion?: boolean;
 
@@ -47,10 +54,16 @@ export type UseCarouselDragReturn = {
     isOverscrollingRef: React.MutableRefObject<boolean>;
 };
 
+const MOMENTUM_START_THRESHOLD = 0.08;
+const MOMENTUM_STOP_THRESHOLD = 0.02;
+const MOMENTUM_DECAY = 0.965;
+const MOMENTUM_MULTIPLIER = 18;
+
 export function useCarouselDrag({
     trackRef,
     draggable = true,
     dragThreshold = 6,
+    minMomentumVelocity = 0.32,
     prefersReducedMotion = false,
     overscroll = true,
     onDragStart,
@@ -73,8 +86,8 @@ export function useCarouselDrag({
     const lastTimeRef = useRef(0);
 
     const velocityRef = useRef(0);
-    const lastMoveTimeRef = useRef(0);
-    const lastMoveXRef = useRef(0);
+    // const lastMoveTimeRef = useRef(0);
+    // const lastMoveXRef = useRef(0);
 
     const overscrollRef = useRef(0);
 
@@ -267,33 +280,33 @@ export function useCarouselDrag({
             return;
         }
 
+        if (Math.abs(velocityRef.current) <= MOMENTUM_START_THRESHOLD) {
+            finish();
+            return;
+        }
+
         isMomentumRef.current = true;
 
-        const MIN_FLICK_VELOCITY = 0.32;
-
-        if (
-            Math.abs(velocityRef.current) > 0.08 &&
-            Math.abs(velocityRef.current) < MIN_FLICK_VELOCITY
-        ) {
+        if (Math.abs(velocityRef.current) < minMomentumVelocity) {
             velocityRef.current =
-                velocityRef.current > 0 ? MIN_FLICK_VELOCITY : -MIN_FLICK_VELOCITY;
+                velocityRef.current > 0 ? minMomentumVelocity : -minMomentumVelocity;
         }
 
         const momentum = () => {
-            velocityRef.current *= 0.965;
+            velocityRef.current *= MOMENTUM_DECAY;
 
-            if (Math.abs(velocityRef.current) < 0.02) {
+            if (Math.abs(velocityRef.current) < MOMENTUM_STOP_THRESHOLD) {
                 finish();
                 return;
             }
 
-            el.scrollLeft -= velocityRef.current * 18;
+            el.scrollLeft -= velocityRef.current * MOMENTUM_MULTIPLIER;
 
             momentumRef.current = requestAnimationFrame(momentum);
         };
 
         momentum();
-    }, [trackRef, prefersReducedMotion, onDragEnd, overscroll]);
+    }, [trackRef, prefersReducedMotion, onDragEnd, overscroll, minMomentumVelocity]);
 
     return {
         startDrag,
