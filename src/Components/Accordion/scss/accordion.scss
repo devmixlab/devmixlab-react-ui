@@ -2,15 +2,44 @@
 @use '../../../scss/mixins/mode' as *;
 @use '../../../scss/functions/common' as *;
 @use './accordion-vars' as *;
+@use './accordion-mixins' as *;
 @use 'sass:map';
 
-@mixin setDensity($conf) {
-    --accordion-trigger-padding-y: #{map.get($conf, trigger-y)};
-    --accordion-trigger-padding-x: #{map.get($conf, trigger-x)};
-
-    --accordion-content-padding-y: #{map.get($conf, content-y)};
-    --accordion-content-padding-x: #{map.get($conf, content-x)};
-}
+// -------------------------------------------------------------------------
+// CSS Variables
+// -------------------------------------------------------------------------
+//
+// Layout
+// --accordion-border-width
+// --accordion-trigger-padding-y
+// --accordion-trigger-padding-x
+// --accordion-content-padding-y
+// --accordion-content-padding-x
+//
+// Colors
+// --accordion-color
+// --accordion-bg
+// --accordion-border-color
+// --accordion-trigger-color
+// --accordion-trigger-bg
+// --accordion-trigger-bg-hover
+// --accordion-trigger-active-bg
+// --accordion-trigger-active-bg-hover
+// --accordion-trigger-active-color
+// --accordion-content-bg
+// --accordion-content-color
+// --accordion-icon-color
+// --accordion-icon-active-color
+// --accordion-ring
+//
+// Icon
+// --accordion-icon-size
+// --accordion-icon-transform
+//
+// Motion
+// --accordion-trigger-duration
+// --accordion-trigger-easing
+// -------------------------------------------------------------------------
 
 .#{$accordion-prefix} {
 
@@ -26,55 +55,11 @@
     // Base variables
     // -------------------------------------------------------------------------
 
-    --accordion-padding-y: 1rem;
-    --accordion-padding-x: 1.25rem;
-
     --accordion-border-width: 1px;
     --accordion-ring: var(--#{$p}-accent-primary);
 
     --accordion-icon-size: 1.2em;
     --accordion-icon-transform: rotate(-180deg);
-
-    // -------------------------------------------------------------------------
-    // Colors
-    // -------------------------------------------------------------------------
-
-    --accordion-color: #{intent(gray, 900)};
-    --accordion-bg: transparent;
-
-    --accordion-border-color: #{intent(gray, 300)};
-
-    --accordion-trigger-color: var(--accordion-color);
-    --accordion-trigger-bg: #{intent(gray, 100)};
-    --accordion-trigger-bg-hover: #{intent(gray, 200)};
-
-    --accordion-trigger-active-bg: #{intent(primary, 200)};
-    --accordion-trigger-active-bg-hover: #{intent(primary, 250)};
-    --accordion-trigger-active-color: #{intent(primary, 800)};
-
-    --accordion-content-bg: transparent;
-    --accordion-content-color: var(--accordion-color);
-
-    --accordion-icon-color: var(--accordion-color);
-    --accordion-icon-active-color: var(--accordion-trigger-active-color);
-
-    @include dark {
-        --accordion-color: #{intent(gray, 100)};
-        --accordion-bg: transparent;
-
-        --accordion-border-color: #{intent(gray, 800)};
-
-        --accordion-trigger-color: var(--accordion-color);
-        --accordion-trigger-bg: #{intent(gray, 900)};
-        --accordion-trigger-bg-hover: #{intent(gray, 800)};
-
-        --accordion-trigger-active-bg: #{intent(primary, 800)};
-        --accordion-trigger-active-bg-hover: #{intent(primary, 750)};
-        --accordion-trigger-active-color: #{intent(primary, 0)};
-
-        --accordion-content-bg: transparent;
-        --accordion-content-color: var(--accordion-color);
-    }
 
     // -------------------------------------------------------------------------
     // Base properties
@@ -86,10 +71,7 @@
     background-color: var(--accordion-bg);
     color: var(--accordion-color);
 
-    border:
-        var(--accordion-border-width)
-        solid
-        var(--accordion-border-color);
+    border: var(--accordion-border-width) solid var(--accordion-border-color);
 
     overflow: hidden;
 
@@ -100,26 +82,11 @@
     .#{$accordion-prefix} {
         &__item {
             //border-radius: inherit;
-            border-bottom:
-                var(--accordion-border-width)
-                solid
-                var(--accordion-border-color);
+            border-bottom: var(--accordion-border-width) solid var(--accordion-border-color);
 
             &:last-child {
                 border-bottom: none;
             }
-
-            //&[data-state='open'] {
-            //    .#{$accordion-prefix}__trigger {
-            //        background-color: var(--accordion-trigger-active-bg);
-            //        color: var(--accordion-trigger-active-color);
-            //
-            //        border-top-left-radius: inherit;
-            //        border-top-right-radius: inherit;
-            //        border-bottom-left-radius: 0;
-            //        border-bottom-right-radius: 0;
-            //    }
-            //}
 
             &:first-child {
                 border-top-left-radius: inherit;
@@ -132,6 +99,7 @@
 
                 overflow: hidden;
             }
+
             &[data-disabled] {
                 opacity: 0.6;
             }
@@ -160,19 +128,15 @@
 
             text-align: left;
 
-            padding:
-                var(--accordion-trigger-padding-y)
-                var(--accordion-trigger-padding-x);
+            padding: var(--accordion-trigger-padding-y) var(--accordion-trigger-padding-x);
 
             //transition: var(--accordion-transition);
-            transition:
-                background-color var(--collapse-trigger-transition),
-                color var(--collapse-trigger-transition);
+            transition: background-color var(--collapse-trigger-transition),
+            color var(--collapse-trigger-transition);
 
             &:not([data-disabled]):not([data-not-closable]):hover {
-                &:not([data-state='open']) {
-                    background-color: var(--accordion-trigger-bg-hover);
-                }
+                background-color: var(--accordion-trigger-bg-hover);
+
                 &[data-state='open'] {
                     background-color: var(--accordion-trigger-active-bg-hover);
                 }
@@ -199,6 +163,7 @@
 
             &[data-not-closable] {
                 cursor: default;
+
                 .#{$accordion-prefix}__chevron {
                     opacity: 0.6;
                 }
@@ -231,9 +196,46 @@
             background-color: var(--accordion-content-bg);
             color: var(--accordion-content-color);
 
-            padding:
-                var(--accordion-content-padding-y)
-                var(--accordion-content-padding-x);
+            padding: var(--accordion-content-padding-y) var(--accordion-content-padding-x);
         }
     }
+
+    @include subtle();
+
+    &[data-variant='subtle'] {
+        @include subtle();
+    }
+
+    &[data-variant='outline'] {
+        @include outline();
+    }
+
+    &[data-variant='solid'] {
+        @include solid();
+    }
+
+    &[data-variant='ghost'] {
+        @include ghost();
+    }
+
+    @include dark {
+        @include subtle('dark');
+
+        &[data-variant='subtle'] {
+            @include subtle('dark');
+        }
+
+        &[data-variant='outline'] {
+            @include outline('dark');
+        }
+
+        &[data-variant='solid'] {
+            @include solid('dark');
+        }
+
+        &[data-variant='ghost'] {
+            @include ghost('dark');
+        }
+    }
+
 }

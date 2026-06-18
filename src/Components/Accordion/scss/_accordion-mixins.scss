@@ -1,0 +1,178 @@
+@use '../../../scss/functions/common' as *;
+@use 'sass:map';
+
+@mixin setDensity($conf) {
+    --accordion-trigger-padding-y: #{map.get($conf, trigger-y)};
+    --accordion-trigger-padding-x: #{map.get($conf, trigger-x)};
+
+    --accordion-content-padding-y: #{map.get($conf, content-y)};
+    --accordion-content-padding-x: #{map.get($conf, content-x)};
+}
+
+@mixin subtle($mode: 'light') {
+    @if $mode == 'light' {
+        --accordion-color: #{intent(gray, 900)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: #{intent(gray, 200)};
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: transparent;
+        --accordion-trigger-bg-hover: #{intent(gray, 100)};
+
+        --accordion-trigger-active-bg: #{intent(primary, 100)};
+        --accordion-trigger-active-bg-hover: #{intent(primary, 150)};
+        --accordion-trigger-active-color: #{intent(primary, 800)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    } @else {
+        --accordion-color: #{intent(gray, 100)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: #{intent(gray, 800)};
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: transparent;
+        --accordion-trigger-bg-hover: #{intent(gray, 900)};
+
+        --accordion-trigger-active-bg: #{intent(primary, 900)};
+        --accordion-trigger-active-bg-hover: #{intent(primary, 800)};
+        --accordion-trigger-active-color: #{intent(primary, 100)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    }
+}
+
+@mixin outline($mode: 'light') {
+    @if $mode == 'light' {
+        --accordion-color: #{intent(gray, 900)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: #{intent(gray, 300)};
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: transparent;
+        --accordion-trigger-bg-hover: #{intent(gray, 50)};
+
+        --accordion-trigger-active-bg: transparent;
+        --accordion-trigger-active-bg-hover: #{intent(primary, 50)};
+        --accordion-trigger-active-color: #{intent(primary, 700)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    } @else {
+        --accordion-color: #{intent(gray, 100)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: #{intent(gray, 700)};
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: transparent;
+        --accordion-trigger-bg-hover: #{intent(gray, 900)};
+
+        --accordion-trigger-active-bg: transparent;
+        --accordion-trigger-active-bg-hover: #{intent(primary, 950)};
+        --accordion-trigger-active-color: #{intent(primary, 200)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    }
+}
+
+@mixin solid($mode: 'light') {
+    @if $mode == 'light' {
+        --accordion-color: #{intent(gray, 900)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: #{intent(gray, 300)};
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: #{intent(gray, 100)};
+        --accordion-trigger-bg-hover: #{intent(gray, 200)};
+
+        --accordion-trigger-active-bg: #{intent(primary, 200)};
+        --accordion-trigger-active-bg-hover: #{intent(primary, 250)};
+        --accordion-trigger-active-color: #{intent(primary, 800)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    } @else {
+        --accordion-color: #{intent(gray, 100)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: #{intent(gray, 800)};
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: #{intent(gray, 900)};
+        --accordion-trigger-bg-hover: #{intent(gray, 800)};
+
+        --accordion-trigger-active-bg: #{intent(primary, 800)};
+        --accordion-trigger-active-bg-hover: #{intent(primary, 750)};
+        --accordion-trigger-active-color: #{intent(primary, 0)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    }
+}
+
+@mixin ghost($mode: 'light') {
+    @if $mode == 'light' {
+        --accordion-color: #{intent(gray, 900)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: transparent;
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: transparent;
+        --accordion-trigger-bg-hover: #{intent(gray, 100)};
+
+        --accordion-trigger-active-bg: transparent;
+        --accordion-trigger-active-bg-hover: #{intent(primary, 50)};
+        --accordion-trigger-active-color: #{intent(primary, 700)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    } @else {
+        --accordion-color: #{intent(gray, 100)};
+        --accordion-bg: transparent;
+
+        --accordion-border-color: transparent;
+
+        --accordion-trigger-color: var(--accordion-color);
+        --accordion-trigger-bg: transparent;
+        --accordion-trigger-bg-hover: #{intent(gray, 900)};
+
+        --accordion-trigger-active-bg: transparent;
+        --accordion-trigger-active-bg-hover: #{intent(primary, 950)};
+        --accordion-trigger-active-color: #{intent(primary, 200)};
+
+        --accordion-content-bg: transparent;
+        --accordion-content-color: var(--accordion-color);
+
+        --accordion-icon-color: var(--accordion-color);
+        --accordion-icon-active-color: var(--accordion-trigger-active-color);
+    }
+}

@@ -38,6 +38,9 @@ const prefix = (name = '') => classPrefix(`--accordion${name}`);
 // Types
 // -----------------------------------------------------------------------------
 
+const accordionVariants = ['solid', 'subtle', 'outline', 'ghost'] as const;
+type AccordionVariant = (typeof accordionVariants)[number];
+
 const accordionDensities = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const;
 type AccordionDensity = (typeof accordionDensities)[number];
 
@@ -49,7 +52,7 @@ type OwnAccordionProps = {
     defaultValue?: string[];
     value?: string[];
     onValueChange?: (value: string[]) => void;
-    variant?: string;
+    variant?: AccordionVariant | (string & {});
     density?: Responsive<AccordionDensity>;
 };
 
@@ -73,7 +76,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             defaultValue = [],
             value: valueProp,
             onValueChange,
-            variant,
+            variant = 'solid',
             density: densityProp,
 
             enterDuration = 200,
@@ -502,4 +505,7 @@ export type {
     AccordionItemProps,
     AccordionTriggerProps,
     AccordionContentProps,
+    AccordionVariant,
 };
+
+export { accordionVariants, accordionDensities };
