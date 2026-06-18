@@ -18,8 +18,8 @@ import React, {
 
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps } from '../Components/Box/Box';
-import { classPrefix } from '../utils/classPrefix';
+import { Box, BoxComponentProps } from '../Box';
+import { classPrefix } from '../../utils/classPrefix';
 
 import { useCarouselDrag, UseCarouselDragReturn } from './useCarouselDrag';
 import { useCarouselAutoplay } from './useCarouselAutoplay';
