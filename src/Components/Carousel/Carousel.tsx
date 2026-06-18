@@ -25,61 +25,13 @@ import { useCarouselDrag, UseCarouselDragReturn } from './useCarouselDrag';
 import { useCarouselAutoplay } from './useCarouselAutoplay';
 import { useCarouselKeyboard } from './useCarouselKeyboard';
 import { useCarouselVisibility } from './useCarouselVisibility';
+import { CarouselContextValue, CarouselContext, useCarouselContext } from './Carousel.context';
 
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
 
 const prefix = (name = '') => classPrefix(`--carousel${name}`);
-
-// -----------------------------------------------------------------------------
-// Context
-// -----------------------------------------------------------------------------
-
-type CarouselContextValue = {
-    trackRef: React.MutableRefObject<HTMLDivElement | null>;
-    activeIndexRef: React.MutableRefObject<number>;
-
-    carouselDrag: UseCarouselDragReturn;
-    stopAnimation: () => void;
-
-    scrollPrev: () => void;
-    scrollNext: () => void;
-
-    canScrollPrev: boolean;
-    canScrollNext: boolean;
-
-    slidesPerView: number;
-    slidesPerScroll: number;
-    gap: number;
-
-    activeIndex: number;
-    pageCount: number;
-
-    scrollTo: (index: number, speed?: number) => void;
-    updatePageCount: () => void;
-
-    draggable: boolean;
-    prefersReducedMotion: boolean;
-    dragThreshold: number;
-
-    loop: boolean;
-
-    onDragStart?: () => void;
-    onDragEnd?: () => void;
-};
-
-const CarouselContext = createContext<CarouselContextValue | null>(null);
-
-const useCarouselContext = () => {
-    const ctx = useContext(CarouselContext);
-
-    if (!ctx) {
-        throw new Error('Carousel components must be used inside <Carousel>');
-    }
-
-    return ctx;
-};
 
 // -----------------------------------------------------------------------------
 // Types
@@ -89,47 +41,46 @@ export type CarouselHandle = {
     sync: () => void;
 };
 
-export type CarouselProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
-    {
-        activeIndex?: number;
-        defaultActiveIndex?: number;
-        onActiveIndexChange?: (index: number) => void;
+type OwnCarouselProps = {
+    activeIndex?: number;
+    defaultActiveIndex?: number;
+    onActiveIndexChange?: (index: number) => void;
 
-        overscroll?: boolean;
+    overscroll?: boolean;
 
-        gap?: number;
+    gap?: number;
 
-        slidesPerView?: number;
-        slidesPerScroll?: number;
+    slidesPerView?: number;
+    slidesPerScroll?: number;
 
-        autoplay?: boolean;
-        autoplayDelay?: number;
-        autoplaySpeed?: number;
-        goToSpeed?: number;
-        pauseOnHover?: boolean;
-        pauseOnFocus?: boolean;
+    autoplay?: boolean;
+    autoplayDelay?: number;
+    autoplaySpeed?: number;
+    goToSpeed?: number;
+    pauseOnHover?: boolean;
+    pauseOnFocus?: boolean;
 
-        draggable?: boolean;
+    draggable?: boolean;
 
-        disableMotion?: boolean;
+    disableMotion?: boolean;
 
-        dragThreshold?: number;
+    dragThreshold?: number;
 
-        loop?: boolean;
+    loop?: boolean;
 
-        onPageChange?: (index: number) => void;
-        onVisibilityChange?: (visibleIndexes: number[]) => void;
-        onSlideVisible?: (index: number) => void;
-        onSlideHidden?: (index: number) => void;
-        onReachStart?: () => void;
-        onReachEnd?: () => void;
-        onDragStart?: () => void;
-        onDragEnd?: () => void;
-        onAutoplayStart?: () => void;
-        onAutoplayStop?: () => void;
-    }
->;
+    onPageChange?: (index: number) => void;
+    onVisibilityChange?: (visibleIndexes: number[]) => void;
+    onSlideVisible?: (index: number) => void;
+    onSlideHidden?: (index: number) => void;
+    onReachStart?: () => void;
+    onReachEnd?: () => void;
+    onDragStart?: () => void;
+    onDragEnd?: () => void;
+    onAutoplayStart?: () => void;
+    onAutoplayStop?: () => void;
+};
+
+export type CarouselProps = BoxComponentProps<'div', OwnCarouselProps>;
 
 type CarouselCompound = typeof CarouselRoot & {
     Track: typeof CarouselTrack;

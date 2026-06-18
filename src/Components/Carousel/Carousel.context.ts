@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { UseCarouselDragReturn } from './useCarouselDrag';
 
-type CarouselContextValue = {
+export type CarouselContextValue = {
     trackRef: React.MutableRefObject<HTMLDivElement | null>;
     activeIndexRef: React.MutableRefObject<number>;
 
@@ -34,9 +34,9 @@ type CarouselContextValue = {
     onDragEnd?: () => void;
 };
 
-const CarouselContext = createContext<CarouselContextValue | null>(null);
+export const CarouselContext = createContext<CarouselContextValue | null>(null);
 
-const useCarouselContext = () => {
+export const useCarouselContext = () => {
     const ctx = useContext(CarouselContext);
 
     if (!ctx) {
