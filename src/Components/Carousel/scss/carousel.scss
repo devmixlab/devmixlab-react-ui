@@ -8,63 +8,6 @@
 $p: cfg.$prefix;
 $carousel-prefix: #{$p}--carousel;
 
-$control-icon-sizes: (
-    xs: (
-        size: 1.5rem,
-        icon-size: 0.75rem,
-    ),
-    sm: (
-        size: 2rem,
-        icon-size: 1rem,
-    ),
-    md: (
-        size: 2.5rem,
-        icon-size: 1.25rem,
-    ),
-    lg: (
-        size: 3rem,
-        icon-size: 1.5rem,
-    ),
-    xl: (
-        size: 3.5rem,
-        icon-size: 1.75rem,
-    ),
-);
-
-$control-text-sizes: (
-    xs: (
-        padding-y: 0.25rem,
-        padding-x: 0.5rem,
-        font-size: 0.75rem,
-    ),
-    sm: (
-        padding-y: 0.375rem,
-        padding-x: 0.75rem,
-        font-size: 0.875rem,
-    ),
-    md: (
-        padding-y: 0.5rem,
-        padding-x: 1rem,
-        font-size: 1rem,
-    ),
-    lg: (
-        padding-y: 0.625rem,
-        padding-x: 1.25rem,
-        font-size: 1.125rem,
-    ),
-    xl: (
-        padding-y: 0.75rem,
-        padding-x: 1.5rem,
-        font-size: 1.25rem,
-    ),
-);
-
-@mixin applyControlTextSize($conf) {
-    --carousel-control-padding-x: #{map.get($conf, padding-x)};
-    --carousel-control-padding-y: #{map.get($conf, padding-y)};
-    --carousel-control-font-size: #{map.get($conf, font-size)};
-}
-
 .#{$carousel-prefix} {
     --ring: var(--#{$p}-accent-primary);
 
@@ -101,29 +44,6 @@ $control-text-sizes: (
         }
 
         &__control {
-            //@include mixins.reset-button;
-
-
-            //&:not([data-icon-only]) {
-            //    @include applyControlTextSize(map.get($control-text-sizes, sm));
-            //
-            //    @each $size, $conf in $control-text-sizes {
-            //        &[data-control-size='#{$size}'] {
-            //            @include applyControlTextSize($conf);
-            //        }
-            //    }
-            //}
-
-            //display: inline-flex;
-            //align-items: center;
-            //justify-content: center;
-
-            //height: var(--carousel-control-height, auto);
-            //padding-inline: var(--carousel-control-padding-x, 0);
-            //padding-block: var(--carousel-control-padding-y, 0);
-            //font-size: var(--carousel-control-font-size, inherit);
-
-
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
@@ -134,74 +54,6 @@ $control-text-sizes: (
             &[data-control-direction='next'] {
                 right: 5px;
             }
-
-            //&[data-control-direction='prev'] {
-            //    left: 5px;
-            //}
-            //&[data-control-direction='next'] {
-            //    right: 5px;
-            //}
-
-            //background-color: var(--carousel-control-bg, transparent);
-            //color: var(--carousel-control-color, currentColor);
-            //border: var(--carousel-control-border-width, 1px) solid var(--carousel-control-border-color, transparent);
-
-            //cursor: pointer;
-
-            //&[data-disabled] {
-            //    cursor: not-allowed;
-            //    opacity: 0.5;
-            //}
-
-            //&[data-control-variant-preset] {
-            //    //border-radius: 9999px;
-            //    &[data-control-direction='prev'] {
-            //        left: 5px;
-            //    }
-            //    &[data-control-direction='next'] {
-            //        right: 0;
-            //    }
-            //}
-
-            //&[data-control-variant='solid'] {
-            //    --carousel-control-bg: #{intent(gray, 100)};
-            //    --carousel-control-color: #{intent(gray, 800)};
-            //    border: 1px solid transparent;
-            //
-            //    &:hover:not(:disabled) {
-            //        background-color: var(--carousel-control-bg-hover);
-            //    }
-            //}
-            //
-            //&[data-control-variant='subtle'] {
-            //    --carousel-control-bg: #{intent(gray, 100)};
-            //    --carousel-control-color: #{intent(gray, 800)};
-            //    --carousel-control-border-color: #{intent(gray, 300)};
-            //
-            //    &:hover:not(:disabled) {
-            //        background-color: var(--carousel-control-subtle-bg-hover);
-            //    }
-            //}
-            //
-            //&[data-control-variant='outline'] {
-            //    background-color: transparent;
-            //    color: var(--carousel-control-outline-color);
-            //    border: 1px solid var(--carousel-control-outline-border);
-            //
-            //    &:hover:not(:disabled) {
-            //        background-color: var(--carousel-control-outline-bg-hover);
-            //    }
-            //}
-            //
-            //&[data-control-variant='ghost'] {
-            //    background-color: transparent;
-            //    color: var(--carousel-control-ghost-color);
-            //    border: 1px solid transparent;
-            //
-            //    &:hover:not(:disabled) {
-            //        background-color: var(--carousel-control-ghost-bg-hover);
-            //    }
-            //}
         }
 
         &__indicators {

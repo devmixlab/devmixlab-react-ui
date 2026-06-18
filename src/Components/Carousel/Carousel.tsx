@@ -26,6 +26,7 @@ import { useCarouselDrag, UseCarouselDragReturn } from './useCarouselDrag';
 import { useCarouselAutoplay } from './useCarouselAutoplay';
 import { useCarouselKeyboard } from './useCarouselKeyboard';
 import { useCarouselVisibility } from './useCarouselVisibility';
+import { useCarouselControl, CarouselControlRenderElementProps } from './useCarouselControl';
 import { CarouselContextValue, CarouselContext, useCarouselContext } from './Carousel.context';
 import { ChevronLeft } from '../Icon';
 import { Button, ButtonProps } from '../Button';
@@ -741,17 +742,10 @@ const CarouselItem = forwardRef<HTMLDivElement, CarouselItemProps>(
 );
 
 // -----------------------------------------------------------------------------
-// Prev
+// Prev & Next controls
 // -----------------------------------------------------------------------------
 
-export type CarouselControlRenderElementProps = Omit<
-    React.ComponentPropsWithoutRef<'button'>,
-    'children'
-> & {
-    'data-control-direction': 'prev' | 'next';
-};
-
-export type CarouselControlRenderProps = {
+type CarouselControlRenderProps = {
     ref: React.Ref<HTMLButtonElement>;
     elementProps: CarouselControlRenderElementProps;
     className: string;
@@ -763,39 +757,15 @@ type CarouselButtonProps = {
 
 const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Prev', onClick, onKeyDown, render, ...rest }, ref) => {
-        const { scrollPrev, canScrollPrev, scrollTo, pageCount, activeIndex, loop, controlProps } =
-            useCarouselContext();
-
-        const { handleKeyDown } = useCarouselKeyboard({
-            activeIndex,
-            pageCount,
-            loop,
-            scrollTo,
-        });
+        const { controlProps } = useCarouselContext();
 
         const controlClassName = clsx(prefix('__control'), className);
 
-        const elementProps: CarouselControlRenderElementProps = {
-            onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-                controlProps?.onClick?.(e);
-                onClick?.(e);
-
-                if (!e.defaultPrevented) {
-                    scrollPrev();
-                }
-            },
-            onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
-                controlProps?.onKeyDown?.(e);
-                onKeyDown?.(e);
-
-                if (!e.defaultPrevented) {
-                    handleKeyDown(e);
-                }
-            },
-            disabled: !canScrollPrev,
-            'aria-label': 'Previous slide',
-            'data-control-direction': 'prev',
-        };
+        const elementProps = useCarouselControl({
+            direction: 'prev',
+            onClick,
+            onKeyDown,
+        });
 
         if (render) {
             return render({
@@ -820,45 +790,17 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     },
 );
 
-// -----------------------------------------------------------------------------
-// Next
-// -----------------------------------------------------------------------------
-
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Next', onClick, onKeyDown, render, ...rest }, ref) => {
-        const { scrollNext, canScrollNext, scrollTo, pageCount, activeIndex, loop, controlProps } =
-            useCarouselContext();
-
-        const { handleKeyDown } = useCarouselKeyboard({
-            activeIndex,
-            pageCount,
-            loop,
-            scrollTo,
-        });
+        const { controlProps } = useCarouselContext();
 
         const controlClassName = clsx(prefix('__control'), className);
 
-        const elementProps: CarouselControlRenderElementProps = {
-            onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-                controlProps?.onClick?.(e);
-                onClick?.(e);
-
-                if (!e.defaultPrevented) {
-                    scrollNext();
-                }
-            },
-            onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
-                controlProps?.onKeyDown?.(e);
-                onKeyDown?.(e);
-
-                if (!e.defaultPrevented) {
-                    handleKeyDown(e);
-                }
-            },
-            disabled: !canScrollNext,
-            'aria-label': 'Next slide',
-            'data-control-direction': 'next',
-        };
+        const elementProps = useCarouselControl({
+            direction: 'next',
+            onClick,
+            onKeyDown,
+        });
 
         if (render) {
             return render({
