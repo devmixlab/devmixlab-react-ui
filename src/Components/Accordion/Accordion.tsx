@@ -38,11 +38,6 @@ type OwnAccordionProps = {
     onValueChange?: (value: string[]) => void;
 };
 
-type AccordionCollapseProps = Omit<
-    OwnCollapseProps,
-    'open' | 'onMount' | 'onUnmount' | 'onEntered' | 'onExited'
->;
-
 export type AccordionProps = BoxComponentProps<
     'div',
     OwnAccordionProps & AccordionCollapseContextValue
@@ -70,8 +65,9 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
             keepMounted,
             reduceMotion,
-            chevronDuration = 150,
-            chevronEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+
+            triggerDuration = 150,
+            triggerEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
 
             rounded = 'md',
             shadow = 'none',
@@ -173,8 +169,8 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 exitEasing,
                 keepMounted,
                 reduceMotion,
-                chevronDuration,
-                chevronEasing,
+                triggerDuration,
+                triggerEasing,
             }),
             [
                 enterDuration,
@@ -183,8 +179,8 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 exitEasing,
                 keepMounted,
                 reduceMotion,
-                chevronDuration,
-                chevronEasing,
+                triggerDuration,
+                triggerEasing,
             ],
         );
 
@@ -261,8 +257,8 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 // -----------------------------------------------------------------------------
 
 export type AccordionTriggerProps = {
-    chevronDuration: number;
-    chevronEasing: string;
+    animationDuration?: number;
+    animationEasing?: string;
 } & BoxComponentProps<'button'>;
 
 const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
@@ -270,11 +266,15 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
         {
             children,
             className,
+            style,
+
             onClick,
             onKeyDown,
             onFocus,
-            chevronDuration: chevronDurationProp,
-            chevronEasing: chevronEasingProp,
+
+            animationDuration: animationDurationProp,
+            animationEasing: animationEasingProp,
+
             ...rest
         },
         ref,
@@ -283,10 +283,10 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
         const ctxAccordion = useAccordionContext();
         const item = useAccordionItemContext();
 
-        const chevronDuration = ctxCollapse?.reduceMotion
+        const animationDuration = ctxCollapse?.reduceMotion
             ? 0
-            : (chevronDurationProp ?? ctxCollapse?.chevronDuration);
-        const chevronEasing = chevronEasingProp ?? ctxCollapse?.chevronEasing;
+            : (animationDurationProp ?? ctxCollapse?.triggerDuration);
+        const animationEasing = animationEasingProp ?? ctxCollapse?.triggerEasing;
 
         const notClosable =
             !ctxAccordion.collapsible && item.open && ctxAccordion.value.length === 1;
@@ -309,6 +309,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
 
         return (
             <Box
+                {...rest}
                 as="button"
                 type="button"
                 tabIndex={item.disabled ? -1 : 0}
@@ -322,6 +323,14 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                         ref.current = node;
                     }
                 }}
+                style={
+                    {
+                        ...style,
+
+                        '--accordion-trigger-duration': `${animationDuration}ms`,
+                        '--accordion-trigger-easing': animationEasing,
+                    } as CSSProperties
+                }
                 id={item.triggerId}
                 className={clsx(prefix('__trigger'), className)}
                 aria-expanded={item.open}
@@ -374,19 +383,12 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                             break;
                     }
                 }}
-                {...rest}
             >
                 {children}
                 <ChevronDownIcon
                     className={prefix('__chevron')}
                     data-state={item.open ? 'open' : 'closed'}
                     aria-hidden
-                    style={
-                        {
-                            '--accordion-chevron-duration': `${chevronDuration}ms`,
-                            '--accordion-chevron-easing': chevronEasing,
-                        } as CSSProperties
-                    }
                 />
             </Box>
         );
@@ -397,10 +399,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
 // Content
 // -----------------------------------------------------------------------------
 
-export type AccordionContentProps = BoxComponentProps<
-    'div',
-    AccordionCollapseProps & Omit<CollapseProps, 'open'>
->;
+export type AccordionContentProps = BoxComponentProps<'div', Omit<CollapseProps, 'open'>>;
 
 const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
     (

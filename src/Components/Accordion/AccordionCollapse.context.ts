@@ -7,8 +7,8 @@ type AccordionCollapseContextValue = {
     exitEasing: string;
     keepMounted: boolean;
     reduceMotion: boolean;
-    chevronDuration: number;
-    chevronEasing: string;
+    triggerDuration: number;
+    triggerEasing: string;
 };
 
 const AccordionCollapseContext = createContext<AccordionCollapseContextValue | null>(null);

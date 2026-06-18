@@ -124,6 +124,10 @@
         }
 
         &__trigger {
+
+            --collapse-trigger-transition-custom: var(--accordion-trigger-duration) var(--accordion-trigger-duration);
+            --collapse-trigger-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
+
             border-radius: inherit;
 
             display: flex;
@@ -146,10 +150,15 @@
                 var(--accordion-trigger-padding-y)
                 var(--accordion-trigger-padding-x);
 
-            transition: var(--accordion-transition);
+            //transition: var(--accordion-transition);
+            transition:
+                background-color var(--collapse-trigger-transition),
+                color var(--collapse-trigger-transition);
 
             &:not([data-disabled]):not([data-not-closable]):hover {
-                background-color: var(--accordion-trigger-hover-bg);
+                &:not([data-state='open']) {
+                    background-color: var(--accordion-trigger-hover-bg);
+                }
             }
 
             &:not([data-disabled]):focus-visible {
@@ -180,7 +189,7 @@
 
             opacity: 0.8;
 
-            transition: transform var(--accordion-chevron-duration) var(--accordion-chevron-easing);
+            transition: transform var(--collapse-trigger-transition-custom);
 
             &[data-state='open'] {
                 transform: var(--accordion-icon-transform);
