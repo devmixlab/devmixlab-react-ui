@@ -5,8 +5,8 @@ type AccordionCollapseContextValue = {
     exitDuration: number;
     enterEasing: string;
     exitEasing: string;
-    keepMounted: boolean;
-    reduceMotion: boolean;
+    keepMounted?: boolean;
+    reduceMotion?: boolean;
     triggerDuration: number;
     triggerEasing: string;
 };

@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import { FocusableListResult, FocusableItem } from '../../hooks/useFocusableList';
+import { AccordionDensity } from './Accordion';
 
 type AccordionContextValue = {
     value: string[];
@@ -13,6 +14,7 @@ type AccordionContextValue = {
     unregisterFocusable: (id: string) => void;
 
     variant?: string;
+    density: AccordionDensity;
 };
 
 const AccordionContext = createContext<AccordionContextValue | null>(null);

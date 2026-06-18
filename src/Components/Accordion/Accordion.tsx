@@ -1,7 +1,15 @@
-import React, { forwardRef, useEffect, useMemo, useState, useCallback, CSSProperties } from 'react';
+import React, {
+    forwardRef,
+    useEffect,
+    useMemo,
+    useState,
+    useCallback,
+    CSSProperties,
+    HTMLAttributes,
+} from 'react';
 import { clsx } from 'clsx';
-import { Box, BoxComponentProps } from '../Box';
-import { Collapse, CollapseProps, OwnCollapseProps } from '../Collapse';
+import { Box, DerivedProps, BoxDerived } from '../Box';
+import { Collapse, CollapseProps } from '../Collapse';
 import { classPrefix } from '../../utils/classPrefix';
 import { AccordionContextValue, AccordionContext, useAccordionContext } from './Accordion.context';
 import {
@@ -17,6 +25,7 @@ import {
 import { useStableId } from '../../utils/useStableId';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { useFocusableList, FocusableItem } from '../../hooks/useFocusableList';
+import { resolveResponsive, Responsive, useBreakpoint } from '../../utils/responsive';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -28,21 +37,25 @@ const prefix = (name = '') => classPrefix(`--accordion${name}`);
 // Types
 // -----------------------------------------------------------------------------
 
+const accordionDensities = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const;
+type AccordionDensity = (typeof accordionDensities)[number];
+
 type OwnAccordionProps = {
-    chevronDuration: number;
-    chevronEasing: string;
+    chevronDuration?: number;
+    chevronEasing?: string;
     multiple?: boolean;
     collapsible?: boolean;
     defaultValue?: string[];
     value?: string[];
     onValueChange?: (value: string[]) => void;
     variant?: string;
+    density?: Responsive<AccordionDensity>;
 };
 
-export type AccordionProps = BoxComponentProps<
-    'div',
-    OwnAccordionProps & AccordionCollapseContextValue
->;
+export type AccordionProps = OwnAccordionProps &
+    DerivedProps &
+    Partial<AccordionCollapseContextValue> &
+    HTMLAttributes<HTMLDivElement>;
 
 // -----------------------------------------------------------------------------
 // Root component
@@ -60,6 +73,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             value: valueProp,
             onValueChange,
             variant,
+            density: densityProp,
 
             enterDuration = 200,
             exitDuration = 150,
@@ -78,6 +92,10 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
         },
         ref,
     ) => {
+        const { breakpoint } = useBreakpoint();
+
+        const density = resolveResponsive(densityProp, breakpoint) ?? 'xs';
+
         const stableId = useStableId('accordion');
 
         const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
@@ -152,6 +170,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 registerFocusable,
                 unregisterFocusable,
                 variant,
+                density,
             }),
             [
                 value,
@@ -162,6 +181,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 registerFocusable,
                 unregisterFocusable,
                 variant,
+                density,
             ],
         );
 
@@ -198,6 +218,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                         rounded={rounded}
                         shadow={shadow}
                         data-variant={variant}
+                        data-density={density}
                     >
                         {children}
                     </Box>
@@ -211,13 +232,14 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
 // Item
 // -----------------------------------------------------------------------------
 
-export type AccordionItemProps = BoxComponentProps<
-    'div',
-    {
-        value: string;
-        disabled?: boolean;
-    }
->;
+type OwnAccordionItemProps = {
+    value: string;
+    disabled?: boolean;
+};
+
+export type AccordionItemProps = OwnAccordionItemProps &
+    DerivedProps &
+    HTMLAttributes<HTMLDivElement>;
 
 const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
     ({ children, className, value, id, disabled = false, ...rest }, ref) => {
@@ -264,7 +286,8 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 export type AccordionTriggerProps = {
     animationDuration?: number;
     animationEasing?: string;
-} & BoxComponentProps<'button'>;
+} & DerivedProps &
+    HTMLAttributes<HTMLButtonElement>;
 
 const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
     (
@@ -313,7 +336,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
         ]);
 
         return (
-            <Box
+            <BoxDerived
                 {...rest}
                 as="button"
                 type="button"
@@ -395,7 +418,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
                     data-state={item.open ? 'open' : 'closed'}
                     aria-hidden
                 />
-            </Box>
+            </BoxDerived>
         );
     },
 );
@@ -404,7 +427,9 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
 // Content
 // -----------------------------------------------------------------------------
 
-export type AccordionContentProps = BoxComponentProps<'div', Omit<CollapseProps, 'open'>>;
+export type AccordionContentProps = Omit<CollapseProps, 'open'> &
+    DerivedProps &
+    HTMLAttributes<HTMLDivElement>;
 
 const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
     (
@@ -446,7 +471,7 @@ const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
 
         return (
             <Collapse open={ctxItem.open} {...collapseProps}>
-                <Box
+                <BoxDerived
                     {...rest}
                     ref={ref}
                     id={ctxItem.contentId}
@@ -456,7 +481,7 @@ const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
                     data-state={ctxItem.open ? 'open' : 'closed'}
                 >
                     {children}
-                </Box>
+                </BoxDerived>
             </Collapse>
         );
     },
@@ -473,3 +498,5 @@ const Accordion = Object.assign(AccordionRoot, {
 // -----------------------------------------------------------------------------
 
 export { Accordion };
+
+export type { AccordionDensity };
