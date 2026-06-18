@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
 import { FocusableListResult, FocusableItem } from '../../hooks/useFocusableList';
-import { OwnCollapseProps } from '../Collapse';
 
 type AccordionContextValue = {
     value: string[];
@@ -12,6 +11,8 @@ type AccordionContextValue = {
     focusable: FocusableListResult;
     registerFocusable: (item: FocusableItem) => void;
     unregisterFocusable: (id: string) => void;
+
+    variant?: string;
 };
 
 const AccordionContext = createContext<AccordionContextValue | null>(null);
@@ -26,31 +27,4 @@ const useAccordionContext = () => {
     return context;
 };
 
-type AccordionItemContextValue = {
-    value: string;
-    open: boolean;
-    disabled: boolean;
-    triggerId: string;
-    contentId: string;
-};
-
-const AccordionItemContext = createContext<AccordionItemContextValue | null>(null);
-
-const useAccordionItemContext = () => {
-    const context = useContext(AccordionItemContext);
-
-    if (!context) {
-        throw new Error('Accordion components must be used inside <Accordion.Item>.');
-    }
-
-    return context;
-};
-
-export {
-    AccordionContextValue,
-    AccordionContext,
-    useAccordionContext,
-    AccordionItemContextValue,
-    AccordionItemContext,
-    useAccordionItemContext,
-};
+export { AccordionContextValue, AccordionContext, useAccordionContext };

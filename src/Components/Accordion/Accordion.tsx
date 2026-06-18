@@ -36,6 +36,7 @@ type OwnAccordionProps = {
     defaultValue?: string[];
     value?: string[];
     onValueChange?: (value: string[]) => void;
+    variant?: string;
 };
 
 export type AccordionProps = BoxComponentProps<
@@ -58,6 +59,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             defaultValue = [],
             value: valueProp,
             onValueChange,
+            variant,
 
             enterDuration = 200,
             exitDuration = 150,
@@ -149,6 +151,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 focusable,
                 registerFocusable,
                 unregisterFocusable,
+                variant,
             }),
             [
                 value,
@@ -158,6 +161,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
                 focusable,
                 registerFocusable,
                 unregisterFocusable,
+                variant,
             ],
         );
 
@@ -188,11 +192,12 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
             <AccordionContext.Provider value={context}>
                 <AccordionCollapseContext.Provider value={collapseContext}>
                     <Box
+                        {...rest}
                         ref={ref}
                         className={clsx(prefix(), className)}
                         rounded={rounded}
                         shadow={shadow}
-                        {...rest}
+                        data-variant={variant}
                     >
                         {children}
                     </Box>

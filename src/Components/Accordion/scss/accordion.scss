@@ -34,9 +34,10 @@
 
     --accordion-trigger-color: var(--accordion-color);
     --accordion-trigger-bg: #{intent(gray, 100)};
-    --accordion-trigger-hover-bg: #{intent(gray, 200)};
+    --accordion-trigger-bg-hover: #{intent(gray, 200)};
 
     --accordion-trigger-active-bg: #{intent(primary, 200)};
+    --accordion-trigger-active-bg-hover: #{intent(primary, 250)};
     --accordion-trigger-active-color: #{intent(primary, 800)};
 
     --accordion-content-bg: transparent;
@@ -53,9 +54,10 @@
 
         --accordion-trigger-color: var(--accordion-color);
         --accordion-trigger-bg: #{intent(gray, 900)};
-        --accordion-trigger-hover-bg: #{intent(gray, 800)};
+        --accordion-trigger-bg-hover: #{intent(gray, 800)};
 
         --accordion-trigger-active-bg: #{intent(primary, 800)};
+        --accordion-trigger-active-bg-hover: #{intent(primary, 750)};
         --accordion-trigger-active-color: #{intent(primary, 0)};
 
         --accordion-content-bg: transparent;
@@ -157,7 +159,10 @@
 
             &:not([data-disabled]):not([data-not-closable]):hover {
                 &:not([data-state='open']) {
-                    background-color: var(--accordion-trigger-hover-bg);
+                    background-color: var(--accordion-trigger-bg-hover);
+                }
+                &[data-state='open'] {
+                    background-color: var(--accordion-trigger-active-bg-hover);
                 }
             }
 
