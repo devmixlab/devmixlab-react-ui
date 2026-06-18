@@ -14,6 +14,7 @@ import React, {
     useRef,
     useState,
     useImperativeHandle,
+    HTMLAttributes,
 } from 'react';
 
 import { clsx } from 'clsx';
@@ -35,11 +36,10 @@ import { Button, ButtonProps } from '../Button';
 
 const prefix = (name = '') => classPrefix(`--carousel${name}`);
 
-const controlDefaultProps = {
+const controlDefaultProps: ButtonProps = {
     rounded: 'full',
     intent: 'secondary',
-    // position: 'absolute',
-    // top: '-50%',
+    type: 'button',
 };
 
 // -----------------------------------------------------------------------------
@@ -744,29 +744,27 @@ const CarouselItem = forwardRef<HTMLDivElement, CarouselItemProps>(
 // Prev
 // -----------------------------------------------------------------------------
 
-type CarouselButtonProps = {} & ButtonProps;
+export type CarouselControlRenderElementProps = Omit<
+    React.ComponentPropsWithoutRef<'button'>,
+    'children'
+> & {
+    'data-control-direction': 'prev' | 'next';
+};
+
+export type CarouselControlRenderProps = {
+    ref: React.Ref<HTMLButtonElement>;
+    elementProps: CarouselControlRenderElementProps;
+    className: string;
+};
+
+type CarouselButtonProps = {
+    render?: (props: CarouselControlRenderProps) => React.ReactElement | null;
+} & ButtonProps;
 
 const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
-    ({ className, children = 'Prev', ...rest }, ref) => {
-        const {
-            scrollPrev,
-            canScrollPrev,
-            scrollNext,
-            scrollTo,
-            pageCount,
-            activeIndex,
-            loop,
-            controlProps,
-        } = useCarouselContext();
-
-        const mergedProps = {
-            ...controlDefaultProps,
-            ...{
-                left: 0,
-            },
-            ...controlProps,
-            ...rest,
-        };
+    ({ className, children = 'Prev', onClick, onKeyDown, render, ...rest }, ref) => {
+        const { scrollPrev, canScrollPrev, scrollTo, pageCount, activeIndex, loop, controlProps } =
+            useCarouselContext();
 
         const { handleKeyDown } = useCarouselKeyboard({
             activeIndex,
@@ -775,18 +773,47 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
             scrollTo,
         });
 
+        const controlClassName = clsx(prefix('__control'), className);
+
+        const elementProps: CarouselControlRenderElementProps = {
+            onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+                controlProps?.onClick?.(e);
+                onClick?.(e);
+
+                if (!e.defaultPrevented) {
+                    scrollPrev();
+                }
+            },
+            onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
+                controlProps?.onKeyDown?.(e);
+                onKeyDown?.(e);
+
+                if (!e.defaultPrevented) {
+                    handleKeyDown(e);
+                }
+            },
+            disabled: !canScrollPrev,
+            'aria-label': 'Previous slide',
+            'data-control-direction': 'prev',
+        };
+
+        if (render) {
+            return render({
+                ref,
+                elementProps,
+                className: controlClassName,
+            });
+        }
+
+        const mergedProps = {
+            ...controlDefaultProps,
+            ...controlProps,
+            ...rest,
+            ...elementProps,
+        };
+
         return (
-            <Button
-                {...mergedProps}
-                ref={ref}
-                className={clsx(prefix('__control'), className)}
-                type="button"
-                onClick={scrollPrev}
-                onKeyDown={handleKeyDown}
-                disabled={!canScrollPrev}
-                aria-label="Previous slide"
-                data-control-direction="prev"
-            >
+            <Button ref={ref} className={controlClassName} {...mergedProps}>
                 {children}
             </Button>
         );
@@ -798,18 +825,9 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 // -----------------------------------------------------------------------------
 
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
-    ({ className, children = 'Next', ...rest }, ref) => {
+    ({ className, children = 'Next', onClick, onKeyDown, render, ...rest }, ref) => {
         const { scrollNext, canScrollNext, scrollTo, pageCount, activeIndex, loop, controlProps } =
             useCarouselContext();
-
-        const mergedProps = {
-            ...controlDefaultProps,
-            ...{
-                right: 0,
-            },
-            ...controlProps,
-            ...rest,
-        };
 
         const { handleKeyDown } = useCarouselKeyboard({
             activeIndex,
@@ -818,20 +836,47 @@ const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
             scrollTo,
         });
 
+        const controlClassName = clsx(prefix('__control'), className);
+
+        const elementProps: CarouselControlRenderElementProps = {
+            onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+                controlProps?.onClick?.(e);
+                onClick?.(e);
+
+                if (!e.defaultPrevented) {
+                    scrollNext();
+                }
+            },
+            onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
+                controlProps?.onKeyDown?.(e);
+                onKeyDown?.(e);
+
+                if (!e.defaultPrevented) {
+                    handleKeyDown(e);
+                }
+            },
+            disabled: !canScrollNext,
+            'aria-label': 'Next slide',
+            'data-control-direction': 'next',
+        };
+
+        if (render) {
+            return render({
+                ref,
+                elementProps,
+                className: controlClassName,
+            });
+        }
+
+        const mergedProps = {
+            ...controlDefaultProps,
+            ...controlProps,
+            ...rest,
+            ...elementProps,
+        };
+
         return (
-            <Button
-                {...mergedProps}
-                ref={ref}
-                rounded="full"
-                intent="secondary"
-                className={clsx(prefix('__control'), className)}
-                type="button"
-                onClick={scrollNext}
-                onKeyDown={handleKeyDown}
-                disabled={!canScrollNext}
-                aria-label="Next slide"
-                data-control-direction="next"
-            >
+            <Button ref={ref} className={controlClassName} {...mergedProps}>
                 {children}
             </Button>
         );
