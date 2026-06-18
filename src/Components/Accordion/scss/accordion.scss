@@ -4,19 +4,21 @@
 @use './accordion-vars' as *;
 @use 'sass:map';
 
+@mixin setDensity($conf) {
+    --accordion-trigger-padding-y: #{map.get($conf, trigger-y)};
+    --accordion-trigger-padding-x: #{map.get($conf, trigger-x)};
+
+    --accordion-content-padding-y: #{map.get($conf, content-y)};
+    --accordion-content-padding-x: #{map.get($conf, content-x)};
+}
+
 .#{$accordion-prefix} {
+
+    @include setDensity(map.get($densities, md));
 
     @each $density, $conf in $densities {
         &[data-density='#{$density}'] {
-            //--accordion-padding-y: #{map.get($conf, padding-y)};
-            //--accordion-padding-x: #{map.get($conf, padding-x)};
-            //--accordion-icon-size: #{map.get($conf, icon-size)};
-
-            --accordion-trigger-padding-y: #{map.get($conf, trigger-y)};
-            --accordion-trigger-padding-x: #{map.get($conf, trigger-x)};
-
-            --accordion-content-padding-y: #{map.get($conf, content-y)};
-            --accordion-content-padding-x: #{map.get($conf, content-x)};
+            @include setDensity($conf);
         }
     }
 
@@ -26,12 +28,6 @@
 
     --accordion-padding-y: 1rem;
     --accordion-padding-x: 1.25rem;
-
-    //--accordion-body-padding-y: var(--accordion-padding-y);
-    //--accordion-body-padding-x: var(--accordion-padding-x);
-    //
-    //--accordion-trigger-padding-y: var(--accordion-padding-y);
-    //--accordion-trigger-padding-x: var(--accordion-padding-x);
 
     --accordion-border-width: 1px;
     --accordion-ring: var(--#{$p}-accent-primary);
@@ -143,7 +139,7 @@
 
         &__trigger {
 
-            --collapse-trigger-transition-custom: var(--accordion-trigger-duration) var(--accordion-trigger-duration);
+            --collapse-trigger-transition-custom: var(--accordion-trigger-duration) var(--accordion-trigger-easing);
             --collapse-trigger-transition: var(--#{$p}-duration-normal) var(--#{$p}-ease-standard);
 
             border-radius: inherit;
