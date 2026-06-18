@@ -1,5 +1,5 @@
 import React, { CSSProperties, forwardRef, HTMLAttributes } from 'react';
-import { DerivedProps, BoxDerived } from './BoxDerived';
+import { BoxDerivedProps, BoxDerived } from './BoxDerived';
 import clsx from 'clsx';
 import { classPrefix } from '../../utils/classPrefix';
 import { hasKey } from '../../utils/ts';
@@ -9,15 +9,15 @@ import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
 import { resolveResponsive, useBreakpoint, Responsiveify } from '../../utils/responsive';
 
 export type Props = {
-    grow?: boolean | DerivedProps['grow'];
-    shrink?: boolean | DerivedProps['shrink'];
+    grow?: boolean | BoxDerivedProps['grow'];
+    shrink?: boolean | BoxDerivedProps['shrink'];
     lineClamp?: number;
     truncate?: boolean;
     isolate?: boolean;
     scrollSmooth?: boolean;
     resizeNone?: boolean;
     appearanceNone?: boolean;
-} & Omit<DerivedProps, 'grow' | 'shrink'>;
+} & Omit<BoxDerivedProps, 'grow' | 'shrink'>;
 
 type BoxProps = Responsiveify<Props>;
 
@@ -162,7 +162,7 @@ const BoxImpl = ({ as, className, style, ...rest }: ImplProps, ref: React.Ref<an
         <BoxDerived
             as={asResolved}
             ref={ref}
-            {...(propsToPassNext as DerivedProps)}
+            {...(propsToPassNext as BoxDerivedProps)}
             className={clsx(classes, className)}
             style={mergedStyle}
         />

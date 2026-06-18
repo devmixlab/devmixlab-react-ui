@@ -8,7 +8,7 @@ import React, {
     HTMLAttributes,
 } from 'react';
 import { clsx } from 'clsx';
-import { Box, DerivedProps, BoxDerived } from '../Box';
+import { Box, BoxDerivedProps, BoxDerived } from '../Box';
 import { Collapse, CollapseProps } from '../Collapse';
 import { classPrefix } from '../../utils/classPrefix';
 import { AccordionContextValue, AccordionContext, useAccordionContext } from './Accordion.context';
@@ -26,6 +26,7 @@ import { useStableId } from '../../utils/useStableId';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { useFocusableList, FocusableItem } from '../../hooks/useFocusableList';
 import { resolveResponsive, Responsive, useBreakpoint } from '../../utils/responsive';
+import { mergeRefs } from '../../utils/mergeRefs';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -52,8 +53,8 @@ type OwnAccordionProps = {
     density?: Responsive<AccordionDensity>;
 };
 
-export type AccordionProps = OwnAccordionProps &
-    DerivedProps &
+type AccordionProps = OwnAccordionProps &
+    BoxDerivedProps &
     Partial<AccordionCollapseContextValue> &
     HTMLAttributes<HTMLDivElement>;
 
@@ -94,7 +95,7 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
     ) => {
         const { breakpoint } = useBreakpoint();
 
-        const density = resolveResponsive(densityProp, breakpoint) ?? 'xs';
+        const density = resolveResponsive(densityProp, breakpoint) ?? 'md';
 
         const stableId = useStableId('accordion');
 
@@ -122,42 +123,47 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionProps>(
 
         const value = valueProp ?? uncontrolledValue;
 
-        if (!multiple && !collapsible && !valueProp && defaultValue.length === 0) {
-            console.warn(
-                '[Accordion] `collapsible={false}` requires a `defaultValue` in uncontrolled mode.',
-            );
-        }
-
-        const toggle = (itemValue: string) => {
-            let nextValue: string[];
-
-            if (multiple) {
-                const isOpen = value.includes(itemValue);
-
-                if (isOpen) {
-                    nextValue =
-                        !collapsible && value.length === 1
-                            ? value
-                            : value.filter((v) => v !== itemValue);
-                } else {
-                    nextValue = [...value, itemValue];
-                }
-            } else {
-                const isOpen = value.includes(itemValue);
-
-                if (isOpen) {
-                    nextValue = collapsible ? [] : value;
-                } else {
-                    nextValue = [itemValue];
-                }
+        useEffect(() => {
+            if (!multiple && !collapsible && !valueProp && defaultValue.length === 0) {
+                console.warn(
+                    '[Accordion] `collapsible={false}` requires a `defaultValue` in uncontrolled mode.',
+                );
             }
+        }, [multiple, collapsible, valueProp, defaultValue]);
 
-            if (!valueProp) {
-                setUncontrolledValue(nextValue);
-            }
+        const toggle = useCallback(
+            (itemValue: string) => {
+                let nextValue: string[];
 
-            onValueChange?.(nextValue);
-        };
+                if (multiple) {
+                    const isOpen = value.includes(itemValue);
+
+                    if (isOpen) {
+                        nextValue =
+                            !collapsible && value.length === 1
+                                ? value
+                                : value.filter((v) => v !== itemValue);
+                    } else {
+                        nextValue = [...value, itemValue];
+                    }
+                } else {
+                    const isOpen = value.includes(itemValue);
+
+                    if (isOpen) {
+                        nextValue = collapsible ? [] : value;
+                    } else {
+                        nextValue = [itemValue];
+                    }
+                }
+
+                if (!valueProp) {
+                    setUncontrolledValue(nextValue);
+                }
+
+                onValueChange?.(nextValue);
+            },
+            [value, multiple, collapsible, valueProp, onValueChange],
+        );
 
         const context: AccordionContextValue = useMemo(
             () => ({
@@ -237,9 +243,7 @@ type OwnAccordionItemProps = {
     disabled?: boolean;
 };
 
-export type AccordionItemProps = OwnAccordionItemProps &
-    DerivedProps &
-    HTMLAttributes<HTMLDivElement>;
+type AccordionItemProps = OwnAccordionItemProps & BoxDerivedProps & HTMLAttributes<HTMLDivElement>;
 
 const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
     ({ children, className, value, id, disabled = false, ...rest }, ref) => {
@@ -283,10 +287,10 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 // Trigger
 // -----------------------------------------------------------------------------
 
-export type AccordionTriggerProps = {
+type AccordionTriggerProps = {
     animationDuration?: number;
     animationEasing?: string;
-} & DerivedProps &
+} & BoxDerivedProps &
     HTMLAttributes<HTMLButtonElement>;
 
 const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
@@ -311,10 +315,10 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
         const ctxAccordion = useAccordionContext();
         const item = useAccordionItemContext();
 
-        const animationDuration = ctxCollapse?.reduceMotion
+        const animationDuration = ctxCollapse.reduceMotion
             ? 0
-            : (animationDurationProp ?? ctxCollapse?.triggerDuration);
-        const animationEasing = animationEasingProp ?? ctxCollapse?.triggerEasing;
+            : (animationDurationProp ?? ctxCollapse.triggerDuration);
+        const animationEasing = animationEasingProp ?? ctxCollapse.triggerEasing;
 
         const notClosable =
             !ctxAccordion.collapsible && item.open && ctxAccordion.value.length === 1;
@@ -335,22 +339,15 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
             item.disabled,
         ]);
 
+        const setFocusableRef = ctxAccordion.focusable.setRef(item.value);
+
         return (
             <BoxDerived
                 {...rest}
                 as="button"
                 type="button"
                 tabIndex={item.disabled ? -1 : 0}
-                // ref={ref}
-                ref={(node) => {
-                    ctxAccordion.focusable.setRef(item.value)(node);
-
-                    if (typeof ref === 'function') {
-                        ref(node);
-                    } else if (ref) {
-                        ref.current = node;
-                    }
-                }}
+                ref={mergeRefs(ref, setFocusableRef)}
                 style={
                     {
                         ...style,
@@ -427,8 +424,8 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
 // Content
 // -----------------------------------------------------------------------------
 
-export type AccordionContentProps = Omit<CollapseProps, 'open'> &
-    DerivedProps &
+type AccordionContentProps = Omit<CollapseProps, 'open'> &
+    BoxDerivedProps &
     HTMLAttributes<HTMLDivElement>;
 
 const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
@@ -457,12 +454,12 @@ const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
         const ctxCollapse = useAccordionCollapseContext();
 
         const collapseProps = {
-            enterDuration: enterDurationProp ?? ctxCollapse?.enterDuration,
-            exitDuration: exitDurationProp ?? ctxCollapse?.exitDuration,
-            enterEasing: enterEasingProp ?? ctxCollapse?.enterEasing,
-            exitEasing: exitEasingProp ?? ctxCollapse?.exitEasing,
-            keepMounted: keepMountedProp ?? ctxCollapse?.keepMounted,
-            reduceMotion: reduceMotionProp ?? ctxCollapse?.reduceMotion,
+            enterDuration: enterDurationProp ?? ctxCollapse.enterDuration,
+            exitDuration: exitDurationProp ?? ctxCollapse.exitDuration,
+            enterEasing: enterEasingProp ?? ctxCollapse.enterEasing,
+            exitEasing: exitEasingProp ?? ctxCollapse.exitEasing,
+            keepMounted: keepMountedProp ?? ctxCollapse.keepMounted,
+            reduceMotion: reduceMotionProp ?? ctxCollapse.reduceMotion,
             onMount,
             onUnmount,
             onEntered,
@@ -499,4 +496,10 @@ const Accordion = Object.assign(AccordionRoot, {
 
 export { Accordion };
 
-export type { AccordionDensity };
+export type {
+    AccordionDensity,
+    AccordionProps,
+    AccordionItemProps,
+    AccordionTriggerProps,
+    AccordionContentProps,
+};

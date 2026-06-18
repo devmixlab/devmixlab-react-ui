@@ -5,7 +5,7 @@ import { createPolymorphic } from '../../types/polymorphic';
 type Size = number | string;
 type Radius = CSSProperties['borderRadius'];
 
-export type DerivedProps = {
+export type BoxDerivedProps = {
     // transform
     tx?: string; // translateX
     ty?: string; // translateY
@@ -45,9 +45,9 @@ export type DerivedProps = {
     clickable?: boolean;
 } & AliasProps;
 
-type DerivedBoxProps = DerivedProps;
+type DerivedBoxProps = BoxDerivedProps;
 
-type ImplProps = DerivedProps & {
+type ImplProps = BoxDerivedProps & {
     children?: React.ReactNode;
     className?: string;
 } & React.HTMLAttributes<HTMLElement>;

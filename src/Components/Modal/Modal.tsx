@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useState, useRef, HTMLAttributes } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, BoxProps, DerivedProps, BoxDerived } from '../Box';
+import { Box, BoxProps, BoxDerivedProps, BoxDerived } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
 import { ModalContext, useModalContext } from './Modal.context';
@@ -340,7 +340,7 @@ Modal.displayName = 'Modal';
 
 type ModalHeaderProps = {
     closeButton?: boolean;
-} & DerivedProps &
+} & BoxDerivedProps &
     HTMLAttributes<HTMLDivElement>;
 
 const ModalHeader = ({ children, className, closeButton = false, ...rest }: ModalHeaderProps) => {
@@ -385,7 +385,7 @@ ModalHeader.displayName = 'ModalHeader';
 
 type ModalBodyProps = {
     fadeEdges?: boolean;
-} & DerivedProps &
+} & BoxDerivedProps &
     HTMLAttributes<HTMLDivElement>;
 
 const ModalBody = ({ children, className, fadeEdges = true, ...rest }: ModalBodyProps) => {
@@ -431,7 +431,7 @@ ModalBody.displayName = 'ModalBody';
 // ModalFooter subcomponent
 //----------------------------------------------------------------------
 
-type ModalFooterProps = DerivedProps & HTMLAttributes<HTMLDivElement>;
+type ModalFooterProps = BoxDerivedProps & HTMLAttributes<HTMLDivElement>;
 
 const ModalFooter = ({ children, className, ...rest }: ModalFooterProps) => {
     return (
