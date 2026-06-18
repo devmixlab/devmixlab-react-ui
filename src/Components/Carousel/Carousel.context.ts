@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { UseCarouselDragReturn } from './useCarouselDrag';
+import { CarouselControlSize, CarouselControlVariant } from './Carousel';
 
 export type CarouselContextValue = {
     trackRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -17,6 +18,9 @@ export type CarouselContextValue = {
     slidesPerView: number;
     slidesPerScroll: number;
     gap: number;
+
+    controlVariant: CarouselControlVariant;
+    controlSize: CarouselControlSize;
 
     activeIndex: number;
     pageCount: number;

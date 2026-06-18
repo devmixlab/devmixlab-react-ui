@@ -37,6 +37,9 @@ const prefix = (name = '') => classPrefix(`--carousel${name}`);
 // Types
 // -----------------------------------------------------------------------------
 
+export type CarouselControlVariant = 'solid' | 'subtle' | 'outline' | 'ghost';
+export type CarouselControlSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
 export type CarouselHandle = {
     sync: () => void;
 };
@@ -49,6 +52,9 @@ type OwnCarouselProps = {
     overscroll?: boolean;
 
     gap?: number;
+
+    controlVariant?: CarouselControlVariant;
+    controlSize?: CarouselControlSize;
 
     slidesPerView?: number;
     slidesPerScroll?: number;
@@ -108,6 +114,9 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
             overscroll = true,
 
             gap = 4,
+
+            controlVariant = 'subtle',
+            controlSize = 'md',
 
             slidesPerView = 1,
             slidesPerScroll = 1,
@@ -500,6 +509,8 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 slidesPerView,
                 slidesPerScroll,
                 gap,
+                controlVariant,
+                controlSize,
                 activeIndex,
                 pageCount,
                 scrollTo,
@@ -524,6 +535,8 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
                 slidesPerView,
                 slidesPerScroll,
                 gap,
+                controlVariant,
+                controlSize,
                 activeIndex,
                 pageCount,
                 scrollTo,
@@ -733,8 +746,17 @@ type CarouselButtonProps<C extends React.ElementType = 'button'> = BoxComponentP
 
 const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Prev', ...rest }, ref) => {
-        const { scrollPrev, canScrollPrev, scrollNext, scrollTo, pageCount, activeIndex, loop } =
-            useCarouselContext();
+        const {
+            scrollPrev,
+            canScrollPrev,
+            scrollNext,
+            scrollTo,
+            pageCount,
+            activeIndex,
+            loop,
+            controlVariant,
+            controlSize,
+        } = useCarouselContext();
 
         const { handleKeyDown } = useCarouselKeyboard({
             activeIndex,
@@ -745,6 +767,7 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 
         return (
             <Box
+                {...rest}
                 as="button"
                 ref={ref}
                 className={clsx(prefix('__control'), prefix('__control-prev'), className)}
@@ -753,7 +776,8 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
                 onKeyDown={handleKeyDown}
                 disabled={!canScrollPrev}
                 aria-label="Previous slide"
-                {...rest}
+                data-control-variant={controlVariant}
+                data-control-size={controlSize}
             >
                 {children}
             </Box>
@@ -767,8 +791,16 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 
 const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     ({ className, children = 'Next', ...rest }, ref) => {
-        const { scrollNext, canScrollNext, scrollTo, pageCount, activeIndex, loop } =
-            useCarouselContext();
+        const {
+            scrollNext,
+            canScrollNext,
+            scrollTo,
+            pageCount,
+            activeIndex,
+            loop,
+            controlVariant,
+            controlSize,
+        } = useCarouselContext();
 
         const { handleKeyDown } = useCarouselKeyboard({
             activeIndex,
@@ -779,6 +811,7 @@ const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
 
         return (
             <Box
+                {...rest}
                 as="button"
                 ref={ref}
                 className={clsx(prefix('__control'), prefix('__control-next'), className)}
@@ -787,7 +820,8 @@ const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
                 onKeyDown={handleKeyDown}
                 disabled={!canScrollNext}
                 aria-label="Next slide"
-                {...rest}
+                data-control-variant={controlVariant}
+                data-control-size={controlSize}
             >
                 {children}
             </Box>
