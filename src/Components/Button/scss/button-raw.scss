@@ -199,6 +199,11 @@ $button-sizes: (
         background-color: bg-with-opacity(var(--button-bg));
     }
 
+    &[data-bg-blur] {
+        backdrop-filter: blur(var(--button-bg-blur));
+        -webkit-backdrop-filter: blur(var(--button-bg-blur));
+    }
+
     color: var(--button-text);
 
     transition:

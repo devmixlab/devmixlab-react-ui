@@ -26,6 +26,7 @@ type OwnButtonProps = {
     loadingComponent?: React.ReactNode;
     iconSlotWidth?: number | string;
     bgOpacity?: number;
+    bgBlur?: number | string;
 };
 
 type ButtonProps = Omit<BoxComponentProps<'button'>, 'size'> & OwnButtonProps;
@@ -57,6 +58,7 @@ const ButtonImpl = (
         loadingComponent,
         iconSlotWidth,
         bgOpacity,
+        bgBlur,
         style,
         ...props
     }: ButtonImplProps,
@@ -144,6 +146,7 @@ const ButtonImpl = (
                     '--button-icon-slot-width':
                         typeof iconSlotWidth === 'number' ? `${iconSlotWidth}px` : iconSlotWidth,
                     '--button-bg-opacity': bgOpacity,
+                    '--button-bg-blur': typeof bgBlur === 'number' ? `${bgBlur}px` : bgBlur,
                 } as React.CSSProperties
             }
             onClick={handleClick}
@@ -159,7 +162,8 @@ const ButtonImpl = (
             data-icon-only={iconOnly || undefined}
             data-loading={showSpinner || undefined}
             data-loading-position={showSpinner ? loadingPosition : undefined}
-            data-bg-opacity={bgOpacity ?? undefined}
+            data-bg-opacity={bgOpacity != null ? true : undefined}
+            data-bg-blur={bgBlur != null ? true : undefined}
         >
             {/* START ICON */}
             {startIcon &&
