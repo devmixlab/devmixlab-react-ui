@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useToastContext } from './Toast.context';
 import { ToastItem } from './ToastItem';
 
-import { classPrefix } from '../utils/classPrefix';
+import { classPrefix } from '../../utils/classPrefix';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 

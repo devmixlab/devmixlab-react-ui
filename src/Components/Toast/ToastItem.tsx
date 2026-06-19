@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 
 import { ToastRecord, useToastContext } from './Toast.context';
 
-import { classPrefix } from '../utils/classPrefix';
+import { classPrefix } from '../../utils/classPrefix';
 
-import { Alert } from '../Components/Alert/Alert';
+import { Alert } from '../Alert';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
@@ -29,8 +29,9 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
 
     return (
         <Alert
-            dismissible
-            accent
+            // dismissible
+            visible={true}
+            accent="left"
             onDismiss={() => close(toast.id)}
             className={prefix('__item')}
             intent={toast.intent}

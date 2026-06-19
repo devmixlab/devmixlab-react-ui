@@ -42,8 +42,8 @@ export { ContainerProvider } from './src/Components/Container/ContainerProvider'
 
 // export { Offcanvas } from './src/Offcanvas/Offcanvas';
 
-export { ToastProvider, useToast } from './src/Toast';
-export { ToastContext, useToastContext } from './src/Toast/Toast.context';
+export { ToastProvider, useToast } from './src/Components/Toast';
+export { ToastContext, useToastContext } from './src/Components/Toast/Toast.context';
 // export { ToastContext } from './src/Toast/Toast.context';
 
 export { Navbar } from './src/Components/Navbar/Navbar';
