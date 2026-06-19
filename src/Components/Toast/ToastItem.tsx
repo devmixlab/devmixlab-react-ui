@@ -42,6 +42,8 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
     return (
         <Alert
             // dismissible
+            animation="slide-right"
+            attention="throb"
             visible={visible}
             accent="left"
             shadow="sm"
