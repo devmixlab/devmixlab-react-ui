@@ -10,8 +10,8 @@ $toast-prefix: #{$p}--toast;
 .#{$toast-prefix} {
     &__viewport {
         position: fixed;
-        top: 1rem;
-        right: 1rem;
+        top: var(--toast-offset, 1rem);
+        right: var(--toast-offset, 1rem);
         z-index: 9999;
 
         display: flex;
@@ -20,6 +20,41 @@ $toast-prefix: #{$p}--toast;
 
         width: min(400px, calc(100vw - 2rem));
         pointer-events: none;
+
+        &[data-position='top-left'] {
+            top: var(--toast-offset, 1rem);
+            left: var(--toast-offset, 1rem);
+        }
+
+        &[data-position='top-center'] {
+            top: var(--toast-offset, 1rem);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        &[data-position='top-right'] {
+            top: var(--toast-offset, 1rem);
+            right: var(--toast-offset, 1rem);
+        }
+
+        &[data-position='bottom-left'] {
+            bottom: var(--toast-offset, 1rem);
+            left: var(--toast-offset, 1rem);
+            flex-direction: column-reverse;
+        }
+
+        &[data-position='bottom-center'] {
+            bottom: var(--toast-offset, 1rem);
+            left: 50%;
+            transform: translateX(-50%);
+            flex-direction: column-reverse;
+        }
+
+        &[data-position='bottom-right'] {
+            bottom: var(--toast-offset, 1rem);
+            right: var(--toast-offset, 1rem);
+            flex-direction: column-reverse;
+        }
     }
 
     &__item {

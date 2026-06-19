@@ -15,42 +15,57 @@ type ToastItemProps = {
 export const ToastItem = ({ toast }: ToastItemProps) => {
     const { close } = useToastContext();
 
+    const [visible, setVisible] = React.useState(true);
+
+    const handleClose = () => {
+        setVisible(false);
+    };
+
     useEffect(() => {
         if (!toast.duration) {
             return;
         }
 
         const timeout = window.setTimeout(() => {
-            close(toast.id);
+            setVisible(false);
         }, toast.duration);
 
         return () => window.clearTimeout(timeout);
-    }, [toast.id, toast.duration, close]);
+    }, [toast.duration]);
+
+    // useEffect(() => {
+    //     if (!toast.duration) {
+    //         return;
+    //     }
+    //
+    //     const timeout = window.setTimeout(() => {
+    //         close(toast.id);
+    //     }, toast.duration);
+    //
+    //     return () => window.clearTimeout(timeout);
+    // }, [toast.id, toast.duration, close]);
 
     return (
         <Alert
             // dismissible
-            visible={true}
+            visible={visible}
             accent="left"
-            onDismiss={() => close(toast.id)}
+            shadow="sm"
+            icon
+            onDismiss={handleClose}
+            onExited={() => close(toast.id)}
             className={prefix('__item')}
             intent={toast.intent}
-            data-intent={toast.intent}
+            variant="subtle"
             role={toast.intent === 'danger' ? 'alert' : 'status'}
         >
-            <div className={prefix('__content')}>
-                {toast.title && <div className={prefix('__title')}>{toast.title}</div>}
+            {toast.title && <Alert.Title>{toast.title}</Alert.Title>}
 
-                {toast.description && (
-                    <div className={prefix('__description')}>{toast.description}</div>
-                )}
-            </div>
-
-            {/*{toast.closable && (*/}
-            {/*    <button type="button" onClick={() => close(toast.id)}>*/}
-            {/*        ×*/}
-            {/*    </button>*/}
-            {/*)}*/}
+            {toast.description && (
+                <Alert.Description className={prefix('__description')}>
+                    {toast.description}
+                </Alert.Description>
+            )}
         </Alert>
     );
 };
