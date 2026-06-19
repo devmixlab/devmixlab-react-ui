@@ -1,6 +1,6 @@
 import React, { createContext, MutableRefObject, useContext } from 'react';
 
-import { ToastOptions, ToastHandle } from './ToastProvider';
+import { ToastOptions, ToastHandle, ToastControlRef, PendingClose } from './ToastProvider';
 import { TransitionControlRef } from '../Transition';
 
 // export type ToastRecord = ToastOptions & {
@@ -31,7 +31,8 @@ export type ToastContextValue = {
 
     minCloseInterval: number;
 
-    controlTransitionRefs: MutableRefObject<Map<string, TransitionControlRef>>;
+    toastControlRefs: MutableRefObject<Map<string, ToastControlRef>>;
+    closeQueueRef: MutableRefObject<PendingClose[]>;
 };
 
 export const ToastContext = createContext<ToastContextValue | null>(null);

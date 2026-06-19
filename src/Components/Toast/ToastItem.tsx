@@ -1,10 +1,8 @@
-import React, { useEffect } from 'react';
-
+import React, { useEffect, useCallback } from 'react';
 import { ToastRecord, useToastContext } from './Toast.context';
-
 import { classPrefix } from '../../utils/classPrefix';
-
 import { Alert } from '../Alert';
+import { TransitionAttention, TransitionControlRef } from '../Transition';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
@@ -13,9 +11,11 @@ type ToastItemProps = {
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-    const { close, requestClose, isPaused, controlTransitionRefs } = useToastContext();
+    const { close, requestClose, isPaused, toastControlRefs, closeQueueRef } = useToastContext();
 
     const [visible, setVisible] = React.useState(true);
+
+    const controlRef = React.useRef<TransitionControlRef>(null);
 
     const timeoutRef = React.useRef<number | null>(null);
     const remainingRef = React.useRef(toast.duration ?? 0);
@@ -48,15 +48,6 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
             }
         };
 
-        // console.log('pause', {
-        //     remaining: remainingRef.current,
-        //     startedAt: startedAtRef.current,
-        // });
-        //
-        // console.log('resume', {
-        //     remaining: remainingRef.current,
-        // });
-
         if (isPaused) {
             clearTimer();
 
@@ -86,16 +77,41 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         return clearTimer;
     }, [toast.id, toast.duration, isPaused, requestClose]);
 
+    const restart = useCallback(() => {
+        closeQueueRef.current = closeQueueRef.current.filter((item) => item.id !== toast.id);
+
+        remainingRef.current = toast.duration ?? 0;
+
+        if (timeoutRef.current !== null) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        startedAtRef.current = Date.now();
+
+        timeoutRef.current = window.setTimeout(() => {
+            requestClose(toast.id);
+        }, remainingRef.current);
+    }, [toast.duration, toast.id, requestClose]);
+
+    const runAttention = (attention?: TransitionAttention) => {
+        controlRef.current?.runAttention(attention);
+    };
+
+    useEffect(() => {
+        toastControlRefs.current.set(toast.id, {
+            restart,
+            runAttention,
+        });
+
+        return () => {
+            toastControlRefs.current.delete(toast.id);
+        };
+    }, [toast.id, restart]);
+
     return (
         <Alert
             // dismissible
-            controlRef={(el) => {
-                if (el) {
-                    controlTransitionRefs.current.set(toast.id, el);
-                } else {
-                    controlTransitionRefs.current.delete(toast.id);
-                }
-            }}
+            controlRef={controlRef}
             animation="slide-right"
             attention="throb"
             visible={visible}

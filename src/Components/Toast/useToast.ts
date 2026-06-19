@@ -11,6 +11,7 @@ export const useToast = () => {
             context.show({
                 title,
                 description,
+                closable: false,
                 intent: 'success',
             }),
 
