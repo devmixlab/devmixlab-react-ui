@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react'
 import { ToastContext, ToastRecord } from './Toast.context';
 
 import { ToastViewport } from './ToastViewport';
+import { TransitionControlRef, TransitionAttention } from '../Transition';
 
 // export type ToastRecord = ToastOptions & {
 //     id: string;
@@ -43,6 +44,13 @@ type PendingClose = {
     leftTillClose: number;
 };
 
+export type ToastHandle = {
+    id: string;
+    runAttention: (attention?: TransitionAttention) => void;
+    close: () => void;
+    restart: () => void;
+};
+
 const QUEUE_PROCESSOR_INTERVAL = 50;
 
 export const ToastProvider = ({
@@ -55,6 +63,7 @@ export const ToastProvider = ({
     const [toasts, setToasts] = useState<ToastRecord[]>([]);
     const [isPaused, setIsPaused] = useState(false);
 
+    const controlRefs = useRef(new Map<string, TransitionControlRef>());
     const isPausedRef = React.useRef(isPaused);
     const intervalRef = React.useRef<number | null>(null);
     const lastCloseAtRef = useRef(0);
@@ -128,9 +137,10 @@ export const ToastProvider = ({
             }
 
             idsToClose.map((id) => {
-                setToasts((prev) =>
-                    prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast)),
-                );
+                setClosing(id);
+                // setToasts((prev) =>
+                //     prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast)),
+                // );
                 closeQueueRef.current = closeQueueRef.current.filter((item) => item.id != id);
             });
 
@@ -189,11 +199,11 @@ export const ToastProvider = ({
     //     );
     // }, []);
 
-    const close = (id: string) => {
+    const setClosing = (id: string) => {
         setToasts((prev) =>
             prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast)),
         );
-        lastCloseAtRef.current = Date.now();
+        // lastCloseAtRef.current = Date.now();
     };
 
     const requestClose = useCallback(
@@ -216,7 +226,7 @@ export const ToastProvider = ({
         setToasts([]);
     }, []);
 
-    const show = useCallback((options: ToastOptions) => {
+    const show = useCallback((options: ToastOptions): ToastHandle => {
         const id = crypto.randomUUID();
 
         setToasts((prev) => {
@@ -235,7 +245,15 @@ export const ToastProvider = ({
             ];
         });
 
-        return id;
+        return {
+            id,
+            close: () => setClosing(id),
+            runAttention: (attention) => {
+                const ref = controlRefs.current.get(id);
+                ref?.runAttention(attention);
+            },
+            restart: () => {},
+        };
     }, []);
 
     const value = useMemo(
@@ -249,6 +267,7 @@ export const ToastProvider = ({
             pauseAll,
             resumeAll,
             minCloseInterval,
+            controlRefs,
         }),
         [toasts, show, close, requestClose, clear, isPaused, pauseAll, resumeAll],
     );

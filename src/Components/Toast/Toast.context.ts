@@ -1,6 +1,7 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, MutableRefObject, useContext } from 'react';
 
-import { ToastOptions } from './ToastProvider';
+import { ToastOptions, ToastHandle } from './ToastProvider';
+import { TransitionControlRef } from '../Transition';
 
 // export type ToastRecord = ToastOptions & {
 //     id: string;
@@ -14,7 +15,7 @@ export type ToastRecord = ToastOptions & {
 export type ToastContextValue = {
     toasts: ToastRecord[];
 
-    show: (options: ToastOptions) => string;
+    show: (options: ToastOptions) => ToastHandle;
 
     requestClose: (id: string) => void;
 
@@ -29,6 +30,8 @@ export type ToastContextValue = {
     resumeAll: () => void;
 
     minCloseInterval: number;
+
+    controlRefs: MutableRefObject<Map<string, TransitionControlRef>>;
 };
 
 export const ToastContext = createContext<ToastContextValue | null>(null);
