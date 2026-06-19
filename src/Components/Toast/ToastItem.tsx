@@ -121,8 +121,10 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         <Alert
             // dismissible
             controlRef={controlRef}
-            animation="slide-up"
-            attention="bounce"
+            animation="fade"
+            // attention="shake"
+            // attentionExit="slide-left"
+            // exitDuration={1000}
             visible={visible}
             // accent="left"
             shadow="sm"

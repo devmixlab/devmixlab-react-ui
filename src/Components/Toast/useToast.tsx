@@ -14,7 +14,7 @@ export const useToast = () => {
                 title,
                 description,
                 closable: false,
-                duration: null,
+                duration: 5000,
                 intent: 'secondary',
                 renderActions: ({ close }) => {
                     return (
