@@ -47,7 +47,7 @@ const controlDefaultProps: ButtonProps = {
 // Types
 // -----------------------------------------------------------------------------
 
-export type CarouselHandle = {
+type CarouselHandle = {
     sync: () => void;
 };
 
@@ -93,7 +93,7 @@ type OwnCarouselProps = {
     onAutoplayStop?: () => void;
 };
 
-export type CarouselProps = BoxComponentProps<'div', OwnCarouselProps>;
+type CarouselProps = BoxComponentProps<'div', OwnCarouselProps>;
 
 type CarouselCompound = typeof CarouselRoot & {
     Track: typeof CarouselTrack;
@@ -751,11 +751,11 @@ type CarouselControlRenderProps = {
     className: string;
 };
 
-type CarouselButtonProps = {
+type CarouselControlProps = {
     render?: (props: CarouselControlRenderProps) => React.ReactElement | null;
 } & ButtonProps;
 
-const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
+const CarouselPrev = forwardRef<HTMLButtonElement, CarouselControlProps>(
     ({ className, children = 'Prev', onClick, onKeyDown, render, ...rest }, ref) => {
         const { controlProps } = useCarouselContext();
 
@@ -790,7 +790,7 @@ const CarouselPrev = forwardRef<HTMLButtonElement, CarouselButtonProps>(
     },
 );
 
-const CarouselNext = forwardRef<HTMLButtonElement, CarouselButtonProps>(
+const CarouselNext = forwardRef<HTMLButtonElement, CarouselControlProps>(
     ({ className, children = 'Next', onClick, onKeyDown, render, ...rest }, ref) => {
         const { controlProps } = useCarouselContext();
 
@@ -957,10 +957,28 @@ const ScrollWatcher = ({ onScroll }: { onScroll: () => void }) => {
 // Compound export
 // -----------------------------------------------------------------------------
 
-export const Carousel = CarouselRoot as CarouselCompound;
+const Carousel = CarouselRoot as CarouselCompound;
 
 Carousel.Track = CarouselTrack;
 Carousel.Item = CarouselItem;
 Carousel.Prev = CarouselPrev;
 Carousel.Next = CarouselNext;
 Carousel.Indicators = CarouselIndicators;
+
+// -----------------------------------------------------------------------------
+// Export
+// -----------------------------------------------------------------------------
+
+export { Carousel };
+
+export type {
+    CarouselHandle,
+    OwnCarouselProps,
+    CarouselProps,
+    CarouselCompound,
+    CarouselTrackProps,
+    CarouselItemProps,
+    CarouselControlRenderProps,
+    CarouselControlProps,
+    CarouselIndicatorsProps,
+};
