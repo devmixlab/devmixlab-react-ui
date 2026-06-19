@@ -13,7 +13,7 @@ type ToastItemProps = {
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-    const { close, requestClose, isPaused, controlRefs } = useToastContext();
+    const { close, requestClose, isPaused, controlTransitionRefs } = useToastContext();
 
     const [visible, setVisible] = React.useState(true);
 
@@ -91,9 +91,9 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
             // dismissible
             controlRef={(el) => {
                 if (el) {
-                    controlRefs.current.set(toast.id, el);
+                    controlTransitionRefs.current.set(toast.id, el);
                 } else {
-                    controlRefs.current.delete(toast.id);
+                    controlTransitionRefs.current.delete(toast.id);
                 }
             }}
             animation="slide-right"

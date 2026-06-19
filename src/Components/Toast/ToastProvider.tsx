@@ -63,7 +63,7 @@ export const ToastProvider = ({
     const [toasts, setToasts] = useState<ToastRecord[]>([]);
     const [isPaused, setIsPaused] = useState(false);
 
-    const controlRefs = useRef(new Map<string, TransitionControlRef>());
+    const controlTransitionRefs = useRef(new Map<string, TransitionControlRef>());
     const isPausedRef = React.useRef(isPaused);
     const intervalRef = React.useRef<number | null>(null);
     const lastCloseAtRef = useRef(0);
@@ -249,7 +249,7 @@ export const ToastProvider = ({
             id,
             close: () => setClosing(id),
             runAttention: (attention) => {
-                const ref = controlRefs.current.get(id);
+                const ref = controlTransitionRefs.current.get(id);
                 ref?.runAttention(attention);
             },
             restart: () => {},
@@ -267,7 +267,7 @@ export const ToastProvider = ({
             pauseAll,
             resumeAll,
             minCloseInterval,
-            controlRefs,
+            controlTransitionRefs,
         }),
         [toasts, show, close, requestClose, clear, isPaused, pauseAll, resumeAll],
     );

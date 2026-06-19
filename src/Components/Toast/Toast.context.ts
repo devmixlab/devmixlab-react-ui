@@ -31,7 +31,7 @@ export type ToastContextValue = {
 
     minCloseInterval: number;
 
-    controlRefs: MutableRefObject<Map<string, TransitionControlRef>>;
+    controlTransitionRefs: MutableRefObject<Map<string, TransitionControlRef>>;
 };
 
 export const ToastContext = createContext<ToastContextValue | null>(null);
