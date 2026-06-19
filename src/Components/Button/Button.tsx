@@ -25,6 +25,7 @@ type OwnButtonProps = {
     spinnerDelay?: number;
     loadingComponent?: React.ReactNode;
     iconSlotWidth?: number | string;
+    bgOpacity?: number;
 };
 
 type ButtonProps = Omit<BoxComponentProps<'button'>, 'size'> & OwnButtonProps;
@@ -55,6 +56,7 @@ const ButtonImpl = (
         spinnerDelay = 150,
         loadingComponent,
         iconSlotWidth,
+        bgOpacity,
         style,
         ...props
     }: ButtonImplProps,
@@ -141,6 +143,7 @@ const ButtonImpl = (
                     ...style,
                     '--button-icon-slot-width':
                         typeof iconSlotWidth === 'number' ? `${iconSlotWidth}px` : iconSlotWidth,
+                    '--button-bg-opacity': bgOpacity,
                 } as React.CSSProperties
             }
             onClick={handleClick}
@@ -156,6 +159,7 @@ const ButtonImpl = (
             data-icon-only={iconOnly || undefined}
             data-loading={showSpinner || undefined}
             data-loading-position={showSpinner ? loadingPosition : undefined}
+            data-bg-opacity={bgOpacity ?? undefined}
         >
             {/* START ICON */}
             {startIcon &&
