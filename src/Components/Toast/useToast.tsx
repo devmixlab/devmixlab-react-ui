@@ -1,5 +1,7 @@
 import React from 'react';
 import { useToastContext } from './Toast.context';
+import { Button } from '../Button';
+import { Box } from '../Box';
 
 export const useToast = () => {
     const context = useToastContext();
@@ -12,7 +14,17 @@ export const useToast = () => {
                 title,
                 description,
                 closable: false,
-                intent: 'success',
+                duration: null,
+                intent: 'secondary',
+                renderActions: ({ close }) => {
+                    return (
+                        <Box d="flex" grow={1} justify="end">
+                            <Button onClick={close} intent="success" size="sm" variant="solid">
+                                Dismiss
+                            </Button>
+                        </Box>
+                    );
+                },
             }),
 
         error: (title: React.ReactNode, description?: React.ReactNode) =>

@@ -11,9 +11,12 @@ type ToastItemProps = {
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-    const { close, requestClose, isPaused, toastControlRefs, closeQueueRef } = useToastContext();
+    const { update, close, requestClose, isPaused, toastControlRefs, closeQueueRef } =
+        useToastContext();
 
     const [visible, setVisible] = React.useState(true);
+
+    const isClosable = toast.closable;
 
     const controlRef = React.useRef<TransitionControlRef>(null);
 
@@ -21,8 +24,10 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
     const remainingRef = React.useRef(toast.duration ?? 0);
     const startedAtRef = React.useRef<number | null>(null);
 
+    console.log(toast);
+
     const handleClose = () => {
-        requestClose(toast.id);
+        close(toast.id);
     };
 
     useEffect(() => {
@@ -78,6 +83,10 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
     }, [toast.id, toast.duration, isPaused, requestClose]);
 
     const restart = useCallback(() => {
+        if (!toast.duration) {
+            return;
+        }
+
         closeQueueRef.current = closeQueueRef.current.filter((item) => item.id !== toast.id);
 
         remainingRef.current = toast.duration ?? 0;
@@ -112,13 +121,14 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         <Alert
             // dismissible
             controlRef={controlRef}
-            animation="slide-right"
-            attention="throb"
+            animation="slide-up"
+            attention="bounce"
             visible={visible}
-            accent="left"
+            // accent="left"
             shadow="sm"
             icon
-            onDismiss={handleClose}
+            onDismiss={toast.closable ? handleClose : undefined}
+            // onDismiss={handleClose}
             onExited={() => close(toast.id)}
             className={prefix('__item')}
             intent={toast.intent}
@@ -135,6 +145,20 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
                 <Alert.Description className={prefix('__description')}>
                     {toast.description}
                 </Alert.Description>
+            )}
+
+            {toast.renderActions && (
+                <Alert.Actions>
+                    {toast.renderActions({
+                        id: toast.id,
+                        close: () => close(toast.id),
+                        runAttention,
+                        restart,
+                        update: (options) => {
+                            update(toast.id, options);
+                        },
+                    })}
+                </Alert.Actions>
             )}
         </Alert>
     );

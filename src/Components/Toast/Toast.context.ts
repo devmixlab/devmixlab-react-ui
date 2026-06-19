@@ -13,6 +13,8 @@ export type ToastRecord = ToastOptions & {
 };
 
 export type ToastContextValue = {
+    update: (id: string, options: Partial<ToastOptions>) => void;
+
     toasts: ToastRecord[];
 
     show: (options: ToastOptions) => ToastHandle;

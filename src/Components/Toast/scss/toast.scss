@@ -21,6 +21,16 @@ $toast-prefix: #{$p}--toast;
         width: min(400px, calc(100vw - 2rem));
         pointer-events: none;
 
+        //&[data-position^='bottom'] {
+        //    flex-direction: column-reverse;
+        //}
+
+        //&[data-position='bottom-left'],
+        //&[data-position='bottom-center'],
+        //&[data-position='bottom-right'] {
+        //    flex-direction: row;
+        //}
+
         &[data-position='top-left'] {
             top: var(--toast-offset, 1rem);
             left: var(--toast-offset, 1rem);
@@ -40,20 +50,22 @@ $toast-prefix: #{$p}--toast;
         &[data-position='bottom-left'] {
             bottom: var(--toast-offset, 1rem);
             left: var(--toast-offset, 1rem);
-            flex-direction: column-reverse;
+            //flex-direction: column-reverse;
+            justify-content: flex-end;
         }
 
         &[data-position='bottom-center'] {
             bottom: var(--toast-offset, 1rem);
             left: 50%;
             transform: translateX(-50%);
-            flex-direction: column-reverse;
+            //flex-direction: column-reverse;
+            justify-content: flex-end;
         }
 
         &[data-position='bottom-right'] {
             bottom: var(--toast-offset, 1rem);
             right: var(--toast-offset, 1rem);
-            flex-direction: column-reverse;
+            justify-content: flex-end;
         }
     }
 

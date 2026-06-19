@@ -26,9 +26,11 @@ export type ToastIntent = 'primary' | 'secondary' | 'success' | 'warning' | 'dan
 export type ToastOptions = {
     title?: React.ReactNode;
     description?: React.ReactNode;
-    duration?: number;
+    duration?: number | null;
     closable?: boolean;
     intent?: ToastIntent;
+
+    renderActions?: (handle: ToastHandle) => React.ReactNode;
 };
 
 export type ToastProviderProps = {
@@ -140,7 +142,7 @@ export const ToastProvider = ({
             }
 
             idsToClose.map((id) => {
-                setClosing(id);
+                close(id);
                 closeQueueRef.current = closeQueueRef.current.filter((item) => item.id != id);
             });
 
@@ -154,7 +156,7 @@ export const ToastProvider = ({
         };
     }, []);
 
-    const setClosing = (id: string) => {
+    const close = (id: string) => {
         setToasts((prev) =>
             prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast)),
         );
@@ -210,7 +212,7 @@ export const ToastProvider = ({
 
         return {
             id,
-            close: () => setClosing(id),
+            close: () => close(id),
             runAttention: (attention) => {
                 const ref = toastControlRefs.current.get(id);
                 ref?.runAttention(attention);
@@ -227,6 +229,7 @@ export const ToastProvider = ({
 
     const value = useMemo(
         () => ({
+            update,
             toasts,
             show,
             close,
@@ -239,7 +242,7 @@ export const ToastProvider = ({
             toastControlRefs,
             closeQueueRef,
         }),
-        [toasts, show, close, requestClose, clear, isPaused, pauseAll, resumeAll],
+        [update, toasts, show, close, requestClose, clear, isPaused, pauseAll, resumeAll],
     );
 
     return (
