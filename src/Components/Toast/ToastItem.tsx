@@ -1,7 +1,8 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useLayoutEffect } from 'react';
 import { ToastRecord, useToastContext } from './Toast.context';
 import { classPrefix } from '../../utils/classPrefix';
 import { Alert } from '../Alert';
+import { Box } from '../Box';
 import { TransitionAttention, TransitionControlRef } from '../Transition';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
@@ -11,15 +12,18 @@ type ToastItemProps = {
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-    const { update, close, requestClose, isPaused, toastControlRefs, closeQueueRef } =
+    const { position, update, close, requestClose, isPaused, toastControlRefs, closeQueueRef } =
         useToastContext();
 
+    const [wrapperIn, setWrapperIn] = React.useState(false);
     const [visible, setVisible] = React.useState(true);
+    const [height, setHeight] = React.useState(0);
 
     const isClosable = toast.closable;
 
     const controlRef = React.useRef<TransitionControlRef>(null);
 
+    const alertRef = React.useRef<HTMLDivElement>(null);
     const timeoutRef = React.useRef<number | null>(null);
     const remainingRef = React.useRef(toast.duration ?? 0);
     const startedAtRef = React.useRef<number | null>(null);
@@ -29,6 +33,14 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
     const handleClose = () => {
         close(toast.id);
     };
+
+    useEffect(() => {
+        const frame = requestAnimationFrame(() => {
+            setWrapperIn(true);
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, []);
 
     useEffect(() => {
         if (toast.closing) {
@@ -117,51 +129,79 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         };
     }, [toast.id, restart]);
 
+    useLayoutEffect(() => {
+        if (!alertRef.current) {
+            return;
+        }
+
+        setHeight(alertRef.current.offsetHeight);
+    }, []);
+
     return (
-        <Alert
-            // dismissible
-            controlRef={controlRef}
-            animation="fade"
-            // attention="shake"
-            // attentionExit="slide-left"
-            // exitDuration={1000}
-            visible={visible}
-            // accent="left"
-            shadow="sm"
-            icon
-            onDismiss={toast.closable ? handleClose : undefined}
-            // onDismiss={handleClose}
-            onExited={() => close(toast.id)}
-            className={prefix('__item')}
-            intent={toast.intent}
-            variant="subtle"
-            role={toast.intent === 'danger' ? 'alert' : 'status'}
-        >
-            {toast.title && (
-                <Alert.Title>
-                    {toast.title} - {isPaused ? 'paused' : 'running'}
-                </Alert.Title>
-            )}
+        (visible || wrapperIn) && (
+            <Box
+                className={prefix('__item-wrapper')}
+                data-position={position}
+                data-mounted={wrapperIn || undefined}
+                style={
+                    {
+                        '--toast-height': `${height}px`,
+                    } as React.CSSProperties
+                }
+            >
+                <Alert
+                    // dismissible
+                    ref={alertRef}
+                    controlRef={controlRef}
+                    animation="toast-bottom"
+                    enterDuration={400}
+                    exitDuration={400}
+                    // attention="shake"
+                    // attentionExit="slide-left"
+                    // exitDuration={1000}s
+                    visible={visible}
+                    // accent="left"
+                    shadow="sm"
+                    icon
+                    onDismiss={toast.closable ? handleClose : undefined}
+                    // onDismiss={handleClose}
+                    onExited={() => {
+                        close(toast.id);
+                        setWrapperIn(false);
+                    }}
+                    className={prefix('__item')}
+                    intent={toast.intent}
+                    variant="subtle"
+                    role={toast.intent === 'danger' ? 'alert' : 'status'}
+                    data-position={position}
+                >
+                    {toast.title && (
+                        <Alert.Title>
+                            {toast.title} - {isPaused ? 'paused' : 'running'}
+                        </Alert.Title>
+                    )}
 
-            {toast.description && (
-                <Alert.Description className={prefix('__description')}>
-                    {toast.description}
-                </Alert.Description>
-            )}
+                    {toast.description && (
+                        <Alert.Description className={prefix('__description')}>
+                            {toast.description}
+                        </Alert.Description>
+                    )}
 
-            {toast.renderActions && (
-                <Alert.Actions>
-                    {toast.renderActions({
-                        id: toast.id,
-                        close: () => close(toast.id),
-                        runAttention,
-                        restart,
-                        update: (options) => {
-                            update(toast.id, options);
-                        },
-                    })}
-                </Alert.Actions>
-            )}
-        </Alert>
+                    {toast.renderActions && (
+                        <Alert.Actions>
+                            {toast.renderActions({
+                                id: toast.id,
+                                close: () => close(toast.id),
+                                runAttention,
+                                restart,
+                                update: (options) => {
+                                    update(toast.id, options);
+                                },
+                            })}
+                        </Alert.Actions>
+                    )}
+                </Alert>
+            </Box>
+        )
     );
 };

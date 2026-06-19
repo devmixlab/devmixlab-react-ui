@@ -229,6 +229,7 @@ export const ToastProvider = ({
 
     const value = useMemo(
         () => ({
+            position,
             update,
             toasts,
             show,
@@ -242,7 +243,7 @@ export const ToastProvider = ({
             toastControlRefs,
             closeQueueRef,
         }),
-        [update, toasts, show, close, requestClose, clear, isPaused, pauseAll, resumeAll],
+        [position, update, toasts, show, close, requestClose, clear, isPaused, pauseAll, resumeAll],
     );
 
     return (

@@ -13,8 +13,8 @@ export const useToast = () => {
             context.show({
                 title,
                 description,
-                closable: false,
-                duration: 5000,
+                closable: true,
+                duration: null,
                 intent: 'secondary',
                 renderActions: ({ close }) => {
                     return (

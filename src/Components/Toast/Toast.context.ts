@@ -1,6 +1,12 @@
 import React, { createContext, MutableRefObject, useContext } from 'react';
 
-import { ToastOptions, ToastHandle, ToastControlRef, PendingClose } from './ToastProvider';
+import {
+    ToastOptions,
+    ToastHandle,
+    ToastControlRef,
+    PendingClose,
+    ToastPosition,
+} from './ToastProvider';
 import { TransitionControlRef } from '../Transition';
 
 // export type ToastRecord = ToastOptions & {
@@ -13,6 +19,8 @@ export type ToastRecord = ToastOptions & {
 };
 
 export type ToastContextValue = {
+    position: ToastPosition;
+
     update: (id: string, options: Partial<ToastOptions>) => void;
 
     toasts: ToastRecord[];

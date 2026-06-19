@@ -69,7 +69,68 @@ $toast-prefix: #{$p}--toast;
         }
     }
 
+    &__item-wrapper {
+        height: 0;
+        margin: 0;
+        padding: 0;
+        //overflow: hidden;
+        //background-color: red;
+
+        transition:
+            height 250ms ease;
+
+        &[data-position='bottom-right'] {
+
+        }
+
+        &[data-mounted] {
+            height: var(--toast-height);
+            //margin-bottom: 12px;
+        }
+    }
+
     &__item {
         pointer-events: auto;
+        //position: absolute;
+
+        &[data-position='bottom-right'] {
+            --offcanvas-transform-from: translateY(110%);
+        }
+
+        &[data-animation='toast-bottom'] {
+            &[data-animation-state='entering'] {
+                animation: #{$toast-prefix}--slide-enter var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+
+            &[data-animation-state='exiting'] {
+                animation: #{$toast-prefix}--slide-exit var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+    }
+}
+
+
+/*
+ * Slide
+ */
+@keyframes #{$toast-prefix}--slide-enter {
+    from {
+        transform: var(--offcanvas-transform-from);
+    }
+
+    to {
+        transform: translate(0);
+    }
+}
+
+@keyframes #{$toast-prefix}--slide-exit {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
     }
 }
