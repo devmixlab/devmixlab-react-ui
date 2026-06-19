@@ -2,14 +2,21 @@ import React, { createContext, useContext } from 'react';
 
 import { ToastOptions } from './ToastProvider';
 
+// export type ToastRecord = ToastOptions & {
+//     id: string;
+// };
+
 export type ToastRecord = ToastOptions & {
     id: string;
+    closing?: boolean;
 };
 
 export type ToastContextValue = {
     toasts: ToastRecord[];
 
     show: (options: ToastOptions) => string;
+
+    requestClose: (id: string) => void;
 
     close: (id: string) => void;
 

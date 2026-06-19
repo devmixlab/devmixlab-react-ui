@@ -13,13 +13,19 @@ type ToastItemProps = {
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-    const { close } = useToastContext();
+    const { close, requestClose } = useToastContext();
 
     const [visible, setVisible] = React.useState(true);
 
     const handleClose = () => {
-        setVisible(false);
+        requestClose(toast.id);
     };
+
+    useEffect(() => {
+        if (toast.closing) {
+            setVisible(false);
+        }
+    }, [toast.closing]);
 
     useEffect(() => {
         if (!toast.duration) {
@@ -27,23 +33,11 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         }
 
         const timeout = window.setTimeout(() => {
-            setVisible(false);
+            requestClose(toast.id);
         }, toast.duration);
 
         return () => window.clearTimeout(timeout);
     }, [toast.duration]);
-
-    // useEffect(() => {
-    //     if (!toast.duration) {
-    //         return;
-    //     }
-    //
-    //     const timeout = window.setTimeout(() => {
-    //         close(toast.id);
-    //     }, toast.duration);
-    //
-    //     return () => window.clearTimeout(timeout);
-    // }, [toast.id, toast.duration, close]);
 
     return (
         <Alert

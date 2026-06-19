@@ -4,6 +4,11 @@ import { ToastContext, ToastRecord } from './Toast.context';
 
 import { ToastViewport } from './ToastViewport';
 
+// export type ToastRecord = ToastOptions & {
+//     id: string;
+//     closing?: boolean;
+// };
+
 export const toastPositions = [
     'top-left',
     'top-center',
@@ -15,7 +20,6 @@ export const toastPositions = [
 
 export type ToastPosition = (typeof toastPositions)[number];
 
-// export type ToastIntent = 'success' | 'error' | 'warning' | 'info';
 export type ToastIntent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
 
 export type ToastOptions = {
@@ -31,6 +35,7 @@ export type ToastProviderProps = {
     position?: ToastPosition;
     offset?: number | string;
     max?: number;
+    minCloseInterval?: number;
 };
 
 export const ToastProvider = ({
@@ -38,12 +43,51 @@ export const ToastProvider = ({
     position = 'top-right',
     offset = '1rem',
     max = 5,
+    minCloseInterval = 1000,
 }: ToastProviderProps) => {
     const [toasts, setToasts] = useState<ToastRecord[]>([]);
 
-    const close = useCallback((id: string) => {
-        setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, []);
+    const closeQueueRef = React.useRef<string[]>([]);
+    const closeTimerRef = React.useRef<number | null>(null);
+
+    const requestClose = useCallback(
+        (id: string) => {
+            if (closeQueueRef.current.includes(id)) {
+                return;
+            }
+
+            closeQueueRef.current.push(id);
+
+            if (closeTimerRef.current) {
+                return;
+            }
+
+            const processNext = () => {
+                const nextId = closeQueueRef.current.shift();
+
+                if (!nextId) {
+                    closeTimerRef.current = null;
+                    return;
+                }
+
+                setToasts((prev) =>
+                    prev.map((toast) =>
+                        toast.id === nextId
+                            ? {
+                                  ...toast,
+                                  closing: true,
+                              }
+                            : toast,
+                    ),
+                );
+
+                closeTimerRef.current = window.setTimeout(processNext, minCloseInterval);
+            };
+
+            processNext();
+        },
+        [minCloseInterval],
+    );
 
     const clear = useCallback(() => {
         setToasts([]);
@@ -51,32 +95,6 @@ export const ToastProvider = ({
 
     const show = useCallback((options: ToastOptions) => {
         const id = crypto.randomUUID();
-
-        // setToasts((prev) => [
-        //     ...prev,
-        //     {
-        //         id,
-        //         duration: 5000,
-        //         closable: true,
-        //         intent: 'info',
-        //         ...options,
-        //     },
-        // ]);
-
-        // setToasts((prev) => {
-        //     const next = [
-        //         ...prev,
-        //         {
-        //             id,
-        //             duration: 5000,
-        //             closable: true,
-        //             intent: 'info',
-        //             ...options,
-        //         },
-        //     ];
-        //
-        //     return next.slice(-max);
-        // });
 
         setToasts((prev) => {
             const limited = prev.length >= max ? prev.slice(1) : prev;
@@ -101,9 +119,10 @@ export const ToastProvider = ({
             toasts,
             show,
             close,
+            requestClose,
             clear,
         }),
-        [toasts, show, close, clear],
+        [toasts, show, close, requestClose, clear],
     );
 
     return (
