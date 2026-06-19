@@ -7,20 +7,22 @@ import { ToastItem } from './ToastItem';
 
 import { classPrefix } from '../../utils/classPrefix';
 import { ToastPosition } from './ToastProvider';
+import { clsx } from 'clsx';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
 type ToastViewportProps = {
     position: ToastPosition;
     offset?: number | string;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export const ToastViewport = ({ position, offset }: ToastViewportProps) => {
+export const ToastViewport = ({ className, position, offset, ...rest }: ToastViewportProps) => {
     const { toasts } = useToastContext();
 
     return createPortal(
         <div
-            className={prefix('__viewport')}
+            {...rest}
+            className={clsx(prefix('__viewport'), className)}
             data-position={position}
             style={
                 {

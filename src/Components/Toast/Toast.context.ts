@@ -21,6 +21,14 @@ export type ToastContextValue = {
     close: (id: string) => void;
 
     clear: () => void;
+
+    isPaused: boolean;
+
+    pauseAll: () => void;
+
+    resumeAll: () => void;
+
+    minCloseInterval: number;
 };
 
 export const ToastContext = createContext<ToastContextValue | null>(null);
