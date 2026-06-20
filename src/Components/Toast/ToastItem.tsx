@@ -3,6 +3,7 @@ import { ToastRecord, useToastContext } from './Toast.context';
 import { classPrefix } from '../../utils/classPrefix';
 import { Alert } from '../Alert';
 import { TransitionAttention, TransitionControlRef, Transition } from '../Transition';
+import { ToastOptions } from './ToastProvider';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
@@ -158,6 +159,16 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         return () => observer.disconnect();
     }, []);
 
+    const renderContent = {
+        id: toast.id,
+        close: () => close(toast.id),
+        runAttention,
+        restart,
+        update: (options: ToastOptions) => {
+            update(toast.id, options);
+        },
+    };
+
     return (
         <Transition
             visible={wrapperIn}
@@ -207,18 +218,10 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
                     </Alert.Description>
                 )}
 
+                {toast.renderContent?.(renderContent)}
+
                 {toast.renderActions && (
-                    <Alert.Actions>
-                        {toast.renderActions({
-                            id: toast.id,
-                            close: () => close(toast.id),
-                            runAttention,
-                            restart,
-                            update: (options) => {
-                                update(toast.id, options);
-                            },
-                        })}
-                    </Alert.Actions>
+                    <Alert.Actions>{toast.renderActions(renderContent)}</Alert.Actions>
                 )}
             </Alert>
         </Transition>

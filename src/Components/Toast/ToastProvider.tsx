@@ -30,6 +30,7 @@ export type ToastOptions = {
 
     shadow?: BoxProps['shadow'];
 
+    renderContent?: (handle: ToastHandle) => React.ReactNode;
     renderActions?: (handle: ToastHandle) => React.ReactNode;
 };
 
