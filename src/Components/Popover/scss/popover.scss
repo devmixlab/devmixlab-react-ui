@@ -82,38 +82,38 @@
             }
         }
 
-        &[data-animation-state='entering'] {
-            animation:
-                popover-backdrop-in
-                var(--animation-enter-duration)
-                var(--animation-enter-easing)
-                forwards;
-        }
-
-        &[data-animation-state='exiting'] {
-            animation:
-                popover-backdrop-out
-                var(--animation-exit-duration)
-                var(--animation-exit-easing)
-                forwards;
-
-            pointer-events: none;
-        }
-
-        &[data-animation-state='entered'] {
-            opacity: 1;
-        }
-
-        &[data-animation-state='exited'] {
-            opacity: 0;
-        }
+        //&[data-animation-state='entering'] {
+        //    animation:
+        //        popover-backdrop-in
+        //        var(--animation-enter-duration)
+        //        var(--animation-enter-easing)
+        //        forwards;
+        //}
+        //
+        //&[data-animation-state='exiting'] {
+        //    animation:
+        //        popover-backdrop-out
+        //        var(--animation-exit-duration)
+        //        var(--animation-exit-easing)
+        //        forwards;
+        //
+        //    pointer-events: none;
+        //}
+        //
+        //&[data-animation-state='entered'] {
+        //    opacity: 1;
+        //}
+        //
+        //&[data-animation-state='exited'] {
+        //    opacity: 0;
+        //}
     }
 
     &__panel {
-        --animation-enter-duration: 120ms;
-        --animation-exit-duration: 120ms;
-        --animation-enter-easing: var(--#{$p}-ease-standard);
-        --animation-exit-easing: var(--#{$p}-ease-standard);
+        //--animation-enter-duration: 120ms;
+        //--animation-exit-duration: 120ms;
+        //--animation-enter-easing: var(--#{$p}-ease-standard);
+        //--animation-exit-easing: var(--#{$p}-ease-standard);
 
         --popover-slide-distance: 8px;
 
@@ -287,134 +287,134 @@
 // Animations
 // ---------------------------------------------------------------------------
 
-.#{$popover-prefix} {
-    &__panel {
-
-        // ---------------------------------------------------------------------------
-        // Placement-aware slide variables
-        // ---------------------------------------------------------------------------
-
-        &[data-placement^='top'] {
-            --popover-slide-x: 0;
-            --popover-slide-y: var(--popover-slide-distance, 8px);
-        }
-
-        &[data-placement^='bottom'] {
-            --popover-slide-x: 0;
-            --popover-slide-y: calc(var(--popover-slide-distance, 8px) * -1);
-        }
-
-        &[data-placement^='left'] {
-            --popover-slide-x: var(--popover-slide-distance, 8px);
-            --popover-slide-y: 0;
-        }
-
-        &[data-placement^='right'] {
-            --popover-slide-x: calc(var(--popover-slide-distance, 8px) * -1);
-            --popover-slide-y: 0;
-        }
-
-        // ---------------------------------------------------------------------------
-        // Animation variants
-        // ---------------------------------------------------------------------------
-
-        &[data-animation-state='exiting'] {
-            pointer-events: none;
-        }
-
-        &[data-animation-state='entering'],
-        &[data-animation-state='exiting'] {
-            will-change: transform, opacity;
-        }
-
-        &[data-animation='fade'] {
-            &[data-animation-state='entering'] {
-                animation:
-                    popover-fade-in
-                    var(--animation-enter-duration)
-                    var(--animation-enter-easing)
-                    forwards;
-            }
-
-            &[data-animation-state='exiting'] {
-                animation:
-                    popover-fade-out
-                    var(--animation-exit-duration)
-                    var(--animation-exit-easing)
-                    forwards;
-            }
-        }
-
-        &[data-animation='scale'] {
-            &[data-animation-state='entering'] {
-                animation:
-                    popover-scale-in
-                    var(--animation-enter-duration)
-                    var(--animation-enter-easing)
-                    forwards;
-            }
-
-            &[data-animation-state='exiting'] {
-                animation:
-                    popover-scale-out
-                    var(--animation-exit-duration)
-                    var(--animation-exit-easing)
-                    forwards;
-            }
-        }
-
-        &[data-animation='scale-fade'] {
-            &[data-animation-state='entering'] {
-                animation:
-                    popover-scale-fade-in
-                    var(--animation-enter-duration)
-                    var(--animation-enter-easing)
-                    forwards;
-            }
-
-            &[data-animation-state='exiting'] {
-                animation:
-                    popover-scale-fade-out
-                    var(--animation-exit-duration)
-                    var(--animation-exit-easing)
-                    forwards;
-            }
-        }
-
-        &[data-animation='slide'] {
-            &[data-animation-state='entering'] {
-                animation:
-                    popover-slide-in
-                    var(--animation-enter-duration)
-                    var(--animation-enter-easing)
-                    forwards;
-            }
-
-            &[data-animation-state='exiting'] {
-                animation:
-                    popover-slide-out
-                    var(--animation-exit-duration)
-                    var(--animation-exit-easing)
-                    forwards;
-            }
-        }
-
-        &[data-animation='slide-fade'] {
-            &[data-animation-state='entering'] {
-                animation:
-                    popover-slide-fade-in
-                    var(--animation-enter-duration)
-                    var(--animation-enter-easing)
-                    forwards;
-            }
-
-            &[data-animation-state='exiting'] {
-                animation:
-                    popover-slide-fade-out
-                    var(--animation-exit-duration)
-                    var(--animation-exit-easing)
-                    forwards;
-            }
-        }
-    }
-}
+//.#{$popover-prefix} {
+//    &__panel {
+//
+//        // ---------------------------------------------------------------------------
+//        // Placement-aware slide variables
+//        // ---------------------------------------------------------------------------
+//
+//        &[data-placement^='top'] {
+//            --popover-slide-x: 0;
+//            --popover-slide-y: var(--popover-slide-distance, 8px);
+//        }
+//
+//        &[data-placement^='bottom'] {
+//            --popover-slide-x: 0;
+//            --popover-slide-y: calc(var(--popover-slide-distance, 8px) * -1);
+//        }
+//
+//        &[data-placement^='left'] {
+//            --popover-slide-x: var(--popover-slide-distance, 8px);
+//            --popover-slide-y: 0;
+//        }
+//
+//        &[data-placement^='right'] {
+//            --popover-slide-x: calc(var(--popover-slide-distance, 8px) * -1);
+//            --popover-slide-y: 0;
+//        }
+//
+//        // ---------------------------------------------------------------------------
+//        // Animation variants
+//        // ---------------------------------------------------------------------------
+//
+//        &[data-animation-state='exiting'] {
+//            pointer-events: none;
+//        }
+//
+//        &[data-animation-state='entering'],
+//        &[data-animation-state='exiting'] {
+//            will-change: transform, opacity;
+//        }
+//
+//        &[data-animation='fade'] {
+//            &[data-animation-state='entering'] {
+//                animation:
+//                    popover-fade-in
+//                    var(--animation-enter-duration)
+//                    var(--animation-enter-easing)
+//                    forwards;
+//            }
+//
+//            &[data-animation-state='exiting'] {
+//                animation:
+//                    popover-fade-out
+//                    var(--animation-exit-duration)
+//                    var(--animation-exit-easing)
+//                    forwards;
+//            }
+//        }
+//
+//        &[data-animation='scale'] {
+//            &[data-animation-state='entering'] {
+//                animation:
+//                    popover-scale-in
+//                    var(--animation-enter-duration)
+//                    var(--animation-enter-easing)
+//                    forwards;
+//            }
+//
+//            &[data-animation-state='exiting'] {
+//                animation:
+//                    popover-scale-out
+//                    var(--animation-exit-duration)
+//                    var(--animation-exit-easing)
+//                    forwards;
+//            }
+//        }
+//
+//        &[data-animation='scale-fade'] {
+//            &[data-animation-state='entering'] {
+//                animation:
+//                    popover-scale-fade-in
+//                    var(--animation-enter-duration)
+//                    var(--animation-enter-easing)
+//                    forwards;
+//            }
+//
+//            &[data-animation-state='exiting'] {
+//                animation:
+//                    popover-scale-fade-out
+//                    var(--animation-exit-duration)
+//                    var(--animation-exit-easing)
+//                    forwards;
+//            }
+//        }
+//
+//        &[data-animation='slide'] {
+//            &[data-animation-state='entering'] {
+//                animation:
+//                    popover-slide-in
+//                    var(--animation-enter-duration)
+//                    var(--animation-enter-easing)
+//                    forwards;
+//            }
+//
+//            &[data-animation-state='exiting'] {
+//                animation:
+//                    popover-slide-out
+//                    var(--animation-exit-duration)
+//                    var(--animation-exit-easing)
+//                    forwards;
+//            }
+//        }
+//
+//        &[data-animation='slide-fade'] {
+//            &[data-animation-state='entering'] {
+//                animation:
+//                    popover-slide-fade-in
+//                    var(--animation-enter-duration)
+//                    var(--animation-enter-easing)
+//                    forwards;
+//            }
+//
+//            &[data-animation-state='exiting'] {
+//                animation:
+//                    popover-slide-fade-out
+//                    var(--animation-exit-duration)
+//                    var(--animation-exit-easing)
+//                    forwards;
+//            }
+//        }
+//    }
+//}

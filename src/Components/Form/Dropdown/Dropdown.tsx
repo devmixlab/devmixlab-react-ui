@@ -119,7 +119,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             modal = false,
 
             onUnmount,
-            onAnimationEntered,
+            onEntered,
             onReady,
 
             ...rest
@@ -351,10 +351,10 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
                         onUnmount?.();
                     }}
-                    onAnimationEntered={() => {
+                    onEntered={() => {
                         flushOnEnteredCallbacks();
 
-                        onAnimationEntered?.();
+                        onEntered?.();
                     }}
                     onReady={() => {
                         flushReadyCallbacks();

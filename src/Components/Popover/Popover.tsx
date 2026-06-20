@@ -29,6 +29,9 @@ import { PopoverProviders } from './PopoverProviders';
 import { Button, ButtonProps } from '../Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import { clsx } from 'clsx';
+import { Transition, SharedTransitionProps, sharedTransitionProps } from '../Transition';
+import { splitProps } from '../../utils/splitProps';
+import { usePopoverTransitionContext } from './PopoverTransition.context';
 
 export const BUTTON_ICON_SLOT_WIDTHS = {
     xs: 6,
@@ -42,6 +45,15 @@ export const BUTTON_ICON_SLOT_WIDTHS = {
 // Types
 // ---------------------------------------------------------------------------
 
+export type PopoverMotionPreset = 'fast' | 'base' | 'slow';
+
+type PopoverMotionPresetRecord = {
+    enterDuration: number;
+    exitDuration: number;
+    enterEasing: string;
+    exitEasing: string;
+};
+
 type PopoverChevron = 'rotate' | 'fixed' | 'none';
 
 export type PopoverTriggerMode = 'click' | 'hover';
@@ -54,14 +66,14 @@ export type PopoverVariant = 'solid' | 'glass' | 'gradient' | (string & {});
 
 export type PopoverRole = 'dialog' | 'menu' | 'listbox';
 
-type PopoverProps = {
+type OwnPopoverProps = {
     children: React.ReactNode;
 
     tree?: boolean;
     role?: PopoverRole;
 
     variant?: PopoverVariant;
-    animation?: PopoverAnimation;
+    motionPreset?: PopoverMotionPreset;
 
     trigger?: PopoverTriggerMode;
     interactive?: boolean;
@@ -129,33 +141,14 @@ type PopoverProps = {
 
     returnFocus?: boolean;
 
-    /**
-     * Duration (ms) of the enter animations.
-     * @default 200
-     */
-    animationEnterDuration?: number;
-    /**
-     * Duration (ms) of the exit animations.
-     * The modal stays mounted for this long after `opened` becomes false so the
-     * exit animation can finish before the DOM node is removed.
-     * @default 200
-     */
-    animationExitDuration?: number;
-
-    enterAnimationEasing?: string;
-    exitAnimationEasing?: string;
-
-    /** Called when the modal has fully entered (animation complete). */
-    onAnimationEntered?: () => void;
-    /** Called when the modal has fully exited (animation complete, just before unmount). */
-    onAnimationExited?: () => void;
-
-    onMount?: () => void;
-    onUnmount?: () => void;
+    // onMount?: () => void;
+    // onUnmount?: () => void;
     onReady?: () => void;
 
-    keepMounted?: boolean;
+    // keepMounted?: boolean;
 };
+
+type PopoverProps = OwnPopoverProps & SharedTransitionProps;
 
 // export type TriggerProps = Omit<React.HTMLAttributes<HTMLElement>, 'ref'> & {
 //     ref?: React.Ref<HTMLElement>;
@@ -215,6 +208,46 @@ const prefix = (name: string = '') => {
     return classPrefix(`--popover${name}`);
 };
 
+// const transitionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecord> = {
+//     fast: {
+//         enterDuration: 120,
+//         exitDuration: 100,
+//     },
+//
+//     base: {
+//         enterDuration: 180,
+//         exitDuration: 140,
+//     },
+//
+//     slow: {
+//         enterDuration: 250,
+//         exitDuration: 200,
+//     },
+// } as const;
+
+const popoverMotionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecord> = {
+    fast: {
+        enterDuration: 120,
+        exitDuration: 100,
+        enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
+    },
+
+    base: {
+        enterDuration: 180,
+        exitDuration: 140,
+        enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
+    },
+
+    slow: {
+        enterDuration: 250,
+        exitDuration: 200,
+        enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
+    },
+} as const;
+
 // ---------------------------------------------------------------------------
 // Popover
 // ---------------------------------------------------------------------------
@@ -225,12 +258,7 @@ const Popover = ({
     tree = false,
     role = 'dialog',
     variant = 'solid',
-    // animation = 'none',
-    animation = 'scale-fade',
-    // animation = 'fade',
-    // animation = 'slide-fade',
-    // animation = 'slide',
-    // animation = 'scale',
+    motionPreset = 'base',
 
     trigger = 'click',
     interactive = true,
@@ -264,20 +292,24 @@ const Popover = ({
     backdropVariant = 'blur',
     returnFocus = true,
 
-    animationEnterDuration = 120,
-    animationExitDuration = 120,
-    enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
-    exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+    // enterDuration = 120,
+    // exitDuration = 120,
+    // enterEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+    // exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
 
-    onAnimationEntered,
-    onAnimationExited,
+    // onEntered,
+    // onExited,
 
-    onMount,
-    onUnmount,
+    // onMount,
+    // onUnmount,
     onReady,
 
-    keepMounted = false,
+    // keepMounted = false,
+
+    ...restWithTransition
 }: PopoverProps) => {
+    const [transitionProps, rest] = splitProps(restWithTransition, sharedTransitionProps);
+
     const arrowInset = arrowCenter ? '50%' : arrowInsetProp;
     const arrowShift = arrowCenter ? '-50%' : arrowShiftProp;
 
@@ -286,17 +318,6 @@ const Popover = ({
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
 
     const opened = isControlled ? open : internalOpen;
-
-    // ── Presence ──────────────────────────────────────────────────────
-    const { isMounted, state: animationState } = usePresence({
-        present: opened,
-        enterDuration: animation === 'none' ? 0 : animationEnterDuration,
-        exitDuration: animation === 'none' ? 0 : animationExitDuration,
-        onEntered: onAnimationEntered,
-        onExited: onAnimationExited,
-        onMount,
-        onUnmount,
-    });
 
     const setOpened = useCallback(
         (next: boolean) => {
@@ -363,10 +384,8 @@ const Popover = ({
         () => ({
             opened,
             setOpened,
-            isMounted,
-            animationState,
         }),
-        [opened, setOpened, isMounted, animationState],
+        [opened, setOpened],
     );
 
     const interactionValue = useMemo(
@@ -403,26 +422,42 @@ const Popover = ({
         [triggerId, panelId, role],
     );
 
+    const transitionValue = useMemo(
+        () => ({ ...transitionProps }),
+        [
+            transitionProps.controlRef,
+            transitionProps.animateOnMount,
+            transitionProps.animation,
+            transitionProps.attention,
+            transitionProps.attentionExit,
+            transitionProps.respectAttentionDuration,
+            transitionProps.reduceMotion,
+            transitionProps.onlyPresence,
+            transitionProps.enterDuration,
+            transitionProps.exitDuration,
+            transitionProps.enterEasing,
+            transitionProps.exitEasing,
+            transitionProps.keepMounted,
+            transitionProps.onEntered,
+            transitionProps.onExited,
+            transitionProps.onMount,
+            transitionProps.onUnmount,
+            transitionProps.slideOffset,
+            transitionProps.scaleFrom,
+            transitionProps.blurFrom,
+        ],
+    );
+
     const configValue = useMemo(
         () => ({
             variant,
-
-            animation,
-            animationEnterDuration,
-            animationExitDuration,
-            enterAnimationEasing,
-            exitAnimationEasing,
-
+            motionPreset,
             modal,
             backdrop,
             backdropVariant,
-
             closeOnOutsideClick,
             returnFocus,
-
             onReady,
-            keepMounted,
-
             arrow,
             arrowSize,
             arrowInset,
@@ -430,23 +465,13 @@ const Popover = ({
         }),
         [
             variant,
-
-            animation,
-            animationEnterDuration,
-            animationExitDuration,
-            enterAnimationEasing,
-            exitAnimationEasing,
-
+            motionPreset,
             modal,
             backdrop,
             backdropVariant,
-
             closeOnOutsideClick,
             returnFocus,
-
             onReady,
-            keepMounted,
-
             arrow,
             arrowSize,
             arrowInset,
@@ -463,6 +488,7 @@ const Popover = ({
                 interaction={interactionValue}
                 accessibility={accessibilityValue}
                 config={configValue}
+                transition={transitionValue}
             >
                 {children}
             </PopoverProviders>
@@ -631,7 +657,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         },
         ref,
     ) => {
-        const { opened, setOpened, isMounted, animationState } = usePopoverStateContext();
+        const { opened, setOpened } = usePopoverStateContext();
 
         const { trigger, interactive, disabled, handleHoverEnter, handleHoverLeave } =
             usePopoverInteractionContext();
@@ -643,11 +669,12 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
         const {
             variant,
-            animation,
-            animationEnterDuration,
-            animationExitDuration,
-            enterAnimationEasing,
-            exitAnimationEasing,
+            motionPreset,
+            // animation,
+            // enterDuration,
+            // exitDuration,
+            // enterEasing,
+            // exitEasing,
 
             modal,
             backdrop,
@@ -657,13 +684,29 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             returnFocus,
 
             onReady,
-            keepMounted,
+            // keepMounted,
 
             arrow,
             arrowSize,
             arrowInset,
             arrowShift,
         } = usePopoverConfigContext();
+
+        const currentMotionPreset = popoverMotionPresets[motionPreset];
+
+        const ctxTransition = usePopoverTransitionContext();
+
+        const finalTransitionProps = {
+            ...ctxTransition,
+            ...{
+                respectAttentionDuration: ctxTransition.respectAttentionDuration ?? true,
+                animation: ctxTransition.animation ?? 'scale-fade',
+                enterDuration: ctxTransition.enterDuration ?? currentMotionPreset.enterDuration,
+                exitDuration: ctxTransition.exitDuration ?? currentMotionPreset.exitDuration,
+                enterEasing: ctxTransition.enterEasing ?? currentMotionPreset.enterEasing,
+                exitEasing: ctxTransition.exitEasing ?? currentMotionPreset.exitEasing,
+            },
+        };
 
         const handleFloatingRef = useCallback(
             (node: HTMLDivElement | null) => {
@@ -679,26 +722,18 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
         );
 
         // ── Unmount after exit animation ─────────────────────────────────
-        if (!keepMounted && !isMounted) {
-            return null;
-        }
+        // if (!keepMounted && !isMounted) {
+        //     return null;
+        // }
 
         return (
             <FloatingPortal>
-                {backdrop && opened && trigger === 'click' && (
-                    <div
+                {backdrop && trigger === 'click' && (
+                    <Transition
+                        visible={opened}
                         className={prefix('__backdrop')}
                         onClick={() => closeOnOutsideClick && setOpened(false)}
                         data-variant={backdropVariant}
-                        data-animation-state={animationState}
-                        style={
-                            {
-                                '--animation-enter-duration': animationEnterDuration + 'ms',
-                                '--animation-exit-duration': animationExitDuration + 'ms',
-                                '--animation-enter-easing': enterAnimationEasing,
-                                '--animation-exit-easing': exitAnimationEasing,
-                            } as CSSProperties
-                        }
                     />
                 )}
 
@@ -708,24 +743,19 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                     initialFocus={modal ? 0 : -1}
                     returnFocus={returnFocus}
                 >
-                    <Box
+                    <Transition
+                        visible={opened}
+                        {...finalTransitionProps}
                         ref={mergeRefs(handleFloatingRef, ref)}
                         id={panelId}
                         role={role}
                         tabIndex={-1}
                         aria-modal={modal || undefined}
-                        // aria-modal={role === 'dialog' ? false : undefined}
                         aria-labelledby={role === 'dialog' ? triggerId : undefined}
-                        aria-hidden={!isMounted || undefined}
+                        // aria-hidden={!isMounted || undefined}
                         style={
                             {
                                 ...floatingStyles,
-                                display: !isMounted ? 'none' : undefined,
-
-                                '--animation-enter-duration': animationEnterDuration + 'ms',
-                                '--animation-exit-duration': animationExitDuration + 'ms',
-                                '--animation-enter-easing': enterAnimationEasing,
-                                '--animation-exit-easing': exitAnimationEasing,
 
                                 '--popover-trigger-width': refs.reference.current
                                     ? `${refs.reference.current.getBoundingClientRect().width}px`
@@ -736,8 +766,6 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         shadow={shadow}
                         rounded={rounded}
                         {...getFloatingProps()}
-                        data-animation={animation}
-                        data-animation-state={animationState}
                         data-match-trigger-width={matchTriggerWidth || undefined}
                         data-variant={variant}
                         data-placement={placement}
@@ -791,7 +819,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         )}
 
                         {children}
-                    </Box>
+                    </Transition>
                 </FloatingFocusManager>
             </FloatingPortal>
         );

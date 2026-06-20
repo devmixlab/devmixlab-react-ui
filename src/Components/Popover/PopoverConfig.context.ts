@@ -1,15 +1,18 @@
 import { createContext, useContext } from 'react';
+import { PopoverMotionPreset } from './Popover';
 
 export type PopoverConfigContextValue = {
     variant: string;
 
-    animation: string;
+    motionPreset: PopoverMotionPreset;
 
-    animationEnterDuration: number;
-    animationExitDuration: number;
+    // animation: string;
 
-    enterAnimationEasing: string;
-    exitAnimationEasing: string;
+    // enterDuration: number;
+    // exitDuration: number;
+
+    // enterEasing: string;
+    // exitEasing: string;
 
     modal: boolean;
 
@@ -22,7 +25,7 @@ export type PopoverConfigContextValue = {
 
     onReady?: () => void;
 
-    keepMounted: boolean;
+    // keepMounted: boolean;
 
     arrow: boolean;
     arrowSize: number;

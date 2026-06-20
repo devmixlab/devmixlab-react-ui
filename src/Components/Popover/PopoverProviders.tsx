@@ -10,6 +10,10 @@ import {
     PopoverAccessibilityContextValue,
 } from './PopoverAccessibility.context';
 import { PopoverConfigContext, PopoverConfigContextValue } from './PopoverConfig.context';
+import {
+    PopoverTransitionContext,
+    PopoverTransitionContextValue,
+} from './PopoverTransition.context';
 
 type PopoverProvidersProps = {
     children: React.ReactNode;
@@ -19,6 +23,7 @@ type PopoverProvidersProps = {
     floating: PopoverFloatingContextValue;
     accessibility: PopoverAccessibilityContextValue;
     config: PopoverConfigContextValue;
+    transition: PopoverTransitionContextValue;
 };
 
 export const PopoverProviders = ({
@@ -29,6 +34,7 @@ export const PopoverProviders = ({
     floating,
     accessibility,
     config,
+    transition,
 }: PopoverProvidersProps) => {
     return (
         <PopoverStateContext.Provider value={state}>
@@ -36,7 +42,9 @@ export const PopoverProviders = ({
                 <PopoverInteractionContext.Provider value={interaction}>
                     <PopoverAccessibilityContext.Provider value={accessibility}>
                         <PopoverConfigContext.Provider value={config}>
-                            {children}
+                            <PopoverTransitionContext.Provider value={transition}>
+                                {children}
+                            </PopoverTransitionContext.Provider>
                         </PopoverConfigContext.Provider>
                     </PopoverAccessibilityContext.Provider>
                 </PopoverInteractionContext.Provider>

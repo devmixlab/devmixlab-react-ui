@@ -3,9 +3,6 @@ import React, { createContext, useContext } from 'react';
 export type PopoverStateContextValue = {
     opened: boolean;
     setOpened: (opened: boolean) => void;
-
-    isMounted: boolean;
-    animationState: string;
 };
 
 export const PopoverStateContext = createContext<PopoverStateContextValue | null>(null);
