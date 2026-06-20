@@ -34,17 +34,20 @@ $toast-prefix: #{$p}--toast;
         &[data-position='top-left'] {
             top: var(--toast-offset, 1rem);
             left: var(--toast-offset, 1rem);
+            flex-direction: column-reverse;
         }
 
         &[data-position='top-center'] {
             top: var(--toast-offset, 1rem);
             left: 50%;
             transform: translateX(-50%);
+            flex-direction: column-reverse;
         }
 
         &[data-position='top-right'] {
             top: var(--toast-offset, 1rem);
             right: var(--toast-offset, 1rem);
+            flex-direction: column-reverse;
         }
 
         &[data-position='bottom-left'] {
@@ -76,22 +79,44 @@ $toast-prefix: #{$p}--toast;
         //overflow: hidden;
         //background-color: red;
 
-        transition:
-            height 250ms ease;
+        //transition:
+        //    height 250ms ease;
 
         &[data-position='bottom-right'] {
 
         }
 
-        &[data-mounted] {
+        &[data-wrapper-in] {
             height: var(--toast-height);
             //margin-bottom: 12px;
+        }
+
+        &[data-animation='toast-wrapper'] {
+            &[data-animation-state='entering'] {
+                animation: #{$toast-prefix}--height-enter var(--animation-enter-duration) var(--animation-enter-easing) forwards;
+            }
+            //&[data-animation-state='entred'] {
+            //    height: var(--toast-height);
+            //}
+
+            &[data-animation-state='exiting'] {
+                animation: #{$toast-prefix}--height-exit var(--animation-exit-duration) var(--animation-exit-easing) forwards;
+            }
+        }
+
+        &[data-animation-state='entering'],
+        &[data-animation-state='exiting'] {
+            will-change: height;
         }
     }
 
     &__item {
         pointer-events: auto;
         //position: absolute;
+
+        &[data-position^='top'] {
+            --offcanvas-transform-from: translateY(-110%);
+        }
 
         &[data-position='bottom-right'] {
             --offcanvas-transform-from: translateY(110%);
@@ -106,9 +131,36 @@ $toast-prefix: #{$p}--toast;
                 animation: #{$toast-prefix}--slide-exit var(--animation-exit-duration) var(--animation-exit-easing) forwards;
             }
         }
+
+        &[data-animation-state='entering'],
+        &[data-animation-state='exiting'] {
+            will-change: transform, opacity;
+        }
     }
 }
 
+/*
+ * Height
+ */
+@keyframes #{$toast-prefix}--height-enter {
+    from {
+        height: 0;
+    }
+
+    to {
+        height: var(--toast-height);
+    }
+}
+
+@keyframes #{$toast-prefix}--height-exit {
+    from {
+        height: var(--toast-height);
+    }
+
+    to {
+        height: 0;
+    }
+}
 
 /*
  * Slide

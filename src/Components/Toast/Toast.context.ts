@@ -19,6 +19,7 @@ export type ToastRecord = ToastOptions & {
 };
 
 export type ToastContextValue = {
+    remove: (id: string) => void;
     position: ToastPosition;
 
     update: (id: string, options: Partial<ToastOptions>) => void;

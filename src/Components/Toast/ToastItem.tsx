@@ -2,8 +2,7 @@ import React, { useEffect, useCallback, useLayoutEffect } from 'react';
 import { ToastRecord, useToastContext } from './Toast.context';
 import { classPrefix } from '../../utils/classPrefix';
 import { Alert } from '../Alert';
-import { Box } from '../Box';
-import { TransitionAttention, TransitionControlRef } from '../Transition';
+import { TransitionAttention, TransitionControlRef, Transition } from '../Transition';
 
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
@@ -12,14 +11,20 @@ type ToastItemProps = {
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-    const { position, update, close, requestClose, isPaused, toastControlRefs, closeQueueRef } =
-        useToastContext();
+    const {
+        remove,
+        position,
+        update,
+        close,
+        requestClose,
+        isPaused,
+        toastControlRefs,
+        closeQueueRef,
+    } = useToastContext();
 
     const [wrapperIn, setWrapperIn] = React.useState(false);
     const [visible, setVisible] = React.useState(true);
     const [height, setHeight] = React.useState(0);
-
-    const isClosable = toast.closable;
 
     const controlRef = React.useRef<TransitionControlRef>(null);
 
@@ -28,11 +33,17 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
     const remainingRef = React.useRef(toast.duration ?? 0);
     const startedAtRef = React.useRef<number | null>(null);
 
-    console.log(toast);
-
     const handleClose = () => {
         close(toast.id);
     };
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const frame = requestAnimationFrame(() => {
@@ -134,74 +145,82 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
             return;
         }
 
-        setHeight(alertRef.current.offsetHeight);
+        const element = alertRef.current;
+
+        const observer = new ResizeObserver(() => {
+            setHeight(element.offsetHeight);
+        });
+
+        observer.observe(element);
+
+        setHeight(element.offsetHeight);
+
+        return () => observer.disconnect();
     }, []);
 
     return (
-        (visible || wrapperIn) && (
-            <Box
-                className={prefix('__item-wrapper')}
+        <Transition
+            visible={wrapperIn}
+            animation="toast-wrapper"
+            enterDuration={250}
+            exitDuration={200}
+            onExited={() => {
+                remove(toast.id);
+            }}
+            className={prefix('__item-wrapper')}
+            data-position={position}
+            data-wrapper-in={wrapperIn || undefined}
+            keepMounted
+            style={
+                {
+                    '--toast-height': `${height}px`,
+                } as React.CSSProperties
+            }
+        >
+            <Alert
+                ref={alertRef}
+                controlRef={controlRef}
+                animation="toast-bottom"
+                enterDuration={350}
+                exitDuration={250}
+                visible={visible}
+                shadow={toast.shadow ?? 'md'}
+                onDismiss={toast.closable ? handleClose : undefined}
+                onExited={() => {
+                    // close(toast.id);
+                    setWrapperIn(false);
+                }}
+                className={prefix('__item')}
+                intent={toast.intent ?? 'secondary'}
+                variant={toast.variant ?? 'subtle'}
+                accent={toast.accent ?? 'left'}
+                size={toast.size ?? 'md'}
+                icon={toast.icon}
+                role={toast.intent === 'danger' ? 'alert' : 'status'}
                 data-position={position}
-                data-mounted={wrapperIn || undefined}
-                style={
-                    {
-                        '--toast-height': `${height}px`,
-                    } as React.CSSProperties
-                }
             >
-                <Alert
-                    // dismissible
-                    ref={alertRef}
-                    controlRef={controlRef}
-                    animation="toast-bottom"
-                    enterDuration={400}
-                    exitDuration={400}
-                    // attention="shake"
-                    // attentionExit="slide-left"
-                    // exitDuration={1000}s
-                    visible={visible}
-                    // accent="left"
-                    shadow="sm"
-                    icon
-                    onDismiss={toast.closable ? handleClose : undefined}
-                    // onDismiss={handleClose}
-                    onExited={() => {
-                        close(toast.id);
-                        setWrapperIn(false);
-                    }}
-                    className={prefix('__item')}
-                    intent={toast.intent}
-                    variant="subtle"
-                    role={toast.intent === 'danger' ? 'alert' : 'status'}
-                    data-position={position}
-                >
-                    {toast.title && (
-                        <Alert.Title>
-                            {toast.title} - {isPaused ? 'paused' : 'running'}
-                        </Alert.Title>
-                    )}
+                {toast.title && <Alert.Title>{toast.title}</Alert.Title>}
 
-                    {toast.description && (
-                        <Alert.Description className={prefix('__description')}>
-                            {toast.description}
-                        </Alert.Description>
-                    )}
+                {toast.description && (
+                    <Alert.Description className={prefix('__description')}>
+                        {toast.description}
+                    </Alert.Description>
+                )}
 
-                    {toast.renderActions && (
-                        <Alert.Actions>
-                            {toast.renderActions({
-                                id: toast.id,
-                                close: () => close(toast.id),
-                                runAttention,
-                                restart,
-                                update: (options) => {
-                                    update(toast.id, options);
-                                },
-                            })}
-                        </Alert.Actions>
-                    )}
-                </Alert>
-            </Box>
-        )
+                {toast.renderActions && (
+                    <Alert.Actions>
+                        {toast.renderActions({
+                            id: toast.id,
+                            close: () => close(toast.id),
+                            runAttention,
+                            restart,
+                            update: (options) => {
+                                update(toast.id, options);
+                            },
+                        })}
+                    </Alert.Actions>
+                )}
+            </Alert>
+        </Transition>
     );
 };

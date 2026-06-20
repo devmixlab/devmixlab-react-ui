@@ -4,6 +4,8 @@ import { ToastContext, ToastRecord } from './Toast.context';
 
 import { ToastViewport } from './ToastViewport';
 import { TransitionControlRef, TransitionAttention } from '../Transition';
+import { AlertAccent, AlertIntent, AlertSize, AlertVariant } from '../Alert';
+import { BoxProps } from '../Box';
 
 // export type ToastRecord = ToastOptions & {
 //     id: string;
@@ -21,14 +23,21 @@ export const toastPositions = [
 
 export type ToastPosition = (typeof toastPositions)[number];
 
-export type ToastIntent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+// export type ToastIntent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
 
 export type ToastOptions = {
     title?: React.ReactNode;
     description?: React.ReactNode;
     duration?: number | null;
     closable?: boolean;
-    intent?: ToastIntent;
+
+    size?: AlertSize;
+    variant?: AlertVariant;
+    intent?: AlertIntent;
+    icon?: boolean | React.ReactNode;
+    accent?: AlertAccent;
+
+    shadow?: BoxProps['shadow'];
 
     renderActions?: (handle: ToastHandle) => React.ReactNode;
 };
@@ -156,11 +165,15 @@ export const ToastProvider = ({
         };
     }, []);
 
-    const close = (id: string) => {
+    const close = useCallback((id: string) => {
         setToasts((prev) =>
             prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast)),
         );
-    };
+    }, []);
+
+    const remove = useCallback((id: string) => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, []);
 
     const requestClose = useCallback(
         (id: string) => {
@@ -191,14 +204,43 @@ export const ToastProvider = ({
         );
     }, []);
 
+    useEffect(() => {
+        const activeToasts = toasts.filter((toast) => !toast.closing);
+
+        if (activeToasts.length <= max) {
+            return;
+        }
+
+        const oldest = activeToasts[0];
+
+        if (oldest) {
+            // close(oldest.id);
+            setTimeout(() => {
+                close(oldest.id);
+            }, 200);
+        }
+    }, [toasts, max, close]);
+
     const show = useCallback((options: ToastOptions): ToastHandle => {
         const id = crypto.randomUUID();
 
         setToasts((prev) => {
-            const limited = prev.length >= max ? prev.slice(1) : prev;
+            // const limited = prev.length >= max ? prev.slice(1) : prev;
+
+            // if (prev.length >= max) {
+            //     console.log('more then max');
+            //     console.log(prev[0].id);
+            //     close(prev[0].id);
+            // }
+            // const oldest = prev.find((toast) => !toast.closing);
+            //
+            // if (oldest) {
+            //     close(oldest.id);
+            // }
 
             return [
-                ...limited,
+                // ...limited,
+                ...prev,
                 {
                     id,
                     // duration: 5000,
@@ -229,6 +271,7 @@ export const ToastProvider = ({
 
     const value = useMemo(
         () => ({
+            remove,
             position,
             update,
             toasts,
@@ -243,7 +286,19 @@ export const ToastProvider = ({
             toastControlRefs,
             closeQueueRef,
         }),
-        [position, update, toasts, show, close, requestClose, clear, isPaused, pauseAll, resumeAll],
+        [
+            remove,
+            position,
+            update,
+            toasts,
+            show,
+            close,
+            requestClose,
+            clear,
+            isPaused,
+            pauseAll,
+            resumeAll,
+        ],
     );
 
     return (

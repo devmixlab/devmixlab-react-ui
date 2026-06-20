@@ -299,7 +299,7 @@ const ImplTransition = (
             data-attention-exit={attentionExit ?? undefined}
             data-running-attention={runningAttention ?? undefined}
             aria-hidden={state === 'exited'}
-            inert={state === 'exited' ? true : undefined}
+            inert={state === 'exited' ? '' : undefined}
             style={
                 {
                     ...style,

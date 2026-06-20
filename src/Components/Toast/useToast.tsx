@@ -15,16 +15,23 @@ export const useToast = () => {
                 description,
                 closable: true,
                 duration: null,
-                intent: 'secondary',
+                intent: 'success',
                 renderActions: ({ close }) => {
                     return (
                         <Box d="flex" grow={1} justify="end">
-                            <Button onClick={close} intent="success" size="sm" variant="solid">
+                            <Button onClick={close} intent="success" size="sm" variant="ghost">
                                 Dismiss
                             </Button>
                         </Box>
                     );
                 },
+            }),
+
+        primary: (title: React.ReactNode, description?: React.ReactNode) =>
+            context.show({
+                title,
+                description,
+                intent: 'primary',
             }),
 
         error: (title: React.ReactNode, description?: React.ReactNode) =>
