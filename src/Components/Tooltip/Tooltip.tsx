@@ -2,7 +2,7 @@ import React, { forwardRef, useState } from 'react';
 import { Popover } from '../Popover';
 import type { Placement } from '@floating-ui/react';
 import { mergeRefs } from '../../utils/mergeRefs';
-import { BoxProps } from '../Box';
+import { Box, BoxProps } from '../Box';
 
 export type TooltipDensity = 'sm' | 'md' | 'lg';
 
@@ -19,11 +19,14 @@ export type TooltipProps = {
     openDelay?: number;
     closeDelay?: number;
     offset?: number;
+    multiline?: boolean;
+    maxLines?: number;
 
     shadow?: BoxProps['shadow'];
     rounded?: BoxProps['rounded'];
     maxWidth?: BoxProps['maxWidth'];
     maxW?: BoxProps['maxW'];
+
     density?: TooltipDensity;
 };
 
@@ -45,11 +48,12 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
             openDelay = 500,
             closeDelay = 0,
             offset = 8,
+            density = 'md',
+            multiline = true,
+            maxLines,
 
             shadow = 'sm',
             rounded = 'sm',
-            density = 'sm',
-
             maxWidth,
             maxW,
         },
@@ -62,6 +66,8 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
         );
 
         const { px, py } = densityMap[density];
+
+        const isOverflowHidden = (multiline && maxLines != null) || !multiline;
 
         if (disabled) {
             return children;
@@ -80,9 +86,6 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
                 arrowSize={10}
                 arrowInset={!isCentered ? 12 : undefined}
                 arrowCenter={isCentered ? true : undefined}
-                onOpenChange={() => {
-                    console.log(434343);
-                }}
             >
                 <Popover.Trigger
                     render={({ triggerProps }) =>
@@ -93,16 +96,20 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
                     }
                 />
 
-                <Popover.Panel
-                    role="tooltip"
-                    shadow={shadow}
-                    rounded={rounded}
-                    py={py}
-                    px={px}
-                    maxWidth={maxWidth}
-                    maxW={maxW}
-                >
-                    {content}
+                <Popover.Panel role="tooltip" shadow={shadow} rounded={rounded}>
+                    <Box
+                        rounded={rounded}
+                        py={py}
+                        px={px}
+                        maxWidth={maxWidth}
+                        maxW={maxW}
+                        textOverflow={multiline ? undefined : 'ellipsis'}
+                        lineClamp={multiline ? maxLines : undefined}
+                        overflow={isOverflowHidden ? 'hidden' : undefined}
+                        whiteSpace={multiline ? 'normal' : 'nowrap'}
+                    >
+                        {content}
+                    </Box>
                 </Popover.Panel>
             </Popover>
         );
