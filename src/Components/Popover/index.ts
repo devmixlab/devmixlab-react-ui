@@ -5,3 +5,4 @@ export type {
     PopoverPanelProps,
     PopoverTriggerRenderProps,
 } from './Popover';
+export class PopoverPlacement {}

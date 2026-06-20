@@ -22,5 +22,6 @@ export * from './src/Components/Heading';
 export * from './src/Components/Accordion';
 export * from './src/Components/Carousel';
 export * from './src/Components/Toast';
+export * from './src/Components/Tooltip';
 
 export * from './src/Components/Transition';
