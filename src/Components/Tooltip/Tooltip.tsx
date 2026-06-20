@@ -2,6 +2,14 @@ import React, { forwardRef, useState } from 'react';
 import { Popover } from '../Popover';
 import type { Placement } from '@floating-ui/react';
 import { mergeRefs } from '../../utils/mergeRefs';
+import { BoxProps } from '../Box';
+
+export type TooltipDensity = 'sm' | 'md' | 'lg';
+
+type TooltipDensityStyles = {
+    px: string;
+    py: string;
+};
 
 export type TooltipProps = {
     children: React.ReactElement;
@@ -12,14 +20,18 @@ export type TooltipProps = {
     closeDelay?: number;
     offset?: number;
 
-    arrow?: boolean;
-    arrowSize?: number;
-    arrowInset?: number | string;
-    arrowShift?: number | string;
-    arrowCenter?: boolean;
+    shadow?: BoxProps['shadow'];
+    rounded?: BoxProps['rounded'];
+    density?: TooltipDensity;
 };
 
 const centeredArrowPlacements = ['top', 'bottom', 'left', 'right'] as const;
+
+const densityMap: Record<TooltipDensity, TooltipDensityStyles> = {
+    sm: { px: 'sm', py: 'xs' },
+    md: { px: 'md', py: 'sm' },
+    lg: { px: 'lg', py: 'md' },
+};
 
 export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
     (
@@ -32,24 +44,23 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
             closeDelay = 0,
             offset = 8,
 
-            // Arrow props
-            // arrow = true,
-            // arrowSize,
-            // arrowInset,
-            // arrowShift,
-            // arrowCenter = true,
+            shadow = 'sm',
+            rounded = 'sm',
+            density = 'sm',
         },
         ref,
     ) => {
         const [resolvedPlacement, setResolvedPlacement] = useState<Placement>(placement);
 
-        if (disabled) {
-            return children;
-        }
-
         const isCentered = centeredArrowPlacements.includes(
             resolvedPlacement as (typeof centeredArrowPlacements)[number],
         );
+
+        const { px, py } = densityMap[density];
+
+        if (disabled) {
+            return children;
+        }
 
         return (
             <Popover
@@ -62,23 +73,11 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
                 arrow
                 arrowSize={10}
                 arrowInset={!isCentered ? 12 : undefined}
-                // arrowShift={arrowShift}
                 arrowCenter={isCentered ? true : undefined}
-                // arrowInset="50%"
-                // arrowShift="-50%"
                 onOpenChange={() => {
                     console.log(434343);
                 }}
             >
-                {/*<Popover.Trigger*/}
-                {/*    render={({ triggerProps }) =>*/}
-                {/*        React.cloneElement(children, {*/}
-                {/*            ...triggerProps,*/}
-                {/*            ref,*/}
-                {/*        })*/}
-                {/*    }*/}
-                {/*/>*/}
-
                 <Popover.Trigger
                     render={({ triggerProps }) =>
                         React.cloneElement(children, {
@@ -88,8 +87,8 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
                     }
                 />
 
-                <Popover.Panel role="tooltip" shadow="sm" rounded="sm" py="xs" px="sm">
-                    {content} asdf asd
+                <Popover.Panel role="tooltip" shadow={shadow} rounded={rounded} py={py} px={px}>
+                    {content}
                 </Popover.Panel>
             </Popover>
         );
