@@ -1,1 +1,65 @@
 @use '../../Popover/scss/popover';
+@use '../../../scss/functions/common' as *;
+@use '../../../scss/mixins/mode' as *;
+@use './tooltip-conf' as *;
+
+$semantic-intents: (primary, secondary, success, warning, info, danger);
+$dark-intents: (zinc, neutral, stone, gray, slate, secondary);
+
+@mixin solid($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --tooltip-color: #{intent($intent, 50)};
+
+        // NEW
+        --popover-panel-bg: #{intent($intent, 700)};
+        --popover-panel-border: #{intent($intent, 700)};
+    } @else {
+        --tooltip-color: #{intent($intent, 50)};
+
+        // NEW
+        --popover-panel-bg: #{intent($intent, 600)};
+        --popover-panel-border: #{intent($intent, 600)};
+    }
+}
+
+@mixin subtle($intent, $mode: 'light') {
+    @if ($mode == 'light') {
+        --tooltip-color: #{intent($intent, 900)};
+
+        --popover-panel-bg: #{intent($intent, 100)};
+        --popover-panel-border: #{intent($intent, 300)};
+    } @else {
+        --tooltip-color: #{intent($intent, 100)};
+
+        --popover-panel-bg: #{intent($intent, 900)};
+        --popover-panel-border: #{intent($intent, 700)};
+    }
+}
+
+.#{$tooltip-prefix}__panel {
+    color: var(--tooltip-color, currentColor);
+
+    @each $intent in $semantic-intents {
+        &[data-intent='#{$intent}'] {
+            &[data-variant='tooltip-solid'] {
+                @include solid($intent);
+            }
+            &[data-variant='tooltip-subtle'] {
+                @include subtle($intent);
+            }
+        }
+    }
+
+    @include dark {
+        @each $intent in $semantic-intents {
+            &[data-intent='#{$intent}'] {
+                &[data-variant='tooltip-solid'] {
+                    @include solid($intent, 'dark');
+                }
+                &[data-variant='tooltip-subtle'] {
+                    @include subtle($intent, 'dark');
+                }
+            }
+        }
+    }
+}
