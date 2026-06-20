@@ -2,6 +2,7 @@ import React, { createContext, useContext } from 'react';
 
 export type PopoverInteractionContextValue = {
     trigger: 'click' | 'hover';
+    interactive: boolean;
 
     openDelay: number;
     closeDelay: number;

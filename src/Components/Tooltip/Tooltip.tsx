@@ -22,6 +22,8 @@ export type TooltipProps = {
 
     shadow?: BoxProps['shadow'];
     rounded?: BoxProps['rounded'];
+    maxWidth?: BoxProps['maxWidth'];
+    maxW?: BoxProps['maxW'];
     density?: TooltipDensity;
 };
 
@@ -47,6 +49,9 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
             shadow = 'sm',
             rounded = 'sm',
             density = 'sm',
+
+            maxWidth,
+            maxW,
         },
         ref,
     ) => {
@@ -66,6 +71,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
             <Popover
                 onPlacementChange={setResolvedPlacement}
                 trigger="hover"
+                interactive={false}
                 placement={placement}
                 openDelay={openDelay}
                 closeDelay={closeDelay}
@@ -87,7 +93,15 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
                     }
                 />
 
-                <Popover.Panel role="tooltip" shadow={shadow} rounded={rounded} py={py} px={px}>
+                <Popover.Panel
+                    role="tooltip"
+                    shadow={shadow}
+                    rounded={rounded}
+                    py={py}
+                    px={px}
+                    maxWidth={maxWidth}
+                    maxW={maxW}
+                >
                     {content}
                 </Popover.Panel>
             </Popover>

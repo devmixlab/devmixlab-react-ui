@@ -67,6 +67,7 @@ type PopoverProps = {
     animation?: PopoverAnimation;
 
     trigger?: PopoverTriggerMode;
+    interactive?: boolean;
 
     arrow?: boolean;
     arrowSize?: number;
@@ -241,6 +242,7 @@ const Popover = ({
     // animation = 'scale',
 
     trigger = 'click',
+    interactive = true,
 
     arrow = false,
     arrowSize = 8,
@@ -387,6 +389,7 @@ const Popover = ({
     const interactionValue = useMemo(
         () => ({
             trigger,
+            interactive,
             openDelay,
             closeDelay,
             disabled,
@@ -647,7 +650,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
     ) => {
         const { opened, setOpened, isMounted, animationState } = usePopoverStateContext();
 
-        const { trigger, disabled, handleHoverEnter, handleHoverLeave } =
+        const { trigger, interactive, disabled, handleHoverEnter, handleHoverLeave } =
             usePopoverInteractionContext();
 
         const { refs, context, floatingStyles, getFloatingProps, placement } =
@@ -759,6 +762,10 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         onMouseEnter={(e) => {
                             onMouseEnter?.(e);
 
+                            if (!interactive) {
+                                return;
+                            }
+
                             if (trigger !== 'hover' || disabled) {
                                 return;
                             }
@@ -767,6 +774,10 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                         }}
                         onMouseLeave={(e) => {
                             onMouseLeave?.(e);
+
+                            if (!interactive) {
+                                return;
+                            }
 
                             if (trigger !== 'hover' || disabled) {
                                 return;
