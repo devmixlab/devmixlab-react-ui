@@ -90,10 +90,14 @@ const transitionAnimations = [
 
 type TransitionAnimation = (typeof transitionAnimations)[number] | (string & {});
 
+type TransitionHiddenStrategy = 'display' | 'visibility' | 'none';
+
 type SharedTransitionProps = {
     controlRef?: React.Ref<TransitionControlRef>;
 
     animateOnMount?: boolean;
+
+    hiddenStrategy?: TransitionHiddenStrategy;
 
     animation?: TransitionAnimation;
     attention?: TransitionAttention;
@@ -142,6 +146,7 @@ type SharedTransitionProps = {
 const sharedTransitionProps = defineExactKeys<SharedTransitionProps>()([
     'controlRef',
     'animateOnMount',
+    'hiddenStrategy',
     'animation',
     'attention',
     'attentionExit',
@@ -193,6 +198,7 @@ const ImplTransition = (
 
         visible,
         animateOnMount = true,
+        hiddenStrategy = 'none',
 
         animation = 'scale-fade',
         attention,
@@ -298,6 +304,7 @@ const ImplTransition = (
             data-attention={attention && !reduceMotion ? attention : undefined}
             data-attention-exit={attentionExit ?? undefined}
             data-running-attention={runningAttention ?? undefined}
+            data-hidden-strategy={hiddenStrategy}
             aria-hidden={state === 'exited'}
             inert={state === 'exited' ? '' : undefined}
             style={

@@ -19,6 +19,17 @@ scale-blur;
 
 .#{$transition-prefix} {
 
+    &[data-animation-state='exited'] {
+        &[data-hidden-strategy='display'] {
+            display: none;
+        }
+
+        &[data-hidden-strategy='visibility'] {
+            visibility: hidden;
+            pointer-events: none;
+        }
+    }
+
     &[data-animation-state='exiting'] {
         pointer-events: none;
     }

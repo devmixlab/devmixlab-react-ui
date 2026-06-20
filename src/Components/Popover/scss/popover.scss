@@ -59,8 +59,6 @@
         inset: 0;
         z-index: 200;
 
-        opacity: 0;
-
         touch-action: none;
 
         &[data-variant='blur'] {
@@ -81,32 +79,6 @@
                 background: rgb(0 0 0 / 0.6);
             }
         }
-
-        //&[data-animation-state='entering'] {
-        //    animation:
-        //        popover-backdrop-in
-        //        var(--animation-enter-duration)
-        //        var(--animation-enter-easing)
-        //        forwards;
-        //}
-        //
-        //&[data-animation-state='exiting'] {
-        //    animation:
-        //        popover-backdrop-out
-        //        var(--animation-exit-duration)
-        //        var(--animation-exit-easing)
-        //        forwards;
-        //
-        //    pointer-events: none;
-        //}
-        //
-        //&[data-animation-state='entered'] {
-        //    opacity: 1;
-        //}
-        //
-        //&[data-animation-state='exited'] {
-        //    opacity: 0;
-        //}
     }
 
     &__panel {

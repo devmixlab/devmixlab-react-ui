@@ -4,7 +4,7 @@ import { useFormFieldContext } from '../FormField/FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useStableId } from '../../../utils/useStableId';
 import { SearchInput, SearchInputProps } from '../SearchInput';
-import { Text } from '../../Text/Text';
+import { Text } from '../../Text';
 import { useFocusableList, useTypeahead } from '../../../hooks';
 import {
     Popover,
@@ -338,13 +338,13 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         return (
             <DropdownContext.Provider value={ctxValue}>
                 <Popover
+                    {...rest}
                     modal={modal}
                     open={opened}
                     onOpenChange={(state) => {
                         onOpenChange?.(state);
                         setOpened(state);
                     }}
-                    {...rest}
                     disabled={disabled}
                     onUnmount={() => {
                         if (search.length > 0) setSearch('');

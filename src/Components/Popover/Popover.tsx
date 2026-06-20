@@ -50,6 +50,8 @@ export type PopoverMotionPreset = 'fast' | 'base' | 'slow';
 type PopoverMotionPresetRecord = {
     enterDuration: number;
     exitDuration: number;
+    backdropEnterDuration: number;
+    backdropExitDuration: number;
     enterEasing: string;
     exitEasing: string;
 };
@@ -229,6 +231,10 @@ const popoverMotionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecor
     fast: {
         enterDuration: 120,
         exitDuration: 100,
+
+        backdropEnterDuration: 140,
+        backdropExitDuration: 120,
+
         enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
     },
@@ -236,6 +242,10 @@ const popoverMotionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecor
     base: {
         enterDuration: 180,
         exitDuration: 140,
+
+        backdropEnterDuration: 220,
+        backdropExitDuration: 180,
+
         enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
     },
@@ -243,6 +253,10 @@ const popoverMotionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecor
     slow: {
         enterDuration: 250,
         exitDuration: 200,
+
+        backdropEnterDuration: 300,
+        backdropExitDuration: 240,
+
         enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
     },
@@ -427,6 +441,7 @@ const Popover = ({
         [
             transitionProps.controlRef,
             transitionProps.animateOnMount,
+            transitionProps.hiddenStrategy,
             transitionProps.animation,
             transitionProps.attention,
             transitionProps.attentionExit,
@@ -701,6 +716,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             ...{
                 respectAttentionDuration: ctxTransition.respectAttentionDuration ?? true,
                 animation: ctxTransition.animation ?? 'scale-fade',
+                hiddenStrategy: ctxTransition.hiddenStrategy ?? 'visibility',
                 enterDuration: ctxTransition.enterDuration ?? currentMotionPreset.enterDuration,
                 exitDuration: ctxTransition.exitDuration ?? currentMotionPreset.exitDuration,
                 enterEasing: ctxTransition.enterEasing ?? currentMotionPreset.enterEasing,
@@ -730,7 +746,10 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             <FloatingPortal>
                 {backdrop && trigger === 'click' && (
                     <Transition
+                        animation="fade"
                         visible={opened}
+                        enterDuration={currentMotionPreset.backdropEnterDuration}
+                        exitDuration={currentMotionPreset.backdropExitDuration}
                         className={prefix('__backdrop')}
                         onClick={() => closeOnOutsideClick && setOpened(false)}
                         data-variant={backdropVariant}
