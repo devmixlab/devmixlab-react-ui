@@ -1,16 +1,9 @@
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
-
 import { ToastContext, ToastRecord } from './Toast.context';
-
 import { ToastViewport } from './ToastViewport';
-import { TransitionControlRef, TransitionAttention } from '../Transition';
+import { TransitionAttention } from '../Transition';
 import { AlertAccent, AlertIntent, AlertSize, AlertVariant } from '../Alert';
 import { BoxProps } from '../Box';
-
-// export type ToastRecord = ToastOptions & {
-//     id: string;
-//     closing?: boolean;
-// };
 
 export const toastPositions = [
     'top-left',
@@ -22,8 +15,6 @@ export const toastPositions = [
 ] as const;
 
 export type ToastPosition = (typeof toastPositions)[number];
-
-// export type ToastIntent = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
 
 export type ToastOptions = {
     title?: React.ReactNode;
@@ -83,6 +74,7 @@ export const ToastProvider = ({
     const toastControlRefs = useRef(new Map<string, ToastControlRef>());
     const isPausedRef = React.useRef(isPaused);
     const intervalRef = React.useRef<number | null>(null);
+    const overflowTimeoutRef = useRef<number | null>(null);
 
     useEffect(() => {
         isPausedRef.current = isPaused;
@@ -97,7 +89,6 @@ export const ToastProvider = ({
     }, []);
 
     const closeQueueRef = React.useRef<PendingClose[]>([]);
-    const closeTimerRef = React.useRef<number | null>(null);
 
     const getTimeLeftTillClose = (delay = 0) => {
         if (closeQueueRef.current.length <= 0) return delay;
@@ -150,7 +141,7 @@ export const ToastProvider = ({
                 return;
             }
 
-            idsToClose.map((id) => {
+            idsToClose.forEach((id) => {
                 close(id);
                 closeQueueRef.current = closeQueueRef.current.filter((item) => item.id != id);
             });
@@ -167,7 +158,9 @@ export const ToastProvider = ({
 
     const close = useCallback((id: string) => {
         setToasts((prev) =>
-            prev.map((toast) => (toast.id === id ? { ...toast, closing: true } : toast)),
+            prev.map((toast) =>
+                toast.id === id && !toast.closing ? { ...toast, closing: true } : toast,
+            ),
         );
     }, []);
 
@@ -178,6 +171,10 @@ export const ToastProvider = ({
     const requestClose = useCallback(
         (id: string) => {
             startQueueProcessor();
+
+            if (closeQueueRef.current.some((item) => item.id === id)) {
+                return;
+            }
 
             closeQueueRef.current.push({
                 id,
@@ -205,6 +202,14 @@ export const ToastProvider = ({
     }, []);
 
     useEffect(() => {
+        return () => {
+            if (overflowTimeoutRef.current) {
+                clearTimeout(overflowTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
         const activeToasts = toasts.filter((toast) => !toast.closing);
 
         if (activeToasts.length <= max) {
@@ -214,60 +219,57 @@ export const ToastProvider = ({
         const oldest = activeToasts[0];
 
         if (oldest) {
-            // close(oldest.id);
-            setTimeout(() => {
+            if (overflowTimeoutRef.current) {
+                clearTimeout(overflowTimeoutRef.current);
+            }
+
+            overflowTimeoutRef.current = window.setTimeout(() => {
                 close(oldest.id);
             }, 200);
         }
+
+        return () => {
+            if (overflowTimeoutRef.current) {
+                clearTimeout(overflowTimeoutRef.current);
+            }
+        };
     }, [toasts, max, close]);
 
-    const show = useCallback((options: ToastOptions): ToastHandle => {
-        const id = crypto.randomUUID();
+    const show = useCallback(
+        (options: ToastOptions): ToastHandle => {
+            const id = crypto.randomUUID();
 
-        setToasts((prev) => {
-            // const limited = prev.length >= max ? prev.slice(1) : prev;
+            setToasts((prev) => {
+                return [
+                    ...prev,
+                    {
+                        id,
+                        duration: 5000,
+                        closable: true,
+                        intent: 'info',
+                        ...options,
+                    },
+                ];
+            });
 
-            // if (prev.length >= max) {
-            //     console.log('more then max');
-            //     console.log(prev[0].id);
-            //     close(prev[0].id);
-            // }
-            // const oldest = prev.find((toast) => !toast.closing);
-            //
-            // if (oldest) {
-            //     close(oldest.id);
-            // }
-
-            return [
-                // ...limited,
-                ...prev,
-                {
-                    id,
-                    // duration: 5000,
-                    duration: 5000,
-                    closable: true,
-                    intent: 'info',
-                    ...options,
+            return {
+                id,
+                close: () => close(id),
+                runAttention: (attention) => {
+                    const ref = toastControlRefs.current.get(id);
+                    ref?.runAttention(attention);
                 },
-            ];
-        });
-
-        return {
-            id,
-            close: () => close(id),
-            runAttention: (attention) => {
-                const ref = toastControlRefs.current.get(id);
-                ref?.runAttention(attention);
-            },
-            restart: () => {
-                const ref = toastControlRefs.current.get(id);
-                ref?.restart();
-            },
-            update: (options) => {
-                update(id, options);
-            },
-        };
-    }, []);
+                restart: () => {
+                    const ref = toastControlRefs.current.get(id);
+                    ref?.restart();
+                },
+                update: (options) => {
+                    update(id, options);
+                },
+            };
+        },
+        [close, update],
+    );
 
     const value = useMemo(
         () => ({
