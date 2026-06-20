@@ -20,7 +20,6 @@ import { mergeRefs } from '../../utils/mergeRefs';
 import { classPrefix } from '../../utils/classPrefix';
 import { useStableId } from '../../utils/useStableId';
 import { useFloatingLayer, usePresence } from '../../hooks';
-import { PopoverContext, usePopoverContext, type PopoverContextValue } from './Popover.context';
 import { usePopoverStateContext } from './PopoverState.context';
 import { usePopoverInteractionContext } from './PopoverInteraction.context';
 import { usePopoverFloatingContext } from './PopoverFloating.context';
@@ -52,8 +51,6 @@ export type BackdropVariant = 'transparent' | 'blur' | 'dim';
 export type PopoverAnimation = 'none' | 'fade' | 'scale' | 'slide' | 'scale-fade' | 'slide-fade';
 
 export type PopoverVariant = 'solid' | 'glass' | 'gradient' | (string & {});
-
-export type PopoverPanelSize = 'auto' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 export type PopoverRole = 'dialog' | 'menu' | 'listbox';
 
@@ -181,12 +178,6 @@ type PopoverTriggerRenderProps = {
     // pressed: boolean;
 };
 
-// type PopoverTriggerProps = {
-//     className?: string;
-//     children?: React.ReactNode;
-//     chevron?: boolean;
-//     render?: (props: TriggerRenderProps) => React.ReactNode;
-// };
 type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
     className?: string;
     children?: React.ReactNode;
@@ -306,14 +297,6 @@ const Popover = ({
         onMount,
         onUnmount,
     });
-
-    // const setOpened = (next: boolean) => {
-    //     if (!isControlled) {
-    //         setInternalOpen(next);
-    //     }
-    //
-    //     onOpenChange?.(next);
-    // };
 
     const setOpened = useCallback(
         (next: boolean) => {
