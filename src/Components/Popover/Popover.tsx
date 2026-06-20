@@ -6,6 +6,7 @@ import React, {
     useLayoutEffect,
     useCallback,
     useRef,
+    useEffect,
 } from 'react';
 import {
     FloatingTree,
@@ -67,6 +68,12 @@ type PopoverProps = {
 
     trigger?: PopoverTriggerMode;
 
+    arrow?: boolean;
+    arrowSize?: number;
+    arrowInset?: number | string;
+    arrowShift?: number | string;
+    arrowCenter?: boolean;
+
     /**
      * Delay before opening when trigger="hover".
      * @default 100
@@ -90,6 +97,8 @@ type PopoverProps = {
      * Placement of panel.
      */
     placement?: Placement;
+    onPlacementChange?: (placement: Placement) => void;
+
     /**
      * Distance between trigger and panel.
      */
@@ -232,6 +241,13 @@ const Popover = ({
     // animation = 'scale',
 
     trigger = 'click',
+
+    arrow = false,
+    arrowSize = 8,
+    arrowInset: arrowInsetProp = 16,
+    arrowShift: arrowShiftProp = 0,
+    arrowCenter,
+
     openDelay = 100,
     closeDelay = 100,
 
@@ -243,6 +259,8 @@ const Popover = ({
 
     placement = 'bottom-start',
     // placement = 'left-start',
+    onPlacementChange,
+
     offset = 8,
 
     closeOnEscape = true,
@@ -267,6 +285,9 @@ const Popover = ({
 
     keepMounted = false,
 }: PopoverProps) => {
+    const arrowInset = arrowCenter ? '50%' : arrowInsetProp;
+    const arrowShift = arrowCenter ? '-50%' : arrowShiftProp;
+
     const isControlled = open !== undefined;
 
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -322,6 +343,10 @@ const Popover = ({
         closeOnOutsideClick,
         closeOnEscape,
     });
+
+    useEffect(() => {
+        onPlacementChange?.(resolvedPlacement);
+    }, [resolvedPlacement, onPlacementChange]);
 
     const openTimeoutRef = useRef<number>();
     const closeTimeoutRef = useRef<number>();
@@ -411,6 +436,11 @@ const Popover = ({
 
             onReady,
             keepMounted,
+
+            arrow,
+            arrowSize,
+            arrowInset,
+            arrowShift,
         }),
         [
             variant,
@@ -430,6 +460,11 @@ const Popover = ({
 
             onReady,
             keepMounted,
+
+            arrow,
+            arrowSize,
+            arrowInset,
+            arrowShift,
         ],
     );
 
@@ -637,6 +672,11 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
             onReady,
             keepMounted,
+
+            arrow,
+            arrowSize,
+            arrowInset,
+            arrowShift,
         } = usePopoverConfigContext();
 
         const handleFloatingRef = useCallback(
@@ -735,6 +775,27 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                             handleHoverLeave();
                         }}
                     >
+                        {arrow && (
+                            <span
+                                className={prefix('__arrow')}
+                                aria-hidden
+                                style={
+                                    {
+                                        '--popover-arrow-size': `${arrowSize}px`,
+                                        '--popover-arrow-inset':
+                                            typeof arrowInset === 'number'
+                                                ? `${arrowInset}px`
+                                                : arrowInset,
+                                        '--popover-arrow-shift':
+                                            typeof arrowShift === 'number'
+                                                ? `${arrowShift}px`
+                                                : arrowShift,
+                                    } as React.CSSProperties
+                                }
+                                data-placement={placement}
+                            />
+                        )}
+
                         {children}
                     </Box>
                 </FloatingFocusManager>

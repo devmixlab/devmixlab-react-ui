@@ -23,6 +23,11 @@ export type PopoverConfigContextValue = {
     onReady?: () => void;
 
     keepMounted: boolean;
+
+    arrow: boolean;
+    arrowSize: number;
+    arrowInset: number | string;
+    arrowShift: number | string;
 };
 
 export const PopoverConfigContext = createContext<PopoverConfigContextValue | null>(null);
