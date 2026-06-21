@@ -12,8 +12,8 @@ type DropdownContextValue = {
     opened: boolean;
     setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 
-    triggerRef: React.RefObject<HTMLElement>;
-    panelRef: React.RefObject<HTMLDivElement>;
+    triggerRef: React.RefObject<HTMLElement | null>;
+    panelRef: React.RefObject<HTMLDivElement | null>;
 
     isPanelHovered: boolean;
     setIsPanelHovered: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,7 +32,7 @@ type DropdownContextValue = {
     setIsSearchable: React.Dispatch<React.SetStateAction<boolean>>;
     search: string;
     setSearch: React.Dispatch<React.SetStateAction<string>>;
-    searchInputRef: React.RefObject<HTMLInputElement>;
+    searchInputRef: React.RefObject<HTMLInputElement | null>;
 
     focusableList: FocusableListResult;
 

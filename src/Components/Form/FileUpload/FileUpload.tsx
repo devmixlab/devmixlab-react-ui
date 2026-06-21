@@ -197,7 +197,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         const [isDragging, setIsDragging] = useState(false);
 
         const [maxExceeded, setMaxExceeded] = useState(false);
-        const maxExceededTimeoutRef = useRef<number>();
+        const maxExceededTimeoutRef = useRef<number | undefined>(undefined);
 
         const isControlled = value !== undefined;
 

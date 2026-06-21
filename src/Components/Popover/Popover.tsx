@@ -368,8 +368,8 @@ const Popover = ({
         onPlacementChange?.(resolvedPlacement);
     }, [resolvedPlacement, onPlacementChange]);
 
-    const openTimeoutRef = useRef<number>();
-    const closeTimeoutRef = useRef<number>();
+    const openTimeoutRef = useRef<number | undefined>(undefined);
+    const closeTimeoutRef = useRef<number | undefined>(undefined);
 
     useLayoutEffect(() => {
         return () => {

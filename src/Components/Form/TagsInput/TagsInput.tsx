@@ -864,7 +864,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         tag: TTag,
         i: number,
         id: string | number,
-        tagNode: React.ReactNode,
+        tagNode: React.ReactElement<any>,
     ) => {
         return (
             <Box
@@ -909,7 +909,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
                     if (
                         e.key === 'Enter' &&
-                        React.isValidElement(tagNode) &&
+                        React.isValidElement<any>(tagNode) &&
                         typeof tagNode.props.onKeyDown === 'function'
                     ) {
                         tagNode.props.onKeyDown(e);
