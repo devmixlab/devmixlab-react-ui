@@ -109,6 +109,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
 
         return (
             <Popover
+                returnFocus={false}
                 onPlacementChange={setResolvedPlacement}
                 trigger="hover"
                 interactive={false}
