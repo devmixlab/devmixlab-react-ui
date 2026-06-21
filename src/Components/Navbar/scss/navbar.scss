@@ -1,5 +1,6 @@
 @use '../../../scss/functions' as functions;
 @use '../../../scss/mixins' as mixins;
+@use '../../../scss/functions/common' as *;
 
 @use '../../../scss/config' as cfg;
 @use 'sass:map';
@@ -9,6 +10,9 @@ $navbar-prefix: #{$p}--navbar;
 $collapse-prefix: #{$p}--collapse;
 
 .#{$navbar-prefix} {
+
+    --navbar-bg: #{intent(gray, 100)};
+    --navbar-border: #{intent(gray, 200)};
 
     &:focus,
     &:focus-visible {
@@ -26,19 +30,18 @@ $collapse-prefix: #{$p}--collapse;
     }
 
     &[data-bordered] {
-        border-bottom: 1px solid var(
-            --navbar-border,
-            rgba(0,0,0,0.08)
-        );
+        border-bottom: 1px solid var(--navbar-border);
     }
 
     &[data-elevated] {
-        box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
     }
 
     .#{$navbar-prefix}__inner {
         display: flex;
         flex-direction: column;
+        background-color: var(--navbar-bg);
+        //border: 1px solid var(--navbar-border);
     }
 
     .#{$navbar-prefix}__header {
@@ -48,8 +51,10 @@ $collapse-prefix: #{$p}--collapse;
 
         min-height: 64px;
 
-        padding-inline: 4px;
-        padding-block: 4px;
+        //padding-inline: 4px;
+        //padding-block: 4px;
+
+        //display: none;
 
         gap: 8px;
     }
@@ -85,31 +90,6 @@ $collapse-prefix: #{$p}--collapse;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        min-height: 40px;
-
-        cursor: pointer;
-
-        transition: background 120ms ease;
-
-        &[data-active] {
-            background-color: var(
-                --navbar-item-active-bg,
-                rgba(0,0,0,0.06)
-            );
-
-            color: var(
-                --navbar-item-active-color,
-                inherit
-            );
-        }
-
-        //&:focus,
-        //&:focus-visible {
-        //    outline: none;
-        //    box-shadow: none;
-        //    border: none;
-        //}
     }
 
     .#{$navbar-prefix}__toggle {
@@ -140,7 +120,7 @@ $collapse-prefix: #{$p}--collapse;
 
         border-top: 1px solid var(
             --navbar-border,
-            rgba(0,0,0,0.08)
+            rgba(0, 0, 0, 0.08)
         );
 
         padding-top: 8px;

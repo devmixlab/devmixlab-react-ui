@@ -2,9 +2,9 @@ import React, { forwardRef, useState, useRef, useCallback, useEffect, useMemo } 
 
 import { clsx } from 'clsx';
 
-import { Box, BoxComponentProps } from '../Box/Box';
+import { Box, BoxComponentProps } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
-import { Button, ButtonProps } from '../Button/Button';
+import { Button, ButtonProps } from '../Button';
 import { ChevronDown as ChevronDownIcon } from '../Icon';
 import {
     NavbarContext,
@@ -30,7 +30,7 @@ import {
 } from './Navbar.types';
 import { useStableId } from '../../utils/useStableId';
 import { breakpointOrder, useBreakpoint } from '../../utils/responsive';
-import { Collapse } from '../Collapse/Collapse';
+import { Collapse } from '../Collapse';
 import { mergeRefs } from '../../utils/mergeRefs';
 import {
     useFocusTrap,
@@ -265,6 +265,8 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
             className,
             active = false,
             disabled = false,
+            intent = 'secondary',
+            variant,
             render,
             onClick,
             onKeyDown,
@@ -400,14 +402,16 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
             });
         }
 
+        const finalVariant = variant ?? (insideMobile ? 'ghost' : 'base');
+
         return (
             <Button
                 {...rest}
                 {...itemProps}
                 className={itemClassName}
                 type="button"
-                variant={insideMobile ? 'ghost' : 'base'}
-                intent="secondary"
+                variant={finalVariant}
+                intent={intent}
                 disabled={disabled}
                 active={active}
                 w={insideMobile ? 'full' : undefined}

@@ -287,6 +287,9 @@
 }
 
 @mixin link ($intent, $mode: 'light') {
+    //--button-bg: transparent;
+    //--button-bg-active: transparent;
+
     @if ($mode == 'light') {
         --button-ring: #{fn.intent-color($intent, 600)};
 
@@ -311,6 +314,9 @@
             --button-text: #{fn.intent-color($intent, 700)};
             --button-text-hover: #{fn.intent-color($intent, 800)};
             --button-text-active: #{fn.intent-color($intent, 900)};
+
+            //background-color: red;
+
 
             &:not([data-disabled]) {
                 text-decoration: underline;
