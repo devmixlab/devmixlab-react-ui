@@ -306,7 +306,7 @@ const ImplTransition = (
             data-running-attention={runningAttention ?? undefined}
             data-hidden-strategy={hiddenStrategy}
             aria-hidden={state === 'exited'}
-            inert={state === 'exited' ? '' : undefined}
+            inert={state === 'exited' ? true : undefined}
             style={
                 {
                     ...style,
