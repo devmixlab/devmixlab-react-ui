@@ -24,7 +24,7 @@ type TooltipDensityStyles = {
 };
 
 export type TooltipProps = {
-    children: React.ReactElement;
+    children: React.ReactElement<any>;
     panelClassName: string;
 
     content: React.ReactNode;
