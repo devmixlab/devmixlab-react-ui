@@ -266,6 +266,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
             active = false,
             disabled = false,
             intent = 'secondary',
+            rounded = 'md',
             variant,
             render,
             onClick,
@@ -403,6 +404,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
         }
 
         const finalVariant = variant ?? (insideMobile ? 'ghost' : 'base');
+        const finalRounded = rounded ?? (insideMobile ? 'none' : undefined);
 
         return (
             <Button
@@ -416,7 +418,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
                 active={active}
                 w={insideMobile ? 'full' : undefined}
                 justify={insideMobile ? 'start' : undefined}
-                rounded={insideMobile ? 'none' : undefined}
+                rounded={finalRounded}
             >
                 {children}
             </Button>
