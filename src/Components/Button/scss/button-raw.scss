@@ -289,10 +289,10 @@ $button-sizes: (
         align-items: center;
         justify-content: center;
 
-        //width: var(--button-icon-slot-width);
+        width: var(--button-icon-slot-width);
 
         > svg,
-        > .MuiSvgIcon-root {
+        > .MuiSvgIcon-root{
             @include icon;
         }
     }

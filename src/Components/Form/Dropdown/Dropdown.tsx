@@ -341,6 +341,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
                     {...rest}
                     modal={modal}
                     open={opened}
+                    hiddenStrategy="visibility"
                     onOpenChange={(state) => {
                         onOpenChange?.(state);
                         setOpened(state);
@@ -485,7 +486,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
         const triggerClassName = prefix('__trigger');
 
         const triggerProps = {
-            ref: mergedRef,
+            // ref: mergedRef,
             ...rest,
             onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
                 if (!disabled) {
@@ -498,13 +499,14 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
 
         return render ? (
             <Popover.Trigger
+                ref={mergedRef}
                 className={triggerClassName}
                 {...triggerProps}
                 renderContent={renderContent}
                 render={render}
             />
         ) : (
-            <Popover.Trigger className={triggerClassName} {...triggerProps}>
+            <Popover.Trigger ref={mergedRef} className={triggerClassName} {...triggerProps}>
                 {selectedOption?.children ?? (
                     <Box as="span" opacity={0.8}>
                         {placeholder}
@@ -930,15 +932,24 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
 
             if (key === 'ArrowDown') {
                 e.preventDefault();
-                if (isSearchable && optionId === lastFocusableId) {
-                    searchInputRef.current?.focus();
+                if (optionId === lastFocusableId) {
+                    if (isSearchable) {
+                        searchInputRef.current?.focus();
+                    } else {
+                        focusFirst();
+                    }
                     return;
                 }
                 focusNext();
             } else if (key === 'ArrowUp') {
                 e.preventDefault();
-                if (isSearchable && optionId === firstFocusableId) {
-                    searchInputRef.current?.focus();
+                if (optionId === firstFocusableId) {
+                    // searchInputRef.current?.focus();
+                    if (isSearchable) {
+                        searchInputRef.current?.focus();
+                    } else {
+                        focusLast();
+                    }
                     return;
                 }
                 focusNext(-1);

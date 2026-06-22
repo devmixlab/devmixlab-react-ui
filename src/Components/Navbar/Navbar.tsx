@@ -346,8 +346,10 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
 
         const itemClassName = clsx(prefix('__item'), className);
 
+        const combinedRef = mergeRefs(ref, setRef(id));
+
         const itemProps = {
-            ref: mergeRefs(ref, setRef(id)),
+            // ref: mergeRefs(ref, setRef(id)),
 
             onClick: (e: React.MouseEvent<HTMLElement>) => {
                 onClick?.(e as any);
@@ -394,6 +396,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
 
         if (render) {
             return render({
+                ref: combinedRef,
                 disabled,
                 active,
                 itemProps,
@@ -410,6 +413,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
             <Button
                 {...rest}
                 {...itemProps}
+                ref={combinedRef}
                 className={itemClassName}
                 type="button"
                 variant={finalVariant}

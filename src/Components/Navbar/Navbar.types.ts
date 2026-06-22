@@ -46,6 +46,8 @@ export type NavbarItemElementProps<T extends HTMLElement = HTMLElement> = {
 };
 
 export type NavbarItemRenderProps = {
+    ref: React.Ref<HTMLElement>;
+
     /**
      * Whether the item interaction is disabled.
      */

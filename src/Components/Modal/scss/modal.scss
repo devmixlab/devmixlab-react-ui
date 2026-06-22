@@ -157,6 +157,13 @@
     &__header-content {
         min-width: 0;
         flex: 1;
+
+        //gap: calc(var(--modal-content-gap) / 2);
+        gap: var(--modal-content-gap);
+
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
     }
 
     // ── Close button ───────────────────────────────────────────────────────

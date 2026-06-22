@@ -164,6 +164,7 @@ export type PopoverTriggerElementProps<T extends HTMLElement = HTMLElement> = Om
 };
 
 type PopoverTriggerRenderProps = {
+    ref: React.Ref<HTMLElement>;
     disabled: boolean;
     opened: boolean;
     triggerClassName: string;
@@ -598,7 +599,6 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
                 },
             }),
 
-            ref: combinedRef,
             id: triggerId,
 
             'aria-expanded': opened,
@@ -610,6 +610,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
 
         if (render) {
             return render({
+                ref: combinedRef,
                 disabled: !!disabled,
                 opened,
                 triggerClassName,
@@ -636,6 +637,7 @@ const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
             <Button
                 {...rest}
                 {...triggerProps}
+                ref={combinedRef}
                 iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[buttonSize]}
                 className={triggerClassName}
                 type="button"

@@ -25,3 +25,5 @@ export * from './src/Components/Toast';
 export * from './src/Components/Tooltip';
 
 export * from './src/Components/Transition';
+
+export * from './src/utils';
