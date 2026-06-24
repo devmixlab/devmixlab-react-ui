@@ -14,3 +14,6 @@ export { useAutoFocus } from './useAutoFocus';
 export { useWindowBlur } from './useWindowBlur';
 export { useLastFocusableItemTab } from './useLastFocusableItemTab';
 export { useFocusBoundary } from './useFocusBoundary';
+
+export { useThemeMode } from './useThemeMode';
+export type { ThemeMode } from './useThemeMode';

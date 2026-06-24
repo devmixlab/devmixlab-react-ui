@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Box, BoxProps } from '../../Box';
+import { Box, BoxProps, BoxDerived, BoxDerivedProps } from '../../Box';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
 import { useStableId } from '../../../utils/useStableId';
@@ -865,7 +865,7 @@ export type DropdownOptionProps = {
     label?: string;
     disabled?: boolean;
     render?: (props: OptionRenderProps) => React.ReactNode;
-} & BoxProps &
+} & BoxDerivedProps &
     React.HTMLAttributes<HTMLElement>;
 
 const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
@@ -1041,9 +1041,9 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
         }
 
         return (
-            <Box className={optionClassName} {...optionProps} {...rest}>
+            <BoxDerived className={optionClassName} {...optionProps} {...rest}>
                 {children}
-            </Box>
+            </BoxDerived>
         );
     },
 );
