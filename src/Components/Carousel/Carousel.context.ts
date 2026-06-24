@@ -1,51 +1,54 @@
-import React, { createContext, useContext } from 'react';
-import { UseCarouselDragReturn } from './useCarouselDrag';
-import { ButtonProps } from '../Button';
+import React, {createContext, useContext} from 'react';
+import {UseCarouselDragReturn} from './useCarouselDrag';
+import {ButtonProps} from '../Button';
 
 export type CarouselContextValue = {
-    trackRef: React.MutableRefObject<HTMLDivElement | null>;
-    activeIndexRef: React.MutableRefObject<number>;
+  trackRef: React.MutableRefObject<HTMLDivElement | null>;
+  activeIndexRef: React.MutableRefObject<number>;
 
-    carouselDrag: UseCarouselDragReturn;
-    stopAnimation: () => void;
+  carouselDrag: UseCarouselDragReturn;
+  stopAnimation: () => void;
 
-    scrollPrev: () => void;
-    scrollNext: () => void;
+  scrollPrev: () => void;
+  scrollNext: () => void;
 
-    canScrollPrev: boolean;
-    canScrollNext: boolean;
+  canScrollPrev: boolean;
+  canScrollNext: boolean;
 
-    slidesPerView: number;
-    slidesPerScroll: number;
-    gap: number;
+  slidesPerView: number;
+  slidesPerScroll: number;
+  gap: number;
 
-    controlProps?: ButtonProps;
+  trackPaddingTop: number;
+  trackPaddingBottom: number;
 
-    activeIndex: number;
-    pageCount: number;
+  controlProps?: ButtonProps;
 
-    scrollTo: (index: number, speed?: number) => void;
-    updatePageCount: () => void;
+  activeIndex: number;
+  pageCount: number;
 
-    draggable: boolean;
-    prefersReducedMotion: boolean;
-    dragThreshold: number;
-    dragVelocity: number;
+  scrollTo: (index: number, speed?: number) => void;
+  updatePageCount: () => void;
 
-    loop: boolean;
+  draggable: boolean;
+  prefersReducedMotion: boolean;
+  dragThreshold: number;
+  dragVelocity: number;
 
-    onDragStart?: () => void;
-    onDragEnd?: () => void;
+  loop: boolean;
+
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
 };
 
 export const CarouselContext = createContext<CarouselContextValue | null>(null);
 
 export const useCarouselContext = () => {
-    const ctx = useContext(CarouselContext);
+  const ctx = useContext(CarouselContext);
 
-    if (!ctx) {
-        throw new Error('Carousel components must be used inside <Carousel>');
-    }
+  if (!ctx) {
+    throw new Error('Carousel components must be used inside <Carousel>');
+  }
 
-    return ctx;
+  return ctx;
 };
