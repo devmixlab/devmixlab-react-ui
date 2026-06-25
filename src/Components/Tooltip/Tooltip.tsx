@@ -16,14 +16,14 @@ type SemanticTooltipIntent = (typeof tooltipIntents)[number];
 const tooltipVariants = ['solid', 'outlined'] as const;
 type TooltipVariant = (typeof tooltipVariants)[number];
 
-export type TooltipDensity = 'sm' | 'md' | 'lg';
+type TooltipDensity = 'sm' | 'md' | 'lg';
 
 type TooltipDensityStyles = {
     px: string;
     py: string;
 };
 
-export type TooltipProps = {
+type TooltipProps = {
     children: React.ReactElement<any>;
     panelClassName: string;
 
@@ -67,7 +67,7 @@ const prefix = (name: string = '') => {
 // Tooltip
 //-----------------------------------------------------------
 
-export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
+const Tooltip = forwardRef<HTMLElement, TooltipProps>(
     (
         {
             children,
@@ -159,3 +159,13 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
 );
 
 Tooltip.displayName = 'Tooltip';
+
+//---------------------------------------------------------
+// Exports
+//---------------------------------------------------------
+
+export {Tooltip};
+
+export type {SemanticTooltipIntent, TooltipVariant, TooltipDensity, TooltipDensityStyles, TooltipProps};
+
+export {tooltipIntents, tooltipVariants, centeredArrowPlacements};

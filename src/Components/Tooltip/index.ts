@@ -1,3 +1,5 @@
-export { Tooltip } from './Tooltip';
+export {Tooltip} from './Tooltip';
 
-export { TooltipProps } from './Tooltip';
+export type {SemanticTooltipIntent, TooltipVariant, TooltipDensity, TooltipDensityStyles, TooltipProps} from './Tooltip';
+
+export {tooltipIntents, tooltipVariants, centeredArrowPlacements} from './Tooltip';
