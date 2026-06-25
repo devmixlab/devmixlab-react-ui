@@ -185,7 +185,7 @@ const CarouselRoot = forwardRef<CarouselHandle, CarouselProps>(
       const previousPageRef = useRef(0);
       const reachedStartRef = useRef(false);
       const reachedEndRef = useRef(false);
-      const scrollStopTimeoutRef = useRef<number | null>(null);
+      const scrollStopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
       // ── useCarouselDrag ──────────────────────────────────────────────────
       const carouselDrag = useCarouselDrag({
