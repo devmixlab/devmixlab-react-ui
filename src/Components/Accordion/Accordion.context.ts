@@ -29,4 +29,10 @@ const useAccordionContext = () => {
     return context;
 };
 
-export { AccordionContextValue, AccordionContext, useAccordionContext };
+//----------------------------------------------------------------
+// Exports
+//----------------------------------------------------------------
+
+export type { AccordionContextValue };
+
+export { AccordionContext, useAccordionContext };

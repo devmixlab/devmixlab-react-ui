@@ -20,4 +20,10 @@ const useAccordionItemContext = () => {
     return context;
 };
 
-export { AccordionItemContextValue, AccordionItemContext, useAccordionItemContext };
+//----------------------------------------------------------------
+// Exports
+//----------------------------------------------------------------
+
+export type { AccordionItemContextValue };
+
+export { AccordionItemContext, useAccordionItemContext };
