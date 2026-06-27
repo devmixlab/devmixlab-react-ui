@@ -1,19 +1,19 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
-export type UseScrollSpyOptions = {
+type UseScrollSpyOptions = {
   ids: readonly string[];
   activeOffset?: number;
   scrollOffset?: number;
   behavior?: ScrollBehavior;
 };
 
-export type UseScrollSpyReturn<T extends string> = {
+type UseScrollSpyReturn<T extends string> = {
   activeId: T | null;
   isActive: (id: T) => boolean;
   scrollToId: (id: T) => void;
 };
 
-export const useScrollSpy = <T extends string>({
+const useScrollSpy = <T extends string>({
                                                  ids,
                                                  activeOffset = 120,
                                                  scrollOffset = 0,
@@ -97,7 +97,7 @@ export const useScrollSpy = <T extends string>({
         //   block: 'start',
         // });
       },
-      [behavior],
+      [behavior, scrollOffset],
   );
 
   return useMemo(
@@ -109,3 +109,11 @@ export const useScrollSpy = <T extends string>({
       [activeId, isActive, scrollToId],
   );
 };
+
+//--------------------------------------------------------------
+// Exports
+//--------------------------------------------------------------
+
+export {useScrollSpy};
+
+export type {UseScrollSpyReturn, UseScrollSpyOptions};
