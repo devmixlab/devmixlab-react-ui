@@ -29,7 +29,11 @@ type OwnButtonProps = {
     bgBlur?: number | string;
 };
 
-type ButtonProps = Omit<BoxComponentProps<'button'>, 'size'> & OwnButtonProps;
+type ButtonPolymorphicProps<E extends React.ElementType> =
+    Omit<BoxComponentProps<E>, 'size'> &
+    OwnButtonProps;
+
+type ButtonProps = ButtonPolymorphicProps<'button'>;
 
 type ButtonImplProps = ButtonProps & {
     as?: React.ElementType;
@@ -200,4 +204,4 @@ const ButtonImpl = (
 
 export const Button = createPolymorphic<ButtonProps, 'button'>(forwardRef(ButtonImpl), 'Button');
 
-export type { ButtonProps, ButtonImplProps };
+export type { ButtonProps, ButtonImplProps, ButtonPolymorphicProps };
