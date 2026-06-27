@@ -29,11 +29,15 @@ type OwnButtonProps = {
     bgBlur?: number | string;
 };
 
-type ButtonPolymorphicProps<E extends React.ElementType> =
-    Omit<BoxComponentProps<E>, 'size'> &
-    OwnButtonProps;
+// type ButtonPolymorphicProps<E extends React.ElementType> =
+//     Omit<BoxComponentProps<E>, 'size'> &
+//     OwnButtonProps;
 
-type ButtonProps = ButtonPolymorphicProps<'button'>;
+type ButtonPolymorphicProps<
+    E extends React.ElementType = 'button'
+> = Omit<BoxComponentProps<E>, 'size'> & OwnButtonProps;
+
+type ButtonProps = ButtonPolymorphicProps;
 
 type ButtonImplProps = ButtonProps & {
     as?: React.ElementType;
