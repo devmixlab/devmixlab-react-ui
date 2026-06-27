@@ -1,8 +1,10 @@
 import React from 'react';
-import { BoxComponentProps } from '../Box/Box';
+import { BoxComponentProps } from '../Box';
 import { Breakpoint } from '../../utils/responsive';
-import { CollapseProps } from '../Collapse/Collapse';
-import { ButtonProps } from '../Button/Button';
+import { CollapseProps } from '../Collapse';
+import { ButtonPolymorphicProps } from '../Button';
+
+type ButtonProps = ButtonPolymorphicProps;
 
 export type Variant = 'base' | 'subtle' | 'solid' | 'outlined' | 'transparent';
 
@@ -34,7 +36,7 @@ export type NavbarItemsProps<C extends React.ElementType = 'div'> = BoxComponent
 
 export type FocusScope = 'desktop' | 'mobile';
 
-export type NavbarItemElementProps<T extends HTMLElement = HTMLElement> = {
+export type NavbarItemElementProps<T extends Element = Element> = {
     ref?: React.Ref<T>;
 
     onClick?: React.MouseEventHandler<T>;
@@ -58,7 +60,7 @@ export type NavbarItemRenderProps = {
      */
     active: boolean;
 
-    itemProps: NavbarItemElementProps;
+    itemProps: NavbarItemElementProps<Element>;
 
     className: string;
 

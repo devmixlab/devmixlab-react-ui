@@ -67,3 +67,46 @@ export function createPolymorphic<Props, Default extends React.ElementType = 'di
 
     return result;
 }
+
+/**
+ * Polymorphic component type with restricted `as` values.
+ */
+export type RestrictedPolymorphicComponent<
+    Props,
+    Default extends Allowed,
+    Allowed extends React.ElementType,
+> = {
+  <C extends Allowed = Default>(
+      props: PolymorphicProps<C, Props> & {
+        ref?: React.ComponentPropsWithRef<C>['ref'];
+      },
+  ): React.ReactElement | null;
+
+  displayName?: string;
+};
+
+/**
+ * Factory for creating a polymorphic component with restricted `as` values.
+ */
+export function createRestrictedPolymorphic<
+    Props,
+    Default extends Allowed,
+    Allowed extends React.ElementType,
+>(
+    component: React.ForwardRefExoticComponent<any> & {
+      displayName?: string;
+    },
+    displayName?: string,
+) {
+  const result =
+      component as unknown as RestrictedPolymorphicComponent<
+          Props,
+          Default,
+          Allowed
+      >;
+
+  result.displayName =
+      displayName ?? component.displayName ?? component.name;
+
+  return result;
+}

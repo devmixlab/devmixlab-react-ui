@@ -29,23 +29,13 @@ import {useCarouselVisibility} from './useCarouselVisibility';
 import {useCarouselControl, CarouselControlRenderElementProps} from './useCarouselControl';
 import {CarouselContextValue, CarouselContext, useCarouselContext} from './Carousel.context';
 import {ChevronLeft} from '../Icon';
-import {Button, ButtonProps} from '../Button';
-
-// -----------------------------------------------------------------------------
-// Helpers
-// -----------------------------------------------------------------------------
-
-const prefix = (name = '') => classPrefix(`--carousel${name}`);
-
-const controlDefaultProps: ButtonProps = {
-  rounded: 'full',
-  intent: 'secondary',
-  type: 'button',
-};
+import {Button, ButtonPolymorphicProps} from '../Button';
 
 // -----------------------------------------------------------------------------
 // Types
 // -----------------------------------------------------------------------------
+
+type ButtonProps = ButtonPolymorphicProps<'button'>;
 
 type CarouselHandle = {
   sync: () => void;
@@ -103,6 +93,18 @@ type CarouselCompound = typeof CarouselRoot & {
   Prev: typeof CarouselPrev;
   Next: typeof CarouselNext;
   Indicators: typeof CarouselIndicators;
+};
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+const prefix = (name = '') => classPrefix(`--carousel${name}`);
+
+const controlDefaultProps: ButtonProps = {
+  rounded: 'full',
+  intent: 'secondary',
+  type: 'button',
 };
 
 // -----------------------------------------------------------------------------

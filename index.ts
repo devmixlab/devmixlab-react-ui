@@ -29,3 +29,5 @@ export * from './src/Components/Transition';
 export * from './src/utils';
 export * from './src/hooks';
 export * from './src/providers';
+
+export * from './src/types';

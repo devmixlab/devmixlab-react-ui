@@ -37,10 +37,15 @@ type ButtonPolymorphicProps<
     E extends React.ElementType = 'button'
 > = Omit<BoxComponentProps<E>, 'size'> & OwnButtonProps;
 
-type ButtonProps = ButtonPolymorphicProps;
+type ButtonProps = OwnButtonProps & Omit<BoxProps, 'size'>;
 
-type ButtonImplProps = ButtonProps & {
-    as?: React.ElementType;
+// type ButtonImplProps = ButtonProps & {
+//     as?: React.ElementType;
+// } & React.ComponentProps<'button'>;
+
+type ButtonImplProps = ButtonProps &
+    Omit<React.ComponentProps<'button'>, keyof ButtonProps> & {
+  as?: React.ElementType;
 };
 
 const ButtonImpl = (

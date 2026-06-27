@@ -258,7 +258,7 @@ const NavbarItems = forwardRef<HTMLDivElement, NavbarItemsProps>(
 // Item
 // -----------------------------------------------------------------------------
 
-const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
+const NavbarItem = forwardRef<Element, NavbarItemProps>(
     (
         {
             children,
@@ -351,7 +351,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
         const itemProps = {
             // ref: mergeRefs(ref, setRef(id)),
 
-            onClick: (e: React.MouseEvent<HTMLElement>) => {
+            onClick: (e: React.MouseEvent<Element>) => {
                 onClick?.(e as any);
 
                 if (collapsed && closeOnSelect && !disabled) {
@@ -359,7 +359,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
                 }
             },
 
-            onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+            onKeyDown: (e: React.KeyboardEvent<Element>) => {
                 if (disabled) {
                     return;
                 }
@@ -379,7 +379,7 @@ const NavbarItem = forwardRef<HTMLElement, NavbarItemProps>(
                 onKeyDown?.(e as React.KeyboardEvent<HTMLButtonElement>);
             },
 
-            onFocus: (e: React.FocusEvent<HTMLElement>) => {
+            onFocus: (e: React.FocusEvent<Element>) => {
                 if (disabled) {
                     return;
                 }

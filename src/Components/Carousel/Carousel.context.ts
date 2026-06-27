@@ -1,6 +1,6 @@
 import React, {createContext, useContext} from 'react';
 import {UseCarouselDragReturn} from './useCarouselDrag';
-import {ButtonProps} from '../Button';
+import {ButtonPolymorphicProps} from '../Button';
 
 export type CarouselContextValue = {
   trackRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -22,7 +22,7 @@ export type CarouselContextValue = {
   trackPaddingTop: number;
   trackPaddingBottom: number;
 
-  controlProps?: ButtonProps;
+  controlProps?: ButtonPolymorphicProps;
 
   activeIndex: number;
   pageCount: number;
