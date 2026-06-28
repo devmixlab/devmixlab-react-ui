@@ -1,7 +1,7 @@
 import React, { forwardRef, useState } from 'react';
 import { Popover } from '../Popover';
 import type { Placement } from '@floating-ui/react';
-import { mergeRefs } from '../../utils/mergeRefs';
+import { mergeRefs, mergeProps } from '../../utils';
 import { Box, BoxProps } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
@@ -19,40 +19,40 @@ type TooltipVariant = (typeof tooltipVariants)[number];
 type TooltipDensity = 'sm' | 'md' | 'lg';
 
 type TooltipDensityStyles = {
-    px: string;
-    py: string;
+  px: string;
+  py: string;
 };
 
 type TooltipProps = {
-    children: React.ReactElement<any>;
-    panelClassName: string;
+  children: React.ReactElement<any>;
+  panelClassName?: string;
 
-    content: React.ReactNode;
-    disabled?: boolean;
-    placement?: Placement;
-    openDelay?: number;
-    closeDelay?: number;
-    offset?: number;
-    multiline?: boolean;
-    maxLines?: number;
+  content: React.ReactNode;
+  disabled?: boolean;
+  placement?: Placement;
+  openDelay?: number;
+  closeDelay?: number;
+  offset?: number;
+  multiline?: boolean;
+  maxLines?: number;
 
-    variant?: TooltipVariant | (string & {});
-    intent?: SemanticTooltipIntent | (string & {});
+  variant?: TooltipVariant | (string & {});
+  intent?: SemanticTooltipIntent | (string & {});
 
-    shadow?: BoxProps['shadow'];
-    rounded?: BoxProps['rounded'];
-    maxWidth?: BoxProps['maxWidth'];
-    maxW?: BoxProps['maxW'];
+  shadow?: BoxProps['shadow'];
+  rounded?: BoxProps['rounded'];
+  maxWidth?: BoxProps['maxWidth'];
+  maxW?: BoxProps['maxW'];
 
-    density?: TooltipDensity;
+  density?: TooltipDensity;
 };
 
 const centeredArrowPlacements = ['top', 'bottom', 'left', 'right'] as const;
 
 const densityMap: Record<TooltipDensity, TooltipDensityStyles> = {
-    sm: { px: 'sm', py: 'xs' },
-    md: { px: 'md', py: 'sm' },
-    lg: { px: 'lg', py: 'md' },
+  sm: { px: 'sm', py: 'xs' },
+  md: { px: 'md', py: 'sm' },
+  lg: { px: 'lg', py: 'md' },
 };
 
 //-----------------------------------------------------------
@@ -60,7 +60,7 @@ const densityMap: Record<TooltipDensity, TooltipDensityStyles> = {
 //-----------------------------------------------------------
 
 const prefix = (name: string = '') => {
-    return classPrefix(`--tooltip${name}`);
+  return classPrefix(`--tooltip${name}`);
 };
 
 //-----------------------------------------------------------
@@ -68,94 +68,101 @@ const prefix = (name: string = '') => {
 //-----------------------------------------------------------
 
 const Tooltip = forwardRef<HTMLElement, TooltipProps>(
-    (
-        {
-            children,
-            panelClassName,
+  (
+    {
+      children,
+      panelClassName,
 
-            content,
-            disabled = false,
-            placement = 'top',
-            openDelay = 500,
-            closeDelay = 0,
-            offset = 8,
-            density = 'md',
-            multiline = true,
-            maxLines,
+      content,
+      disabled = false,
+      placement = 'top',
+      openDelay = 500,
+      closeDelay = 0,
+      offset = 8,
+      density = 'md',
+      multiline = true,
+      maxLines,
 
-            variant = 'subtle',
-            intent = 'secondary',
+      variant = 'subtle',
+      intent = 'secondary',
 
-            shadow = 'sm',
-            rounded = 'sm',
-            maxWidth,
-            maxW,
-        },
-        ref,
-    ) => {
-        const [resolvedPlacement, setResolvedPlacement] = useState<Placement>(placement);
-
-        const isCentered = centeredArrowPlacements.includes(
-            resolvedPlacement as (typeof centeredArrowPlacements)[number],
-        );
-
-        const { px, py } = densityMap[density];
-
-        const isOverflowHidden = (multiline && maxLines != null) || !multiline;
-
-        if (disabled) {
-            return children;
-        }
-
-        return (
-            <Popover
-                returnFocus={false}
-                onPlacementChange={setResolvedPlacement}
-                trigger="hover"
-                interactive={false}
-                placement={placement}
-                openDelay={openDelay}
-                closeDelay={closeDelay}
-                offset={offset}
-                arrow
-                arrowSize={10}
-                arrowInset={!isCentered ? 12 : undefined}
-                arrowCenter={isCentered ? true : undefined}
-            >
-                <Popover.Trigger
-                    render={({ triggerProps }) =>
-                        React.cloneElement(children, {
-                            ...triggerProps,
-                            ref: mergeRefs(triggerProps.ref, ref, (children as any).ref),
-                        })
-                    }
-                />
-
-                <Popover.Panel
-                    className={clsx(prefix('__panel'), panelClassName)}
-                    role="tooltip"
-                    shadow={shadow}
-                    rounded={rounded}
-                    data-variant={`tooltip-${variant}`}
-                    data-intent={intent}
-                >
-                    <Box
-                        rounded={rounded}
-                        py={py}
-                        px={px}
-                        maxWidth={maxWidth}
-                        maxW={maxW}
-                        textOverflow={multiline ? undefined : 'ellipsis'}
-                        lineClamp={multiline ? maxLines : undefined}
-                        overflow={isOverflowHidden ? 'hidden' : undefined}
-                        whiteSpace={multiline ? 'normal' : 'nowrap'}
-                    >
-                        {content}
-                    </Box>
-                </Popover.Panel>
-            </Popover>
-        );
+      shadow = 'sm',
+      rounded = 'sm',
+      maxWidth,
+      maxW,
     },
+    ref,
+  ) => {
+    const [resolvedPlacement, setResolvedPlacement] = useState<Placement>(placement);
+
+    const isCentered = centeredArrowPlacements.includes(
+      resolvedPlacement as (typeof centeredArrowPlacements)[number],
+    );
+
+    const { px, py } = densityMap[density];
+
+    const isOverflowHidden = (multiline && maxLines != null) || !multiline;
+
+    if (disabled) {
+      return children;
+    }
+
+    return (
+      <Popover
+        returnFocus={false}
+        onPlacementChange={setResolvedPlacement}
+        trigger="hover"
+        interactive={false}
+        placement={placement}
+        openDelay={openDelay}
+        closeDelay={closeDelay}
+        offset={offset}
+        arrow
+        arrowSize={10}
+        arrowInset={!isCentered ? 12 : undefined}
+        arrowCenter={isCentered ? true : undefined}
+      >
+        <Popover.Trigger
+          render={({ triggerProps, ref: triggerRef }) =>
+            // React.cloneElement(children, {
+            //   ref: mergeRefs(triggerRef, ref, (children as any).ref),
+            //   ...triggerProps,
+            // })
+            React.cloneElement(
+              children,
+              mergeProps(children.props, {
+                ...triggerProps,
+                ref: mergeRefs(triggerRef, ref, (children as any).ref),
+              }),
+            )
+          }
+        />
+
+        <Popover.Panel
+          className={clsx(prefix('__panel'), panelClassName)}
+          role="tooltip"
+          shadow={shadow}
+          rounded={rounded}
+          data-variant={`tooltip-${variant}`}
+          data-intent={intent}
+        >
+          <Box
+            rounded={rounded}
+            py={py}
+            px={px}
+            maxWidth={maxWidth}
+            maxW={maxW}
+            textOverflow={multiline ? undefined : 'ellipsis'}
+            lineClamp={multiline ? maxLines : undefined}
+            overflow={isOverflowHidden ? 'hidden' : undefined}
+            whiteSpace={multiline ? 'normal' : 'nowrap'}
+          >
+            {content}
+          </Box>
+        </Popover.Panel>
+      </Popover>
+    );
+  },
 );
 
 Tooltip.displayName = 'Tooltip';
@@ -164,8 +171,14 @@ Tooltip.displayName = 'Tooltip';
 // Exports
 //---------------------------------------------------------
 
-export {Tooltip};
+export { Tooltip };
 
-export type {SemanticTooltipIntent, TooltipVariant, TooltipDensity, TooltipDensityStyles, TooltipProps};
+export type {
+  SemanticTooltipIntent,
+  TooltipVariant,
+  TooltipDensity,
+  TooltipDensityStyles,
+  TooltipProps,
+};
 
-export {tooltipIntents, tooltipVariants, centeredArrowPlacements};
+export { tooltipIntents, tooltipVariants, centeredArrowPlacements };

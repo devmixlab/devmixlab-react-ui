@@ -1,18 +1,18 @@
 import React, {
-    CSSProperties,
-    forwardRef,
-    useMemo,
-    useState,
-    useLayoutEffect,
-    useCallback,
-    useRef,
-    useEffect,
+  CSSProperties,
+  forwardRef,
+  useMemo,
+  useState,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  useEffect,
 } from 'react';
 import {
-    FloatingTree,
-    FloatingPortal,
-    FloatingFocusManager,
-    FloatingNode,
+  FloatingTree,
+  FloatingPortal,
+  FloatingFocusManager,
+  FloatingNode,
 } from '@floating-ui/react';
 import type { Placement } from '@floating-ui/react';
 import { Box, BoxProps, BoxComponentProps } from '../Box';
@@ -34,11 +34,11 @@ import { splitProps } from '../../utils/splitProps';
 import { usePopoverTransitionContext } from './PopoverTransition.context';
 
 export const BUTTON_ICON_SLOT_WIDTHS = {
-    xs: 6,
-    sm: 8,
-    md: 10,
-    lg: 12,
-    xl: 14,
+  xs: 6,
+  sm: 8,
+  md: 10,
+  lg: 12,
+  xl: 14,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -48,12 +48,12 @@ export const BUTTON_ICON_SLOT_WIDTHS = {
 export type PopoverMotionPreset = 'fast' | 'base' | 'slow';
 
 type PopoverMotionPresetRecord = {
-    enterDuration: number;
-    exitDuration: number;
-    backdropEnterDuration: number;
-    backdropExitDuration: number;
-    enterEasing: string;
-    exitEasing: string;
+  enterDuration: number;
+  exitDuration: number;
+  backdropEnterDuration: number;
+  backdropExitDuration: number;
+  enterEasing: string;
+  exitEasing: string;
 };
 
 type PopoverChevron = 'rotate' | 'fixed' | 'none';
@@ -69,85 +69,85 @@ export type PopoverVariant = 'solid' | 'glass' | 'gradient' | (string & {});
 export type PopoverRole = 'dialog' | 'menu' | 'listbox';
 
 type OwnPopoverProps = {
-    children: React.ReactNode;
+  children: React.ReactNode;
 
-    tree?: boolean;
-    role?: PopoverRole;
+  tree?: boolean;
+  role?: PopoverRole;
 
-    variant?: PopoverVariant;
-    motionPreset?: PopoverMotionPreset;
+  variant?: PopoverVariant;
+  motionPreset?: PopoverMotionPreset;
 
-    trigger?: PopoverTriggerMode;
-    interactive?: boolean;
+  trigger?: PopoverTriggerMode;
+  interactive?: boolean;
 
-    arrow?: boolean;
-    arrowSize?: number;
-    arrowInset?: number | string;
-    arrowShift?: number | string;
-    arrowCenter?: boolean;
+  arrow?: boolean;
+  arrowSize?: number;
+  arrowInset?: number | string;
+  arrowShift?: number | string;
+  arrowCenter?: boolean;
 
-    /**
-     * Delay before opening when trigger="hover".
-     * @default 100
-     */
-    openDelay?: number;
+  /**
+   * Delay before opening when trigger="hover".
+   * @default 100
+   */
+  openDelay?: number;
 
-    /**
-     * Delay before closing when trigger="hover".
-     * @default 100
-     */
-    closeDelay?: number;
+  /**
+   * Delay before closing when trigger="hover".
+   * @default 100
+   */
+  closeDelay?: number;
 
-    // State
-    open?: boolean;
-    defaultOpen?: boolean;
-    onOpenChange?: (open: boolean) => void;
+  // State
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 
-    disabled?: boolean;
+  disabled?: boolean;
 
-    /**
-     * Placement of panel.
-     */
-    placement?: Placement;
-    onPlacementChange?: (placement: Placement) => void;
+  /**
+   * Placement of panel.
+   */
+  placement?: Placement;
+  onPlacementChange?: (placement: Placement) => void;
 
-    /**
-     * Distance between trigger and panel.
-     */
-    offset?: number;
+  /**
+   * Distance between trigger and panel.
+   */
+  offset?: number;
 
-    /**
-     * Whether pressing Escape closes the popover.
-     */
-    closeOnEscape?: boolean;
+  /**
+   * Whether pressing Escape closes the popover.
+   */
+  closeOnEscape?: boolean;
 
-    /**
-     * Whether clicking outside closes the popover.
-     */
-    closeOnOutsideClick?: boolean;
+  /**
+   * Whether clicking outside closes the popover.
+   */
+  closeOnOutsideClick?: boolean;
 
-    /**
-     * Whether focus should be trapped inside the popover.
-     */
-    modal?: boolean;
+  /**
+   * Whether focus should be trapped inside the popover.
+   */
+  modal?: boolean;
 
-    /**
-     * Renders a backdrop behind the panel.
-     */
-    backdrop?: boolean;
+  /**
+   * Renders a backdrop behind the panel.
+   */
+  backdrop?: boolean;
 
-    /**
-     * Backdrop opacity/color variant.
-     */
-    backdropVariant?: BackdropVariant;
+  /**
+   * Backdrop opacity/color variant.
+   */
+  backdropVariant?: BackdropVariant;
 
-    returnFocus?: boolean;
+  returnFocus?: boolean;
 
-    // onMount?: () => void;
-    // onUnmount?: () => void;
-    onReady?: () => void;
+  // onMount?: () => void;
+  // onUnmount?: () => void;
+  onReady?: () => void;
 
-    // keepMounted?: boolean;
+  // keepMounted?: boolean;
 };
 
 type PopoverProps = OwnPopoverProps & SharedTransitionProps;
@@ -157,50 +157,50 @@ type PopoverProps = OwnPopoverProps & SharedTransitionProps;
 // };
 
 export type PopoverTriggerElementProps<T extends HTMLElement = HTMLElement> = Omit<
-    React.HTMLAttributes<T>,
-    'ref'
+  React.HTMLAttributes<T>,
+  'ref'
 > & {
-    ref?: React.Ref<T>;
+  ref?: React.Ref<T>;
 };
 
 type PopoverTriggerRenderProps = {
-    ref: React.Ref<HTMLElement>;
-    disabled: boolean;
-    opened: boolean;
-    triggerClassName: string;
-    triggerProps: PopoverTriggerElementProps;
-    content?: any;
-    // focusedVisible: boolean;
-    // pressed: boolean;
+  ref: React.Ref<HTMLElement>;
+  disabled: boolean;
+  opened: boolean;
+  triggerClassName: string;
+  triggerProps: PopoverTriggerElementProps;
+  content?: any;
+  // focusedVisible: boolean;
+  // pressed: boolean;
 };
 
 type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
-    className?: string;
-    children?: React.ReactNode;
-    chevron?: PopoverChevron;
-    render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
-    btnProps?: ButtonProps;
-    renderContent?: T;
+  className?: string;
+  children?: React.ReactNode;
+  chevron?: PopoverChevron;
+  render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
+  btnProps?: ButtonProps;
+  renderContent?: T;
 };
 
 type PopoverPanelProps<C extends React.ElementType = 'div'> = BoxComponentProps<
-    C,
-    {
-        children: React.ReactNode;
-        className?: string;
+  C,
+  {
+    children: React.ReactNode;
+    className?: string;
 
-        /**
-         * Makes panel width match trigger width.
-         */
-        matchTriggerWidth?: boolean;
-    }
+    /**
+     * Makes panel width match trigger width.
+     */
+    matchTriggerWidth?: boolean;
+  }
 >;
 
 type PopoverComponent = React.ForwardRefExoticComponent<
-    PopoverProps & React.RefAttributes<HTMLDivElement>
+  PopoverProps & React.RefAttributes<HTMLDivElement>
 > & {
-    Trigger: typeof PopoverTrigger;
-    Panel: typeof PopoverPanel;
+  Trigger: typeof PopoverTrigger;
+  Panel: typeof PopoverPanel;
 };
 
 // ---------------------------------------------------------------------------
@@ -208,7 +208,7 @@ type PopoverComponent = React.ForwardRefExoticComponent<
 // ---------------------------------------------------------------------------
 
 const prefix = (name: string = '') => {
-    return classPrefix(`--popover${name}`);
+  return classPrefix(`--popover${name}`);
 };
 
 // const transitionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecord> = {
@@ -229,38 +229,38 @@ const prefix = (name: string = '') => {
 // } as const;
 
 const popoverMotionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecord> = {
-    fast: {
-        enterDuration: 120,
-        exitDuration: 100,
+  fast: {
+    enterDuration: 120,
+    exitDuration: 100,
 
-        backdropEnterDuration: 140,
-        backdropExitDuration: 120,
+    backdropEnterDuration: 140,
+    backdropExitDuration: 120,
 
-        enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
-    },
+    enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
+  },
 
-    base: {
-        enterDuration: 180,
-        exitDuration: 140,
+  base: {
+    enterDuration: 180,
+    exitDuration: 140,
 
-        backdropEnterDuration: 220,
-        backdropExitDuration: 180,
+    backdropEnterDuration: 220,
+    backdropExitDuration: 180,
 
-        enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
-    },
+    enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
+  },
 
-    slow: {
-        enterDuration: 250,
-        exitDuration: 200,
+  slow: {
+    enterDuration: 250,
+    exitDuration: 200,
 
-        backdropEnterDuration: 300,
-        backdropExitDuration: 240,
+    backdropEnterDuration: 300,
+    backdropExitDuration: 240,
 
-        enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
-    },
+    enterEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    exitEasing: 'cubic-bezier(0.4, 0, 1, 1)',
+  },
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -268,254 +268,254 @@ const popoverMotionPresets: Record<PopoverMotionPreset, PopoverMotionPresetRecor
 // ---------------------------------------------------------------------------
 
 const Popover = ({
-    children,
+  children,
 
-    tree = false,
-    role = 'dialog',
-    variant = 'solid',
-    motionPreset = 'base',
+  tree = false,
+  role = 'dialog',
+  variant = 'solid',
+  motionPreset = 'base',
 
-    trigger = 'click',
-    interactive = true,
+  trigger = 'click',
+  interactive = true,
 
-    arrow = false,
-    arrowSize = 8,
-    arrowInset: arrowInsetProp = 16,
-    arrowShift: arrowShiftProp = 0,
-    arrowCenter,
+  arrow = false,
+  arrowSize = 8,
+  arrowInset: arrowInsetProp = 16,
+  arrowShift: arrowShiftProp = 0,
+  arrowCenter,
 
-    openDelay = 100,
-    closeDelay = 100,
+  openDelay = 100,
+  closeDelay = 100,
 
-    open,
-    defaultOpen = false,
-    onOpenChange,
+  open,
+  defaultOpen = false,
+  onOpenChange,
 
-    disabled = false,
+  disabled = false,
 
-    placement = 'bottom-start',
-    // placement = 'left-start',
-    onPlacementChange,
+  placement = 'bottom-start',
+  // placement = 'left-start',
+  onPlacementChange,
 
-    offset = 8,
+  offset = 8,
 
-    closeOnEscape = true,
-    closeOnOutsideClick = true,
+  closeOnEscape = true,
+  closeOnOutsideClick = true,
 
-    modal = false,
-    backdrop = false,
-    backdropVariant = 'blur',
-    returnFocus = true,
+  modal = false,
+  backdrop = false,
+  backdropVariant = 'blur',
+  returnFocus = true,
 
-    // enterDuration = 120,
-    // exitDuration = 120,
-    // enterEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
-    // exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+  // enterDuration = 120,
+  // exitDuration = 120,
+  // enterEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+  // exitEasing = 'cubic-bezier(0.4, 0, 1, 1)',
 
-    // onEntered,
-    // onExited,
+  // onEntered,
+  // onExited,
 
-    // onMount,
-    // onUnmount,
-    onReady,
+  // onMount,
+  // onUnmount,
+  onReady,
 
-    // keepMounted = false,
+  // keepMounted = false,
 
-    ...restWithTransition
+  ...restWithTransition
 }: PopoverProps) => {
-    const [transitionProps, rest] = splitProps(restWithTransition, sharedTransitionProps);
+  const [transitionProps, rest] = splitProps(restWithTransition, sharedTransitionProps);
 
-    const arrowInset = arrowCenter ? '50%' : arrowInsetProp;
-    const arrowShift = arrowCenter ? '-50%' : arrowShiftProp;
+  const arrowInset = arrowCenter ? '50%' : arrowInsetProp;
+  const arrowShift = arrowCenter ? '-50%' : arrowShiftProp;
 
-    const isControlled = open !== undefined;
+  const isControlled = open !== undefined;
 
-    const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
 
-    const opened = isControlled ? open : internalOpen;
+  const opened = isControlled ? open : internalOpen;
 
-    const setOpened = useCallback(
-        (next: boolean) => {
-            if (!isControlled) {
-                setInternalOpen(next);
-            }
+  const setOpened = useCallback(
+    (next: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(next);
+      }
 
-            onOpenChange?.(next);
-        },
-        [isControlled, onOpenChange],
-    );
+      onOpenChange?.(next);
+    },
+    [isControlled, onOpenChange],
+  );
 
-    const triggerId = useStableId('popover-trigger');
-    const panelId = useStableId('popover-panel');
+  const triggerId = useStableId('popover-trigger');
+  const panelId = useStableId('popover-panel');
 
-    const {
-        context,
-        refs,
-        floatingStyles,
-        getReferenceProps,
-        getFloatingProps,
-        nodeId,
-        placement: resolvedPlacement,
-    } = useFloatingLayer({
-        opened,
-        onOpenChange: setOpened,
-        placement,
-        offsetValue: offset,
-        closeOnOutsideClick,
-        closeOnEscape,
-    });
+  const {
+    context,
+    refs,
+    floatingStyles,
+    getReferenceProps,
+    getFloatingProps,
+    nodeId,
+    placement: resolvedPlacement,
+  } = useFloatingLayer({
+    opened,
+    onOpenChange: setOpened,
+    placement,
+    offsetValue: offset,
+    closeOnOutsideClick,
+    closeOnEscape,
+  });
 
-    useEffect(() => {
-        onPlacementChange?.(resolvedPlacement);
-    }, [resolvedPlacement, onPlacementChange]);
+  useEffect(() => {
+    onPlacementChange?.(resolvedPlacement);
+  }, [resolvedPlacement, onPlacementChange]);
 
-    const openTimeoutRef = useRef<number | undefined>(undefined);
-    const closeTimeoutRef = useRef<number | undefined>(undefined);
+  const openTimeoutRef = useRef<number | undefined>(undefined);
+  const closeTimeoutRef = useRef<number | undefined>(undefined);
 
-    useLayoutEffect(() => {
-        return () => {
-            clearTimeout(openTimeoutRef.current);
-            clearTimeout(closeTimeoutRef.current);
-        };
-    }, []);
+  useLayoutEffect(() => {
+    return () => {
+      clearTimeout(openTimeoutRef.current);
+      clearTimeout(closeTimeoutRef.current);
+    };
+  }, []);
 
-    const handleHoverEnter = useCallback(() => {
-        clearTimeout(closeTimeoutRef.current);
+  const handleHoverEnter = useCallback(() => {
+    clearTimeout(closeTimeoutRef.current);
 
-        openTimeoutRef.current = window.setTimeout(() => {
-            setOpened(true);
-        }, openDelay);
-    }, [setOpened, openDelay]);
+    openTimeoutRef.current = window.setTimeout(() => {
+      setOpened(true);
+    }, openDelay);
+  }, [setOpened, openDelay]);
 
-    const handleHoverLeave = useCallback(() => {
-        clearTimeout(openTimeoutRef.current);
+  const handleHoverLeave = useCallback(() => {
+    clearTimeout(openTimeoutRef.current);
 
-        closeTimeoutRef.current = window.setTimeout(() => {
-            setOpened(false);
-        }, closeDelay);
-    }, [setOpened, closeDelay]);
+    closeTimeoutRef.current = window.setTimeout(() => {
+      setOpened(false);
+    }, closeDelay);
+  }, [setOpened, closeDelay]);
 
-    const stateValue = useMemo(
-        () => ({
-            opened,
-            setOpened,
-        }),
-        [opened, setOpened],
-    );
+  const stateValue = useMemo(
+    () => ({
+      opened,
+      setOpened,
+    }),
+    [opened, setOpened],
+  );
 
-    const interactionValue = useMemo(
-        () => ({
-            trigger,
-            interactive,
-            openDelay,
-            closeDelay,
-            disabled,
-            handleHoverEnter,
-            handleHoverLeave,
-        }),
-        [trigger, openDelay, closeDelay, disabled, handleHoverEnter, handleHoverLeave],
-    );
+  const interactionValue = useMemo(
+    () => ({
+      trigger,
+      interactive,
+      openDelay,
+      closeDelay,
+      disabled,
+      handleHoverEnter,
+      handleHoverLeave,
+    }),
+    [trigger, openDelay, closeDelay, disabled, handleHoverEnter, handleHoverLeave],
+  );
 
-    const floatingValue = useMemo(
-        () => ({
-            refs,
-            context,
-            floatingStyles,
-            getReferenceProps,
-            getFloatingProps,
-            placement: resolvedPlacement,
-        }),
-        [refs, context, floatingStyles, getReferenceProps, getFloatingProps, resolvedPlacement],
-    );
+  const floatingValue = useMemo(
+    () => ({
+      refs,
+      context,
+      floatingStyles,
+      getReferenceProps,
+      getFloatingProps,
+      placement: resolvedPlacement,
+    }),
+    [refs, context, floatingStyles, getReferenceProps, getFloatingProps, resolvedPlacement],
+  );
 
-    const accessibilityValue = useMemo(
-        () => ({
-            triggerId,
-            panelId,
-            role,
-        }),
-        [triggerId, panelId, role],
-    );
+  const accessibilityValue = useMemo(
+    () => ({
+      triggerId,
+      panelId,
+      role,
+    }),
+    [triggerId, panelId, role],
+  );
 
-    const transitionValue = useMemo(
-        () => ({ ...transitionProps }),
-        [
-            transitionProps.controlRef,
-            transitionProps.animateOnMount,
-            transitionProps.hiddenStrategy,
-            transitionProps.animation,
-            transitionProps.attention,
-            transitionProps.attentionExit,
-            transitionProps.respectAttentionDuration,
-            transitionProps.reduceMotion,
-            transitionProps.onlyPresence,
-            transitionProps.enterDuration,
-            transitionProps.exitDuration,
-            transitionProps.enterEasing,
-            transitionProps.exitEasing,
-            transitionProps.keepMounted,
-            transitionProps.onEntered,
-            transitionProps.onExited,
-            transitionProps.onMount,
-            transitionProps.onUnmount,
-            transitionProps.slideOffset,
-            transitionProps.scaleFrom,
-            transitionProps.blurFrom,
-        ],
-    );
+  const transitionValue = useMemo(
+    () => ({ ...transitionProps }),
+    [
+      transitionProps.controlRef,
+      transitionProps.animateOnMount,
+      transitionProps.hiddenStrategy,
+      transitionProps.animation,
+      transitionProps.attention,
+      transitionProps.attentionExit,
+      transitionProps.respectAttentionDuration,
+      transitionProps.reduceMotion,
+      transitionProps.onlyPresence,
+      transitionProps.enterDuration,
+      transitionProps.exitDuration,
+      transitionProps.enterEasing,
+      transitionProps.exitEasing,
+      transitionProps.keepMounted,
+      transitionProps.onEntered,
+      transitionProps.onExited,
+      transitionProps.onMount,
+      transitionProps.onUnmount,
+      transitionProps.slideOffset,
+      transitionProps.scaleFrom,
+      transitionProps.blurFrom,
+    ],
+  );
 
-    const configValue = useMemo(
-        () => ({
-            variant,
-            motionPreset,
-            modal,
-            backdrop,
-            backdropVariant,
-            closeOnOutsideClick,
-            returnFocus,
-            onReady,
-            arrow,
-            arrowSize,
-            arrowInset,
-            arrowShift,
-        }),
-        [
-            variant,
-            motionPreset,
-            modal,
-            backdrop,
-            backdropVariant,
-            closeOnOutsideClick,
-            returnFocus,
-            onReady,
-            arrow,
-            arrowSize,
-            arrowInset,
-            arrowShift,
-        ],
-    );
+  const configValue = useMemo(
+    () => ({
+      variant,
+      motionPreset,
+      modal,
+      backdrop,
+      backdropVariant,
+      closeOnOutsideClick,
+      returnFocus,
+      onReady,
+      arrow,
+      arrowSize,
+      arrowInset,
+      arrowShift,
+    }),
+    [
+      variant,
+      motionPreset,
+      modal,
+      backdrop,
+      backdropVariant,
+      closeOnOutsideClick,
+      returnFocus,
+      onReady,
+      arrow,
+      arrowSize,
+      arrowInset,
+      arrowShift,
+    ],
+  );
 
-    const content = (
-        <FloatingNode id={nodeId}>
-            {/*<PopoverContext.Provider value={value}>{children}</PopoverContext.Provider>*/}
-            <PopoverProviders
-                state={stateValue}
-                floating={floatingValue}
-                interaction={interactionValue}
-                accessibility={accessibilityValue}
-                config={configValue}
-                transition={transitionValue}
-            >
-                {children}
-            </PopoverProviders>
-        </FloatingNode>
-    );
+  const content = (
+    <FloatingNode id={nodeId}>
+      {/*<PopoverContext.Provider value={value}>{children}</PopoverContext.Provider>*/}
+      <PopoverProviders
+        state={stateValue}
+        floating={floatingValue}
+        interaction={interactionValue}
+        accessibility={accessibilityValue}
+        config={configValue}
+        transition={transitionValue}
+      >
+        {children}
+      </PopoverProviders>
+    </FloatingNode>
+  );
 
-    if (tree) {
-        return <FloatingTree>{content}</FloatingTree>;
-    }
+  if (tree) {
+    return <FloatingTree>{content}</FloatingTree>;
+  }
 
-    return content;
+  return content;
 };
 
 Popover.displayName = 'Popover';
@@ -525,133 +525,133 @@ Popover.displayName = 'Popover';
 // ---------------------------------------------------------------------------
 
 const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
-    (
-        {
-            children,
-            className,
-            chevron = 'none',
-            render,
-            btnProps,
-            onClick,
-            onKeyDown,
-            onMouseEnter,
-            onMouseLeave,
-            renderContent,
-            ...rest
-        },
-        ref,
-    ) => {
-        const { opened, setOpened } = usePopoverStateContext();
-
-        const { disabled, trigger, handleHoverEnter, handleHoverLeave } =
-            usePopoverInteractionContext();
-
-        const { refs, getReferenceProps, placement } = usePopoverFloatingContext();
-
-        const { triggerId, panelId, role } = usePopoverAccessibilityContext();
-
-        const combinedRef = mergeRefs(refs.setReference, ref);
-
-        const handleKeyDown = useCallback(
-            (e: React.KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setOpened(!opened);
-                }
-            },
-            [opened, setOpened],
-        );
-
-        const triggerProps = {
-            ...getReferenceProps({
-                onClick: (e: React.MouseEvent<HTMLElement>) => {
-                    onClick?.(e);
-
-                    if (!disabled && trigger === 'click') {
-                        setOpened(!opened);
-                    }
-                },
-
-                onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
-                    if (!disabled) {
-                        handleKeyDown(e);
-                    }
-
-                    onKeyDown?.(e);
-                },
-                onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
-                    onMouseEnter?.(e);
-
-                    if (trigger !== 'hover' || disabled) {
-                        return;
-                    }
-
-                    handleHoverEnter();
-                },
-                onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
-                    onMouseLeave?.(e);
-
-                    if (trigger !== 'hover' || disabled) {
-                        return;
-                    }
-
-                    handleHoverLeave();
-                },
-            }),
-
-            id: triggerId,
-
-            'aria-expanded': opened,
-            'aria-controls': opened ? panelId : undefined,
-            'aria-haspopup': role,
-        };
-
-        const triggerClassName = clsx(prefix('__trigger'), className);
-
-        if (render) {
-            return render({
-                ref: combinedRef,
-                disabled: !!disabled,
-                opened,
-                triggerClassName,
-                triggerProps,
-                content: renderContent,
-            });
-        }
-
-        const isLeftPlacement = placement?.startsWith('left');
-
-        const chevronIcon = (chevron == 'rotate' || chevron == 'fixed') && (
-            <ChevronDownIcon
-                className={prefix('__chevron')}
-                data-opened={opened || undefined}
-                data-rotate={chevron == 'rotate' || undefined}
-                data-placement={placement}
-                aria-hidden
-            />
-        );
-
-        const buttonSize = btnProps?.size ?? 'md';
-
-        return (
-            <Button
-                {...rest}
-                {...triggerProps}
-                ref={combinedRef}
-                iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[buttonSize]}
-                className={triggerClassName}
-                type="button"
-                disabled={disabled}
-                active={trigger === 'click' && opened}
-                {...btnProps}
-                // endIcon={chevronIcon}
-                startIcon={isLeftPlacement ? chevronIcon : btnProps?.startIcon}
-                endIcon={!isLeftPlacement ? chevronIcon : btnProps?.endIcon}
-            >
-                {children}
-            </Button>
-        );
+  (
+    {
+      children,
+      className,
+      chevron = 'none',
+      render,
+      btnProps,
+      onClick,
+      onKeyDown,
+      onMouseEnter,
+      onMouseLeave,
+      renderContent,
+      ...rest
     },
+    ref,
+  ) => {
+    const { opened, setOpened } = usePopoverStateContext();
+
+    const { disabled, trigger, handleHoverEnter, handleHoverLeave } =
+      usePopoverInteractionContext();
+
+    const { refs, getReferenceProps, placement } = usePopoverFloatingContext();
+
+    const { triggerId, panelId, role } = usePopoverAccessibilityContext();
+
+    const combinedRef = mergeRefs(refs.setReference, ref);
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setOpened(!opened);
+        }
+      },
+      [opened, setOpened],
+    );
+
+    const triggerProps = {
+      ...getReferenceProps({
+        onClick: (e: React.MouseEvent<HTMLElement>) => {
+          onClick?.(e);
+
+          if (!disabled && trigger === 'click') {
+            setOpened(!opened);
+          }
+        },
+
+        onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+          if (!disabled) {
+            handleKeyDown(e);
+          }
+
+          onKeyDown?.(e);
+        },
+        onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+          onMouseEnter?.(e);
+
+          if (trigger !== 'hover' || disabled) {
+            return;
+          }
+
+          handleHoverEnter();
+        },
+        onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+          onMouseLeave?.(e);
+
+          if (trigger !== 'hover' || disabled) {
+            return;
+          }
+
+          handleHoverLeave();
+        },
+      }),
+
+      id: triggerId,
+
+      'aria-expanded': opened,
+      'aria-controls': opened ? panelId : undefined,
+      'aria-haspopup': role,
+    };
+
+    const triggerClassName = clsx(prefix('__trigger'), className);
+
+    if (render) {
+      return render({
+        ref: combinedRef,
+        disabled: !!disabled,
+        opened,
+        triggerClassName,
+        triggerProps,
+        content: renderContent,
+      });
+    }
+
+    const isLeftPlacement = placement?.startsWith('left');
+
+    const chevronIcon = (chevron == 'rotate' || chevron == 'fixed') && (
+      <ChevronDownIcon
+        className={prefix('__chevron')}
+        data-opened={opened || undefined}
+        data-rotate={chevron == 'rotate' || undefined}
+        data-placement={placement}
+        aria-hidden
+      />
+    );
+
+    const buttonSize = btnProps?.size ?? 'md';
+
+    return (
+      <Button
+        {...rest}
+        {...triggerProps}
+        ref={combinedRef}
+        iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[buttonSize]}
+        className={triggerClassName}
+        type="button"
+        disabled={disabled}
+        active={trigger === 'click' && opened}
+        {...btnProps}
+        // endIcon={chevronIcon}
+        startIcon={isLeftPlacement ? chevronIcon : btnProps?.startIcon}
+        endIcon={!isLeftPlacement ? chevronIcon : btnProps?.endIcon}
+      >
+        {children}
+      </Button>
+    );
+  },
 );
 
 PopoverTrigger.displayName = 'Popover.Trigger';
@@ -661,190 +661,186 @@ PopoverTrigger.displayName = 'Popover.Trigger';
 // ---------------------------------------------------------------------------
 
 const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
-    (
-        {
-            children,
-            className,
-            matchTriggerWidth = false,
-            shadow = 'lg',
-            rounded = 'sm',
-            onMouseEnter,
-            onMouseLeave,
-            ...rest
-        },
-        ref,
-    ) => {
-        const { opened, setOpened } = usePopoverStateContext();
-
-        const { trigger, interactive, disabled, handleHoverEnter, handleHoverLeave } =
-            usePopoverInteractionContext();
-
-        const { refs, context, floatingStyles, getFloatingProps, placement } =
-            usePopoverFloatingContext();
-
-        const { triggerId, panelId, role } = usePopoverAccessibilityContext();
-
-        const {
-            variant,
-            motionPreset,
-            // animation,
-            // enterDuration,
-            // exitDuration,
-            // enterEasing,
-            // exitEasing,
-
-            modal,
-            backdrop,
-            backdropVariant,
-
-            closeOnOutsideClick,
-            returnFocus,
-
-            onReady,
-            // keepMounted,
-
-            arrow,
-            arrowSize,
-            arrowInset,
-            arrowShift,
-        } = usePopoverConfigContext();
-
-        const currentMotionPreset = popoverMotionPresets[motionPreset];
-
-        const ctxTransition = usePopoverTransitionContext();
-
-        const finalTransitionProps = {
-            ...ctxTransition,
-            ...{
-                respectAttentionDuration: ctxTransition.respectAttentionDuration ?? true,
-                animation: ctxTransition.animation ?? 'scale-fade',
-                hiddenStrategy: ctxTransition.hiddenStrategy ?? 'visibility',
-                enterDuration: ctxTransition.enterDuration ?? currentMotionPreset.enterDuration,
-                exitDuration: ctxTransition.exitDuration ?? currentMotionPreset.exitDuration,
-                enterEasing: ctxTransition.enterEasing ?? currentMotionPreset.enterEasing,
-                exitEasing: ctxTransition.exitEasing ?? currentMotionPreset.exitEasing,
-            },
-        };
-
-        const handleFloatingRef = useCallback(
-            (node: HTMLDivElement | null) => {
-                refs.setFloating(node);
-
-                if (!node) return;
-
-                queueMicrotask(() => {
-                    onReady?.();
-                });
-            },
-            [refs, onReady],
-        );
-
-        // ── Unmount after exit animation ─────────────────────────────────
-        // if (!keepMounted && !isMounted) {
-        //     return null;
-        // }
-
-        return (
-            <FloatingPortal>
-                {backdrop && trigger === 'click' && (
-                    <Transition
-                        animation="fade"
-                        visible={opened}
-                        enterDuration={currentMotionPreset.backdropEnterDuration}
-                        exitDuration={currentMotionPreset.backdropExitDuration}
-                        className={prefix('__backdrop')}
-                        onClick={() => closeOnOutsideClick && setOpened(false)}
-                        data-variant={backdropVariant}
-                    />
-                )}
-
-                <FloatingFocusManager
-                    context={context}
-                    modal={modal}
-                    initialFocus={modal ? 0 : -1}
-                    returnFocus={returnFocus}
-                >
-                    <Transition
-                        visible={opened}
-                        {...finalTransitionProps}
-                        ref={mergeRefs(handleFloatingRef, ref)}
-                        id={panelId}
-                        role={role}
-                        tabIndex={-1}
-                        aria-modal={modal || undefined}
-                        aria-labelledby={role === 'dialog' ? triggerId : undefined}
-                        // aria-hidden={!isMounted || undefined}
-                        style={
-                            {
-                                ...floatingStyles,
-
-                                '--popover-trigger-width': refs.reference.current
-                                    ? `${refs.reference.current.getBoundingClientRect().width}px`
-                                    : undefined,
-                            } as CSSProperties
-                        }
-                        className={[prefix('__panel'), className].filter(Boolean).join(' ')}
-                        shadow={shadow}
-                        rounded={rounded}
-                        {...getFloatingProps()}
-                        data-match-trigger-width={matchTriggerWidth || undefined}
-                        data-variant={variant}
-                        data-placement={placement}
-                        {...rest}
-                        onMouseEnter={(e) => {
-                            onMouseEnter?.(e);
-
-                            if (!interactive) {
-                                return;
-                            }
-
-                            if (trigger !== 'hover' || disabled) {
-                                return;
-                            }
-
-                            handleHoverEnter();
-                        }}
-                        onMouseLeave={(e) => {
-                            onMouseLeave?.(e);
-
-                            if (!interactive) {
-                                return;
-                            }
-
-                            if (trigger !== 'hover' || disabled) {
-                                return;
-                            }
-
-                            handleHoverLeave();
-                        }}
-                    >
-                        {arrow && (
-                            <span
-                                className={prefix('__arrow')}
-                                aria-hidden
-                                style={
-                                    {
-                                        '--popover-arrow-size': `${arrowSize}px`,
-                                        '--popover-arrow-inset':
-                                            typeof arrowInset === 'number'
-                                                ? `${arrowInset}px`
-                                                : arrowInset,
-                                        '--popover-arrow-shift':
-                                            typeof arrowShift === 'number'
-                                                ? `${arrowShift}px`
-                                                : arrowShift,
-                                    } as React.CSSProperties
-                                }
-                                data-placement={placement}
-                            />
-                        )}
-
-                        {children}
-                    </Transition>
-                </FloatingFocusManager>
-            </FloatingPortal>
-        );
+  (
+    {
+      children,
+      className,
+      matchTriggerWidth = false,
+      shadow = 'lg',
+      rounded = 'sm',
+      onMouseEnter,
+      onMouseLeave,
+      ...rest
     },
+    ref,
+  ) => {
+    const { opened, setOpened } = usePopoverStateContext();
+
+    const { trigger, interactive, disabled, handleHoverEnter, handleHoverLeave } =
+      usePopoverInteractionContext();
+
+    const { refs, context, floatingStyles, getFloatingProps, placement } =
+      usePopoverFloatingContext();
+
+    const { triggerId, panelId, role } = usePopoverAccessibilityContext();
+
+    const {
+      variant,
+      motionPreset,
+      // animation,
+      // enterDuration,
+      // exitDuration,
+      // enterEasing,
+      // exitEasing,
+
+      modal,
+      backdrop,
+      backdropVariant,
+
+      closeOnOutsideClick,
+      returnFocus,
+
+      onReady,
+      // keepMounted,
+
+      arrow,
+      arrowSize,
+      arrowInset,
+      arrowShift,
+    } = usePopoverConfigContext();
+
+    const currentMotionPreset = popoverMotionPresets[motionPreset];
+
+    const ctxTransition = usePopoverTransitionContext();
+
+    const finalTransitionProps = {
+      ...ctxTransition,
+      ...{
+        respectAttentionDuration: ctxTransition.respectAttentionDuration ?? true,
+        animation: ctxTransition.animation ?? 'scale-fade',
+        hiddenStrategy: ctxTransition.hiddenStrategy ?? 'visibility',
+        enterDuration: ctxTransition.enterDuration ?? currentMotionPreset.enterDuration,
+        exitDuration: ctxTransition.exitDuration ?? currentMotionPreset.exitDuration,
+        enterEasing: ctxTransition.enterEasing ?? currentMotionPreset.enterEasing,
+        exitEasing: ctxTransition.exitEasing ?? currentMotionPreset.exitEasing,
+      },
+    };
+
+    const handleFloatingRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        refs.setFloating(node);
+
+        if (!node) return;
+
+        queueMicrotask(() => {
+          onReady?.();
+        });
+      },
+      [refs, onReady],
+    );
+
+    // ── Unmount after exit animation ─────────────────────────────────
+    // if (!keepMounted && !isMounted) {
+    //     return null;
+    // }
+
+    return (
+      <FloatingPortal>
+        {backdrop && trigger === 'click' && (
+          <Transition
+            animation="fade"
+            visible={opened}
+            enterDuration={currentMotionPreset.backdropEnterDuration}
+            exitDuration={currentMotionPreset.backdropExitDuration}
+            className={prefix('__backdrop')}
+            onClick={() => closeOnOutsideClick && setOpened(false)}
+            data-variant={backdropVariant}
+          />
+        )}
+
+        <FloatingFocusManager
+          context={context}
+          modal={modal}
+          initialFocus={modal ? 0 : -1}
+          returnFocus={returnFocus}
+        >
+          <Transition
+            visible={opened}
+            {...finalTransitionProps}
+            ref={mergeRefs(handleFloatingRef, ref)}
+            id={panelId}
+            role={role}
+            tabIndex={-1}
+            aria-modal={modal || undefined}
+            aria-labelledby={role === 'dialog' ? triggerId : undefined}
+            // aria-hidden={!isMounted || undefined}
+            style={
+              {
+                ...floatingStyles,
+
+                '--popover-trigger-width': refs.reference.current
+                  ? `${refs.reference.current.getBoundingClientRect().width}px`
+                  : undefined,
+              } as CSSProperties
+            }
+            className={[prefix('__panel'), className].filter(Boolean).join(' ')}
+            shadow={shadow}
+            rounded={rounded}
+            {...getFloatingProps()}
+            data-match-trigger-width={matchTriggerWidth || undefined}
+            data-variant={variant}
+            data-placement={placement}
+            {...rest}
+            onMouseEnter={(e) => {
+              onMouseEnter?.(e);
+
+              if (!interactive) {
+                return;
+              }
+
+              if (trigger !== 'hover' || disabled) {
+                return;
+              }
+
+              handleHoverEnter();
+            }}
+            onMouseLeave={(e) => {
+              onMouseLeave?.(e);
+
+              if (!interactive) {
+                return;
+              }
+
+              if (trigger !== 'hover' || disabled) {
+                return;
+              }
+
+              handleHoverLeave();
+            }}
+          >
+            {arrow && (
+              <span
+                className={prefix('__arrow')}
+                aria-hidden
+                style={
+                  {
+                    '--popover-arrow-size': `${arrowSize}px`,
+                    '--popover-arrow-inset':
+                      typeof arrowInset === 'number' ? `${arrowInset}px` : arrowInset,
+                    '--popover-arrow-shift':
+                      typeof arrowShift === 'number' ? `${arrowShift}px` : arrowShift,
+                  } as React.CSSProperties
+                }
+                data-placement={placement}
+              />
+            )}
+
+            {children}
+          </Transition>
+        </FloatingFocusManager>
+      </FloatingPortal>
+    );
+  },
 );
 
 PopoverPanel.displayName = 'Popover.Panel';
