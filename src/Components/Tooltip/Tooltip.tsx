@@ -179,6 +179,7 @@ export type {
   TooltipDensity,
   TooltipDensityStyles,
   TooltipProps,
+  Placement as TooltipPlacement,
 };
 
 export { tooltipIntents, tooltipVariants, centeredArrowPlacements };
