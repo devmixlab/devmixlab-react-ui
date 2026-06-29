@@ -13,9 +13,9 @@ export type AddQueueProps = {
   onTrigger: OnTrigger;
 };
 
-export type QueueProcessorProps = {
-  minTriggerInterval: number;
-};
+// export type QueueProcessorProps = {
+//   minTriggerInterval?: number;
+// };
 
 export type AddQueueReturn = {
   remove: () => void;
@@ -23,7 +23,7 @@ export type AddQueueReturn = {
 
 const QUEUE_PROCESSOR_INTERVAL = 300;
 
-export const useQueueProcessor = ({ minTriggerInterval = 1000 }: QueueProcessorProps) => {
+export const useQueueProcessor = (minTriggerInterval: number = 5000) => {
   const queueRef = useRef<Pending[]>([]);
   const intervalRef = useRef<number | null>(null);
   const isPausedRef = useRef(false);
@@ -53,10 +53,14 @@ export const useQueueProcessor = ({ minTriggerInterval = 1000 }: QueueProcessorP
 
     startQueueProcessor();
 
+    // console.log(maxRemainingTimeRef.current);
+
     const remainingTime =
       queueRef.current.length <= 0
         ? minTriggerInterval
         : maxRemainingTimeRef.current + minTriggerInterval;
+
+    console.log(remainingTime);
 
     queueRef.current.push({
       id,

@@ -30,7 +30,10 @@ const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
   ({ name = 'default', className, gap = 12, alertProps }, ref) => {
     const alert = useAlert();
 
-    const alerts = alert.getAlerts(name);
+    const alerts = alert.getHostAlerts(name);
+
+    console.log(alerts);
+    // const alerts = alert.alerts.get(name) ?? [];
 
     // const onDismissResolved =
 
@@ -73,7 +76,11 @@ const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
             >
               {(item.title || item.description) && (
                 <>
-                  {item.title && <Alert.Title>{item.title}</Alert.Title>}
+                  {item.title && (
+                    <Alert.Title>
+                      {item.title} - {item.visible ? 'true' : 'false'}
+                    </Alert.Title>
+                  )}
 
                   {item.description && <Alert.Description>{item.description}</Alert.Description>}
                 </>

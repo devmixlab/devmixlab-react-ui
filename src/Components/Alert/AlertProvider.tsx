@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertContext } from './AlertContext';
 import type {
   AlertContextValue,
@@ -7,139 +7,133 @@ import type {
   AlertInstance,
   AlertOptions,
 } from './Alert.types';
-import { PendingClose } from '../Toast';
+import { useQueueProcessor } from './useQueueProcessor';
 
 type AlertProviderProps = {
   children: React.ReactNode;
   defaultHostName?: AlertHostName;
 };
 
-export type PendingClose = {
-  id: string;
-  leftTillClose: number;
-};
-
 const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderProps) => {
-  const [alerts, setAlerts] = useState<Map<AlertHostName, AlertInstance[]>>(new Map());
+  const [alerts, setAlerts] = useState(new Map<string, AlertInstance>());
 
   const alertRefs = useRef(new Map<string, HTMLElement>());
-  const closeQueueRef = React.useRef<PendingClose[]>([]);
+
+  const queue = useQueueProcessor();
 
   //-----------------------------------------------------------
   // Helpers
   //-----------------------------------------------------------
 
-  const updateHost = useCallback(
-    (hostName: AlertHostName, updater: (alerts: AlertInstance[]) => AlertInstance[]) => {
-      setAlerts((prev) => {
-        const next = new Map(prev);
-
-        const hostAlerts = next.get(hostName) ?? [];
-
-        next.set(hostName, updater(hostAlerts));
-
-        return next;
-      });
-    },
-    [],
-  );
-
-  const findHost = useCallback(
-    (id: string): AlertHostName | undefined => {
-      for (const [hostName, hostAlerts] of alerts) {
-        if (hostAlerts.some((x) => x.id === id)) {
-          return hostName;
-        }
-      }
-
-      return undefined;
-    },
-    [alerts],
-  );
-
-  //-----------------------------------------------------------
-  // Actions
-  //-----------------------------------------------------------
-
-  const close = useCallback(
-    (id: string) => {
-      const hostName = findHost(id);
-
-      if (!hostName) return;
-
-      updateHost(hostName, (items) =>
-        items.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                visible: false,
-              }
-            : item,
-        ),
-      );
-    },
-    [findHost, updateHost],
-  );
-
-  const update = useCallback(
-    (id: string, options: Partial<AlertOptions>) => {
-      const hostName = findHost(id);
-
-      if (!hostName) return;
-
-      updateHost(hostName, (items) =>
-        items.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                ...options,
-              }
-            : item,
-        ),
-      );
-    },
-    [findHost, updateHost],
-  );
-
-  const shake = useCallback((id: string) => {
-    // implemented later
+  const update = useCallback((id: string, options: Partial<AlertOptions>) => {
+    updateAlert(id, options);
   }, []);
 
-  const focus = useCallback((id: string) => {
-    alertRefs.current.get(id)?.focus();
-  }, []);
-
-  const clear = useCallback(() => {
+  const updateAlert = useCallback((id: string, options: Partial<AlertInstance>) => {
     setAlerts((prev) => {
       const next = new Map(prev);
 
-      next.forEach((items, hostName) => {
-        next.set(
-          hostName,
-          items.map((item) => ({
-            ...item,
-            visible: false,
-          })),
-        );
+      const previousAlert = next.get(id);
+
+      if (!previousAlert) {
+        return prev;
+      }
+
+      next.set(id, {
+        ...previousAlert,
+        ...options,
       });
 
       return next;
     });
   }, []);
 
-  const closeAll = useCallback(
-    (hostName: AlertHostName) => {
-      updateHost(hostName, (items) =>
-        items.map((item) => ({
-          ...item,
+  //-----------------------------------------------------------
+  // Actions
+  //-----------------------------------------------------------
+
+  const close = useCallback((id: string) => {
+    updateAlert(id, { visible: false });
+  }, []);
+
+  // const update = useCallback(
+  //   (id: string, options: Partial<AlertOptions>) => {
+  //     const hostName = findHost(id);
+  //
+  //     if (!hostName) return;
+  //
+  //     updateHost(hostName, (items) =>
+  //       items.map((item) =>
+  //         item.id === id
+  //           ? {
+  //               ...item,
+  //               ...options,
+  //             }
+  //           : item,
+  //       ),
+  //     );
+  //   },
+  //   [findHost, updateHost],
+  // );
+
+  // const shake = useCallback((id: string) => {
+  //   // implemented later
+  // }, []);
+  //
+  // const focus = useCallback((id: string) => {
+  //   alertRefs.current.get(id)?.focus();
+  // }, []);
+
+  const clear = useCallback(() => {
+    setAlerts((prev) => {
+      const next = new Map(prev);
+
+      next.forEach((alert, id) => {
+        next.set(id, {
+          ...alert,
           visible: false,
-        })),
-      );
+        });
+      });
+
+      return next;
+    });
+  }, []);
+
+  const closeHost = useCallback((hostName: AlertHostName) => {
+    setAlerts((prev) => {
+      const next = new Map(prev);
+
+      next.forEach((alert, id) => {
+        if (alert.hostName !== hostName) {
+          return;
+        }
+
+        next.set(id, {
+          ...alert,
+          visible: false,
+        });
+      });
+
+      return next;
+    });
+  }, []);
+
+  const getHostAlerts = useCallback(
+    (hostName: AlertHostName): AlertInstance[] => {
+      const result: AlertInstance[] = [];
+
+      alerts.forEach((alert) => {
+        if (alert.hostName === hostName) {
+          result.push(alert);
+        }
+      });
+
+      return result;
     },
-    [updateHost],
+    [alerts],
   );
 
-  const getAlerts = useCallback((hostName: AlertHostName) => alerts.get(hostName) ?? [], [alerts]);
+  // const getAlerts = useCallback((hostName: AlertHostName) => alerts.get(hostName) ?? [], [alerts]);
 
   const show = useCallback(
     ({ duration, ...options }: AlertOptions): AlertHandle => {
@@ -154,10 +148,35 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
         visible: true,
       };
 
-      updateHost(hostName, (items) => [...items, alert]);
+      setAlerts((prev) => {
+        const next = new Map(prev);
+
+        next.set(id, alert);
+
+        return next;
+      });
+
+      // console.log('host');
+      // console.log(alerts);
 
       if (duration) {
-        requestClose(id);
+        setTimeout(() => {
+          // setAlerts((prev) => {
+          //   console.log('size');
+          //   console.log(prev);
+          //   return prev;
+          // });
+          // close(id);
+          queue.add({
+            id,
+            onTrigger: () => {
+              close(id);
+              console.log('close');
+              // close(id);
+              // console.log(alertsRefs.current);
+            },
+          });
+        }, duration);
       }
 
       return {
@@ -167,12 +186,12 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
 
         update: (opts) => update(id, opts),
 
-        shake: () => shake(id),
-
-        focus: () => focus(id),
+        // shake: () => shake(id),
+        //
+        // focus: () => focus(id),
       };
     },
-    [close, defaultHostName, focus, shake, update, updateHost],
+    [close, defaultHostName, focus, update],
   );
 
   //-----------------------------------------------------------
@@ -184,13 +203,14 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
       show,
       close,
       clear,
-      closeAll,
+      closeHost,
       update,
-      shake,
-      focus,
-      getAlerts,
+      // shake,
+      // focus,
+      getHostAlerts,
+      // alerts,
     }),
-    [show, close, clear, closeAll, update, shake, focus, getAlerts],
+    [show, close, clear, closeHost, update, focus, getHostAlerts],
   );
 
   return <AlertContext.Provider value={value}>{children}</AlertContext.Provider>;

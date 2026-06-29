@@ -103,12 +103,12 @@ export type AlertHandle = {
   /**
    * Plays attention animation.
    */
-  shake(): void;
+  // shake(): void;
 
   /**
    * Focuses the alert element.
    */
-  focus(): void;
+  // focus(): void;
 };
 
 export type AlertContextValue = {
@@ -130,7 +130,7 @@ export type AlertContextValue = {
   /**
    * Closes all alerts in a host.
    */
-  closeAll(hostName: AlertHostName): void;
+  closeHost(hostName: AlertHostName): void;
 
   /**
    * Updates an existing alert.
@@ -140,15 +140,15 @@ export type AlertContextValue = {
   /**
    * Plays the attention animation.
    */
-  shake(id: string): void;
+  // shake(id: string): void;
 
   /**
    * Focuses an alert.
    */
-  focus(id: string): void;
+  // focus(id: string): void;
 
   /**
    * Returns alerts assigned to a host.
    */
-  getAlerts(hostName: AlertHostName): readonly AlertInstance[];
+  getHostAlerts(hostName: AlertHostName): readonly AlertInstance[];
 };
