@@ -7,16 +7,23 @@ import type {
   AlertInstance,
   AlertOptions,
 } from './Alert.types';
+import { PendingClose } from '../Toast';
 
 type AlertProviderProps = {
   children: React.ReactNode;
   defaultHostName?: AlertHostName;
 };
 
+export type PendingClose = {
+  id: string;
+  leftTillClose: number;
+};
+
 const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderProps) => {
   const [alerts, setAlerts] = useState<Map<AlertHostName, AlertInstance[]>>(new Map());
 
   const alertRefs = useRef(new Map<string, HTMLElement>());
+  const closeQueueRef = React.useRef<PendingClose[]>([]);
 
   //-----------------------------------------------------------
   // Helpers
@@ -148,6 +155,10 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
       };
 
       updateHost(hostName, (items) => [...items, alert]);
+
+      if (duration) {
+        requestClose(id);
+      }
 
       return {
         id,
