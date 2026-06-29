@@ -1,60 +1,22 @@
 import React, { forwardRef, HTMLAttributes } from 'react';
-import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
+import { createPolymorphic } from '../../types/polymorphic';
 import { Box } from '../Box';
 import type { BoxProps } from '../Box';
 import clsx from 'clsx';
 import { Info, Warning, Success, Close } from '../Icon';
-import { classPrefix } from '../../utils/classPrefix';
 import { TextProps, Text } from '../Text';
-import { TransitionProps, Transition } from '../Transition';
+import { Transition } from '../Transition';
+import { SemanticAlertIntent, AlertProps, ImplAlertProps } from './Alert.types';
+import { prefix } from './Alert.helpers';
 
 //-----------------------------------------------------------
 // Types
 //-----------------------------------------------------------
 
-const alertIntents = ['primary', 'secondary', 'success', 'warning', 'danger', 'info'] as const;
-
-type SemanticAlertIntent = (typeof alertIntents)[number];
-
-type AlertIntent = SemanticAlertIntent | (string & {});
-
-const alertVariants = ['solid', 'outlined', 'subtle'] as const;
-
-type AlertVariant = (typeof alertVariants)[number] | (string & {});
-
-const alertSizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
-
-type AlertSize = (typeof alertSizes)[number];
-
-const alertAccents = ['left', 'top'] as const;
-
-type AlertAccent = (typeof alertAccents)[number];
-
-type OwnAlertProps = {
-    intent?: AlertIntent;
-    variant?: AlertVariant;
-    size?: AlertSize;
-    icon?: boolean | React.ReactNode;
-    accent?: AlertAccent;
-
-    onDismiss?: () => void;
-};
-
-type AlertProps = OwnAlertProps & TransitionProps & Omit<BoxProps, 'size'>;
-
-type ImplAlertProps = PolymorphicProps<'div', AlertProps>;
-
 type AlertComponent = ReturnType<typeof createPolymorphic<AlertProps, 'div'>> & {
-    Title: typeof AlertTitle;
-    Description: typeof AlertDescription;
-    Actions: typeof AlertActions;
-};
-
-//-----------------------------------------------------------
-// Helpers
-//-----------------------------------------------------------
-export const prefix = (name: string = '') => {
-    return classPrefix(`--alert${name}`);
+  Title: typeof AlertTitle;
+  Description: typeof AlertDescription;
+  Actions: typeof AlertActions;
 };
 
 //-----------------------------------------------------------
@@ -62,73 +24,69 @@ export const prefix = (name: string = '') => {
 //-----------------------------------------------------------
 
 const defaultIcons: Record<SemanticAlertIntent, React.ReactNode> = {
-    primary: null,
-    secondary: null,
-    success: <Success />,
-    warning: <Warning />,
-    danger: <Warning />,
-    info: <Info />,
+  primary: null,
+  secondary: null,
+  success: <Success />,
+  warning: <Warning />,
+  danger: <Warning />,
+  info: <Info />,
 };
 
 //-----------------------------------------------------------
 // Implementation of component
 //-----------------------------------------------------------
 const AlertImpl = (
-    {
-        children,
-        className,
-        rounded = 'md',
+  {
+    children,
+    className,
+    rounded = 'md',
+    as,
 
-        intent = 'danger',
-        variant = 'solid',
-        size = 'md',
-        icon,
-        accent,
+    intent = 'primary',
+    variant = 'subtle',
+    size = 'md',
+    icon,
+    accent,
 
-        onDismiss,
+    onDismiss,
 
-        ...rest
-    }: ImplAlertProps,
-    ref: React.Ref<HTMLDivElement>,
+    ...rest
+  }: ImplAlertProps,
+  ref: React.Ref<HTMLDivElement>,
 ) => {
-    const isDismissible = onDismiss !== undefined;
+  const finalAs = as ?? Box;
 
-    const resolvedIcon =
-        icon === true
-            ? (defaultIcons[intent as keyof typeof defaultIcons] ?? null)
-            : (icon ?? null);
+  const isDismissible = onDismiss !== undefined;
 
-    return (
-        <Transition
-            {...rest}
-            as={Box}
-            ref={ref}
-            className={clsx(prefix(), className)}
-            rounded={rounded}
-            data-intent={intent}
-            data-variant={variant}
-            data-size={size}
-            data-accent={accent ?? undefined}
-            data-has-icon={!!resolvedIcon || undefined}
-        >
-            {resolvedIcon != null && <Box className={prefix('__icon')}>{resolvedIcon}</Box>}
+  const resolvedIcon =
+    icon === true ? (defaultIcons[intent as keyof typeof defaultIcons] ?? null) : (icon ?? null);
 
-            <Box className={prefix('__content')}>{children}</Box>
+  return (
+    <Transition
+      {...rest}
+      as={finalAs}
+      ref={ref}
+      className={clsx(prefix(), className)}
+      rounded={rounded}
+      data-intent={intent}
+      data-variant={variant}
+      data-size={size}
+      data-accent={accent ?? undefined}
+      data-has-icon={!!resolvedIcon || undefined}
+    >
+      {resolvedIcon != null && <Box className={prefix('__icon')}>{resolvedIcon}</Box>}
 
-            {isDismissible && (
-                <Box className={prefix('__dismiss')}>
-                    <Box
-                        as="button"
-                        type="button"
-                        className={prefix('__dismiss-button')}
-                        onClick={onDismiss}
-                    >
-                        <Close />
-                    </Box>
-                </Box>
-            )}
-        </Transition>
-    );
+      <Box className={prefix('__content')}>{children}</Box>
+
+      {isDismissible && (
+        <Box className={prefix('__dismiss')}>
+          <Box as="button" type="button" className={prefix('__dismiss-button')} onClick={onDismiss}>
+            <Close />
+          </Box>
+        </Box>
+      )}
+    </Transition>
+  );
 };
 
 //-----------------------------------------------------------
@@ -136,13 +94,13 @@ const AlertImpl = (
 //-----------------------------------------------------------
 type AlertTitleProps = TextProps & HTMLAttributes<HTMLDivElement>;
 const AlertTitle = ({ className, ...rest }: AlertTitleProps) => (
-    // <Box {...rest} className={clsx(prefix('__title'), className)} />
-    <Text
-        {...rest}
-        variant="body-md"
-        emphasis="strong"
-        className={clsx(prefix('__title'), className)}
-    />
+  // <Box {...rest} className={clsx(prefix('__title'), className)} />
+  <Text
+    {...rest}
+    variant="body-md"
+    emphasis="strong"
+    className={clsx(prefix('__title'), className)}
+  />
 );
 
 //-----------------------------------------------------------
@@ -150,12 +108,12 @@ const AlertTitle = ({ className, ...rest }: AlertTitleProps) => (
 //-----------------------------------------------------------
 type AlertDescriptionProps = TextProps & HTMLAttributes<HTMLDivElement>;
 const AlertDescription = ({ className, ...rest }: AlertDescriptionProps) => (
-    <Text
-        {...rest}
-        variant="body-sm"
-        emphasis="muted"
-        className={clsx(prefix('__description'), className)}
-    />
+  <Text
+    {...rest}
+    variant="body-sm"
+    emphasis="muted"
+    className={clsx(prefix('__description'), className)}
+  />
 );
 
 //-----------------------------------------------------------
@@ -163,15 +121,15 @@ const AlertDescription = ({ className, ...rest }: AlertDescriptionProps) => (
 //-----------------------------------------------------------
 type AlertActionsProps = {} & BoxProps & HTMLAttributes<HTMLDivElement>;
 const AlertActions = ({ className, ...rest }: AlertActionsProps) => (
-    <Box {...rest} className={clsx(prefix('__actions'), className)} />
+  <Box {...rest} className={clsx(prefix('__actions'), className)} />
 );
 
 //-----------------------------------------------------------
 // Polymorphic component
 //-----------------------------------------------------------
 const Alert = createPolymorphic<AlertProps, 'div'>(
-    forwardRef(AlertImpl),
-    'Alert',
+  forwardRef(AlertImpl),
+  'Alert',
 ) as AlertComponent;
 
 Alert.Title = AlertTitle;
@@ -179,15 +137,3 @@ Alert.Description = AlertDescription;
 Alert.Actions = AlertActions;
 
 export { Alert };
-
-export type {
-    SemanticAlertIntent,
-    AlertIntent,
-    AlertVariant,
-    AlertSize,
-    AlertAccent,
-    OwnAlertProps,
-    AlertProps,
-};
-
-export { alertIntents, alertVariants, alertSizes, alertAccents };
