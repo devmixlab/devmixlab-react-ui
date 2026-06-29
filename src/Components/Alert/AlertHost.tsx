@@ -4,9 +4,14 @@ import { Box } from '../Box';
 import { Alert } from './Alert';
 import { useAlert } from './useAlert';
 import { classPrefix } from '../../utils/classPrefix';
-import type { AlertHostName } from './Alert.types';
+import type { AlertHostName, AlertProps } from './Alert.types';
 
 const prefix = (name = '') => classPrefix(`--alert-host${name}`);
+
+export type AlertHostAlertProps = Pick<
+  AlertProps,
+  'rounded' | 'shadow' | 'variant' | 'intent' | 'size' | 'accent' | 'onDismiss'
+>;
 
 export type AlertHostProps = {
   name?: AlertHostName;
@@ -17,13 +22,17 @@ export type AlertHostProps = {
    * Vertical gap between alerts.
    */
   gap?: number | string;
+
+  alertProps?: AlertHostAlertProps;
 };
 
 const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
-  ({ name = 'default', className, gap = 12, ...props }, ref) => {
+  ({ name = 'default', className, gap = 12, alertProps }, ref) => {
     const alert = useAlert();
 
     const alerts = alert.getAlerts(name);
+
+    // const onDismissResolved =
 
     return (
       <Box
@@ -32,38 +41,48 @@ const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
         display="flex"
         flexDirection="column"
         gap={gap}
-        {...props}
+        data-alert-host={name}
       >
-        {alerts.map((item) => (
-          <Alert
-            key={item.id}
-            visible={item.visible}
-            intent={item.intent}
-            variant={item.variant}
-            size={item.size}
-            accent={item.accent}
-            icon={item.icon}
-            onDismiss={() => {
-              item.onDismiss?.();
-              alert.close(item.id);
-            }}
-            onExited={() => {
-              // TODO:
-              // alert.remove(item.id);
-              console.log(alerts);
-            }}
-          >
-            {(item.title || item.description) && (
-              <>
-                {item.title && <Alert.Title>{item.title}</Alert.Title>}
+        {alerts.map((item) => {
+          const onDismissResolved = item.onDismiss ?? alertProps?.onDismiss;
 
-                {item.description && <Alert.Description>{item.description}</Alert.Description>}
-              </>
-            )}
+          return (
+            <Alert
+              key={item.id}
+              visible={item.visible}
+              intent={item.intent ?? alertProps?.intent}
+              variant={item.variant ?? alertProps?.variant}
+              size={item.size ?? alertProps?.size}
+              accent={item.accent ?? alertProps?.accent}
+              shadow={alertProps?.shadow}
+              rounded={alertProps?.rounded}
+              icon={item.icon}
+              onDismiss={
+                onDismissResolved
+                  ? () => {
+                      onDismissResolved();
+                      alert.close(item.id);
+                    }
+                  : undefined
+              }
+              onExited={() => {
+                // TODO:
+                // alert.remove(item.id);
+                console.log(alerts);
+              }}
+            >
+              {(item.title || item.description) && (
+                <>
+                  {item.title && <Alert.Title>{item.title}</Alert.Title>}
 
-            {item.actions && <Alert.Actions>{item.actions}</Alert.Actions>}
-          </Alert>
-        ))}
+                  {item.description && <Alert.Description>{item.description}</Alert.Description>}
+                </>
+              )}
+
+              {item.actions && <Alert.Actions>{item.actions}</Alert.Actions>}
+            </Alert>
+          );
+        })}
       </Box>
     );
   },

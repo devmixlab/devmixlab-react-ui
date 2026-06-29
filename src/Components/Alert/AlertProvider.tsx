@@ -135,7 +135,7 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
   const getAlerts = useCallback((hostName: AlertHostName) => alerts.get(hostName) ?? [], [alerts]);
 
   const show = useCallback(
-    (options: AlertOptions): AlertHandle => {
+    ({ duration, ...options }: AlertOptions): AlertHandle => {
       const id = crypto.randomUUID();
 
       const hostName = options.hostName ?? defaultHostName;
