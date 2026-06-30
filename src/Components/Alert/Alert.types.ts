@@ -151,4 +151,7 @@ export type AlertContextValue = {
    * Returns alerts assigned to a host.
    */
   getHostAlerts(hostName: AlertHostName): readonly AlertInstance[];
+
+  pause: () => void;
+  resume: () => void;
 };

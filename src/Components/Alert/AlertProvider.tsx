@@ -52,6 +52,14 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
   // Actions
   //-----------------------------------------------------------
 
+  const pause = () => {
+    queue.pause();
+  };
+
+  const resume = () => {
+    queue.resume();
+  };
+
   const close = useCallback((id: string) => {
     updateAlert(id, { visible: false });
   }, []);
@@ -133,8 +141,6 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
     [alerts],
   );
 
-  // const getAlerts = useCallback((hostName: AlertHostName) => alerts.get(hostName) ?? [], [alerts]);
-
   const show = useCallback(
     ({ duration, ...options }: AlertOptions): AlertHandle => {
       const id = crypto.randomUUID();
@@ -156,24 +162,12 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
         return next;
       });
 
-      // console.log('host');
-      // console.log(alerts);
-
       if (duration) {
         setTimeout(() => {
-          // setAlerts((prev) => {
-          //   console.log('size');
-          //   console.log(prev);
-          //   return prev;
-          // });
-          // close(id);
           queue.add({
             id,
             onTrigger: () => {
               close(id);
-              console.log('close');
-              // close(id);
-              // console.log(alertsRefs.current);
             },
           });
         }, duration);
@@ -208,6 +202,8 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
       // shake,
       // focus,
       getHostAlerts,
+      pause,
+      resume,
       // alerts,
     }),
     [show, close, clear, closeHost, update, focus, getHostAlerts],

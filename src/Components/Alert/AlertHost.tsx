@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import clsx from 'clsx';
-import { Box } from '../Box';
+import { Box, BoxProps } from '../Box';
 import { Alert } from './Alert';
 import { useAlert } from './useAlert';
 import { classPrefix } from '../../utils/classPrefix';
@@ -13,7 +13,7 @@ export type AlertHostAlertProps = Pick<
   'rounded' | 'shadow' | 'variant' | 'intent' | 'size' | 'accent' | 'onDismiss'
 >;
 
-export type AlertHostProps = {
+export type AlertHostOwnProps = {
   name?: AlertHostName;
 
   className?: string;
@@ -26,24 +26,28 @@ export type AlertHostProps = {
   alertProps?: AlertHostAlertProps;
 };
 
+export type AlertHostProps = AlertHostOwnProps & BoxProps;
+
 const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
-  ({ name = 'default', className, gap = 12, alertProps }, ref) => {
+  ({ name = 'default', className, gap = 12, alertProps, ...rest }, ref) => {
     const alert = useAlert();
 
     const alerts = alert.getHostAlerts(name);
 
-    console.log(alerts);
-    // const alerts = alert.alerts.get(name) ?? [];
-
-    // const onDismissResolved =
-
     return (
       <Box
+        {...rest}
         ref={ref}
         className={clsx(prefix(), className)}
         display="flex"
         flexDirection="column"
         gap={gap}
+        onMouseOver={(e) => {
+          alert.pause();
+        }}
+        onMouseLeave={(e) => {
+          alert.resume();
+        }}
         data-alert-host={name}
       >
         {alerts.map((item) => {

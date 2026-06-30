@@ -23,7 +23,7 @@ export type AddQueueReturn = {
 
 const QUEUE_PROCESSOR_INTERVAL = 300;
 
-export const useQueueProcessor = (minTriggerInterval: number = 5000) => {
+export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
   const queueRef = useRef<Pending[]>([]);
   const intervalRef = useRef<number | null>(null);
   const isPausedRef = useRef(false);
@@ -42,13 +42,9 @@ export const useQueueProcessor = (minTriggerInterval: number = 5000) => {
     isPausedRef.current = false;
   };
 
-  const add = ({ id, onTrigger }: AddQueueProps): AddQueueReturn => {
-    const returnData = {
-      remove: () => remove(id),
-    };
-
+  const add = ({ id, onTrigger }: AddQueueProps) => {
     if (queueRef.current.some((item) => item.id === id)) {
-      return returnData;
+      return;
     }
 
     startQueueProcessor();
@@ -67,8 +63,6 @@ export const useQueueProcessor = (minTriggerInterval: number = 5000) => {
       onTrigger,
       remainingTime,
     });
-
-    return returnData;
   };
 
   const remove = (id: string) => {
