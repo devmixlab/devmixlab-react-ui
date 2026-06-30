@@ -14,9 +14,13 @@ export type QueueTask = {
   onTrigger: OnTrigger;
 };
 
+export type EnqueueTask = {
+  id: string;
+  onTrigger: OnTrigger;
+};
+
 export type DelayQueueItem = {
   id: string;
-  delay: number;
   remainingDelay: number;
   onTrigger: OnTrigger;
 };
@@ -46,6 +50,7 @@ export type QueueTaskHandle = {
 const SCHEDULER_TICK = 300;
 
 export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
+  const delayQueueKeeperRef = useRef(new Map<string, DelayQueueItem>());
   const delayQueueRef = useRef<DelayQueueItem[]>([]);
   const executionQueueRef = useRef<ExecutionQueueItem[]>([]);
   const intervalRef = useRef<number | null>(null);
@@ -55,6 +60,7 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
   const clear = () => {
     delayQueueRef.current = [];
     executionQueueRef.current = [];
+    delayQueueKeeperRef.current.clear();
     stopScheduler();
   };
 
@@ -66,7 +72,7 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
     isPausedRef.current = false;
   };
 
-  const enqueue = ({ id, onTrigger }: QueueTask) => {
+  const enqueue = ({ id, onTrigger }: EnqueueTask) => {
     if (executionQueueRef.current.some((item) => item.id === id)) {
       return;
     }
@@ -90,50 +96,61 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
 
     startScheduler();
 
-    delayQueueRef.current.push({
+    const queue = {
       id,
-      delay,
       remainingDelay: delay,
       onTrigger,
-    });
+    };
+
+    delayQueueRef.current.push({ ...queue });
+    delayQueueKeeperRef.current.set(id, { ...queue });
 
     return {
       remove: () => remove(id),
       reset: () => {
-        delayQueueRef.current = delayQueueRef.current.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              remainingDelay: item.delay,
-            };
-          }
+        const original = delayQueueKeeperRef.current.get(id);
 
-          return item;
-        });
+        if (!original) {
+          return;
+        }
+
         removeExecution(id);
+
+        delayQueueRef.current = delayQueueRef.current.filter((item) => item.id !== id);
+
+        delayQueueRef.current.push({
+          ...original,
+        });
       },
     };
+  };
+
+  const stopSchedulerIfEmpty = () => {
+    if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
+      stopScheduler();
+    }
   };
 
   const remove = (id: string) => {
     removeExecution(id);
     removeDelay(id);
+    removeKeeper(id);
   };
 
   const removeExecution = (id: string) => {
     executionQueueRef.current = executionQueueRef.current.filter((item) => item.id !== id);
 
-    if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
-      stopScheduler();
-    }
+    stopSchedulerIfEmpty();
   };
 
   const removeDelay = (id: string) => {
     delayQueueRef.current = delayQueueRef.current.filter((item) => item.id !== id);
 
-    if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
-      stopScheduler();
-    }
+    stopSchedulerIfEmpty();
+  };
+
+  const removeKeeper = (id: string) => {
+    delayQueueKeeperRef.current.delete(id);
   };
 
   const stopScheduler = () => {
@@ -150,13 +167,13 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
     }
 
     const processDelayQueue = () => {
-      const idsToAdd: string[] = [];
+      const idsToEnqueue: string[] = [];
 
       delayQueueRef.current = delayQueueRef.current.map((item) => {
         const updatedRemainingDelay = item.remainingDelay - SCHEDULER_TICK;
 
         if (updatedRemainingDelay <= 0) {
-          idsToAdd.push(item.id);
+          idsToEnqueue.push(item.id);
         }
 
         return {
@@ -165,15 +182,16 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
         };
       });
 
-      if (idsToAdd.length <= 0) {
+      if (idsToEnqueue.length <= 0) {
         return;
       }
 
-      idsToAdd.forEach((id) => {
-        const itemToAdd = delayQueueRef.current.find((item) => item.id === id);
-        if (!itemToAdd) return;
+      idsToEnqueue.forEach((id) => {
+        const itemToEnqueue = delayQueueRef.current.find((item) => item.id === id);
+        if (!itemToEnqueue) return;
 
-        enqueue(itemToAdd);
+        enqueue({ id: itemToEnqueue.id, onTrigger: itemToEnqueue.onTrigger });
+        removeDelay(id);
       });
     };
 
@@ -208,7 +226,7 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
         const itemToTrigger = executionQueueRef.current.find((item) => item.id === id);
         itemToTrigger?.onTrigger?.();
         removeExecution(id);
-        removeDelay(id);
+        removeKeeper(id);
       });
     };
 
