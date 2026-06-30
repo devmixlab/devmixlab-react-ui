@@ -10,8 +10,23 @@ export type Pending = {
 
 export type AddQueueProps = {
   id: string;
+  delay: number;
   onTrigger: OnTrigger;
 };
+
+export type DelayQueueProps = {
+  id: string;
+  delay: number;
+  remainingDelay: number;
+  isPaused: boolean;
+  onTrigger: OnTrigger;
+};
+
+// export type DelayPending = {
+//   id: string;
+//   onTrigger: OnTrigger;
+//   remainingTime: number;
+// };
 
 // export type QueueProcessorProps = {
 //   minTriggerInterval?: number;
@@ -19,18 +34,20 @@ export type AddQueueProps = {
 
 export type AddQueueReturn = {
   remove: () => void;
+  reset: () => void;
 };
 
 const QUEUE_PROCESSOR_INTERVAL = 300;
 
 export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
-  const queueRef = useRef<Pending[]>([]);
+  const delayQueueRef = useRef<DelayQueueProps[]>([]);
+  const executionQueueRef = useRef<Pending[]>([]);
   const intervalRef = useRef<number | null>(null);
   const isPausedRef = useRef(false);
   const maxRemainingTimeRef = useRef(0);
 
   const clear = () => {
-    queueRef.current = [];
+    executionQueueRef.current = [];
     stopQueueProcessor();
   };
 
@@ -42,33 +59,79 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
     isPausedRef.current = false;
   };
 
-  const add = ({ id, onTrigger }: AddQueueProps) => {
-    if (queueRef.current.some((item) => item.id === id)) {
+  const enqueue = ({ id, onTrigger }: AddQueueProps) => {
+    if (executionQueueRef.current.some((item) => item.id === id)) {
       return;
     }
 
-    startQueueProcessor();
+    // startQueueProcessor();
 
     // console.log(maxRemainingTimeRef.current);
 
     const remainingTime =
-      queueRef.current.length <= 0
+      executionQueueRef.current.length <= 0
         ? minTriggerInterval
         : maxRemainingTimeRef.current + minTriggerInterval;
 
     console.log(remainingTime);
 
-    queueRef.current.push({
+    executionQueueRef.current.push({
       id,
       onTrigger,
       remainingTime,
     });
   };
 
-  const remove = (id: string) => {
-    queueRef.current = queueRef.current.filter((item) => item.id !== id);
+  const add = ({ id, delay, onTrigger }: AddQueueProps): AddQueueReturn | undefined => {
+    if (delayQueueRef.current.some((item) => item.id === id)) {
+      return;
+    }
 
-    if (queueRef.current.length === 0) {
+    startQueueProcessor();
+
+    delayQueueRef.current.push({
+      id,
+      delay,
+      remainingDelay: delay,
+      isPaused: false,
+      onTrigger,
+    });
+
+    return {
+      remove: () => remove(id),
+      reset: () => {
+        delayQueueRef.current = delayQueueRef.current.map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              remainingDelay: item.delay,
+            };
+          }
+
+          return item;
+        });
+        removeQueue(id);
+      },
+    };
+  };
+
+  const remove = (id: string) => {
+    removeQueue(id);
+    removeDelay(id);
+  };
+
+  const removeQueue = (id: string) => {
+    executionQueueRef.current = executionQueueRef.current.filter((item) => item.id !== id);
+
+    if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
+      stopQueueProcessor();
+    }
+  };
+
+  const removeDelay = (id: string) => {
+    delayQueueRef.current = delayQueueRef.current.filter((item) => item.id !== id);
+
+    if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
       stopQueueProcessor();
     }
   };
@@ -86,20 +149,39 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
       return;
     }
 
-    intervalRef.current = window.setInterval(() => {
-      if (queueRef.current.length === 0) {
-        stopQueueProcessor();
+    const processDelayQueue = () => {
+      const idsToAdd: string[] = [];
+
+      delayQueueRef.current = delayQueueRef.current.map((item) => {
+        const updatedTrackDelay = item.remainingDelay - QUEUE_PROCESSOR_INTERVAL;
+
+        if (updatedTrackDelay <= 0) {
+          idsToAdd.push(item.id);
+        }
+
+        return {
+          ...item,
+          trackDelay: updatedTrackDelay,
+        };
+      });
+
+      if (idsToAdd.length <= 0) {
         return;
       }
 
-      if (isPausedRef.current) {
-        return;
-      }
+      idsToAdd.forEach((id) => {
+        const itemToAdd = delayQueueRef.current.find((item) => item.id === id);
+        if (!itemToAdd) return;
 
+        enqueue(itemToAdd);
+      });
+    };
+
+    const processQueue = () => {
       let maxRemainingTime = 0;
       const idsToTrigger: string[] = [];
 
-      queueRef.current = queueRef.current.map((item) => {
+      executionQueueRef.current = executionQueueRef.current.map((item) => {
         const updatedRemainingTime = item.remainingTime - QUEUE_PROCESSOR_INTERVAL;
 
         if (updatedRemainingTime <= 0) {
@@ -123,10 +205,32 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
       }
 
       idsToTrigger.forEach((id) => {
-        const itemToTrigger = queueRef.current.find((item) => item.id === id);
+        const itemToTrigger = executionQueueRef.current.find((item) => item.id === id);
         itemToTrigger?.onTrigger?.();
-        remove(id);
+        removeQueue(id);
+        removeDelay(id);
       });
+    };
+
+    intervalRef.current = window.setInterval(() => {
+      if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
+        stopQueueProcessor();
+        return;
+      }
+
+      if (isPausedRef.current) {
+        return;
+      }
+
+      console.log(1234123);
+
+      if (delayQueueRef.current.length > 0) {
+        processDelayQueue();
+      }
+
+      if (executionQueueRef.current.length > 0) {
+        processQueue();
+      }
 
       // process queue
     }, QUEUE_PROCESSOR_INTERVAL);
@@ -141,5 +245,6 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
     pause,
     resume,
     clear,
+    remove,
   };
 };
