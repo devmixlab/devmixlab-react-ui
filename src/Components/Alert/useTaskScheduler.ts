@@ -96,14 +96,14 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
 
     startScheduler();
 
-    const queue = {
+    const task = {
       id,
       remainingDelay: delay,
       onTrigger,
     };
 
-    delayQueueRef.current.push({ ...queue });
-    delayQueueKeeperRef.current.set(id, { ...queue });
+    delayQueueRef.current.push({ ...task });
+    delayQueueKeeperRef.current.set(id, { ...task });
 
     return {
       remove: () => remove(id),
@@ -167,13 +167,13 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
     }
 
     const processDelayQueue = () => {
-      const idsToEnqueue: string[] = [];
+      const itemsToEnqueue: DelayQueueItem[] = [];
 
       delayQueueRef.current = delayQueueRef.current.map((item) => {
         const updatedRemainingDelay = item.remainingDelay - SCHEDULER_TICK;
 
         if (updatedRemainingDelay <= 0) {
-          idsToEnqueue.push(item.id);
+          itemsToEnqueue.push(item);
         }
 
         return {
@@ -182,16 +182,13 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
         };
       });
 
-      if (idsToEnqueue.length <= 0) {
+      if (itemsToEnqueue.length <= 0) {
         return;
       }
 
-      idsToEnqueue.forEach((id) => {
-        const itemToEnqueue = delayQueueRef.current.find((item) => item.id === id);
-        if (!itemToEnqueue) return;
-
-        enqueue({ id: itemToEnqueue.id, onTrigger: itemToEnqueue.onTrigger });
-        removeDelay(id);
+      itemsToEnqueue.forEach((item) => {
+        enqueue({ id: item.id, onTrigger: item.onTrigger });
+        removeDelay(item.id);
       });
     };
 
@@ -223,7 +220,7 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
       }
 
       itemsToTrigger.forEach((item) => {
-        item?.onTrigger?.();
+        item.onTrigger();
         removeExecution(item.id);
         removeKeeper(item.id);
       });
