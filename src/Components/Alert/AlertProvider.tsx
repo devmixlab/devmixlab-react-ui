@@ -162,24 +162,15 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
         return next;
       });
 
-      queue.add({
-        id,
-        delay: duration ?? 0,
-        onTrigger: () => {
-          close(id);
-        },
-      });
-
-      // if (duration) {
-      //   setTimeout(() => {
-      //     queue.add({
-      //       id,
-      //       onTrigger: () => {
-      //         close(id);
-      //       },
-      //     });
-      //   }, duration);
-      // }
+      if (duration) {
+        queue.add({
+          id,
+          delay: duration,
+          onTrigger: () => {
+            close(id);
+          },
+        });
+      }
 
       return {
         id,

@@ -2,51 +2,41 @@ import { useRef, useEffect } from 'react';
 
 type OnTrigger = () => void;
 
-export type Pending = {
+export type ExecutionQueueItem = {
   id: string;
   onTrigger: OnTrigger;
   remainingTime: number;
 };
 
-export type AddQueueProps = {
+export type QueueTask = {
   id: string;
   delay: number;
   onTrigger: OnTrigger;
 };
 
-export type DelayQueueProps = {
+export type DelayQueueItem = {
   id: string;
   delay: number;
   remainingDelay: number;
-  isPaused: boolean;
   onTrigger: OnTrigger;
 };
 
-// export type DelayPending = {
-//   id: string;
-//   onTrigger: OnTrigger;
-//   remainingTime: number;
-// };
-
-// export type QueueProcessorProps = {
-//   minTriggerInterval?: number;
-// };
-
-export type AddQueueReturn = {
+export type QueueTaskHandle = {
   remove: () => void;
   reset: () => void;
 };
 
-const QUEUE_PROCESSOR_INTERVAL = 300;
+const SCHEDULER_TICK = 300;
 
 export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
-  const delayQueueRef = useRef<DelayQueueProps[]>([]);
-  const executionQueueRef = useRef<Pending[]>([]);
+  const delayQueueRef = useRef<DelayQueueItem[]>([]);
+  const executionQueueRef = useRef<ExecutionQueueItem[]>([]);
   const intervalRef = useRef<number | null>(null);
   const isPausedRef = useRef(false);
   const maxRemainingTimeRef = useRef(0);
 
   const clear = () => {
+    delayQueueRef.current = [];
     executionQueueRef.current = [];
     stopQueueProcessor();
   };
@@ -59,21 +49,15 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
     isPausedRef.current = false;
   };
 
-  const enqueue = ({ id, onTrigger }: AddQueueProps) => {
+  const enqueue = ({ id, onTrigger }: QueueTask) => {
     if (executionQueueRef.current.some((item) => item.id === id)) {
       return;
     }
-
-    // startQueueProcessor();
-
-    // console.log(maxRemainingTimeRef.current);
 
     const remainingTime =
       executionQueueRef.current.length <= 0
         ? minTriggerInterval
         : maxRemainingTimeRef.current + minTriggerInterval;
-
-    console.log(remainingTime);
 
     executionQueueRef.current.push({
       id,
@@ -82,7 +66,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
     });
   };
 
-  const add = ({ id, delay, onTrigger }: AddQueueProps): AddQueueReturn | undefined => {
+  const add = ({ id, delay, onTrigger }: QueueTask): QueueTaskHandle | undefined => {
     if (delayQueueRef.current.some((item) => item.id === id)) {
       return;
     }
@@ -93,7 +77,6 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
       id,
       delay,
       remainingDelay: delay,
-      isPaused: false,
       onTrigger,
     });
 
@@ -110,17 +93,17 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
 
           return item;
         });
-        removeQueue(id);
+        removeExecution(id);
       },
     };
   };
 
   const remove = (id: string) => {
-    removeQueue(id);
+    removeExecution(id);
     removeDelay(id);
   };
 
-  const removeQueue = (id: string) => {
+  const removeExecution = (id: string) => {
     executionQueueRef.current = executionQueueRef.current.filter((item) => item.id !== id);
 
     if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
@@ -153,15 +136,15 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
       const idsToAdd: string[] = [];
 
       delayQueueRef.current = delayQueueRef.current.map((item) => {
-        const updatedTrackDelay = item.remainingDelay - QUEUE_PROCESSOR_INTERVAL;
+        const updatedRemainingDelay = item.remainingDelay - SCHEDULER_TICK;
 
-        if (updatedTrackDelay <= 0) {
+        if (updatedRemainingDelay <= 0) {
           idsToAdd.push(item.id);
         }
 
         return {
           ...item,
-          trackDelay: updatedTrackDelay,
+          remainingDelay: updatedRemainingDelay,
         };
       });
 
@@ -177,12 +160,12 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
       });
     };
 
-    const processQueue = () => {
+    const processExecutionQueue = () => {
       let maxRemainingTime = 0;
       const idsToTrigger: string[] = [];
 
       executionQueueRef.current = executionQueueRef.current.map((item) => {
-        const updatedRemainingTime = item.remainingTime - QUEUE_PROCESSOR_INTERVAL;
+        const updatedRemainingTime = item.remainingTime - SCHEDULER_TICK;
 
         if (updatedRemainingTime <= 0) {
           idsToTrigger.push(item.id);
@@ -207,7 +190,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
       idsToTrigger.forEach((id) => {
         const itemToTrigger = executionQueueRef.current.find((item) => item.id === id);
         itemToTrigger?.onTrigger?.();
-        removeQueue(id);
+        removeExecution(id);
         removeDelay(id);
       });
     };
@@ -222,18 +205,16 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
         return;
       }
 
-      console.log(1234123);
-
       if (delayQueueRef.current.length > 0) {
         processDelayQueue();
       }
 
       if (executionQueueRef.current.length > 0) {
-        processQueue();
+        processExecutionQueue();
       }
 
       // process queue
-    }, QUEUE_PROCESSOR_INTERVAL);
+    }, SCHEDULER_TICK);
   };
 
   useEffect(() => {
