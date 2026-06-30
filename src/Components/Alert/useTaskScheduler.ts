@@ -22,13 +22,30 @@ export type DelayQueueItem = {
 };
 
 export type QueueTaskHandle = {
+  /**
+   * Removes the task from the scheduler.
+   *
+   * If the task is waiting in the delay queue or
+   * already queued for execution, it will be
+   * cancelled and never triggered.
+   */
   remove: () => void;
+
+  /**
+   * Restarts the task delay.
+   *
+   * The remaining delay is restored to its original
+   * value. If the task has already entered the
+   * execution queue, it is removed so it must wait
+   * for the full delay again before becoming
+   * eligible for execution.
+   */
   reset: () => void;
 };
 
 const SCHEDULER_TICK = 300;
 
-export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
+export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
   const delayQueueRef = useRef<DelayQueueItem[]>([]);
   const executionQueueRef = useRef<ExecutionQueueItem[]>([]);
   const intervalRef = useRef<number | null>(null);
@@ -38,7 +55,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
   const clear = () => {
     delayQueueRef.current = [];
     executionQueueRef.current = [];
-    stopQueueProcessor();
+    stopScheduler();
   };
 
   const pause = () => {
@@ -71,7 +88,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
       return;
     }
 
-    startQueueProcessor();
+    startScheduler();
 
     delayQueueRef.current.push({
       id,
@@ -107,7 +124,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
     executionQueueRef.current = executionQueueRef.current.filter((item) => item.id !== id);
 
     if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
-      stopQueueProcessor();
+      stopScheduler();
     }
   };
 
@@ -115,11 +132,11 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
     delayQueueRef.current = delayQueueRef.current.filter((item) => item.id !== id);
 
     if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
-      stopQueueProcessor();
+      stopScheduler();
     }
   };
 
-  const stopQueueProcessor = () => {
+  const stopScheduler = () => {
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -127,7 +144,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
     }
   };
 
-  const startQueueProcessor = () => {
+  const startScheduler = () => {
     if (intervalRef.current !== null) {
       return;
     }
@@ -197,7 +214,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
 
     intervalRef.current = window.setInterval(() => {
       if (executionQueueRef.current.length === 0 && delayQueueRef.current.length === 0) {
-        stopQueueProcessor();
+        stopScheduler();
         return;
       }
 
@@ -218,7 +235,7 @@ export const useQueueProcessor = (minTriggerInterval: number = 1000) => {
   };
 
   useEffect(() => {
-    return () => stopQueueProcessor();
+    return () => stopScheduler();
   }, []);
 
   return {

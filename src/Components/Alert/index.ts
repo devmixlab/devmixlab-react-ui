@@ -18,4 +18,4 @@ export { AlertHost } from './AlertHost';
 
 export { useAlert } from './useAlert';
 
-export { useQueueProcessor } from './useQueueProcessor';
+export { useTaskScheduler } from './useTaskScheduler';

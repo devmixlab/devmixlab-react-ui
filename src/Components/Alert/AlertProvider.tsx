@@ -7,7 +7,7 @@ import type {
   AlertInstance,
   AlertOptions,
 } from './Alert.types';
-import { useQueueProcessor } from './useQueueProcessor';
+import { useTaskScheduler } from './useTaskScheduler';
 
 type AlertProviderProps = {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
 
   const alertRefs = useRef(new Map<string, HTMLElement>());
 
-  const queue = useQueueProcessor();
+  const queue = useTaskScheduler();
 
   //-----------------------------------------------------------
   // Helpers
