@@ -197,13 +197,13 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
 
     const processExecutionQueue = () => {
       let maxRemainingTime = 0;
-      const idsToTrigger: string[] = [];
+      const itemsToTrigger: ExecutionQueueItem[] = [];
 
       executionQueueRef.current = executionQueueRef.current.map((item) => {
         const updatedRemainingTime = item.remainingTime - SCHEDULER_TICK;
 
         if (updatedRemainingTime <= 0) {
-          idsToTrigger.push(item.id);
+          itemsToTrigger.push(item);
         }
 
         if (updatedRemainingTime > maxRemainingTime) {
@@ -218,15 +218,14 @@ export const useTaskScheduler = (minTriggerInterval: number = 1000) => {
 
       maxRemainingTimeRef.current = maxRemainingTime;
 
-      if (idsToTrigger.length <= 0) {
+      if (itemsToTrigger.length <= 0) {
         return;
       }
 
-      idsToTrigger.forEach((id) => {
-        const itemToTrigger = executionQueueRef.current.find((item) => item.id === id);
-        itemToTrigger?.onTrigger?.();
-        removeExecution(id);
-        removeKeeper(id);
+      itemsToTrigger.forEach((item) => {
+        item?.onTrigger?.();
+        removeExecution(item.id);
+        removeKeeper(item.id);
       });
     };
 
