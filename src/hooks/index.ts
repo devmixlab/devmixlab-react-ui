@@ -14,9 +14,10 @@ export { useAutoFocus } from './useAutoFocus';
 export { useWindowBlur } from './useWindowBlur';
 export { useLastFocusableItemTab } from './useLastFocusableItemTab';
 export { useFocusBoundary } from './useFocusBoundary';
+export { useTaskScheduler } from './useTaskScheduler';
 
 export { useScrollSpy } from './useScrollSpy';
-export type {UseScrollSpyReturn, UseScrollSpyOptions} from './useScrollSpy';
+export type { UseScrollSpyReturn, UseScrollSpyOptions } from './useScrollSpy';
 
 export { useThemeMode } from './useThemeMode';
 export type { ThemeMode } from './useThemeMode';

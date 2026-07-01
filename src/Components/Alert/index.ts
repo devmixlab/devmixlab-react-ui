@@ -18,4 +18,4 @@ export { AlertHost } from './AlertHost';
 
 export { useAlert } from './useAlert';
 
-export { useTaskScheduler } from './useTaskScheduler';
+export { useTaskScheduler } from '../../hooks/useTaskScheduler';

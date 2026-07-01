@@ -7,7 +7,7 @@ import type {
   AlertInstance,
   AlertOptions,
 } from './Alert.types';
-import { useTaskScheduler } from './useTaskScheduler';
+import { useTaskScheduler } from '../../hooks/useTaskScheduler';
 
 type AlertProviderProps = {
   children: React.ReactNode;
