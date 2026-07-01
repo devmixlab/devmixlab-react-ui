@@ -34,6 +34,10 @@ const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
 
     const alerts = alert.getHostAlerts(name);
 
+    if (alerts.length <= 0) {
+      return;
+    }
+
     return (
       <Box
         {...rest}
@@ -63,6 +67,7 @@ const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
               accent={item.accent ?? alertProps?.accent}
               shadow={alertProps?.shadow}
               rounded={alertProps?.rounded}
+              animateOnMount={item.animateOnMount}
               icon={item.icon}
               onDismiss={
                 onDismissResolved
@@ -74,8 +79,8 @@ const AlertHost = forwardRef<HTMLDivElement, AlertHostProps>(
               }
               onExited={() => {
                 // TODO:
-                // alert.remove(item.id);
-                console.log(alerts);
+                alert.remove(item.id);
+                // console.log(alerts);
               }}
             >
               {(item.title || item.description) && (

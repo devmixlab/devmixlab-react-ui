@@ -62,6 +62,11 @@ export type AlertOptions = {
   description?: React.ReactNode;
   actions?: React.ReactNode;
 
+  /*
+   * transition properties
+   */
+  animateOnMount?: boolean;
+
   /**
    * Auto close duration in milliseconds.
    *
@@ -154,4 +159,6 @@ export type AlertContextValue = {
 
   pause: () => void;
   resume: () => void;
+
+  remove: (id: string) => void;
 };

@@ -52,6 +52,16 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
   // Actions
   //-----------------------------------------------------------
 
+  const remove = (id: string) => {
+    setAlerts((prev) => {
+      const next = new Map(prev);
+
+      next.delete(id);
+
+      return next;
+    });
+  };
+
   const pause = () => {
     queue.pause();
   };
@@ -203,6 +213,7 @@ const AlertProvider = ({ children, defaultHostName = 'default' }: AlertProviderP
       getHostAlerts,
       pause,
       resume,
+      remove,
       // alerts,
     }),
     [show, close, clear, closeHost, update, focus, getHostAlerts],
