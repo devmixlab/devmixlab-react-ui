@@ -9,7 +9,7 @@ import { Box } from '../Box';
 // Types
 //----------------------------------------------------------------
 
-type StepperVariant = 'base' | 'icon-only' | (string & {});
+type StepperVariant = 'base' | 'icon-only' | 'bars-only' | (string & {});
 
 type StepperStepProp = string | null;
 
@@ -72,6 +72,7 @@ const Stepper = ({
     steps,
     setSteps,
     completeIndicator: finalCompleteIndicator,
+    indicator,
     allowFutureNavigation,
     variant,
     titlePlacement,
@@ -117,6 +118,7 @@ const StepperStep = ({
     steps,
     setSteps,
     completeIndicator: ctxCompleteIndicator,
+    indicator: ctxIndicator,
     allowFutureNavigation,
     variant,
     titlePlacement,
@@ -125,6 +127,7 @@ const StepperStep = ({
   const Element = onClick ? 'button' : 'div';
 
   const finalCompleteIndicator = completeIndicator ?? ctxCompleteIndicator;
+  const resolvedIndicator = indicator ?? ctxIndicator;
 
   const isActive = id === activeStep;
 
@@ -132,7 +135,7 @@ const StepperStep = ({
   const currentStepIndex = steps.findIndex((itm) => itm.id === id);
 
   const finalIndicator =
-    indicator ??
+    resolvedIndicator ??
     (variant == 'icon-only' ? (
       <Box size={35}>
         <DotIcon style={{ width: '100%', height: '100%' }} />

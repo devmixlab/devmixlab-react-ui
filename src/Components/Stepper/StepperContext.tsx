@@ -7,7 +7,7 @@ export interface StepperContextValue {
   steps: StepperStep[];
   setSteps: React.Dispatch<React.SetStateAction<StepperStep[]>>;
   completeIndicator: React.ReactNode;
-  indicator: React.ReactNode;
+  indicator?: React.ReactNode;
   allowFutureNavigation: boolean;
   variant: StepperVariant;
   titlePlacement: StepperTitlePlacement;
