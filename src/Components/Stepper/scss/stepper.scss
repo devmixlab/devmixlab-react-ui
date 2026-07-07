@@ -1,0 +1,333 @@
+@use '../../../scss/config' as cfg;
+@use '../../../scss/functions/common' as *;
+@use '../../../scss/mixins/mode' as *;
+
+$p: cfg.$prefix;
+$stepper-prefix: #{$p}--stepper;
+
+.#{$stepper-prefix} {
+
+  /* -------------------------------------------------------------------------- */
+  /* Variables                                                                   */
+  /* -------------------------------------------------------------------------- */
+
+  --stepper-transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
+
+  --stepper-indicator-size: 2.5rem;
+  --stepper-connector-height: 2px;
+
+  --stepper-indicator-border-width: 2px;
+  --stepper-title-gap: 15px;
+  --stepper-title-font-size: .875rem;
+
+  --stepper-connector-bg: #{intent(gray, 400)};
+  --stepper-connector-bg-complete: #{intent(primary, 500)};
+
+  --stepper-indicator-border-upcoming: #{intent(gray, 400)};
+  --stepper-indicator-bg-upcoming: transparent;
+  --stepper-indicator-color-upcoming: #{intent(gray, 700)};
+  --stepper-indicator-shadow-upcoming: none;
+
+  --stepper-indicator-border-complete: #{intent(primary, 600)};
+  --stepper-indicator-bg-complete: #{intent(primary, 600)};
+  --stepper-indicator-color-complete: #{intent(primary, 0)};
+  --stepper-indicator-shadow-complete: none;
+
+  --stepper-indicator-border-current: #{intent(primary, 600)};
+  --stepper-indicator-bg-current: transparent;
+  --stepper-indicator-color-current: #{intent(primary, 700)};
+  --stepper-indicator-shadow-current: 0 0 0 .25rem color-mix(
+      in srgb,
+      #{intent(primary, 600)} 15%,
+      transparent
+  );
+
+  --stepper-title-color-upcoming: #{intent(gray, 600)};
+  --stepper-title-color-current: #{intent(gray, 900)};
+  --stepper-title-color-complete: #{intent(gray, 900)};
+
+  --stepper-ring: #{intent(primary, 500)};
+
+  @include dark {
+    --stepper-connector-bg: #{intent(gray, 700)};
+    --stepper-connector-bg-complete: #{intent(primary, 500)};
+
+    --stepper-indicator-border-upcoming: #{intent(gray, 600)};
+    --stepper-indicator-bg-upcoming: transparent;
+    --stepper-indicator-color-upcoming: #{intent(gray, 300)};
+    --stepper-indicator-shadow-upcoming: none;
+
+    --stepper-indicator-border-complete: #{intent(primary, 500)};
+    --stepper-indicator-bg-complete: #{intent(primary, 500)};
+    --stepper-indicator-color-complete: #{intent(primary, 0)};
+    --stepper-indicator-shadow-complete: none;
+
+    --stepper-indicator-border-current: #{intent(primary, 400)};
+    --stepper-indicator-bg-current: transparent;
+    --stepper-indicator-color-current: #{intent(primary, 300)};
+    --stepper-indicator-shadow-current: 0 0 0 .25rem color-mix(
+        in srgb,
+        #{intent(primary, 400)} 25%,
+        transparent
+    );
+
+    --stepper-title-color-upcoming: #{intent(gray, 400)};
+    --stepper-title-color-current: #{intent(gray, 100)};
+    --stepper-title-color-complete: #{intent(gray, 100)};
+
+    --stepper-ring: #{intent(primary, 400)};
+  }
+
+  &[data-variant='icon-only'] {
+    --stepper-indicator-border-width: 0px;
+    --stepper-indicator-shadow-current: none;
+
+    --stepper-indicator-bg-complete: transparent;
+    --stepper-indicator-bg-current: transparent;
+    --stepper-indicator-bg-upcoming: transparent;
+
+    --stepper-indicator-color-complete: #{intent(primary, 600)};
+    --stepper-indicator-color-current: #{intent(primary, 600)};
+    --stepper-indicator-color-upcoming: #{intent(gray, 500)};
+
+    --stepper-connector-bg: #{intent(gray, 300)};
+
+    @include dark {
+      --stepper-indicator-color-complete: #{intent(primary, 400)};
+      --stepper-indicator-color-current: #{intent(primary, 400)};
+      --stepper-indicator-color-upcoming: #{intent(gray, 500)};
+
+      --stepper-connector-bg: #{intent(gray, 700)};
+    }
+  }
+
+  display: flex;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  /* -------------------------------------------------------------------------- */
+  /* Row                                                                         */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* Step                                                                        */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__step {
+    margin-top: .75rem;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    border-radius: 6px;
+
+    //&[data-clickable] .#{$stepper-prefix}__title {
+    //  &:hover {
+    //    text-decoration: underline;
+    //  }
+    //}
+
+    &[data-clickable] {
+      cursor: pointer;
+
+      &:hover {
+        .#{$stepper-prefix}__title {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &:focus{
+      outline: none;
+    }
+
+    &[data-clickable]:focus-visible{
+      outline: 2px solid var(--stepper-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* Connector                                                                   */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__connector {
+    flex: 1;
+    display: flex;
+    align-items: center;
+
+    > div {
+      width: 100%;
+      height: var(--stepper-connector-height);
+      background: var(--stepper-connector-bg);
+      transition: background-color var(--stepper-transition);
+    }
+
+    &-left {
+      padding-right: .75rem;
+
+      > div {
+        border-top-right-radius: 999px;
+        border-bottom-right-radius: 999px;
+      }
+
+      &[data-connector-hidden] {
+        opacity: 0;
+      }
+      &[data-step-status='complete'] > div {
+        background: var(--stepper-connector-bg-complete);
+      }
+      &[data-step-status='current'] > div {
+        background: var(--stepper-connector-bg-complete);
+      }
+      &[data-step-status='upcoming'] > div {
+        background: var(--stepper-connector-bg);
+      }
+    }
+
+    &-right {
+      padding-left: .75rem;
+
+      > div {
+        border-top-left-radius: 999px;
+        border-bottom-left-radius: 999px;
+      }
+
+      &[data-connector-hidden] {
+        opacity: 0;
+      }
+      &[data-step-status='complete'] > div {
+        background: var(--stepper-connector-bg-complete);
+      }
+      &[data-step-status='current'] > div {
+        background: var(--stepper-connector-bg);
+      }
+      &[data-step-status='upcoming'] > div {
+        background: var(--stepper-connector-bg);
+      }
+    }
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* Indicator                                                                   */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__indicator {
+    flex-shrink: 0;
+
+    width: var(--stepper-indicator-size);
+    height: var(--stepper-indicator-size);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    font-size: .875rem;
+    font-weight: 600;
+
+    border-width: var(--stepper-indicator-border-width);
+    border-style: solid;
+
+    transition:
+        background var(--stepper-transition),
+        border-color var(--stepper-transition),
+        color var(--stepper-transition),
+        box-shadow var(--stepper-transition),
+        transform var(--stepper-transition);
+
+    svg{
+      width: 60%;
+      height: 60%;
+    }
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* Content                                                                        */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__content {
+    padding-top: var(--stepper-title-gap);
+
+    &[data-clickable] .#{$stepper-prefix}__title {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .#{$stepper-prefix}__title {
+    display: block;
+
+    font-size: var(--stepper-title-font-size);
+    line-height: 1.4;
+
+    transition: color var(--stepper-transition);
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* Upcoming                                                                    */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__indicator[data-step-status='upcoming'] {
+    border-color: var(--stepper-indicator-border-upcoming);
+    background: var(--stepper-indicator-bg-upcoming);
+    color: var(--stepper-indicator-color-upcoming);
+
+    box-shadow: var(--stepper-indicator-shadow-upcoming);
+  }
+
+  .#{$stepper-prefix}__step[data-step-status='upcoming'] {
+    .#{$stepper-prefix}__title {
+      color: var(--stepper-title-color-upcoming);
+    }
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* Current                                                                     */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__indicator[data-step-status='current'] {
+    border-color: var(--stepper-indicator-border-current);
+    color: var(--stepper-indicator-color-current);
+    background: var(--stepper-indicator-bg-current);
+
+    box-shadow: var(--stepper-indicator-shadow-current);
+  }
+
+  .#{$stepper-prefix}__step[data-step-status='current'] {
+    .#{$stepper-prefix}__title {
+      color: var(--stepper-title-color-current);
+      font-weight: 600;
+    }
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* Complete                                                                    */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__indicator[data-step-status='complete'] {
+    border-color: var(--stepper-indicator-border-complete);
+    background: var(--stepper-indicator-bg-complete);
+    color: var(--stepper-indicator-color-complete);
+
+    box-shadow: var(--stepper-indicator-shadow-complete);
+  }
+
+  .#{$stepper-prefix}__step[data-step-status='complete'] {
+    .#{$stepper-prefix}__title {
+      color: var(--stepper-title-color-complete);
+    }
+  }
+
+}
