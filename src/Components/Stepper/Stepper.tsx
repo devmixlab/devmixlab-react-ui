@@ -220,32 +220,40 @@ const StepperStep = ({
       )}
 
       <div className={prefix('__row')}>
-        <div
-          className={clsx(prefix('__connector'), prefix('__connector-left'))}
-          data-connector-hidden={isFirstStep || undefined}
-          data-step-status={status}
-        >
-          <div />
-        </div>
+        {variant === 'bars-only' && (
+          <div className={prefix('__bar')} data-step-status={status}>
+            <div />
+          </div>
+        )}
 
-        <div className={prefix('__indicator')} data-step-status={status}>
-          {status === 'complete' ? finalCompleteIndicator : finalIndicator}
-        </div>
+        {variant !== 'bars-only' && (
+          <>
+            <div
+              className={clsx(prefix('__connector'), prefix('__connector-left'))}
+              data-connector-hidden={isFirstStep || undefined}
+              data-step-status={status}
+            >
+              <div />
+            </div>
 
-        <div
-          className={clsx(prefix('__connector'), prefix('__connector-right'))}
-          data-connector-hidden={isLastStep || undefined}
-          data-step-status={status}
-        >
-          <div />
-        </div>
+            <div className={prefix('__indicator')} data-step-status={status}>
+              {status === 'complete' ? finalCompleteIndicator : finalIndicator}
+            </div>
+
+            <div
+              className={clsx(prefix('__connector'), prefix('__connector-right'))}
+              data-connector-hidden={isLastStep || undefined}
+              data-step-status={status}
+            >
+              <div />
+            </div>
+          </>
+        )}
       </div>
 
       {titlePlacement == 'below' && children && (
         <div className={prefix('__content')} data-step-status={status}>
-          <span className={prefix('__title')}>
-            {children} - {status}
-          </span>
+          <span className={prefix('__title')}>{children}</span>
         </div>
       )}
     </Box>

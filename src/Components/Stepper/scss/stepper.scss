@@ -157,6 +157,41 @@ $stepper-prefix: #{$p}--stepper;
   }
 
   /* -------------------------------------------------------------------------- */
+  /* Bar                                                                   */
+  /* -------------------------------------------------------------------------- */
+
+  .#{$stepper-prefix}__bar {
+    width: 100%;
+    padding-inline: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 6px;
+
+    > div {
+      width: 100%;
+      height: 4px;
+      transform: scaleY(1);
+      background: #{intent(primary, 500)};
+      //border: 1px solid #{intent(primary, 500)};
+      transition:
+          background-color var(--stepper-transition),
+          transform var(--stepper-transition);
+      border-radius: 999px;
+    }
+
+    &[data-step-status='current'] > div {
+      background: #{intent(primary, 300)};
+      transform: scaleY(1.5);
+    }
+
+    &[data-step-status='upcoming'] > div {
+      height: 4px;
+      background: #{intent(gray, 300)};
+    }
+  }
+
+  /* -------------------------------------------------------------------------- */
   /* Connector                                                                   */
   /* -------------------------------------------------------------------------- */
 
