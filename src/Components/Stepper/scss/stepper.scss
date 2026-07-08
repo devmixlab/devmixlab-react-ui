@@ -12,20 +12,19 @@ $stepper-prefix: #{$p}--stepper;
   /* -------------------------------------------------------------------------- */
 
   --stepper-transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
+  --stepper-step-transition: var(--#{$p}-duration-fast) var(--#{$p}-ease-press);
 
-  --stepper-indicator-size: 2.5rem;
   --stepper-connector-height: 2px;
 
-  --stepper-indicator-border-width: 2px;
-  --stepper-title-gap: 15px;
-  --stepper-title-font-size: .875rem;
+  --stepper-bg-hover: #{intent(primary, 100)};
+  --stepper-bg-active: #{intent(primary, 200)};
 
-  --stepper-connector-bg: #{intent(gray, 400)};
+  --stepper-connector-bg: #{intent(gray, 300)};
   --stepper-connector-bg-complete: #{intent(primary, 500)};
 
   --stepper-indicator-border-upcoming: #{intent(gray, 400)};
   --stepper-indicator-bg-upcoming: transparent;
-  --stepper-indicator-color-upcoming: #{intent(gray, 700)};
+  --stepper-indicator-color-upcoming: #{intent(gray, 400)};
   --stepper-indicator-shadow-upcoming: none;
 
   --stepper-indicator-border-complete: #{intent(primary, 600)};
@@ -46,9 +45,16 @@ $stepper-prefix: #{$p}--stepper;
   --stepper-title-color-current: #{intent(gray, 900)};
   --stepper-title-color-complete: #{intent(gray, 900)};
 
+  --stepper-bar-bg-complete: #{intent(primary, 500)};
+  --stepper-bar-bg-current: #{intent(primary, 300)};
+  --stepper-bar-bg-upcoming: #{intent(gray, 300)};
+
   --stepper-ring: #{intent(primary, 500)};
 
   @include dark {
+    --stepper-bg-hover: #{intent(primary, 900)};
+    --stepper-bg-active: #{intent(primary, 800)};
+
     --stepper-connector-bg: #{intent(gray, 700)};
     --stepper-connector-bg-complete: #{intent(primary, 500)};
 
@@ -75,31 +81,34 @@ $stepper-prefix: #{$p}--stepper;
     --stepper-title-color-current: #{intent(gray, 100)};
     --stepper-title-color-complete: #{intent(gray, 100)};
 
+    --stepper-bar-bg-complete: #{intent(primary, 400)};
+    --stepper-bar-bg-current: #{intent(primary, 500)};
+    --stepper-bar-bg-upcoming: #{intent(gray, 700)};
+
     --stepper-ring: #{intent(primary, 400)};
   }
 
-  &[data-variant='icon-only'] {
-    --stepper-indicator-border-width: 0px;
-    --stepper-indicator-shadow-current: none;
-
-    --stepper-indicator-bg-complete: transparent;
-    --stepper-indicator-bg-current: transparent;
-    --stepper-indicator-bg-upcoming: transparent;
-
-    --stepper-indicator-color-complete: #{intent(primary, 600)};
-    --stepper-indicator-color-current: #{intent(primary, 600)};
-    --stepper-indicator-color-upcoming: #{intent(gray, 500)};
-
-    --stepper-connector-bg: #{intent(gray, 300)};
-
-    @include dark {
-      --stepper-indicator-color-complete: #{intent(primary, 400)};
-      --stepper-indicator-color-current: #{intent(primary, 400)};
-      --stepper-indicator-color-upcoming: #{intent(gray, 500)};
-
-      --stepper-connector-bg: #{intent(gray, 700)};
-    }
-  }
+  //&[data-variant='icon-only'] {
+  //  --stepper-indicator-shadow-current: none;
+  //
+  //  --stepper-indicator-bg-complete: transparent;
+  //  --stepper-indicator-bg-current: transparent;
+  //  --stepper-indicator-bg-upcoming: transparent;
+  //
+  //  --stepper-indicator-color-complete: #{intent(primary, 600)};
+  //  --stepper-indicator-color-current: #{intent(primary, 600)};
+  //  --stepper-indicator-color-upcoming: #{intent(gray, 500)};
+  //
+  //  --stepper-connector-bg: #{intent(gray, 300)};
+  //
+  //  @include dark {
+  //    --stepper-indicator-color-complete: #{intent(primary, 400)};
+  //    --stepper-indicator-color-current: #{intent(primary, 400)};
+  //    --stepper-indicator-color-upcoming: #{intent(gray, 500)};
+  //
+  //    --stepper-connector-bg: #{intent(gray, 700)};
+  //  }
+  //}
 
   display: flex;
   width: 100%;
@@ -130,19 +139,21 @@ $stepper-prefix: #{$p}--stepper;
 
     border-radius: 6px;
 
-    //&[data-clickable] .#{$stepper-prefix}__title {
-    //  &:hover {
-    //    text-decoration: underline;
-    //  }
-    //}
+    transition: background var(--stepper-transition);
 
     &[data-clickable] {
       cursor: pointer;
 
       &:hover {
+        background-color: var(--stepper-bg-hover);
         .#{$stepper-prefix}__title {
           text-decoration: underline;
         }
+      }
+      &:active {
+        transition-duration: var(--#{$p}-duration-fast);
+        transition-timing-function: var(--#{$p}-ease-press);
+        background-color: var(--stepper-bg-active);
       }
     }
 
@@ -162,7 +173,7 @@ $stepper-prefix: #{$p}--stepper;
 
   .#{$stepper-prefix}__bar {
     width: 100%;
-    padding-inline: 10px;
+    //padding-inline: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -172,22 +183,24 @@ $stepper-prefix: #{$p}--stepper;
       width: 100%;
       height: 4px;
       transform: scaleY(1);
-      background: #{intent(primary, 500)};
-      //border: 1px solid #{intent(primary, 500)};
       transition:
           background-color var(--stepper-transition),
           transform var(--stepper-transition);
-      border-radius: 999px;
+      //border-radius: 999px;
+    }
+
+    &[data-step-status='complete'] > div {
+      background: var(--stepper-bar-bg-complete);
     }
 
     &[data-step-status='current'] > div {
-      background: #{intent(primary, 300)};
+      background: var(--stepper-bar-bg-current);
       transform: scaleY(1.5);
     }
 
     &[data-step-status='upcoming'] > div {
       height: 4px;
-      background: #{intent(gray, 300)};
+      background: var(--stepper-bar-bg-upcoming);
     }
   }
 
@@ -208,7 +221,7 @@ $stepper-prefix: #{$p}--stepper;
     }
 
     &-left {
-      padding-right: .75rem;
+      padding-right: var(--connector-gap, .75rem);
 
       > div {
         border-top-right-radius: 999px;
@@ -230,7 +243,7 @@ $stepper-prefix: #{$p}--stepper;
     }
 
     &-right {
-      padding-left: .75rem;
+      padding-left: var(--connector-gap, .75rem);
 
       > div {
         border-top-left-radius: 999px;
@@ -259,19 +272,18 @@ $stepper-prefix: #{$p}--stepper;
   .#{$stepper-prefix}__indicator {
     flex-shrink: 0;
 
-    width: var(--stepper-indicator-size);
-    height: var(--stepper-indicator-size);
-
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 999px;
+    width: 2.5rem;
+    height: 2.5rem;
 
     font-size: .875rem;
     font-weight: 600;
 
-    border-width: var(--stepper-indicator-border-width);
+    border-width: 2px;
+    border-radius: 9999px;
     border-style: solid;
 
     transition:
@@ -281,9 +293,33 @@ $stepper-prefix: #{$p}--stepper;
         box-shadow var(--stepper-transition),
         transform var(--stepper-transition);
 
+    &[data-icon-only] {
+      &[data-step-status='complete'], &[data-step-status='current'], &[data-step-status='upcoming'] {
+        border: none;
+        box-shadow: none;
+        background: none;
+      }
+      &[data-step-status='complete'], &[data-step-status='current'] {
+        color: #{intent(primary, 700)};
+      }
+
+      &[data-step-status='upcoming'] {
+        color: #{intent(gray, 400)};
+      }
+
+      @include dark {
+        &[data-step-status='complete'], &[data-step-status='current'] {
+          color: #{intent(primary, 500)};
+        }
+        &[data-step-status='upcoming'] {
+          color: #{intent(gray, 700)};
+        }
+      }
+    }
+
     svg{
-      width: 60%;
-      height: 60%;
+      width: var(--indicator-svg-size, 60%);
+      height: var(--indicator-svg-size, 60%);
     }
   }
 
@@ -292,21 +328,16 @@ $stepper-prefix: #{$p}--stepper;
   /* -------------------------------------------------------------------------- */
 
   .#{$stepper-prefix}__content {
-    padding-top: var(--stepper-title-gap);
+    //padding-top: 16px;
 
-    &[data-clickable] .#{$stepper-prefix}__title {
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+    //&[data-clickable] .#{$stepper-prefix}__title {
+    //  &:hover {
+    //    text-decoration: underline;
+    //  }
+    //}
   }
 
   .#{$stepper-prefix}__title {
-    display: block;
-
-    font-size: var(--stepper-title-font-size);
-    line-height: 1.4;
-
     transition: color var(--stepper-transition);
   }
 

@@ -1,35 +1,34 @@
-import React, { useState, ComponentProps, useEffect } from 'react';
+import React, { useState, ComponentProps, useEffect, CSSProperties } from 'react';
 import { classPrefix } from '../../utils/classPrefix';
 import { clsx } from 'clsx';
 import { StepperContext, useStepperContext, StepperContextValue } from './StepperContext';
+import {
+  StepperStepContext,
+  StepperStepContextValue,
+  useStepperStepContext,
+} from './StepperStepContext';
 import { CheckIcon, DotIcon } from '../Icon';
-import { Box } from '../Box';
+import { Box, BoxDerived, type BoxProps, type BoxDerivedProps } from '../Box';
 
 //----------------------------------------------------------------
 // Types
 //----------------------------------------------------------------
 
-type StepperVariant = 'base' | 'icon-only' | 'bars-only' | (string & {});
+type StepperVariant = 'track' | 'bar' | (string & {});
 
 type StepperStepProp = string | null;
 
 type StepperStatus = 'complete' | 'current' | 'upcoming';
 
-type StepperTitlePlacement = 'below' | 'above';
-
 type StepperStep = {
-  title?: string;
   id: string;
   active: boolean;
   status: StepperStatus;
 };
 
 type OwnStepperProps = {
-  indicator?: React.ReactNode;
-  completeIndicator?: React.ReactNode;
   allowFutureNavigation?: boolean;
   variant?: StepperVariant;
-  titlePlacement?: StepperTitlePlacement;
   activeStep: string;
 };
 
@@ -50,11 +49,8 @@ const prefix = (name: string = '') => {
 const Stepper = ({
   className,
   children,
-  indicator,
-  completeIndicator,
   allowFutureNavigation = false,
-  variant = 'base',
-  titlePlacement = 'below',
+  variant = 'track',
   activeStep: activeStepProp,
 }: StepperProps) => {
   const [activeStep, setActiveStep] = useState<string>(activeStepProp);
@@ -64,18 +60,13 @@ const Stepper = ({
     setActiveStep(activeStepProp);
   }, [activeStepProp]);
 
-  const finalCompleteIndicator = completeIndicator ?? <CheckIcon />;
-
   const ctxValue: StepperContextValue = {
     activeStep,
     setActiveStep,
     steps,
     setSteps,
-    completeIndicator: finalCompleteIndicator,
-    indicator,
     allowFutureNavigation,
     variant,
-    titlePlacement,
   };
 
   return (
@@ -97,52 +88,19 @@ Stepper.displayName = 'Stepper';
 
 type StepperStepProps = {
   id: string;
-  children?: string;
-  completeIndicator?: React.ReactNode;
-  indicator?: React.ReactNode;
   onClick?: (e: MouseEvent) => void;
-} & Omit<ComponentProps<'div'>, 'children'>;
+} & ComponentProps<'div'>;
 
-const StepperStep = ({
-  className,
-  children,
-  id,
-  completeIndicator,
-  indicator,
-  onClick,
-  ...rest
-}: StepperStepProps) => {
-  const {
-    activeStep,
-    setActiveStep,
-    steps,
-    setSteps,
-    completeIndicator: ctxCompleteIndicator,
-    indicator: ctxIndicator,
-    allowFutureNavigation,
-    variant,
-    titlePlacement,
-  } = useStepperContext();
+const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepProps) => {
+  const { activeStep, setActiveStep, steps, setSteps, allowFutureNavigation, variant } =
+    useStepperContext();
 
   const Element = onClick ? 'button' : 'div';
-
-  const finalCompleteIndicator = completeIndicator ?? ctxCompleteIndicator;
-  const resolvedIndicator = indicator ?? ctxIndicator;
 
   const isActive = id === activeStep;
 
   const activeStepIndex = steps.findIndex((itm) => itm.id === activeStep);
   const currentStepIndex = steps.findIndex((itm) => itm.id === id);
-
-  const finalIndicator =
-    resolvedIndicator ??
-    (variant == 'icon-only' ? (
-      <Box size={35}>
-        <DotIcon style={{ width: '100%', height: '100%' }} />
-      </Box>
-    ) : (
-      currentStepIndex + 1
-    ));
 
   const status: StepperStatus =
     currentStepIndex === -1 || activeStepIndex === -1
@@ -164,7 +122,6 @@ const StepperStep = ({
       return [
         ...prev,
         {
-          title: children,
           id,
           active: isActive,
           status,
@@ -173,96 +130,229 @@ const StepperStep = ({
     });
   }, []);
 
-  // setSteps((prev) => {
-  //   const isInSteps = prev.findIndex((itm) => itm.id === id);
-  //
-  //   if (isInSteps >= 0) {
-  //     return prev;
-  //   }
-  //
-  //   return [
-  //     ...prev,
-  //     {
-  //       title: children,
-  //       id,
-  //       active,
-  //       status,
-  //     },
-  //   ];
-  // });
-
   const isFirstStep = steps[0]?.id === id;
   const isLastStep = steps[steps.length - 1]?.id === id;
   const isClickable =
-    onClick && (status === 'complete' || (status === 'upcoming' && allowFutureNavigation));
+    (onClick && (status === 'complete' || (status === 'upcoming' && allowFutureNavigation))) ||
+    false;
+
+  const stepCtxValue: StepperStepContextValue = {
+    activeStepIndex,
+    currentStepIndex,
+    isActive,
+    status,
+    isFirstStep,
+    isLastStep,
+    isClickable,
+  };
 
   return (
-    <Box
-      {...rest}
-      as={Element}
-      tabIndex={isClickable ? 0 : -1}
-      className={clsx(prefix('__step'), className)}
-      key={id}
-      data-clickable={isClickable || undefined}
-      data-step-status={status}
-      onClick={
-        isClickable
-          ? (e: React.MouseEvent<HTMLDivElement>) => {
-              onClick(e);
-            }
-          : undefined
-      }
-    >
-      {titlePlacement == 'above' && children && (
-        <div className={prefix('__content')} data-step-status={status}>
-          <span className={prefix('__title')}>{children}</span>
-        </div>
-      )}
-
-      <div className={prefix('__row')}>
-        {variant === 'bars-only' && (
-          <div className={prefix('__bar')} data-step-status={status}>
-            <div />
-          </div>
-        )}
-
-        {variant !== 'bars-only' && (
-          <>
-            <div
-              className={clsx(prefix('__connector'), prefix('__connector-left'))}
-              data-connector-hidden={isFirstStep || undefined}
-              data-step-status={status}
-            >
-              <div />
-            </div>
-
-            <div className={prefix('__indicator')} data-step-status={status}>
-              {status === 'complete' ? finalCompleteIndicator : finalIndicator}
-            </div>
-
-            <div
-              className={clsx(prefix('__connector'), prefix('__connector-right'))}
-              data-connector-hidden={isLastStep || undefined}
-              data-step-status={status}
-            >
-              <div />
-            </div>
-          </>
-        )}
-      </div>
-
-      {titlePlacement == 'below' && children && (
-        <div className={prefix('__content')} data-step-status={status}>
-          <span className={prefix('__title')}>{children}</span>
-        </div>
-      )}
-    </Box>
+    <StepperStepContext.Provider value={stepCtxValue}>
+      <Box
+        {...rest}
+        as={Element}
+        tabIndex={isClickable ? 0 : -1}
+        className={clsx(prefix('__step'), className)}
+        key={id}
+        data-clickable={isClickable || undefined}
+        data-step-status={status}
+        onClick={
+          isClickable
+            ? (e: React.MouseEvent<HTMLDivElement>) => {
+                onClick?.(e);
+              }
+            : undefined
+        }
+      >
+        {children}
+      </Box>
+    </StepperStepContext.Provider>
   );
 };
 
 StepperStep.displayName = 'StepperStep';
 
 Stepper.Step = StepperStep;
+
+//----------------------------------------------------------------
+// StepperStepBarRow
+//----------------------------------------------------------------
+
+type StepperStepBarProps = {
+  gap?: string | number;
+  rounded?: BoxDerivedProps['rounded'];
+} & ComponentProps<'div'>;
+
+const StepperStepBar = ({ gap = 10, rounded = '9999px' }: StepperStepBarProps) => {
+  const { status } = useStepperStepContext();
+
+  return (
+    <div className={prefix('__row')}>
+      <BoxDerived px={gap} className={prefix('__bar')} data-step-status={status}>
+        <BoxDerived rounded={rounded} />
+      </BoxDerived>
+    </div>
+  );
+};
+
+StepperStepBar.displayName = 'StepperStepBar';
+
+Stepper.Bar = StepperStepBar;
+
+//----------------------------------------------------------------
+// StepperStepIndicatorRow
+//----------------------------------------------------------------
+
+type StepperStepTrackProps = {
+  connectorGap?: string | number;
+} & ComponentProps<'div'>;
+
+const StepperStepTrack = ({ children, className, style, connectorGap }: StepperStepTrackProps) => {
+  const { status, isFirstStep, isLastStep } = useStepperStepContext();
+
+  return (
+    <div
+      className={clsx(prefix('__row'), className)}
+      style={
+        {
+          ...style,
+          '--connector-gap': typeof connectorGap === 'number' ? `${connectorGap}px` : connectorGap,
+        } as CSSProperties
+      }
+    >
+      <div
+        className={clsx(prefix('__connector'), prefix('__connector-left'))}
+        data-connector-hidden={isFirstStep || undefined}
+        data-step-status={status}
+      >
+        <div />
+      </div>
+
+      {children}
+
+      <div
+        className={clsx(prefix('__connector'), prefix('__connector-right'))}
+        data-connector-hidden={isLastStep || undefined}
+        data-step-status={status}
+      >
+        <div />
+      </div>
+    </div>
+  );
+};
+
+StepperStepTrack.displayName = 'StepperStepTrack';
+
+Stepper.Track = StepperStepTrack;
+
+//----------------------------------------------------------------
+// StepperStepIndicator
+//----------------------------------------------------------------
+
+type StepperStepIndicatorProps = {
+  indicator?: React.ReactNode;
+  completeIndicator?: React.ReactNode;
+  iconOnly?: boolean;
+  svgSize?: number | string;
+} & BoxDerivedProps &
+  Omit<ComponentProps<'div'>, 'children'>;
+
+const StepperStepIndicator = ({
+  className,
+  style,
+  indicator,
+  completeIndicator,
+  iconOnly = false,
+  svgSize = '60%',
+  ...rest
+}: StepperStepIndicatorProps) => {
+  const { status, isLastStep, isFirstStep, currentStepIndex } = useStepperStepContext();
+
+  const finalIndicator = indicator ?? currentStepIndex + 1;
+  const finalCompleteIndicator = completeIndicator ?? <CheckIcon />;
+
+  return (
+    <BoxDerived
+      {...rest}
+      className={clsx(prefix('__indicator'), className)}
+      style={
+        {
+          ...style,
+
+          '--indicator-svg-size': typeof svgSize === 'number' ? `${svgSize}px` : svgSize,
+        } as CSSProperties
+      }
+      data-step-status={status}
+      data-icon-only={iconOnly || undefined}
+    >
+      {status === 'complete' ? finalCompleteIndicator : finalIndicator}
+    </BoxDerived>
+  );
+};
+
+StepperStepIndicator.displayName = 'StepperStepIndicator';
+
+Stepper.Indicator = StepperStepIndicator;
+
+//----------------------------------------------------------------
+// StepperStepContent
+//----------------------------------------------------------------
+
+type StepperStepContentProps = {
+  render?: (value: StepperStepContextValue) => React.ReactNode;
+} & BoxDerivedProps &
+  ComponentProps<'div'>;
+
+const StepperStepContent = ({ children, className, render, ...rest }: StepperStepContentProps) => {
+  const ctx = useStepperStepContext();
+
+  return (
+    <BoxDerived
+      {...rest}
+      className={clsx(prefix('__content'), className)}
+      data-step-status={ctx.status}
+    >
+      {render ? render(ctx) : children}
+    </BoxDerived>
+  );
+};
+
+StepperStepContent.displayName = 'StepperStepContent';
+
+Stepper.Content = StepperStepContent;
+
+//----------------------------------------------------------------
+// StepperStepTitle
+//----------------------------------------------------------------
+
+type StepperStepTitleProps = {} & BoxDerivedProps & ComponentProps<'span'>;
+
+const StepperStepTitle = ({
+  children,
+  className,
+  lh = 1.4,
+  fs = '.875rem',
+  ...rest
+}: StepperStepTitleProps) => {
+  const { status } = useStepperStepContext();
+
+  return (
+    <BoxDerived
+      as="span"
+      {...rest}
+      lh={lh}
+      fs={fs}
+      className={clsx(prefix('__title'), className)}
+      data-step-status={status}
+    >
+      {children}
+    </BoxDerived>
+  );
+};
+
+StepperStepTitle.displayName = 'StepperStepTitle';
+
+Stepper.Title = StepperStepTitle;
 
 //----------------------------------------------------------------
 // Exports
@@ -277,5 +367,4 @@ export type {
   StepperStep,
   OwnStepperProps,
   StepperProps,
-  StepperTitlePlacement,
 };

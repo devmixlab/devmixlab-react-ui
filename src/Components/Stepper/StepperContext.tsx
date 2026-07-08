@@ -1,16 +1,13 @@
 import React, { createContext, useContext } from 'react';
-import { StepperStep, StepperStepProp, StepperVariant, StepperTitlePlacement } from './Stepper';
+import { StepperStep, StepperStepProp, StepperVariant } from './Stepper';
 
 export interface StepperContextValue {
   activeStep: StepperStepProp;
   setActiveStep: React.Dispatch<React.SetStateAction<string>>;
   steps: StepperStep[];
   setSteps: React.Dispatch<React.SetStateAction<StepperStep[]>>;
-  completeIndicator: React.ReactNode;
-  indicator?: React.ReactNode;
   allowFutureNavigation: boolean;
-  variant: StepperVariant;
-  titlePlacement: StepperTitlePlacement;
+  variant?: StepperVariant;
 }
 
 export const StepperContext = createContext<StepperContextValue | null>(null);
