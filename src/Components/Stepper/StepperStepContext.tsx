@@ -10,6 +10,9 @@ export interface StepperStepContextValue {
   isLastStep: boolean;
   isClickable: boolean;
   isLastShown: boolean;
+  isLastComplete: boolean;
+  isBeforeCurrent: boolean;
+  isAfterCurrent: boolean;
 }
 
 export const StepperStepContext = createContext<StepperStepContextValue | null>(null);

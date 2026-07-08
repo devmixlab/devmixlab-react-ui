@@ -62,6 +62,7 @@ const Stepper = ({
   passedSteps: passedStepsProp,
   // keepPassedStepsStatus = true,
 }: StepperProps) => {
+  const [lastComplete, setLastComplete] = useState<StepperLastShownStep | null>(null);
   const [lastShown, setLastShown] = useState<StepperLastShownStep | null>(null);
   const [passedSteps, setPassedSteps] = useState<Set<string>>(passedStepsProp ?? new Set());
   const [activeStep, setActiveStep] = useState<string>(activeStepProp);
@@ -78,6 +79,8 @@ const Stepper = ({
   }, [passedStepsProp]);
 
   const ctxValue: StepperContextValue = {
+    lastComplete,
+    setLastComplete,
     lastShown,
     setLastShown,
     passedSteps,
@@ -115,6 +118,8 @@ type StepperStepProps = {
 
 const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepProps) => {
   const {
+    lastComplete,
+    setLastComplete,
     lastShown,
     setLastShown,
     passedSteps,
@@ -144,6 +149,9 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
   //         : 'upcoming';
   const isComplete = keepPassedSteps ? passedSteps.has(id) : currentStepIndex < activeStepIndex;
   const isCurrent = currentStepIndex === activeStepIndex;
+
+  const isBeforeCurrent = activeStepIndex > currentStepIndex;
+  const isAfterCurrent = activeStepIndex < currentStepIndex;
 
   // console.log(keepPassedSteps);
   // console.log(isComplete);
@@ -193,6 +201,14 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
     if (currentStepIndex >= 0) setLastShown({ id: id, index: currentStepIndex });
   }
 
+  if (
+    (lastComplete == null && isComplete) ||
+    (isComplete && lastComplete?.id !== id && (lastComplete?.index ?? -1) < currentStepIndex)
+  ) {
+    if (currentStepIndex >= 0) setLastComplete({ id: id, index: currentStepIndex });
+  }
+
+  const isLastComplete = lastComplete?.id === id;
   const isLastShown = lastShown?.id === id;
   const isFirstStep = steps[0]?.id === id;
   const isLastStep = steps[steps.length - 1]?.id === id;
@@ -211,6 +227,9 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
     isLastStep,
     isClickable,
     isLastShown,
+    isLastComplete,
+    isBeforeCurrent,
+    isAfterCurrent,
   };
 
   return (
@@ -275,7 +294,15 @@ type StepperStepTrackProps = {
 } & ComponentProps<'div'>;
 
 const StepperStepTrack = ({ children, className, style, connectorGap }: StepperStepTrackProps) => {
-  const { status, isFirstStep, isLastStep, isLastShown } = useStepperStepContext();
+  const {
+    status,
+    isFirstStep,
+    isLastStep,
+    isLastShown,
+    isLastComplete,
+    isBeforeCurrent,
+    isAfterCurrent,
+  } = useStepperStepContext();
 
   const {
     // lastShown,
@@ -289,6 +316,8 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
     // variant,
     keepPassedSteps,
   } = useStepperContext();
+
+  const placedToActive = isBeforeCurrent ? 'before' : isAfterCurrent ? 'after' : 'current';
 
   return (
     <div
@@ -305,7 +334,9 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
         data-connector-hidden={isFirstStep || undefined}
         data-step-status={status}
         data-step-last-shown={isLastShown || undefined}
+        data-step-last-complete={isLastComplete || undefined}
         data-keep-passed-steps={keepPassedSteps || undefined}
+        data-placed-to-active={placedToActive}
       >
         <div />
       </div>
@@ -317,7 +348,9 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
         data-connector-hidden={isLastStep || undefined}
         data-step-status={status}
         data-step-last-shown={isLastShown || undefined}
+        data-step-last-complete={isLastComplete || undefined}
         data-keep-passed-steps={keepPassedSteps || undefined}
+        data-placed-to-active={placedToActive}
       >
         <div />
       </div>

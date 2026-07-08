@@ -2,6 +2,8 @@ import React, { createContext, useContext } from 'react';
 import { StepperStep, StepperStepProp, StepperVariant, StepperLastShownStep } from './Stepper';
 
 export interface StepperContextValue {
+  lastComplete: StepperLastShownStep | null;
+  setLastComplete: React.Dispatch<React.SetStateAction<StepperLastShownStep | null>>;
   lastShown: StepperLastShownStep | null;
   setLastShown: React.Dispatch<React.SetStateAction<StepperLastShownStep | null>>;
   passedSteps: Set<string>;

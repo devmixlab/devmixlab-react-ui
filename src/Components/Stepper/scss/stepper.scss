@@ -253,16 +253,29 @@ $stepper-prefix: #{$p}--stepper;
       &[data-connector-hidden] {
         opacity: 0;
       }
-      &:not([data-step-last-shown])[data-step-status='complete'] > div {
+      &[data-step-status='complete'] > div {
         background: var(--stepper-connector-bg-complete);
       }
-      &:not([data-step-last-shown])[data-step-status='current'] > div {
+
+      &[data-step-status='current'] > div {
         background: var(--stepper-connector-bg-complete);
       }
-      &:not([data-keep-passed-steps])[data-step-status='current'] > div {
+      //&:not([data-step-last-shown])[data-step-status='complete'] > div {
+      //  background: var(--stepper-connector-bg-complete);
+      //}
+      //&:not([data-step-last-shown])[data-step-status='current'] > div{
+      //  background: var(--stepper-connector-bg-complete);
+      //}
+      //&:not([data-keep-passed-steps])[data-step-status='current'] > div {
+      //  background: var(--stepper-connector-bg);
+      //}
+      &[data-step-status='upcoming'] > div {
         background: var(--stepper-connector-bg);
       }
-      &[data-step-status='upcoming'] > div {
+      &[data-step-last-shown] > div,
+      &[data-step-status='current'][data-step-last-complete] > div,
+      &:not([data-placed-to-active='before'])[data-step-status='complete'][data-step-last-complete] > div,
+      &:not([data-keep-passed-steps])[data-step-status='current'] > div,{
         background: var(--stepper-connector-bg);
       }
     }
