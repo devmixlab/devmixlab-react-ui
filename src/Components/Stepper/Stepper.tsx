@@ -14,7 +14,7 @@ import { Box, BoxDerived, type BoxProps, type BoxDerivedProps } from '../Box';
 // Types
 //----------------------------------------------------------------
 
-type StepperVariant = 'track' | 'bar' | (string & {});
+type StepperVariant = 'base' | (string & {});
 
 type StepperStepProp = string | null;
 
@@ -26,10 +26,17 @@ type StepperStep = {
   status: StepperStatus;
 };
 
+type StepperLastShownStep = {
+  id: string;
+  index: number;
+};
+
 type OwnStepperProps = {
   allowFutureNavigation?: boolean;
   variant?: StepperVariant;
   activeStep: string;
+  passedSteps?: Set<string>;
+  // keepStatus?: boolean;
 };
 
 type StepperProps = OwnStepperProps & ComponentProps<'div'>;
@@ -50,17 +57,32 @@ const Stepper = ({
   className,
   children,
   allowFutureNavigation = false,
-  variant = 'track',
+  variant = 'base',
   activeStep: activeStepProp,
+  passedSteps: passedStepsProp,
+  // keepPassedStepsStatus = true,
 }: StepperProps) => {
+  const [lastShown, setLastShown] = useState<StepperLastShownStep | null>(null);
+  const [passedSteps, setPassedSteps] = useState<Set<string>>(passedStepsProp ?? new Set());
   const [activeStep, setActiveStep] = useState<string>(activeStepProp);
   const [steps, setSteps] = useState<StepperStep[]>([]);
+
+  const keepPassedSteps = passedStepsProp != null;
 
   useEffect(() => {
     setActiveStep(activeStepProp);
   }, [activeStepProp]);
 
+  useEffect(() => {
+    setPassedSteps((v) => new Set(passedStepsProp));
+  }, [passedStepsProp]);
+
   const ctxValue: StepperContextValue = {
+    lastShown,
+    setLastShown,
+    passedSteps,
+    setPassedSteps,
+    keepPassedSteps,
     activeStep,
     setActiveStep,
     steps,
@@ -92,8 +114,18 @@ type StepperStepProps = {
 } & ComponentProps<'div'>;
 
 const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepProps) => {
-  const { activeStep, setActiveStep, steps, setSteps, allowFutureNavigation, variant } =
-    useStepperContext();
+  const {
+    lastShown,
+    setLastShown,
+    passedSteps,
+    activeStep,
+    setActiveStep,
+    steps,
+    setSteps,
+    allowFutureNavigation,
+    variant,
+    keepPassedSteps,
+  } = useStepperContext();
 
   const Element = onClick ? 'button' : 'div';
 
@@ -102,14 +134,38 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
   const activeStepIndex = steps.findIndex((itm) => itm.id === activeStep);
   const currentStepIndex = steps.findIndex((itm) => itm.id === id);
 
+  // const status: StepperStatus =
+  //   currentStepIndex === -1 || activeStepIndex === -1
+  //     ? 'upcoming'
+  //     : currentStepIndex < activeStepIndex
+  //       ? 'complete'
+  //       : currentStepIndex === activeStepIndex
+  //         ? 'current'
+  //         : 'upcoming';
+  const isComplete = keepPassedSteps ? passedSteps.has(id) : currentStepIndex < activeStepIndex;
+  const isCurrent = currentStepIndex === activeStepIndex;
+
+  // console.log(keepPassedSteps);
+  // console.log(isComplete);
+  // console.log(isComplete);
+
   const status: StepperStatus =
     currentStepIndex === -1 || activeStepIndex === -1
       ? 'upcoming'
-      : currentStepIndex < activeStepIndex
-        ? 'complete'
-        : currentStepIndex === activeStepIndex
-          ? 'current'
+      : isCurrent
+        ? 'current'
+        : isComplete
+          ? 'complete'
           : 'upcoming';
+
+  // const status: StepperStatus =
+  //   currentStepIndex === -1 || activeStepIndex === -1
+  //     ? 'upcoming'
+  //     : (keepPassedSteps ? passedSteps.has(id) : currentStepIndex < activeStepIndex)
+  //       ? 'complete'
+  //       : currentStepIndex === activeStepIndex
+  //         ? 'current'
+  //         : 'upcoming';
 
   useEffect(() => {
     setSteps((prev) => {
@@ -130,11 +186,21 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
     });
   }, []);
 
+  if (
+    (lastShown == null && isActive) ||
+    (isActive && lastShown?.id !== id && (lastShown?.index ?? -1) < currentStepIndex)
+  ) {
+    if (currentStepIndex >= 0) setLastShown({ id: id, index: currentStepIndex });
+  }
+
+  const isLastShown = lastShown?.id === id;
   const isFirstStep = steps[0]?.id === id;
   const isLastStep = steps[steps.length - 1]?.id === id;
   const isClickable =
     (onClick && (status === 'complete' || (status === 'upcoming' && allowFutureNavigation))) ||
     false;
+
+  console.log(isLastShown, id);
 
   const stepCtxValue: StepperStepContextValue = {
     activeStepIndex,
@@ -144,6 +210,7 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
     isFirstStep,
     isLastStep,
     isClickable,
+    isLastShown,
   };
 
   return (
@@ -208,7 +275,20 @@ type StepperStepTrackProps = {
 } & ComponentProps<'div'>;
 
 const StepperStepTrack = ({ children, className, style, connectorGap }: StepperStepTrackProps) => {
-  const { status, isFirstStep, isLastStep } = useStepperStepContext();
+  const { status, isFirstStep, isLastStep, isLastShown } = useStepperStepContext();
+
+  const {
+    // lastShown,
+    // setLastShown,
+    // passedSteps,
+    // activeStep,
+    // setActiveStep,
+    // steps,
+    // setSteps,
+    // allowFutureNavigation,
+    // variant,
+    keepPassedSteps,
+  } = useStepperContext();
 
   return (
     <div
@@ -224,6 +304,8 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
         className={clsx(prefix('__connector'), prefix('__connector-left'))}
         data-connector-hidden={isFirstStep || undefined}
         data-step-status={status}
+        data-step-last-shown={isLastShown || undefined}
+        data-keep-passed-steps={keepPassedSteps || undefined}
       >
         <div />
       </div>
@@ -234,6 +316,8 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
         className={clsx(prefix('__connector'), prefix('__connector-right'))}
         data-connector-hidden={isLastStep || undefined}
         data-step-status={status}
+        data-step-last-shown={isLastShown || undefined}
+        data-keep-passed-steps={keepPassedSteps || undefined}
       >
         <div />
       </div>
@@ -367,4 +451,5 @@ export type {
   StepperStep,
   OwnStepperProps,
   StepperProps,
+  StepperLastShownStep,
 };

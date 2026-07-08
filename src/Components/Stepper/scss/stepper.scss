@@ -253,10 +253,13 @@ $stepper-prefix: #{$p}--stepper;
       &[data-connector-hidden] {
         opacity: 0;
       }
-      &[data-step-status='complete'] > div {
+      &:not([data-step-last-shown])[data-step-status='complete'] > div {
         background: var(--stepper-connector-bg-complete);
       }
-      &[data-step-status='current'] > div {
+      &:not([data-step-last-shown])[data-step-status='current'] > div {
+        background: var(--stepper-connector-bg-complete);
+      }
+      &:not([data-keep-passed-steps])[data-step-status='current'] > div {
         background: var(--stepper-connector-bg);
       }
       &[data-step-status='upcoming'] > div {
