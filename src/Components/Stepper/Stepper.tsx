@@ -194,26 +194,32 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
     });
   }, []);
 
-  if (
-    (lastShown == null && isActive) ||
-    (isActive && lastShown?.id !== id && (lastShown?.index ?? -1) < currentStepIndex)
-  ) {
-    if (currentStepIndex >= 0) setLastShown({ id: id, index: currentStepIndex });
-  }
+  useEffect(() => {
+    if (
+      (lastShown == null && isActive) ||
+      (isActive && lastShown?.id !== id && (lastShown?.index ?? -1) < currentStepIndex)
+    ) {
+      if (currentStepIndex >= 0) setLastShown({ id: id, index: currentStepIndex });
+    }
+  }, [lastShown, isActive, currentStepIndex, id]);
 
-  if (
-    (lastComplete == null && isComplete) ||
-    (isComplete && lastComplete?.id !== id && (lastComplete?.index ?? -1) < currentStepIndex)
-  ) {
-    if (currentStepIndex >= 0) setLastComplete({ id: id, index: currentStepIndex });
-  }
+  useEffect(() => {
+    if (
+      (lastComplete == null && isComplete) ||
+      (isComplete && lastComplete?.id !== id && (lastComplete?.index ?? -1) < currentStepIndex)
+    ) {
+      if (currentStepIndex >= 0) setLastComplete({ id: id, index: currentStepIndex });
+    }
+  }, [lastComplete, isComplete, currentStepIndex, id]);
 
   const isLastComplete = lastComplete?.id === id;
   const isLastShown = lastShown?.id === id;
   const isFirstStep = steps[0]?.id === id;
   const isLastStep = steps[steps.length - 1]?.id === id;
   const isClickable =
-    (onClick && (status === 'complete' || (status === 'upcoming' && allowFutureNavigation))) ||
+    (onClick &&
+      !isActive &&
+      (status === 'complete' || isLastShown || (status === 'upcoming' && allowFutureNavigation))) ||
     false;
 
   console.log(isLastShown, id);
