@@ -6,8 +6,7 @@ export interface StepperContextValue {
   setLastComplete: React.Dispatch<React.SetStateAction<StepperLastShownStep | null>>;
   lastShown: StepperLastShownStep | null;
   setLastShown: React.Dispatch<React.SetStateAction<StepperLastShownStep | null>>;
-  passedSteps: Set<string>;
-  setPassedSteps: React.Dispatch<React.SetStateAction<Set<string>>>;
+  passedSteps?: Set<string>;
   activeStep: StepperStepProp;
   // setActiveStep: React.Dispatch<React.SetStateAction<string>>;
   steps: StepperStep[];

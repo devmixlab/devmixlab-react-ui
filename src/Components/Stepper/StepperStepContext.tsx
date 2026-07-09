@@ -5,6 +5,7 @@ export interface StepperStepContextValue {
   activeStepIndex: number;
   currentStepIndex: number;
   isActive: boolean;
+  isComplete: boolean;
   status: StepperStatus;
   isFirstStep: boolean;
   isLastStep: boolean;

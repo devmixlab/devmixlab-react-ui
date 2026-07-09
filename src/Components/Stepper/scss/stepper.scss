@@ -275,7 +275,7 @@ $stepper-prefix: #{$p}--stepper;
       &[data-step-last-shown] > div,
       &[data-step-status='current'][data-step-last-complete] > div,
       &:not([data-placed-to-active='before'])[data-step-status='complete'][data-step-last-complete] > div,
-      &:not([data-keep-passed-steps])[data-step-status='current'] > div,{
+      &:not([data-keep-passed-steps])[data-step-status='current'] > div{
         background: var(--stepper-connector-bg);
       }
     }

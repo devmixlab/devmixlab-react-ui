@@ -57,21 +57,14 @@ const Stepper = ({
   allowFutureNavigation = false,
   variant = 'base',
   activeStep,
-  passedSteps: passedStepsProp,
+  passedSteps,
   // keepPassedStepsStatus = true,
 }: StepperProps) => {
   const [lastComplete, setLastComplete] = useState<StepperLastShownStep | null>(null);
   const [lastShown, setLastShown] = useState<StepperLastShownStep | null>(null);
-  const [passedSteps, setPassedSteps] = useState<Set<string>>(passedStepsProp ?? new Set());
   const [steps, setSteps] = useState<StepperStep[]>([]);
 
-  const keepPassedSteps = passedStepsProp != null;
-
-  useEffect(() => {
-    if (passedStepsProp) {
-      setPassedSteps(new Set(passedStepsProp));
-    }
-  }, [passedStepsProp]);
+  const keepPassedSteps = passedSteps != null;
 
   const ctxValue: StepperContextValue = {
     lastComplete,
@@ -79,7 +72,6 @@ const Stepper = ({
     lastShown,
     setLastShown,
     passedSteps,
-    setPassedSteps,
     keepPassedSteps,
     activeStep,
     steps,
@@ -132,7 +124,8 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
   const activeStepIndex = steps.findIndex((itm) => itm.id === activeStep);
   const currentStepIndex = steps.findIndex((itm) => itm.id === id);
 
-  const isComplete = keepPassedSteps ? passedSteps.has(id) : currentStepIndex < activeStepIndex;
+  const isComplete =
+    (keepPassedSteps ? passedSteps?.has(id) : currentStepIndex < activeStepIndex) || false;
   const isCurrent = currentStepIndex === activeStepIndex;
 
   const isBeforeCurrent = activeStepIndex > currentStepIndex;
@@ -162,6 +155,10 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
         },
       ];
     });
+
+    return () => {
+      setSteps((prev) => prev.filter((step) => step.id !== id));
+    };
   }, []);
 
   useEffect(() => {
@@ -192,12 +189,11 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
       (status === 'complete' || isLastShown || (status === 'upcoming' && allowFutureNavigation))) ||
     false;
 
-  console.log(isLastShown, id);
-
   const stepCtxValue: StepperStepContextValue = {
     activeStepIndex,
     currentStepIndex,
     isActive,
+    isComplete,
     status,
     isFirstStep,
     isLastStep,
@@ -218,6 +214,7 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
         key={id}
         data-clickable={isClickable || undefined}
         data-step-status={status}
+        aria-current={status === 'current' ? 'step' : undefined}
         onClick={
           isClickable
             ? (e: React.MouseEvent<HTMLDivElement>) => {
@@ -272,6 +269,7 @@ type StepperStepTrackProps = {
 const StepperStepTrack = ({ children, className, style, connectorGap }: StepperStepTrackProps) => {
   const {
     status,
+    isComplete,
     isFirstStep,
     isLastStep,
     isLastShown,
