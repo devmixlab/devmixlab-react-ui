@@ -7,8 +7,8 @@ import {
   StepperStepContextValue,
   useStepperStepContext,
 } from './StepperStepContext';
-import { CheckIcon, DotIcon } from '../Icon';
-import { Box, BoxDerived, type BoxProps, type BoxDerivedProps } from '../Box';
+import { CheckIcon } from '../Icon';
+import { BoxDerived, type BoxDerivedProps } from '../Box';
 
 //----------------------------------------------------------------
 // Types
@@ -22,8 +22,6 @@ type StepperStatus = 'complete' | 'current' | 'upcoming';
 
 type StepperStep = {
   id: string;
-  active: boolean;
-  status: StepperStatus;
 };
 
 type StepperLastShownStep = {
@@ -75,7 +73,9 @@ const Stepper = ({
   }, [activeStepProp]);
 
   useEffect(() => {
-    setPassedSteps((v) => new Set(passedStepsProp));
+    if (passedStepsProp) {
+      setPassedSteps(new Set(passedStepsProp));
+    }
   }, [passedStepsProp]);
 
   const ctxValue: StepperContextValue = {
@@ -139,23 +139,11 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
   const activeStepIndex = steps.findIndex((itm) => itm.id === activeStep);
   const currentStepIndex = steps.findIndex((itm) => itm.id === id);
 
-  // const status: StepperStatus =
-  //   currentStepIndex === -1 || activeStepIndex === -1
-  //     ? 'upcoming'
-  //     : currentStepIndex < activeStepIndex
-  //       ? 'complete'
-  //       : currentStepIndex === activeStepIndex
-  //         ? 'current'
-  //         : 'upcoming';
   const isComplete = keepPassedSteps ? passedSteps.has(id) : currentStepIndex < activeStepIndex;
   const isCurrent = currentStepIndex === activeStepIndex;
 
   const isBeforeCurrent = activeStepIndex > currentStepIndex;
   const isAfterCurrent = activeStepIndex < currentStepIndex;
-
-  // console.log(keepPassedSteps);
-  // console.log(isComplete);
-  // console.log(isComplete);
 
   const status: StepperStatus =
     currentStepIndex === -1 || activeStepIndex === -1
@@ -165,15 +153,6 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
         : isComplete
           ? 'complete'
           : 'upcoming';
-
-  // const status: StepperStatus =
-  //   currentStepIndex === -1 || activeStepIndex === -1
-  //     ? 'upcoming'
-  //     : (keepPassedSteps ? passedSteps.has(id) : currentStepIndex < activeStepIndex)
-  //       ? 'complete'
-  //       : currentStepIndex === activeStepIndex
-  //         ? 'current'
-  //         : 'upcoming';
 
   useEffect(() => {
     setSteps((prev) => {
@@ -187,8 +166,6 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
         ...prev,
         {
           id,
-          active: isActive,
-          status,
         },
       ];
     });
@@ -240,7 +217,7 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
 
   return (
     <StepperStepContext.Provider value={stepCtxValue}>
-      <Box
+      <BoxDerived
         {...rest}
         as={Element}
         tabIndex={isClickable ? 0 : -1}
@@ -257,7 +234,7 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
         }
       >
         {children}
-      </Box>
+      </BoxDerived>
     </StepperStepContext.Provider>
   );
 };
@@ -310,18 +287,7 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
     isAfterCurrent,
   } = useStepperStepContext();
 
-  const {
-    // lastShown,
-    // setLastShown,
-    // passedSteps,
-    // activeStep,
-    // setActiveStep,
-    // steps,
-    // setSteps,
-    // allowFutureNavigation,
-    // variant,
-    keepPassedSteps,
-  } = useStepperContext();
+  const { keepPassedSteps } = useStepperContext();
 
   const placedToActive = isBeforeCurrent ? 'before' : isAfterCurrent ? 'after' : 'current';
 
