@@ -56,21 +56,16 @@ const Stepper = ({
   children,
   allowFutureNavigation = false,
   variant = 'base',
-  activeStep: activeStepProp,
+  activeStep,
   passedSteps: passedStepsProp,
   // keepPassedStepsStatus = true,
 }: StepperProps) => {
   const [lastComplete, setLastComplete] = useState<StepperLastShownStep | null>(null);
   const [lastShown, setLastShown] = useState<StepperLastShownStep | null>(null);
   const [passedSteps, setPassedSteps] = useState<Set<string>>(passedStepsProp ?? new Set());
-  const [activeStep, setActiveStep] = useState<string>(activeStepProp);
   const [steps, setSteps] = useState<StepperStep[]>([]);
 
   const keepPassedSteps = passedStepsProp != null;
-
-  useEffect(() => {
-    setActiveStep(activeStepProp);
-  }, [activeStepProp]);
 
   useEffect(() => {
     if (passedStepsProp) {
@@ -87,7 +82,6 @@ const Stepper = ({
     setPassedSteps,
     keepPassedSteps,
     activeStep,
-    setActiveStep,
     steps,
     setSteps,
     allowFutureNavigation,
@@ -124,7 +118,6 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
     setLastShown,
     passedSteps,
     activeStep,
-    setActiveStep,
     steps,
     setSteps,
     allowFutureNavigation,

@@ -9,7 +9,7 @@ export interface StepperContextValue {
   passedSteps: Set<string>;
   setPassedSteps: React.Dispatch<React.SetStateAction<Set<string>>>;
   activeStep: StepperStepProp;
-  setActiveStep: React.Dispatch<React.SetStateAction<string>>;
+  // setActiveStep: React.Dispatch<React.SetStateAction<string>>;
   steps: StepperStep[];
   setSteps: React.Dispatch<React.SetStateAction<StepperStep[]>>;
   allowFutureNavigation: boolean;
