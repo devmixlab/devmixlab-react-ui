@@ -14,6 +14,8 @@ export interface StepperStepContextValue {
   isLastComplete: boolean;
   isBeforeCurrent: boolean;
   isAfterCurrent: boolean;
+  isPreviousComplete: boolean;
+  isNextComplete: boolean;
 }
 
 export const StepperStepContext = createContext<StepperStepContextValue | null>(null);

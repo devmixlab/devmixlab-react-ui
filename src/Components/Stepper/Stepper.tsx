@@ -22,6 +22,7 @@ type StepperStatus = 'complete' | 'current' | 'upcoming';
 
 type StepperStep = {
   id: string;
+  status: StepperStatus;
 };
 
 type StepperLastShownStep = {
@@ -124,6 +125,15 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
   const activeStepIndex = steps.findIndex((itm) => itm.id === activeStep);
   const currentStepIndex = steps.findIndex((itm) => itm.id === id);
 
+  const previousStep = currentStepIndex <= 0 ? null : steps[currentStepIndex - 1];
+  const nextStep = currentStepIndex >= steps.length - 1 ? null : steps[currentStepIndex + 1];
+
+  console.log('previousStep');
+  console.log(previousStep);
+
+  const isPreviousComplete = previousStep?.status === 'complete';
+  const isNextComplete = nextStep?.status === 'complete';
+
   const isComplete =
     (keepPassedSteps ? passedSteps?.has(id) : currentStepIndex < activeStepIndex) || false;
   const isCurrent = currentStepIndex === activeStepIndex;
@@ -142,24 +152,53 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
 
   useEffect(() => {
     setSteps((prev) => {
-      const isInSteps = prev.findIndex((itm) => itm.id === id);
-
-      if (isInSteps >= 0) {
+      if (prev.some((step) => step.id === id)) {
         return prev;
       }
 
-      return [
-        ...prev,
-        {
-          id,
-        },
-      ];
+      return [...prev, { id, status }];
     });
 
     return () => {
       setSteps((prev) => prev.filter((step) => step.id !== id));
     };
   }, []);
+
+  useEffect(() => {
+    setSteps((prev) => prev.map((step) => (step.id === id ? { ...step, status } : step)));
+  }, [status]);
+
+  // useEffect(() => {
+  //   setSteps((prev) => {
+  //     const isInSteps = prev.findIndex((itm) => itm.id === id);
+  //
+  //     if (isInSteps >= 0) {
+  //       return prev.map((itm) => {
+  //         if (itm.id === id) {
+  //           return { ...itm, status };
+  //         }
+  //
+  //         return itm;
+  //       });
+  //     }
+  //
+  //     return [
+  //       ...prev,
+  //       {
+  //         id,
+  //         status,
+  //       },
+  //     ];
+  //   });
+  //
+  //   return () => {
+  //     setSteps((prev) => prev.filter((step) => step.id !== id));
+  //   };
+  // }, [status]);
+
+  useEffect(() => {
+    console.log(steps);
+  }, [steps]);
 
   useEffect(() => {
     if (
@@ -190,6 +229,8 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
     false;
 
   const stepCtxValue: StepperStepContextValue = {
+    isPreviousComplete,
+    isNextComplete,
     activeStepIndex,
     currentStepIndex,
     isActive,
@@ -276,6 +317,8 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
     isLastComplete,
     isBeforeCurrent,
     isAfterCurrent,
+    isPreviousComplete,
+    isNextComplete,
   } = useStepperStepContext();
 
   const { keepPassedSteps } = useStepperContext();
@@ -296,6 +339,10 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
         className={clsx(prefix('__connector'), prefix('__connector-left'))}
         data-connector-hidden={isFirstStep || undefined}
         data-step-status={status}
+        data-step-before-current={isBeforeCurrent || undefined}
+        data-step-after-current={isAfterCurrent || undefined}
+        data-step-previous-complete={isPreviousComplete || undefined}
+        data-step-next-complete={isNextComplete || undefined}
         data-step-last-shown={isLastShown || undefined}
         data-step-last-complete={isLastComplete || undefined}
         data-keep-passed-steps={keepPassedSteps || undefined}
@@ -310,6 +357,10 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
         className={clsx(prefix('__connector'), prefix('__connector-right'))}
         data-connector-hidden={isLastStep || undefined}
         data-step-status={status}
+        data-step-before-current={isBeforeCurrent || undefined}
+        data-step-after-current={isAfterCurrent || undefined}
+        data-step-previous-complete={isPreviousComplete || undefined}
+        data-step-next-complete={isNextComplete || undefined}
         data-step-last-shown={isLastShown || undefined}
         data-step-last-complete={isLastComplete || undefined}
         data-keep-passed-steps={keepPassedSteps || undefined}
