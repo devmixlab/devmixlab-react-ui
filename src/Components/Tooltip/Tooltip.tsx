@@ -123,19 +123,21 @@ const Tooltip = forwardRef<HTMLElement, TooltipProps>(
         arrowCenter={isCentered ? true : undefined}
       >
         <Popover.Trigger
-          render={({ triggerProps, ref: triggerRef }) =>
+          render={({ triggerProps, ref: triggerRef }) => {
             // React.cloneElement(children, {
             //   ref: mergeRefs(triggerRef, ref, (children as any).ref),
             //   ...triggerProps,
             // })
-            React.cloneElement(
+            const childRef = (children.props as { ref?: React.Ref<HTMLElement> }).ref;
+
+            return React.cloneElement(
               children,
               mergeProps(children.props, {
                 ...triggerProps,
-                ref: mergeRefs(triggerRef, ref, (children as any).ref),
+                ref: mergeRefs(triggerRef, ref, childRef),
               }),
-            )
-          }
+            );
+          }}
         />
 
         <Popover.Panel

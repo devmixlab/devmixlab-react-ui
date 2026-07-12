@@ -1,16 +1,11 @@
 import React, { createContext, useContext } from 'react';
-import { StepperStep, StepperStepProp, StepperVariant, StepperLastShownStep } from './Stepper';
+import { StepperStepRegister, StepperStepProp, StepperVariant } from './Stepper';
 
 export interface StepperContextValue {
-  lastComplete: StepperLastShownStep | null;
-  setLastComplete: React.Dispatch<React.SetStateAction<StepperLastShownStep | null>>;
-  lastShown: StepperLastShownStep | null;
-  setLastShown: React.Dispatch<React.SetStateAction<StepperLastShownStep | null>>;
   passedSteps?: Set<string>;
   activeStep: StepperStepProp;
-  // setActiveStep: React.Dispatch<React.SetStateAction<string>>;
-  steps: StepperStep[];
-  setSteps: React.Dispatch<React.SetStateAction<StepperStep[]>>;
+  steps: StepperStepRegister[];
+  setSteps: React.Dispatch<React.SetStateAction<StepperStepRegister[]>>;
   allowFutureNavigation: boolean;
   variant?: StepperVariant;
   keepPassedSteps: boolean;

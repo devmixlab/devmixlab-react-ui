@@ -1,9 +1,10 @@
-import React, { forwardRef } from 'react';
+import React, { ComponentProps, forwardRef } from 'react';
 import clsx from 'clsx';
-import { Box, type BoxProps } from '../Box';
+import { Box, BoxDerived, BoxDerivedProps, type BoxProps } from '../Box';
 import { classPrefix } from '../../utils/classPrefix';
 import { createPolymorphic, PolymorphicProps } from '../../types/polymorphic';
 import { Close as CloseIcon } from '../Icon';
+import { CompositeProps } from '@floating-ui/react';
 
 //---------------------------------------------------------------
 // Types
@@ -11,6 +12,8 @@ import { Close as CloseIcon } from '../Icon';
 
 export const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 export type Size = (typeof sizes)[number];
+
+export type ContentProps = BoxDerivedProps & ComponentProps<'span'>;
 
 export type Variant = 'solid' | 'base' | 'outlined' | 'ghost' | (string & {});
 export type Intent =
@@ -26,6 +29,8 @@ export type OwnChipProps = {
   intent?: Intent;
   variant?: Variant;
   size?: Size;
+
+  contentProps?: ContentProps;
 
   noInteraction?: boolean; // removes hover/active interaction styles
 
@@ -62,6 +67,8 @@ const ImplChip = <C extends React.ElementType = 'button'>(
     intent = 'primary',
     variant = 'base',
     size = 'md',
+
+    contentProps,
 
     noInteraction = false,
 
@@ -178,7 +185,15 @@ const ImplChip = <C extends React.ElementType = 'button'>(
       {startIcon != null && <span className={prefix(`__icon`)}>{startIcon}</span>}
 
       {/* CONTENT */}
-      {!iconOnly && <span className={prefix(`__content`)}>{children}</span>}
+      {!iconOnly && (
+        <BoxDerived
+          {...contentProps}
+          as="span"
+          className={clsx(prefix(`__content`), contentProps?.className)}
+        >
+          {children}
+        </BoxDerived>
+      )}
 
       {/* END ICON */}
       {endIcon != null && <span className={prefix(`__icon`)}>{endIcon}</span>}

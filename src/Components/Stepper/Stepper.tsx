@@ -18,16 +18,12 @@ type StepperVariant = 'base' | (string & {});
 
 type StepperStepProp = string | null;
 
-type StepperStatus = 'complete' | 'current' | 'upcoming';
-
-type StepperStep = {
+type StepperStepRegister = {
   id: string;
-  status: StepperStatus;
-};
-
-type StepperLastShownStep = {
-  id: string;
-  index: number;
+  isComplete: boolean;
+  isActive: boolean;
+  hasBeenVisited: boolean;
+  isClickable: boolean;
 };
 
 type OwnStepperProps = {
@@ -35,7 +31,6 @@ type OwnStepperProps = {
   variant?: StepperVariant;
   activeStep: string;
   passedSteps?: Set<string>;
-  // keepStatus?: boolean;
 };
 
 type StepperProps = OwnStepperProps & ComponentProps<'div'>;
@@ -59,19 +54,12 @@ const Stepper = ({
   variant = 'base',
   activeStep,
   passedSteps,
-  // keepPassedStepsStatus = true,
 }: StepperProps) => {
-  const [lastComplete, setLastComplete] = useState<StepperLastShownStep | null>(null);
-  const [lastShown, setLastShown] = useState<StepperLastShownStep | null>(null);
-  const [steps, setSteps] = useState<StepperStep[]>([]);
+  const [steps, setSteps] = useState<StepperStepRegister[]>([]);
 
   const keepPassedSteps = passedSteps != null;
 
   const ctxValue: StepperContextValue = {
-    lastComplete,
-    setLastComplete,
-    lastShown,
-    setLastShown,
     passedSteps,
     keepPassedSteps,
     activeStep,
@@ -101,14 +89,11 @@ Stepper.displayName = 'Stepper';
 type StepperStepProps = {
   id: string;
   onClick?: (e: MouseEvent) => void;
-} & ComponentProps<'div'>;
+} & BoxDerivedProps &
+  ComponentProps<'div'>;
 
 const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepProps) => {
   const {
-    lastComplete,
-    setLastComplete,
-    lastShown,
-    setLastShown,
     passedSteps,
     activeStep,
     steps,
@@ -119,36 +104,31 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
   } = useStepperContext();
 
   const Element = onClick ? 'button' : 'div';
-
-  const isActive = id === activeStep;
+  const isOnClick = typeof onClick !== 'undefined';
 
   const activeStepIndex = steps.findIndex((itm) => itm.id === activeStep);
   const currentStepIndex = steps.findIndex((itm) => itm.id === id);
 
-  const previousStep = currentStepIndex <= 0 ? null : steps[currentStepIndex - 1];
-  const nextStep = currentStepIndex >= steps.length - 1 ? null : steps[currentStepIndex + 1];
+  const previousStep = currentStepIndex <= 0 ? undefined : steps[currentStepIndex - 1];
+  const nextStep = currentStepIndex >= steps.length - 1 ? undefined : steps[currentStepIndex + 1];
+  const currentStep = steps[currentStepIndex];
 
-  console.log('previousStep');
-  console.log(previousStep);
-
-  const isPreviousComplete = previousStep?.status === 'complete';
-  const isNextComplete = nextStep?.status === 'complete';
-
+  const isActive = id === activeStep;
   const isComplete =
     (keepPassedSteps ? passedSteps?.has(id) : currentStepIndex < activeStepIndex) || false;
-  const isCurrent = currentStepIndex === activeStepIndex;
 
-  const isBeforeCurrent = activeStepIndex > currentStepIndex;
-  const isAfterCurrent = activeStepIndex < currentStepIndex;
+  // const isClickable =
+  //     (onClick &&
+  //         !isActive &&
+  //         (isComplete || currentStep?.hasBeenVisited || (!isComplete && allowFutureNavigation))) ||
+  //     false;
 
-  const status: StepperStatus =
-    currentStepIndex === -1 || activeStepIndex === -1
-      ? 'upcoming'
-      : isCurrent
-        ? 'current'
-        : isComplete
-          ? 'complete'
-          : 'upcoming';
+  const isClickable =
+    (!isActive &&
+      (isComplete || currentStep?.hasBeenVisited || (!isComplete && allowFutureNavigation))) ||
+    false;
+
+  // console.log(steps);
 
   useEffect(() => {
     setSteps((prev) => {
@@ -156,7 +136,7 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
         return prev;
       }
 
-      return [...prev, { id, status }];
+      return [...prev, { id, isComplete, isActive, hasBeenVisited: isActive, isClickable }];
     });
 
     return () => {
@@ -165,84 +145,27 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
   }, []);
 
   useEffect(() => {
-    setSteps((prev) => prev.map((step) => (step.id === id ? { ...step, status } : step)));
-  }, [status]);
-
-  // useEffect(() => {
-  //   setSteps((prev) => {
-  //     const isInSteps = prev.findIndex((itm) => itm.id === id);
-  //
-  //     if (isInSteps >= 0) {
-  //       return prev.map((itm) => {
-  //         if (itm.id === id) {
-  //           return { ...itm, status };
-  //         }
-  //
-  //         return itm;
-  //       });
-  //     }
-  //
-  //     return [
-  //       ...prev,
-  //       {
-  //         id,
-  //         status,
-  //       },
-  //     ];
-  //   });
-  //
-  //   return () => {
-  //     setSteps((prev) => prev.filter((step) => step.id !== id));
-  //   };
-  // }, [status]);
-
-  useEffect(() => {
-    console.log(steps);
-  }, [steps]);
-
-  useEffect(() => {
-    if (
-      (lastShown == null && isActive) ||
-      (isActive && lastShown?.id !== id && (lastShown?.index ?? -1) < currentStepIndex)
-    ) {
-      if (currentStepIndex >= 0) setLastShown({ id: id, index: currentStepIndex });
-    }
-  }, [lastShown, isActive, currentStepIndex, id]);
-
-  useEffect(() => {
-    if (
-      (lastComplete == null && isComplete) ||
-      (isComplete && lastComplete?.id !== id && (lastComplete?.index ?? -1) < currentStepIndex)
-    ) {
-      if (currentStepIndex >= 0) setLastComplete({ id: id, index: currentStepIndex });
-    }
-  }, [lastComplete, isComplete, currentStepIndex, id]);
-
-  const isLastComplete = lastComplete?.id === id;
-  const isLastShown = lastShown?.id === id;
-  const isFirstStep = steps[0]?.id === id;
-  const isLastStep = steps[steps.length - 1]?.id === id;
-  const isClickable =
-    (onClick &&
-      !isActive &&
-      (status === 'complete' || isLastShown || (status === 'upcoming' && allowFutureNavigation))) ||
-    false;
+    setSteps((prev) =>
+      prev.map((step) =>
+        step.id === id
+          ? {
+              ...step,
+              isComplete,
+              isActive,
+              hasBeenVisited: step.hasBeenVisited || isActive,
+              isClickable,
+            }
+          : step,
+      ),
+    );
+  }, [isComplete, isActive, isClickable]);
 
   const stepCtxValue: StepperStepContextValue = {
-    isPreviousComplete,
-    isNextComplete,
+    currentStep,
+    previousStep,
+    nextStep,
     activeStepIndex,
     currentStepIndex,
-    isActive,
-    isComplete,
-    status,
-    isFirstStep,
-    isLastStep,
-    isClickable,
-    isLastShown,
-    isLastComplete,
-    isBeforeCurrent,
-    isAfterCurrent,
   };
 
   return (
@@ -250,14 +173,13 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
       <BoxDerived
         {...rest}
         as={Element}
-        tabIndex={isClickable ? 0 : -1}
+        tabIndex={isClickable && onClick ? 0 : -1}
         className={clsx(prefix('__step'), className)}
         key={id}
-        data-clickable={isClickable || undefined}
-        data-step-status={status}
-        aria-current={status === 'current' ? 'step' : undefined}
+        data-clickable={(isClickable && isOnClick) || undefined}
+        aria-current={isActive ? 'step' : undefined}
         onClick={
-          isClickable
+          isClickable && isOnClick
             ? (e: React.MouseEvent<HTMLDivElement>) => {
                 onClick?.(e);
               }
@@ -284,11 +206,16 @@ type StepperStepBarProps = {
 } & ComponentProps<'div'>;
 
 const StepperStepBar = ({ gap = 10, rounded = '9999px' }: StepperStepBarProps) => {
-  const { status } = useStepperStepContext();
+  const { currentStep } = useStepperStepContext();
 
   return (
     <div className={prefix('__row')}>
-      <BoxDerived px={gap} className={prefix('__bar')} data-step-status={status}>
+      <BoxDerived
+        px={gap}
+        className={prefix('__bar')}
+        data-step-complete={currentStep?.isComplete || undefined}
+        data-step-active={currentStep?.isActive || undefined}
+      >
         <BoxDerived rounded={rounded} />
       </BoxDerived>
     </div>
@@ -308,22 +235,9 @@ type StepperStepTrackProps = {
 } & ComponentProps<'div'>;
 
 const StepperStepTrack = ({ children, className, style, connectorGap }: StepperStepTrackProps) => {
-  const {
-    status,
-    isComplete,
-    isFirstStep,
-    isLastStep,
-    isLastShown,
-    isLastComplete,
-    isBeforeCurrent,
-    isAfterCurrent,
-    isPreviousComplete,
-    isNextComplete,
-  } = useStepperStepContext();
+  const { previousStep, nextStep, currentStep } = useStepperStepContext();
 
   const { keepPassedSteps } = useStepperContext();
-
-  const placedToActive = isBeforeCurrent ? 'before' : isAfterCurrent ? 'after' : 'current';
 
   return (
     <div
@@ -337,16 +251,11 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
     >
       <div
         className={clsx(prefix('__connector'), prefix('__connector-left'))}
-        data-connector-hidden={isFirstStep || undefined}
-        data-step-status={status}
-        data-step-before-current={isBeforeCurrent || undefined}
-        data-step-after-current={isAfterCurrent || undefined}
-        data-step-previous-complete={isPreviousComplete || undefined}
-        data-step-next-complete={isNextComplete || undefined}
-        data-step-last-shown={isLastShown || undefined}
-        data-step-last-complete={isLastComplete || undefined}
-        data-keep-passed-steps={keepPassedSteps || undefined}
-        data-placed-to-active={placedToActive}
+        data-step-complete={currentStep?.isComplete || undefined}
+        data-step-active={currentStep?.isActive || undefined}
+        data-step-has-previous={previousStep ? true : undefined}
+        data-step-previous-active={previousStep?.isActive || undefined}
+        data-step-previous-complete={previousStep?.isComplete || undefined}
       >
         <div />
       </div>
@@ -355,16 +264,11 @@ const StepperStepTrack = ({ children, className, style, connectorGap }: StepperS
 
       <div
         className={clsx(prefix('__connector'), prefix('__connector-right'))}
-        data-connector-hidden={isLastStep || undefined}
-        data-step-status={status}
-        data-step-before-current={isBeforeCurrent || undefined}
-        data-step-after-current={isAfterCurrent || undefined}
-        data-step-previous-complete={isPreviousComplete || undefined}
-        data-step-next-complete={isNextComplete || undefined}
-        data-step-last-shown={isLastShown || undefined}
-        data-step-last-complete={isLastComplete || undefined}
-        data-keep-passed-steps={keepPassedSteps || undefined}
-        data-placed-to-active={placedToActive}
+        data-step-complete={currentStep?.isComplete || undefined}
+        data-step-active={currentStep?.isActive || undefined}
+        data-step-has-next={nextStep ? true : undefined}
+        data-step-next-active={nextStep?.isActive || undefined}
+        data-step-next-complete={nextStep?.isComplete || undefined}
       >
         <div />
       </div>
@@ -397,7 +301,7 @@ const StepperStepIndicator = ({
   svgSize = '60%',
   ...rest
 }: StepperStepIndicatorProps) => {
-  const { status, isLastStep, isFirstStep, currentStepIndex } = useStepperStepContext();
+  const { previousStep, nextStep, currentStepIndex, currentStep } = useStepperStepContext();
 
   const finalIndicator = indicator ?? currentStepIndex + 1;
   const finalCompleteIndicator = completeIndicator ?? <CheckIcon />;
@@ -413,10 +317,11 @@ const StepperStepIndicator = ({
           '--indicator-svg-size': typeof svgSize === 'number' ? `${svgSize}px` : svgSize,
         } as CSSProperties
       }
-      data-step-status={status}
+      data-step-active={currentStep?.isActive || undefined}
+      data-step-complete={currentStep?.isComplete || undefined}
       data-icon-only={iconOnly || undefined}
     >
-      {status === 'complete' ? finalCompleteIndicator : finalIndicator}
+      {currentStep?.isComplete ? finalCompleteIndicator : finalIndicator}
     </BoxDerived>
   );
 };
@@ -437,11 +342,14 @@ type StepperStepContentProps = {
 const StepperStepContent = ({ children, className, render, ...rest }: StepperStepContentProps) => {
   const ctx = useStepperStepContext();
 
+  const { currentStep } = ctx;
+
   return (
     <BoxDerived
       {...rest}
       className={clsx(prefix('__content'), className)}
-      data-step-status={ctx.status}
+      data-step-active={currentStep?.isActive || undefined}
+      data-step-complete={currentStep?.isComplete || undefined}
     >
       {render ? render(ctx) : children}
     </BoxDerived>
@@ -465,7 +373,7 @@ const StepperStepTitle = ({
   fs = '.875rem',
   ...rest
 }: StepperStepTitleProps) => {
-  const { status } = useStepperStepContext();
+  const { currentStep } = useStepperStepContext();
 
   return (
     <BoxDerived
@@ -474,7 +382,8 @@ const StepperStepTitle = ({
       lh={lh}
       fs={fs}
       className={clsx(prefix('__title'), className)}
-      data-step-status={status}
+      data-step-active={currentStep?.isActive || undefined}
+      data-step-complete={currentStep?.isComplete || undefined}
     >
       {children}
     </BoxDerived>
@@ -491,12 +400,4 @@ Stepper.Title = StepperStepTitle;
 
 export { Stepper };
 
-export type {
-  StepperVariant,
-  StepperStepProp,
-  StepperStatus,
-  StepperStep,
-  OwnStepperProps,
-  StepperProps,
-  StepperLastShownStep,
-};
+export type { StepperVariant, StepperStepProp, StepperStepRegister, OwnStepperProps, StepperProps };

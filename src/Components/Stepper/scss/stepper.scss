@@ -41,9 +41,9 @@ $stepper-prefix: #{$p}--stepper;
       transparent
   );
 
-  --stepper-title-color-upcoming: #{intent(gray, 600)};
-  --stepper-title-color-current: #{intent(gray, 900)};
-  --stepper-title-color-complete: #{intent(gray, 900)};
+  --stepper-title-color: #{intent(gray, 600)};
+  --stepper-title-color-active: #{intent(gray, 900)};
+  --stepper-title-color-complete: #{intent(gray, 800)};
 
   --stepper-bar-bg-complete: #{intent(primary, 500)};
   --stepper-bar-bg-current: #{intent(primary, 300)};
@@ -77,9 +77,9 @@ $stepper-prefix: #{$p}--stepper;
         transparent
     );
 
-    --stepper-title-color-upcoming: #{intent(gray, 400)};
-    --stepper-title-color-current: #{intent(gray, 100)};
-    --stepper-title-color-complete: #{intent(gray, 100)};
+    --stepper-title-color: #{intent(gray, 400)};
+    --stepper-title-color-complete: #{intent(gray, 300)};
+    --stepper-title-color-active: #{intent(gray, 50)};
 
     --stepper-bar-bg-complete: #{intent(primary, 400)};
     --stepper-bar-bg-current: #{intent(primary, 500)};
@@ -87,28 +87,6 @@ $stepper-prefix: #{$p}--stepper;
 
     --stepper-ring: #{intent(primary, 400)};
   }
-
-  //&[data-variant='icon-only'] {
-  //  --stepper-indicator-shadow-current: none;
-  //
-  //  --stepper-indicator-bg-complete: transparent;
-  //  --stepper-indicator-bg-current: transparent;
-  //  --stepper-indicator-bg-upcoming: transparent;
-  //
-  //  --stepper-indicator-color-complete: #{intent(primary, 600)};
-  //  --stepper-indicator-color-current: #{intent(primary, 600)};
-  //  --stepper-indicator-color-upcoming: #{intent(gray, 500)};
-  //
-  //  --stepper-connector-bg: #{intent(gray, 300)};
-  //
-  //  @include dark {
-  //    --stepper-indicator-color-complete: #{intent(primary, 400)};
-  //    --stepper-indicator-color-current: #{intent(primary, 400)};
-  //    --stepper-indicator-color-upcoming: #{intent(gray, 500)};
-  //
-  //    --stepper-connector-bg: #{intent(gray, 700)};
-  //  }
-  //}
 
   display: flex;
   width: 100%;
@@ -183,24 +161,19 @@ $stepper-prefix: #{$p}--stepper;
       width: 100%;
       height: 4px;
       transform: scaleY(1);
+      background: var(--stepper-bar-bg-upcoming);
       transition:
           background-color var(--stepper-transition),
           transform var(--stepper-transition);
-      //border-radius: 999px;
     }
 
-    &[data-step-status='complete'] > div {
-      background: var(--stepper-bar-bg-complete);
-    }
-
-    &[data-step-status='current'] > div {
+    &[data-step-complete] > div,
+    &[data-step-active] > div {
       background: var(--stepper-bar-bg-current);
-      transform: scaleY(1.5);
     }
 
-    &[data-step-status='upcoming'] > div {
-      height: 4px;
-      background: var(--stepper-bar-bg-upcoming);
+    &[data-step-active] > div {
+      transform: scaleY(1.5);
     }
   }
 
@@ -228,20 +201,13 @@ $stepper-prefix: #{$p}--stepper;
         border-bottom-right-radius: 999px;
       }
 
-      &[data-connector-hidden] {
+      &:not([data-step-has-previous]) {
         opacity: 0;
       }
-      //&[data-step-previous-complete][data-step-status='complete'] > div {
-      //  background: var(--stepper-connector-bg-complete);
-      //}
-      //&[data-step-previous-complete][data-step-status='current'] > div {
-      //  background: var(--stepper-connector-bg-complete);
-      //}
-      //&[data-step-status='upcoming'] > div {
-      //  background: var(--stepper-connector-bg);
-      //}
 
-      &[data-step-status="current"] > div {
+      &[data-step-previous-active][data-step-complete] > div,
+      &[data-step-previous-complete][data-step-complete] > div,
+      &[data-step-previous-complete][data-step-active] > div {
         background: var(--stepper-connector-bg-complete);
       }
     }
@@ -254,39 +220,15 @@ $stepper-prefix: #{$p}--stepper;
         border-bottom-left-radius: 999px;
       }
 
-      &[data-connector-hidden] {
+      &:not([data-step-has-next]) {
         opacity: 0;
       }
 
-      &[data-step-status="complete"][data-step-before-current] > div {
+      &[data-step-next-complete][data-step-active] > div,
+      &[data-step-next-complete][data-step-complete] > div,
+      &[data-step-next-active][data-step-complete] > div {
         background: var(--stepper-connector-bg-complete);
       }
-
-      //&[data-step-status='complete'] > div {
-      //  background: var(--stepper-connector-bg-complete);
-      //}
-      //
-      //&[data-step-next-complete][data-step-status='current'] > div {
-      //  background: var(--stepper-connector-bg-complete);
-      //}
-      //&:not([data-step-last-shown])[data-step-status='complete'] > div {
-      //  background: var(--stepper-connector-bg-complete);
-      //}
-      //&:not([data-step-last-shown])[data-step-status='current'] > div{
-      //  background: var(--stepper-connector-bg-complete);
-      //}
-      //&:not([data-keep-passed-steps])[data-step-status='current'] > div {
-      //  background: var(--stepper-connector-bg);
-      //}
-      //&[data-step-status='upcoming'] > div {
-      //  background: var(--stepper-connector-bg);
-      //}
-      //&[data-step-last-shown] > div,
-      //&[data-step-status='current'][data-step-last-complete] > div,
-      //&:not([data-placed-to-active='before'])[data-step-status='complete'][data-step-last-complete] > div,
-      //&:not([data-keep-passed-steps])[data-step-status='current'] > div{
-      //  background: var(--stepper-connector-bg);
-      //}
     }
   }
 
@@ -318,27 +260,48 @@ $stepper-prefix: #{$p}--stepper;
         box-shadow var(--stepper-transition),
         transform var(--stepper-transition);
 
-    &[data-icon-only] {
-      &[data-step-status='complete'], &[data-step-status='current'], &[data-step-status='upcoming'] {
-        border: none;
-        box-shadow: none;
-        background: none;
+    border-color: var(--stepper-indicator-border-upcoming);
+    background: var(--stepper-indicator-bg-upcoming);
+    color: var(--stepper-indicator-color-upcoming);
+
+    box-shadow: var(--stepper-indicator-shadow-upcoming);
+
+    &[data-step-complete] {
+      border-color: var(--stepper-indicator-border-complete);
+      background: var(--stepper-indicator-bg-complete);
+      color: var(--stepper-indicator-color-complete);
+
+      box-shadow: var(--stepper-indicator-shadow-complete);
+    }
+
+    &[data-step-active],
+    &[data-step-active][data-step-complete] {
+      &:not([data-icon-only]) {
+        border-color: var(--stepper-indicator-border-current);
+        color: var(--stepper-indicator-color-current);
+        background: var(--stepper-indicator-bg-current);
+
+        box-shadow: var(--stepper-indicator-shadow-current);
       }
-      &[data-step-status='complete'], &[data-step-status='current'] {
+    }
+
+    &[data-icon-only] {
+      border: none;
+      box-shadow: none;
+      background: none;
+
+      &[data-step-complete], &[data-step-active] {
         color: #{intent(primary, 700)};
       }
 
-      &[data-step-status='upcoming'] {
-        color: #{intent(gray, 400)};
-      }
+      color: #{intent(gray, 400)};
 
       @include dark {
-        &[data-step-status='complete'], &[data-step-status='current'] {
+        &[data-step-complete], &[data-step-active] {
           color: #{intent(primary, 500)};
         }
-        &[data-step-status='upcoming'] {
-          color: #{intent(gray, 700)};
-        }
+
+        color: #{intent(gray, 700)};
       }
     }
 
@@ -353,70 +316,32 @@ $stepper-prefix: #{$p}--stepper;
   /* -------------------------------------------------------------------------- */
 
   .#{$stepper-prefix}__content {
-    //padding-top: 16px;
 
-    //&[data-clickable] .#{$stepper-prefix}__title {
-    //  &:hover {
-    //    text-decoration: underline;
-    //  }
-    //}
   }
 
   .#{$stepper-prefix}__title {
-    transition: color var(--stepper-transition);
-  }
+    //transition: color var(--stepper-transition);
+    display: inline-block;
+    transition:
+        color var(--stepper-transition),
+        transform var(--stepper-transition);
 
-  /* -------------------------------------------------------------------------- */
-  /* Upcoming                                                                    */
-  /* -------------------------------------------------------------------------- */
+    color: var(--stepper-title-color);
+    font-weight: 400;
 
-  .#{$stepper-prefix}__indicator[data-step-status='upcoming'] {
-    border-color: var(--stepper-indicator-border-upcoming);
-    background: var(--stepper-indicator-bg-upcoming);
-    color: var(--stepper-indicator-color-upcoming);
-
-    box-shadow: var(--stepper-indicator-shadow-upcoming);
-  }
-
-  .#{$stepper-prefix}__step[data-step-status='upcoming'] {
-    .#{$stepper-prefix}__title {
-      color: var(--stepper-title-color-upcoming);
-    }
-  }
-
-  /* -------------------------------------------------------------------------- */
-  /* Current                                                                     */
-  /* -------------------------------------------------------------------------- */
-
-  .#{$stepper-prefix}__indicator[data-step-status='current'] {
-    border-color: var(--stepper-indicator-border-current);
-    color: var(--stepper-indicator-color-current);
-    background: var(--stepper-indicator-bg-current);
-
-    box-shadow: var(--stepper-indicator-shadow-current);
-  }
-
-  .#{$stepper-prefix}__step[data-step-status='current'] {
-    .#{$stepper-prefix}__title {
-      color: var(--stepper-title-color-current);
+    &[data-step-active][data-step-complete],
+    &[data-step-active] {
+      color: var(--stepper-title-color-active);
+      //color: red;
       font-weight: 600;
+      //transform: scale(1.1);
     }
-  }
 
-  /* -------------------------------------------------------------------------- */
-  /* Complete                                                                    */
-  /* -------------------------------------------------------------------------- */
+    &:not([data-step-active])[data-step-complete] {
 
-  .#{$stepper-prefix}__indicator[data-step-status='complete'] {
-    border-color: var(--stepper-indicator-border-complete);
-    background: var(--stepper-indicator-bg-complete);
-    color: var(--stepper-indicator-color-complete);
+    }
 
-    box-shadow: var(--stepper-indicator-shadow-complete);
-  }
-
-  .#{$stepper-prefix}__step[data-step-status='complete'] {
-    .#{$stepper-prefix}__title {
+    &[data-step-complete] {
       color: var(--stepper-title-color-complete);
     }
   }

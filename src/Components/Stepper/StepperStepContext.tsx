@@ -1,21 +1,24 @@
 import React, { createContext, useContext } from 'react';
-import { StepperStatus } from './Stepper';
+import { StepperStepRegister } from './Stepper';
 
 export interface StepperStepContextValue {
+  previousStep?: StepperStepRegister;
+  nextStep?: StepperStepRegister;
+  currentStep: StepperStepRegister;
   activeStepIndex: number;
   currentStepIndex: number;
-  isActive: boolean;
-  isComplete: boolean;
-  status: StepperStatus;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-  isClickable: boolean;
-  isLastShown: boolean;
-  isLastComplete: boolean;
-  isBeforeCurrent: boolean;
-  isAfterCurrent: boolean;
-  isPreviousComplete: boolean;
-  isNextComplete: boolean;
+  // isActive: boolean;
+  // isComplete: boolean;
+  // status: StepperStatus;
+  // isFirstStep: boolean;
+  // isLastStep: boolean;
+  // isClickable: boolean;
+  // isLastShown: boolean;
+  // isLastComplete: boolean;
+  // isBeforeCurrent: boolean;
+  // isAfterCurrent: boolean;
+  // isPreviousComplete: boolean;
+  // isNextComplete: boolean;
 }
 
 export const StepperStepContext = createContext<StepperStepContextValue | null>(null);
