@@ -12,150 +12,148 @@ export type Size = 'sm' | 'md' | 'lg';
 export type Intent = 'danger' | 'warning' | 'success' | 'info';
 
 type CheckboxProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
-    size?: Size;
-    intent?: Intent;
-    invalid?: boolean;
-    rounded?: BoxProps['rounded'];
-    children?: React.ReactNode;
-    indeterminate?: boolean;
-    description?: React.ReactNode;
-    labelPosition?: 'left' | 'right';
+  size?: Size;
+  intent?: Intent;
+  invalid?: boolean;
+  rounded?: BoxProps['rounded'];
+  children?: React.ReactNode;
+  indeterminate?: boolean;
+  description?: React.ReactNode;
+  labelPosition?: 'left' | 'right';
 
-    onCheckedChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
 };
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--checkbox${name}`;
+  return `${CLASS_PREFIX}--checkbox${name}`;
 };
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-    (
-        {
-            className,
-            size,
-            intent,
-            disabled,
-            invalid,
-            children,
-            indeterminate,
-            description,
-            labelPosition = 'right',
-            onChange,
+  (
+    {
+      className,
+      size,
+      intent,
+      disabled,
+      invalid,
+      children,
+      indeterminate,
+      description,
+      labelPosition = 'right',
+      onChange,
 
-            checked,
-            defaultChecked,
+      checked,
+      defaultChecked,
 
-            onCheckedChange,
-            ...rest
-        },
-        ref,
-    ) => {
-        const inputRef = useRef<HTMLInputElement>(null);
-        const combinedRef = mergeRefs(inputRef, ref);
-
-        const group = useCheckboxGroupContext<any>();
-        const valueProp = rest.value as unknown;
-
-        const isDisabled = group?.disabled ?? disabled;
-
-        const [uncontrolledChecked, setUncontrolledChecked] = useState(() =>
-            Boolean(defaultChecked),
-        );
-
-        const isInGroup = group && valueProp !== undefined;
-
-        const isControlled = typeof checked === 'boolean';
-        const isChecked = isInGroup
-            ? group.value.includes(valueProp)
-            : isControlled
-              ? checked
-              : uncontrolledChecked;
-
-        // const id = rest.id ?? useId();
-        const id = useStableId(prefix(), rest.id);
-        const descriptionId = description && id ? `${id}-desc` : undefined;
-        const labelId = children ? `${id}-label` : undefined;
-        const finalSize = group?.size ?? size ?? 'md';
-
-        useEffect(() => {
-            if (inputRef.current) {
-                inputRef.current.indeterminate = indeterminate ?? false;
-            }
-        }, [indeterminate]);
-
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (isInGroup) {
-                group.toggle(valueProp);
-            } else {
-                if (!isControlled) {
-                    setUncontrolledChecked(e.target.checked);
-                }
-            }
-
-            onChange?.(e);
-            if (isInGroup) {
-                const nextChecked = !group.value.includes(valueProp);
-                onCheckedChange?.(nextChecked);
-            } else {
-                onCheckedChange?.(e.target.checked);
-            }
-        };
-
-        const labelNode =
-            children || description ? (
-                <span className={prefix('__text')}>
-                    {children && (
-                        <span id={labelId} className={prefix('__label')}>
-                            {children}
-                        </span>
-                    )}
-                    {description && (
-                        <span id={descriptionId} className={prefix('__description')}>
-                            {description}
-                        </span>
-                    )}
-                </span>
-            ) : null;
-
-        return (
-            <label
-                className={clsx(prefix(), className)}
-                data-size={finalSize}
-                data-disabled={isDisabled || undefined}
-                data-state={indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'}
-                data-invalid={invalid || undefined}
-                {...(intent ? { ['data-intent']: intent } : {})}
-            >
-                {labelPosition === 'left' && labelNode}
-
-                <Box
-                    as="input"
-                    {...rest}
-                    type="checkbox"
-                    name={group?.name ?? rest.name}
-                    disabled={isDisabled}
-                    onChange={handleChange}
-                    id={id}
-                    ref={combinedRef}
-                    className={prefix('__input')}
-                    aria-invalid={invalid || undefined}
-                    aria-checked={indeterminate ? 'mixed' : isChecked}
-                    aria-describedby={descriptionId}
-                    checked={isChecked}
-                />
-
-                <span className={prefix('__control')}>
-                    {indeterminate ? (
-                        <IndeterminateIcon className={prefix('__checkmark')} />
-                    ) : (
-                        <CheckIcon className={prefix('__checkmark')} />
-                    )}
-                </span>
-
-                {labelPosition === 'right' && labelNode}
-            </label>
-        );
+      onCheckedChange,
+      ...rest
     },
+    ref,
+  ) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const combinedRef = mergeRefs(inputRef, ref);
+
+    const group = useCheckboxGroupContext<any>();
+    const valueProp = rest.value as unknown;
+
+    const isDisabled = group?.disabled ?? disabled;
+
+    const [uncontrolledChecked, setUncontrolledChecked] = useState(() => Boolean(defaultChecked));
+
+    const isInGroup = group && valueProp !== undefined;
+
+    const isControlled = typeof checked === 'boolean';
+    const isChecked = isInGroup
+      ? group.valueSet.has(valueProp)
+      : isControlled
+        ? checked
+        : uncontrolledChecked;
+
+    // const id = rest.id ?? useId();
+    const id = useStableId(prefix(), rest.id);
+    const descriptionId = description && id ? `${id}-desc` : undefined;
+    const labelId = children ? `${id}-label` : undefined;
+    const finalSize = group?.size ?? size ?? 'md';
+
+    useEffect(() => {
+      if (inputRef.current) {
+        inputRef.current.indeterminate = indeterminate ?? false;
+      }
+    }, [indeterminate]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (isInGroup) {
+        group.toggle(valueProp);
+      } else {
+        if (!isControlled) {
+          setUncontrolledChecked(e.target.checked);
+        }
+      }
+
+      onChange?.(e);
+      if (isInGroup) {
+        const nextChecked = !group.valueSet.has(valueProp);
+        onCheckedChange?.(nextChecked);
+      } else {
+        onCheckedChange?.(e.target.checked);
+      }
+    };
+
+    const labelNode =
+      children || description ? (
+        <span className={prefix('__text')}>
+          {children && (
+            <span id={labelId} className={prefix('__label')}>
+              {children}
+            </span>
+          )}
+          {description && (
+            <span id={descriptionId} className={prefix('__description')}>
+              {description}
+            </span>
+          )}
+        </span>
+      ) : null;
+
+    return (
+      <label
+        className={clsx(prefix(), className)}
+        data-size={finalSize}
+        data-disabled={isDisabled || undefined}
+        data-state={indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'}
+        data-invalid={invalid || undefined}
+        {...(intent ? { ['data-intent']: intent } : {})}
+      >
+        {labelPosition === 'left' && labelNode}
+
+        <Box
+          as="input"
+          {...rest}
+          type="checkbox"
+          name={group?.name ?? rest.name}
+          disabled={isDisabled}
+          onChange={handleChange}
+          id={id}
+          ref={combinedRef}
+          className={prefix('__input')}
+          aria-invalid={invalid || undefined}
+          aria-checked={indeterminate ? 'mixed' : isChecked}
+          aria-describedby={descriptionId}
+          checked={isChecked}
+        />
+
+        <span className={prefix('__control')}>
+          {indeterminate ? (
+            <IndeterminateIcon className={prefix('__checkmark')} />
+          ) : (
+            <CheckIcon className={prefix('__checkmark')} />
+          )}
+        </span>
+
+        {labelPosition === 'right' && labelNode}
+      </label>
+    );
+  },
 );
 
 Checkbox.displayName = 'Checkbox';
