@@ -13,9 +13,11 @@ type CheckboxGroupProps<T extends Value> = {
   size?: Size;
   children: React.ReactNode;
   ariaLabel?: string;
+  as?: React.ElementType;
 };
 
 function CheckboxGroup<T extends Value>({
+  as,
   value,
   defaultValue = [],
   onChange,
@@ -39,26 +41,41 @@ function CheckboxGroup<T extends Value>({
   const current = isControlled ? value! : inner;
   const currentSet = useMemo(() => new Set(current), [current]);
 
+  // const toggle = useCallback(
+  //   (val: T) => {
+  //     if (isControlled) {
+  //       // const exists = current.includes(val);
+  //       const exists = currentSet.has(val);
+  //       const next = exists ? current.filter((v) => v !== val) : [...current, val];
+  //
+  //       onChange?.(next);
+  //     } else {
+  //       setInner((prev) => {
+  //         const exists = prev.includes(val);
+  //
+  //         const next = exists ? prev.filter((v) => v !== val) : [...prev, val];
+  //
+  //         onChange?.(next);
+  //         return next;
+  //       });
+  //     }
+  //   },
+  //   [isControlled, current, currentSet, onChange],
+  // );
+
   const toggle = useCallback(
     (val: T) => {
-      if (isControlled) {
-        // const exists = current.includes(val);
-        const exists = currentSet.has(val);
-        const next = exists ? current.filter((v) => v !== val) : [...current, val];
+      const exists = currentSet.has(val);
 
-        onChange?.(next);
-      } else {
-        setInner((prev) => {
-          const exists = prev.includes(val);
+      const next = exists ? current.filter((v) => v !== val) : [...current, val];
 
-          const next = exists ? prev.filter((v) => v !== val) : [...prev, val];
-
-          onChange?.(next);
-          return next;
-        });
+      if (!isControlled) {
+        setInner(next);
       }
+
+      onChange?.(next);
     },
-    [isControlled, current, currentSet, onChange],
+    [current, currentSet, isControlled, onChange],
   );
 
   const ctx = useMemo(() => {
@@ -76,9 +93,13 @@ function CheckboxGroup<T extends Value>({
 
   return (
     <CheckboxGroupProvider value={ctx}>
-      <div role="group" {...(finalAriaLabel && { 'aria-label': finalAriaLabel })}>
-        {children}
-      </div>
+      {as ? (
+        <div role="group" {...(finalAriaLabel && { 'aria-label': finalAriaLabel })}>
+          {children}
+        </div>
+      ) : (
+        children
+      )}
     </CheckboxGroupProvider>
   );
 }
