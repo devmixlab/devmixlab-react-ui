@@ -1,4 +1,4 @@
-import React, { useState, ComponentProps, useEffect, CSSProperties } from 'react';
+import React, { useState, ComponentProps, useEffect, CSSProperties, useMemo } from 'react';
 import { classPrefix } from '../../utils/classPrefix';
 import { clsx } from 'clsx';
 import { StepperContext, useStepperContext, StepperContextValue } from './StepperContext';
@@ -30,7 +30,7 @@ type OwnStepperProps = {
   allowFutureNavigation?: boolean;
   variant?: StepperVariant;
   activeStep: string;
-  passedSteps?: Set<string>;
+  passedSteps?: string[];
 };
 
 type StepperProps = OwnStepperProps & ComponentProps<'div'>;
@@ -57,10 +57,12 @@ const Stepper = ({
 }: StepperProps) => {
   const [steps, setSteps] = useState<StepperStepRegister[]>([]);
 
+  const passedStepsSet = useMemo(() => new Set(passedSteps ?? []), [passedSteps]);
+
   const keepPassedSteps = passedSteps != null;
 
   const ctxValue: StepperContextValue = {
-    passedSteps,
+    passedSteps: passedStepsSet,
     keepPassedSteps,
     activeStep,
     steps,
