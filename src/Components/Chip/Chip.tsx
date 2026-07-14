@@ -41,7 +41,6 @@ export type OwnChipProps = {
   endIcon?: React.ReactNode;
   iconOnly?: boolean;
 
-  removable?: boolean;
   onRemove?: () => void;
 };
 
@@ -81,7 +80,6 @@ const ImplChip = <C extends React.ElementType = 'button'>(
     disabled = false,
     selected = false,
 
-    removable = false,
     onRemove,
 
     onClick,
@@ -93,6 +91,8 @@ const ImplChip = <C extends React.ElementType = 'button'>(
 ) => {
   const { href, target, rel } = rest as any;
 
+  const removable = onRemove != null;
+
   if (iconOnly && children == null) {
     console.warn('Chip: `iconOnly` requires children.');
   }
@@ -102,7 +102,7 @@ const ImplChip = <C extends React.ElementType = 'button'>(
   }
 
   if (iconOnly && removable) {
-    console.warn('Chip: `iconOnly` cannot be used together with `removable`.');
+    console.warn('Chip: `iconOnly` cannot be used together with `onRemove`.');
   }
 
   const resolvedAs: React.ElementType = removable ? 'div' : (as ?? 'button');
@@ -115,13 +115,8 @@ const ImplChip = <C extends React.ElementType = 'button'>(
     console.warn('Chip: removable chips do not support onClick. Use the remove button instead.');
   }
 
-  if (onRemove && !removable) {
-    console.warn('Chip: `onRemove` has no effect unless `removable` is true.');
-  }
-
   const isButton = resolvedAs === 'button';
   const isLink = resolvedAs === 'a' || (!!href && !isButton && !removable);
-  // const isInteractive = (isButton || isLink || !!onClick) && !disabled && !removable;
   const isInteractive =
     (isButton || isLink || !!onClick) && !disabled && !removable && !noInteraction;
 
@@ -163,7 +158,6 @@ const ImplChip = <C extends React.ElementType = 'button'>(
       aria-pressed={isButton ? selected : undefined} // only for toggle buttons (not links)
       role={!isButton && !isLink && isInteractive ? 'button' : undefined} // add for custom interactive elements (not button/link)
       rel={isLink ? (target === '_blank' ? (rel ?? 'noopener noreferrer') : rel) : undefined} // prevent window.opener security issues
-      // tabIndex={!isButton && !isLink && isInteractive ? 0 : undefined} // enable focus for non-focusable interactive elements (link/button focusable)
       tabIndex={isInteractive ? 0 : -1} // enable focus for non-focusable interactive elements (link/button focusable)
       ref={ref}
       className={clsx(prefix(), className)}

@@ -25,6 +25,7 @@ export * from './src/Components/Toast';
 export * from './src/Components/Tooltip';
 export * from './src/Components/Link';
 export * from './src/Components/Stepper';
+export * from './src/Components/Divider';
 
 export * from './src/Components/Transition';
 
