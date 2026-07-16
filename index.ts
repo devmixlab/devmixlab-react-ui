@@ -1,4 +1,4 @@
-export { ResponsiveProvider } from './src/utils/responsive';
+export { ResponsiveProvider, BreakpointProvider } from './src/utils/responsive';
 
 export * from './src/Components/Button';
 export * from './src/Components/Box';

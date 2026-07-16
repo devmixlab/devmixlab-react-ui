@@ -34,54 +34,56 @@ const modalWidthPresetSet = new Set<ModalWidthPreset>(modalWidthPresets);
 const modalOverlayStyles = ['blur', 'dim', 'none'] as const;
 type ModalOverlayStyle = (typeof modalOverlayStyles)[number];
 
+type ModalPlacement = 'top' | 'center' | (string & {});
+
 type OwnModalProps = {
-    placement?: 'top' | 'center' | (string & {});
-    separated?: boolean;
-    opened?: boolean;
-    onClose?: () => void;
-    closeOnOverlayClick?: boolean;
-    zIndex?: number;
+  placement?: ModalPlacement;
+  separated?: boolean;
+  opened?: boolean;
+  onClose?: () => void;
+  closeOnOverlayClick?: boolean;
+  zIndex?: number;
 
-    closeOnEscape?: boolean;
-    initialFocus?: React.RefObject<HTMLElement>;
-    portalContainer?: HTMLElement;
-    overlayStyle?: ModalOverlayStyle;
+  closeOnEscape?: boolean;
+  initialFocus?: React.RefObject<HTMLElement>;
+  portalContainer?: HTMLElement;
+  overlayStyle?: ModalOverlayStyle;
 
-    width?: BoxProps['width'] | Responsive<ModalWidthPreset>;
-    w?: BoxProps['w'] | Responsive<ModalWidthPreset>;
-    maxW?: BoxProps['maxW'] | Responsive<ModalWidthPreset>;
-    maxWidth?: BoxProps['maxWidth'] | Responsive<ModalWidthPreset>;
+  width?: BoxProps['width'] | Responsive<ModalWidthPreset>;
+  w?: BoxProps['w'] | Responsive<ModalWidthPreset>;
+  maxW?: BoxProps['maxW'] | Responsive<ModalWidthPreset>;
+  maxWidth?: BoxProps['maxWidth'] | Responsive<ModalWidthPreset>;
 
-    sideSpace?: Responsive<ModalSideSpace>;
-    mode?: Responsive<ModalMode>;
-    density?: Responsive<ModalDensity>;
+  sideSpace?: Responsive<ModalSideSpace>;
+  mode?: Responsive<ModalMode>;
+  density?: Responsive<ModalDensity>;
 };
 
 type BoxModalProps = Pick<
-    BoxProps,
-    | 'height'
-    | 'h'
-    | 'maxHeight'
-    | 'maxH'
-    | 'shadow'
-    | 'marginTop'
-    | 'marginBottom'
-    | 'mt'
-    | 'mb'
-    | 'rounded'
+  BoxProps,
+  | 'height'
+  | 'h'
+  | 'maxHeight'
+  | 'maxH'
+  | 'shadow'
+  | 'marginTop'
+  | 'marginBottom'
+  | 'mt'
+  | 'mb'
+  | 'rounded'
 >;
 
 type ModalProps = OwnModalProps &
-    BoxModalProps &
-    SharedTransitionProps &
-    HTMLAttributes<HTMLDivElement>;
+  BoxModalProps &
+  SharedTransitionProps &
+  HTMLAttributes<HTMLDivElement>;
 
 type ModalComponent = React.ForwardRefExoticComponent<
-    ModalProps & React.RefAttributes<HTMLDivElement>
+  ModalProps & React.RefAttributes<HTMLDivElement>
 > & {
-    Header: typeof ModalHeader;
-    Body: typeof ModalBody;
-    Footer: typeof ModalFooter;
+  Header: typeof ModalHeader;
+  Body: typeof ModalBody;
+  Footer: typeof ModalFooter;
 };
 
 //----------------------------------------------------------------------
@@ -91,11 +93,11 @@ type ModalComponent = React.ForwardRefExoticComponent<
 const prefix = (name: string = '') => classPrefix(`--modal${name}`);
 
 const isModalWidthPreset = (value: unknown): value is ModalWidthPreset => {
-    return typeof value === 'string' && modalWidthPresetSet.has(value as ModalWidthPreset);
+  return typeof value === 'string' && modalWidthPresetSet.has(value as ModalWidthPreset);
 };
 
 const resolveModalWidthPreset = (value: string | number | undefined) => {
-    return isModalWidthPreset(value) ? modalWidthPresetMap[value] : value;
+  return isModalWidthPreset(value) ? modalWidthPresetMap[value] : value;
 };
 
 //----------------------------------------------------------------------
@@ -103,233 +105,230 @@ const resolveModalWidthPreset = (value: string | number | undefined) => {
 //----------------------------------------------------------------------
 
 const modalWidthPresetMap: Record<ModalWidthPreset, string> = {
-    '2xs': '22.5rem', // 360px
-    xs: '30rem', // 480px
-    sm: '40rem', // 640px
-    md: '48rem', // 768px
-    lg: '64rem', // 1024px
-    xl: '80rem', // 1280px
-    '2xl': '96rem', // 1536px
+  '2xs': '22.5rem', // 360px
+  xs: '30rem', // 480px
+  sm: '40rem', // 640px
+  md: '48rem', // 768px
+  lg: '64rem', // 1024px
+  xl: '80rem', // 1280px
+  '2xl': '96rem', // 1536px
 
-    full: '100%',
+  full: '100%',
 } as const;
 
 const fullModeProps = {
-    height: '100%',
-    h: '100%',
-    width: '100%',
-    w: '100%',
-    maxHeight: '100%',
-    maxH: '100%',
-    maxWidth: '100%',
-    maxW: '100%',
-    marginTop: 0,
-    marginBottom: 0,
-    mt: 0,
-    mb: 0,
+  height: '100%',
+  h: '100%',
+  width: '100%',
+  w: '100%',
+  maxHeight: '100%',
+  maxH: '100%',
+  maxWidth: '100%',
+  maxW: '100%',
+  marginTop: 0,
+  marginBottom: 0,
+  mt: 0,
+  mb: 0,
 } as const;
 
 //----------------------------------------------------------------------
 // Modal component
 //----------------------------------------------------------------------
 const Modal = forwardRef<HTMLDivElement, ModalProps>(
-    (
-        {
-            // Element props
-            className,
-            children,
-            id,
+  (
+    {
+      // Element props
+      className,
+      children,
+      id,
 
-            // Own props
-            placement = 'center',
-            opened = false,
-            separated = true,
-            onClose,
-            closeOnOverlayClick = true,
-            zIndex,
-            closeOnEscape = true,
-            initialFocus,
-            portalContainer,
-            overlayStyle = 'dim',
+      // Own props
+      placement = 'center',
+      opened = false,
+      separated = true,
+      onClose,
+      closeOnOverlayClick = true,
+      zIndex,
+      closeOnEscape = true,
+      initialFocus,
+      portalContainer,
+      overlayStyle = 'dim',
 
-            // Animation props
-            animation = 'scale-fade',
-            respectAttentionDuration = true,
-            enterDuration: animationEnterDuration = 200,
-            exitDuration: animationExitDuration = 150,
-            enterEasing: enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
-            exitEasing: exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
-            onEntered: onAnimationEntered,
+      // Animation props
+      animation = 'scale-fade',
+      respectAttentionDuration = true,
+      enterDuration: animationEnterDuration = 200,
+      exitDuration: animationExitDuration = 150,
+      enterEasing: enterAnimationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)',
+      exitEasing: exitAnimationEasing = 'cubic-bezier(0.4, 0, 1, 1)',
+      onEntered: onAnimationEntered,
 
-            // Box props
-            width,
-            w,
-            maxWidth,
-            maxW,
-            shadow = 'xl',
-            rounded = 'xl',
+      // Box props
+      width,
+      w,
+      maxWidth,
+      maxW,
+      shadow = 'xl',
+      rounded = 'xl',
 
-            sideSpace = { base: 'xs', md: 'sm', xl: 'md' },
-            mode = 'normal',
-            density = 'md',
+      sideSpace = { base: 'xs', md: 'sm', xl: 'md' },
+      mode = 'normal',
+      density = 'md',
 
-            ...rest
-        },
-        forwardedRef,
-    ) => {
-        const { breakpoint } = useBreakpoint();
-
-        const [fullyVisible, setFullyVisible] = useState(false);
-        const [hasHeader, setHasHeader] = useState(false);
-        const [hasBody, setHasBody] = useState(false);
-
-        const [transitionProps, restWithoutTransitionProps] = splitProps(
-            rest,
-            sharedTransitionProps,
-        );
-
-        const resolvedWidth = resolveResponsive(width || w, breakpoint);
-        const resolvedMaxWidth = resolveResponsive(maxWidth || maxW, breakpoint);
-        const resolvedSideSpace = resolveResponsive(sideSpace, breakpoint);
-        const resolvedMode = resolveResponsive(mode, breakpoint);
-        const resolvedDensity = resolveResponsive(density, breakpoint);
-
-        const isFullMode = resolvedMode === 'full';
-        const isFullscreenMode = resolvedMode === 'fullscreen';
-
-        const finalWidth = resolveModalWidthPreset(resolvedWidth || '100%');
-        const finalMaxWidth = resolveModalWidthPreset(resolvedMaxWidth || 'md');
-        const finalSideSpace = isFullscreenMode ? 'none' : resolvedSideSpace;
-
-        const contentRef = useRef<HTMLDivElement | null>(null);
-        const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
-        const modalIdRef = useRef(Math.random());
-
-        // ── Modal stack ──────────────────────────────────────────────────────
-        useEffect(() => {
-            if (!opened) return;
-            const id = modalIdRef.current;
-            modalManager.push(id);
-            return () => modalManager.remove(id);
-        }, [opened]);
-
-        // ── Scroll lock ──────────────────────────────────────────────────────
-        useEffect(() => {
-            if (!opened) return;
-            modalManager.acquire();
-            return () => modalManager.release();
-        }, [opened]);
-
-        // ── Focus: snapshot & restore ────────────────────────────────────────
-        useEffect(() => {
-            const id = modalIdRef.current;
-            if (opened) {
-                modalManager.captureFocus(id);
-            } else {
-                modalManager.restoreFocus(id);
-            }
-        }, [opened]);
-
-        // ── Focus trap ───────────────────────────────────────────────────────
-        useFocusTrap({
-            active: fullyVisible,
-            containerRef: contentRef,
-            onEscape: onClose,
-            isActive: () => modalManager.isTop(modalIdRef.current),
-            closeOnEscape,
-            initialFocus,
-        });
-
-        // ── Refs ─────────────────────────────────────────────────────────────
-        const mergedContentRef = mergeRefs(contentRef, forwardedRef);
-
-        // ── Stable IDs ───────────────────────────────────────────────────────
-        const modalId = id ?? useStableId('modal');
-        const headerId = `${modalId}-header`;
-        const bodyId = `${modalId}-body`;
-
-        const sizingProps =
-            isFullMode || isFullscreenMode
-                ? fullModeProps
-                : {
-                      w: finalWidth,
-                      maxW: finalMaxWidth,
-                  };
-
-        return createPortal(
-            <ModalContext.Provider
-                value={{ onClose, headerId, bodyId, hasHeader, setHasHeader, hasBody, setHasBody }}
-            >
-                <Transition
-                    as={Box}
-                    visible={opened}
-                    animation="none"
-                    enterDuration={animationEnterDuration}
-                    exitDuration={animationExitDuration}
-                    onExited={() => {
-                        setFullyVisible(false);
-                    }}
-                    className={clsx(prefix(), className)}
-                    position="fixed"
-                    inset={0}
-                    zIndex={zIndexRef.current}
-                    data-placement={placement}
-                    data-separated={separated || undefined}
-                    data-side-space={finalSideSpace}
-                    data-density={resolvedDensity}
-                >
-                    <Transition
-                        visible={opened}
-                        animation="fade"
-                        enterDuration={animationEnterDuration}
-                        exitDuration={animationExitDuration}
-                        enterEasing={enterAnimationEasing}
-                        exitEasing={exitAnimationEasing}
-                        className={prefix('__overlay')}
-                        data-style={overlayStyle}
-                    />
-
-                    <div
-                        className={prefix('__content-wrapper')}
-                        onClick={(e) => {
-                            if (!closeOnOverlayClick) return;
-                            if (e.target === e.currentTarget) onClose?.();
-                        }}
-                    >
-                        <Transition
-                            {...transitionProps}
-                            {...restWithoutTransitionProps}
-                            as={Box}
-                            visible={opened}
-                            animation={animation}
-                            respectAttentionDuration={respectAttentionDuration}
-                            enterDuration={animationEnterDuration}
-                            exitDuration={animationExitDuration}
-                            enterEasing={enterAnimationEasing}
-                            exitEasing={exitAnimationEasing}
-                            onEntered={() => {
-                                onAnimationEntered?.();
-                                setFullyVisible(true);
-                            }}
-                            ref={mergedContentRef}
-                            shadow={shadow}
-                            rounded={isFullscreenMode ? undefined : rounded}
-                            tabIndex={-1}
-                            className={clsx(prefix('__content'))}
-                            role="dialog"
-                            aria-modal="true"
-                            aria-labelledby={hasHeader ? headerId : undefined}
-                            aria-describedby={hasBody ? bodyId : undefined}
-                            {...sizingProps}
-                        >
-                            {children}
-                        </Transition>
-                    </div>
-                </Transition>
-            </ModalContext.Provider>,
-            portalContainer != null ? portalContainer : document.body,
-        );
+      ...rest
     },
+    forwardedRef,
+  ) => {
+    const { breakpoint } = useBreakpoint();
+
+    const [fullyVisible, setFullyVisible] = useState(false);
+    const [hasHeader, setHasHeader] = useState(false);
+    const [hasBody, setHasBody] = useState(false);
+
+    const [transitionProps, restWithoutTransitionProps] = splitProps(rest, sharedTransitionProps);
+
+    const resolvedWidth = resolveResponsive(width || w, breakpoint);
+    const resolvedMaxWidth = resolveResponsive(maxWidth || maxW, breakpoint);
+    const resolvedSideSpace = resolveResponsive(sideSpace, breakpoint);
+    const resolvedMode = resolveResponsive(mode, breakpoint);
+    const resolvedDensity = resolveResponsive(density, breakpoint);
+
+    const isFullMode = resolvedMode === 'full';
+    const isFullscreenMode = resolvedMode === 'fullscreen';
+
+    const finalWidth = resolveModalWidthPreset(resolvedWidth || '100%');
+    const finalMaxWidth = resolveModalWidthPreset(resolvedMaxWidth || 'md');
+    const finalSideSpace = isFullscreenMode ? 'none' : resolvedSideSpace;
+
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
+    const modalIdRef = useRef(Math.random());
+
+    // ── Modal stack ──────────────────────────────────────────────────────
+    useEffect(() => {
+      if (!opened) return;
+      const id = modalIdRef.current;
+      modalManager.push(id);
+      return () => modalManager.remove(id);
+    }, [opened]);
+
+    // ── Scroll lock ──────────────────────────────────────────────────────
+    useEffect(() => {
+      if (!opened) return;
+      modalManager.acquire();
+      return () => modalManager.release();
+    }, [opened]);
+
+    // ── Focus: snapshot & restore ────────────────────────────────────────
+    useEffect(() => {
+      const id = modalIdRef.current;
+      if (opened) {
+        modalManager.captureFocus(id);
+      } else {
+        modalManager.restoreFocus(id);
+      }
+    }, [opened]);
+
+    // ── Focus trap ───────────────────────────────────────────────────────
+    useFocusTrap({
+      active: fullyVisible,
+      containerRef: contentRef,
+      onEscape: onClose,
+      isActive: () => modalManager.isTop(modalIdRef.current),
+      closeOnEscape,
+      initialFocus,
+    });
+
+    // ── Refs ─────────────────────────────────────────────────────────────
+    const mergedContentRef = mergeRefs(contentRef, forwardedRef);
+
+    // ── Stable IDs ───────────────────────────────────────────────────────
+    const modalId = id ?? useStableId('modal');
+    const headerId = `${modalId}-header`;
+    const bodyId = `${modalId}-body`;
+
+    const sizingProps =
+      isFullMode || isFullscreenMode
+        ? fullModeProps
+        : {
+            w: finalWidth,
+            maxW: finalMaxWidth,
+          };
+
+    return createPortal(
+      <ModalContext.Provider
+        value={{ onClose, headerId, bodyId, hasHeader, setHasHeader, hasBody, setHasBody }}
+      >
+        <Transition
+          as={Box}
+          visible={opened}
+          animation="none"
+          enterDuration={animationEnterDuration}
+          exitDuration={animationExitDuration}
+          onExited={() => {
+            setFullyVisible(false);
+          }}
+          className={clsx(prefix(), className)}
+          position="fixed"
+          inset={0}
+          zIndex={zIndexRef.current}
+          data-placement={placement}
+          data-separated={separated || undefined}
+          data-side-space={finalSideSpace}
+          data-density={resolvedDensity}
+        >
+          <Transition
+            visible={opened}
+            animation="fade"
+            enterDuration={animationEnterDuration}
+            exitDuration={animationExitDuration}
+            enterEasing={enterAnimationEasing}
+            exitEasing={exitAnimationEasing}
+            className={prefix('__overlay')}
+            data-style={overlayStyle}
+          />
+
+          <div
+            className={prefix('__content-wrapper')}
+            onClick={(e) => {
+              if (!closeOnOverlayClick) return;
+              if (e.target === e.currentTarget) onClose?.();
+            }}
+          >
+            <Transition
+              {...transitionProps}
+              {...restWithoutTransitionProps}
+              as={Box}
+              visible={opened}
+              animation={animation}
+              respectAttentionDuration={respectAttentionDuration}
+              enterDuration={animationEnterDuration}
+              exitDuration={animationExitDuration}
+              enterEasing={enterAnimationEasing}
+              exitEasing={exitAnimationEasing}
+              onEntered={() => {
+                onAnimationEntered?.();
+                setFullyVisible(true);
+              }}
+              ref={mergedContentRef}
+              shadow={shadow}
+              rounded={isFullscreenMode ? undefined : rounded}
+              tabIndex={-1}
+              className={clsx(prefix('__content'))}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={hasHeader ? headerId : undefined}
+              aria-describedby={hasBody ? bodyId : undefined}
+              {...sizingProps}
+            >
+              {children}
+            </Transition>
+          </div>
+        </Transition>
+      </ModalContext.Provider>,
+      portalContainer != null ? portalContainer : document.body,
+    );
+  },
 ) as ModalComponent;
 
 Modal.displayName = 'Modal';
@@ -339,42 +338,42 @@ Modal.displayName = 'Modal';
 //----------------------------------------------------------------------
 
 type ModalHeaderProps = {
-    closeButton?: boolean;
+  closeButton?: boolean;
 } & BoxDerivedProps &
-    HTMLAttributes<HTMLDivElement>;
+  HTMLAttributes<HTMLDivElement>;
 
 const ModalHeader = ({ children, className, closeButton = false, ...rest }: ModalHeaderProps) => {
-    const ctx = useModalContext();
+  const ctx = useModalContext();
 
-    useEffect(() => {
-        ctx?.setHasHeader(true);
+  useEffect(() => {
+    ctx?.setHasHeader(true);
 
-        return () => {
-            ctx?.setHasHeader(false);
-        };
-    }, [ctx]);
+    return () => {
+      ctx?.setHasHeader(false);
+    };
+  }, [ctx]);
 
-    return (
-        <BoxDerived {...rest} id={ctx?.headerId} className={clsx(prefix('__header'), className)}>
-            <div className={prefix('__header-content')}>{children}</div>
-            {closeButton && ctx?.onClose && (
-                <div className={prefix('__close')}>
-                    <Box
-                        as="button"
-                        rounded="sm"
-                        type="button"
-                        className={prefix('__close-button')}
-                        onClick={ctx.onClose}
-                        aria-label="Close modal"
-                    >
-                        <div className={prefix('__close-button-icon')}>
-                            <CloseIcon />
-                        </div>
-                    </Box>
-                </div>
-            )}
-        </BoxDerived>
-    );
+  return (
+    <BoxDerived {...rest} id={ctx?.headerId} className={clsx(prefix('__header'), className)}>
+      <div className={prefix('__header-content')}>{children}</div>
+      {closeButton && ctx?.onClose && (
+        <div className={prefix('__close')}>
+          <Box
+            as="button"
+            rounded="sm"
+            type="button"
+            className={prefix('__close-button')}
+            onClick={ctx.onClose}
+            aria-label="Close modal"
+          >
+            <div className={prefix('__close-button-icon')}>
+              <CloseIcon />
+            </div>
+          </Box>
+        </div>
+      )}
+    </BoxDerived>
+  );
 };
 
 ModalHeader.displayName = 'ModalHeader';
@@ -384,45 +383,45 @@ ModalHeader.displayName = 'ModalHeader';
 //----------------------------------------------------------------------
 
 type ModalBodyProps = {
-    fadeEdges?: boolean;
+  fadeEdges?: boolean;
 } & BoxDerivedProps &
-    HTMLAttributes<HTMLDivElement>;
+  HTMLAttributes<HTMLDivElement>;
 
 const ModalBody = ({ children, className, fadeEdges = true, ...rest }: ModalBodyProps) => {
-    const ctx = useModalContext();
+  const ctx = useModalContext();
 
-    const [showTop, setShowTop] = useState(false);
-    const [showBottom, setShowBottom] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+  const [showBottom, setShowBottom] = useState(false);
 
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        const el = e.currentTarget;
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
 
-        setShowTop(el.scrollTop > 0);
+    setShowTop(el.scrollTop > 0);
 
-        setShowBottom(el.scrollTop < el.scrollHeight - el.clientHeight - 1);
+    setShowBottom(el.scrollTop < el.scrollHeight - el.clientHeight - 1);
+  };
+
+  useEffect(() => {
+    ctx?.setHasBody(true);
+
+    return () => {
+      ctx?.setHasBody(false);
     };
+  }, [ctx]);
 
-    useEffect(() => {
-        ctx?.setHasBody(true);
-
-        return () => {
-            ctx?.setHasBody(false);
-        };
-    }, [ctx]);
-
-    return (
-        <BoxDerived
-            {...rest}
-            id={ctx?.bodyId}
-            className={clsx(prefix('__body'), className)}
-            data-show-top={fadeEdges && showTop ? true : undefined}
-            data-show-bottom={fadeEdges && showBottom ? true : undefined}
-        >
-            <div onScroll={handleScroll} className={prefix('__body-content')}>
-                {children}
-            </div>
-        </BoxDerived>
-    );
+  return (
+    <BoxDerived
+      {...rest}
+      id={ctx?.bodyId}
+      className={clsx(prefix('__body'), className)}
+      data-show-top={fadeEdges && showTop ? true : undefined}
+      data-show-bottom={fadeEdges && showBottom ? true : undefined}
+    >
+      <div onScroll={handleScroll} className={prefix('__body-content')}>
+        {children}
+      </div>
+    </BoxDerived>
+  );
 };
 
 ModalBody.displayName = 'ModalBody';
@@ -434,11 +433,11 @@ ModalBody.displayName = 'ModalBody';
 type ModalFooterProps = BoxDerivedProps & HTMLAttributes<HTMLDivElement>;
 
 const ModalFooter = ({ children, className, ...rest }: ModalFooterProps) => {
-    return (
-        <BoxDerived {...rest} className={clsx(prefix('__footer'), className)}>
-            {children}
-        </BoxDerived>
-    );
+  return (
+    <BoxDerived {...rest} className={clsx(prefix('__footer'), className)}>
+      {children}
+    </BoxDerived>
+  );
 };
 
 ModalFooter.displayName = 'ModalFooter';
@@ -454,13 +453,17 @@ Modal.Footer = ModalFooter;
 export { Modal, ModalHeader, ModalBody, ModalFooter };
 
 export type {
-    OwnModalProps,
-    ModalProps,
-    ModalComponent,
-    ModalDensity,
-    ModalMode,
-    ModalSideSpace,
-    ModalWidthPreset,
+  OwnModalProps,
+  ModalProps,
+  ModalComponent,
+  ModalDensity,
+  ModalMode,
+  ModalSideSpace,
+  ModalWidthPreset,
+  ModalPlacement,
+  ModalHeaderProps,
+  ModalBodyProps,
+  ModalFooterProps,
 };
 
 export { modalDensities, modalSideSpaces, modalWidthPresets, modalOverlayStyles };
