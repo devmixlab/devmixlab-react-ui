@@ -8,222 +8,237 @@ import { ToastOptions } from './ToastProvider';
 const prefix = (name = '') => classPrefix(`--toast${name}`);
 
 type ToastItemProps = {
-    toast: ToastRecord;
+  toast: ToastRecord;
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-    const {
-        remove,
-        position,
-        update,
-        close,
-        requestClose,
-        isPaused,
-        toastControlRefs,
-        closeQueueRef,
-    } = useToastContext();
+  const {
+    remove,
+    position,
+    update,
+    close,
+    requestClose,
+    isPaused,
+    toastControlRefs,
+    closeQueueRef,
+  } = useToastContext();
 
-    const [wrapperIn, setWrapperIn] = React.useState(false);
-    const [visible, setVisible] = React.useState(true);
-    const [height, setHeight] = React.useState(0);
+  const [wrapperIn, setWrapperIn] = React.useState(false);
+  const [visible, setVisible] = React.useState(true);
+  const [height, setHeight] = React.useState(0);
 
-    const controlRef = React.useRef<TransitionControlRef>(null);
+  const controlRef = React.useRef<TransitionControlRef>(null);
 
-    const alertRef = React.useRef<HTMLDivElement>(null);
-    const timeoutRef = React.useRef<number | null>(null);
-    const remainingRef = React.useRef(toast.duration ?? 0);
-    const startedAtRef = React.useRef<number | null>(null);
+  const alertRef = React.useRef<HTMLDivElement>(null);
+  const timeoutRef = React.useRef<number | null>(null);
+  const remainingRef = React.useRef(toast.duration ?? 0);
+  const startedAtRef = React.useRef<number | null>(null);
 
-    const handleClose = () => {
-        close(toast.id);
+  const handleClose = () => {
+    close(toast.id);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (wrapperIn) {
+      toast.onOpening?.(renderContent);
+    }
+  }, [wrapperIn]);
+
+  useEffect(() => {
+    if (!visible) {
+      toast.onClosing?.(renderContent);
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setWrapperIn(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (toast.closing) {
+      setVisible(false);
+    }
+  }, [toast.closing]);
+
+  useEffect(() => {
+    remainingRef.current = toast.duration ?? 0;
+    startedAtRef.current = null;
+  }, [toast.id, toast.duration]);
+
+  useEffect(() => {
+    if (!toast.duration) {
+      return;
+    }
+
+    const clearTimer = () => {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     };
 
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current !== null) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []);
+    if (isPaused) {
+      clearTimer();
 
-    useEffect(() => {
-        const frame = requestAnimationFrame(() => {
-            setWrapperIn(true);
-        });
+      if (startedAtRef.current !== null) {
+        const elapsed = Date.now() - startedAtRef.current;
 
-        return () => cancelAnimationFrame(frame);
-    }, []);
+        remainingRef.current = Math.max(0, remainingRef.current - elapsed);
 
-    useEffect(() => {
-        if (toast.closing) {
-            setVisible(false);
-        }
-    }, [toast.closing]);
-
-    useEffect(() => {
-        remainingRef.current = toast.duration ?? 0;
         startedAtRef.current = null;
-    }, [toast.id, toast.duration]);
+      }
 
-    useEffect(() => {
-        if (!toast.duration) {
-            return;
-        }
+      return;
+    }
 
-        const clearTimer = () => {
-            if (timeoutRef.current !== null) {
-                window.clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-        };
+    if (remainingRef.current <= 0) {
+      requestClose(toast.id);
 
-        if (isPaused) {
-            clearTimer();
+      return;
+    }
 
-            if (startedAtRef.current !== null) {
-                const elapsed = Date.now() - startedAtRef.current;
+    startedAtRef.current = Date.now();
 
-                remainingRef.current = Math.max(0, remainingRef.current - elapsed);
+    timeoutRef.current = window.setTimeout(() => {
+      requestClose(toast.id);
+    }, remainingRef.current);
 
-                startedAtRef.current = null;
-            }
+    return clearTimer;
+  }, [toast.id, toast.duration, isPaused, requestClose]);
 
-            return;
-        }
+  const restart = useCallback(() => {
+    if (!toast.duration) {
+      return;
+    }
 
-        if (remainingRef.current <= 0) {
-            requestClose(toast.id);
+    closeQueueRef.current = closeQueueRef.current.filter((item) => item.id !== toast.id);
 
-            return;
-        }
+    remainingRef.current = toast.duration ?? 0;
 
-        startedAtRef.current = Date.now();
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+    }
 
-        timeoutRef.current = window.setTimeout(() => {
-            requestClose(toast.id);
-        }, remainingRef.current);
+    startedAtRef.current = Date.now();
 
-        return clearTimer;
-    }, [toast.id, toast.duration, isPaused, requestClose]);
+    timeoutRef.current = window.setTimeout(() => {
+      requestClose(toast.id);
+    }, remainingRef.current);
+  }, [toast.duration, toast.id, requestClose]);
 
-    const restart = useCallback(() => {
-        if (!toast.duration) {
-            return;
-        }
+  const runAttention = (attention?: TransitionAttention) => {
+    controlRef.current?.runAttention(attention);
+  };
 
-        closeQueueRef.current = closeQueueRef.current.filter((item) => item.id !== toast.id);
+  useEffect(() => {
+    toastControlRefs.current.set(toast.id, {
+      restart,
+      runAttention,
+    });
 
-        remainingRef.current = toast.duration ?? 0;
-
-        if (timeoutRef.current !== null) {
-            clearTimeout(timeoutRef.current);
-        }
-
-        startedAtRef.current = Date.now();
-
-        timeoutRef.current = window.setTimeout(() => {
-            requestClose(toast.id);
-        }, remainingRef.current);
-    }, [toast.duration, toast.id, requestClose]);
-
-    const runAttention = (attention?: TransitionAttention) => {
-        controlRef.current?.runAttention(attention);
+    return () => {
+      toastControlRefs.current.delete(toast.id);
     };
+  }, [toast.id, restart]);
 
-    useEffect(() => {
-        toastControlRefs.current.set(toast.id, {
-            restart,
-            runAttention,
-        });
+  useLayoutEffect(() => {
+    if (!alertRef.current) {
+      return;
+    }
 
-        return () => {
-            toastControlRefs.current.delete(toast.id);
-        };
-    }, [toast.id, restart]);
+    const element = alertRef.current;
 
-    useLayoutEffect(() => {
-        if (!alertRef.current) {
-            return;
-        }
+    const observer = new ResizeObserver(() => {
+      setHeight(element.offsetHeight);
+    });
 
-        const element = alertRef.current;
+    observer.observe(element);
 
-        const observer = new ResizeObserver(() => {
-            setHeight(element.offsetHeight);
-        });
+    setHeight(element.offsetHeight);
 
-        observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
-        setHeight(element.offsetHeight);
+  const renderContent = {
+    id: toast.id,
+    close: () => close(toast.id),
+    runAttention,
+    restart,
+    update: (options: ToastOptions) => {
+      update(toast.id, options);
+    },
+  };
 
-        return () => observer.disconnect();
-    }, []);
+  return (
+    <Transition
+      visible={wrapperIn}
+      animation="toast-wrapper"
+      enterDuration={250}
+      exitDuration={200}
+      onExited={() => {
+        remove(toast.id);
+        toast.onClose?.(renderContent);
+      }}
+      className={prefix('__item-wrapper')}
+      data-position={position}
+      data-wrapper-in={wrapperIn || undefined}
+      keepMounted
+      style={
+        {
+          '--toast-height': `${height}px`,
+        } as React.CSSProperties
+      }
+    >
+      <Alert
+        ref={alertRef}
+        controlRef={controlRef}
+        animation="toast-bottom"
+        enterDuration={350}
+        exitDuration={250}
+        visible={visible}
+        shadow={toast.shadow ?? 'md'}
+        onDismiss={toast.closable ? handleClose : undefined}
+        onEntered={() => {
+          toast.onOpen?.(renderContent);
+        }}
+        onExited={() => {
+          // close(toast.id);
+          // toast.onClose?.(renderContent);
+          setWrapperIn(false);
+        }}
+        className={prefix('__item')}
+        intent={toast.intent ?? 'secondary'}
+        variant={toast.variant ?? 'subtle'}
+        accent={toast.accent ?? 'left'}
+        size={toast.size ?? 'md'}
+        icon={toast.icon}
+        role={toast.intent === 'danger' ? 'alert' : 'status'}
+        data-position={position}
+      >
+        {toast.title && <Alert.Title>{toast.title}</Alert.Title>}
 
-    const renderContent = {
-        id: toast.id,
-        close: () => close(toast.id),
-        runAttention,
-        restart,
-        update: (options: ToastOptions) => {
-            update(toast.id, options);
-        },
-    };
+        {toast.description && (
+          <Alert.Description className={prefix('__description')}>
+            {toast.description}
+          </Alert.Description>
+        )}
 
-    return (
-        <Transition
-            visible={wrapperIn}
-            animation="toast-wrapper"
-            enterDuration={250}
-            exitDuration={200}
-            onExited={() => {
-                remove(toast.id);
-            }}
-            className={prefix('__item-wrapper')}
-            data-position={position}
-            data-wrapper-in={wrapperIn || undefined}
-            keepMounted
-            style={
-                {
-                    '--toast-height': `${height}px`,
-                } as React.CSSProperties
-            }
-        >
-            <Alert
-                ref={alertRef}
-                controlRef={controlRef}
-                animation="toast-bottom"
-                enterDuration={350}
-                exitDuration={250}
-                visible={visible}
-                shadow={toast.shadow ?? 'md'}
-                onDismiss={toast.closable ? handleClose : undefined}
-                onExited={() => {
-                    // close(toast.id);
-                    setWrapperIn(false);
-                }}
-                className={prefix('__item')}
-                intent={toast.intent ?? 'secondary'}
-                variant={toast.variant ?? 'subtle'}
-                accent={toast.accent ?? 'left'}
-                size={toast.size ?? 'md'}
-                icon={toast.icon}
-                role={toast.intent === 'danger' ? 'alert' : 'status'}
-                data-position={position}
-            >
-                {toast.title && <Alert.Title>{toast.title}</Alert.Title>}
+        {toast.renderContent?.(renderContent)}
 
-                {toast.description && (
-                    <Alert.Description className={prefix('__description')}>
-                        {toast.description}
-                    </Alert.Description>
-                )}
-
-                {toast.renderContent?.(renderContent)}
-
-                {toast.renderActions && (
-                    <Alert.Actions>{toast.renderActions(renderContent)}</Alert.Actions>
-                )}
-            </Alert>
-        </Transition>
-    );
+        {toast.renderActions && <Alert.Actions>{toast.renderActions(renderContent)}</Alert.Actions>}
+      </Alert>
+    </Transition>
+  );
 };

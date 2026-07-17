@@ -6,314 +6,323 @@ import { AlertAccent, AlertIntent, AlertSize, AlertVariant } from '../Alert';
 import { BoxProps } from '../Box';
 
 export const toastPositions = [
-    'top-left',
-    'top-center',
-    'top-right',
-    'bottom-left',
-    'bottom-center',
-    'bottom-right',
+  'top-left',
+  'top-center',
+  'top-right',
+  'bottom-left',
+  'bottom-center',
+  'bottom-right',
 ] as const;
 
 export type ToastPosition = (typeof toastPositions)[number];
 
+export type ToastCloseReason = 'timeout' | 'manual';
+
 export type ToastOptions = {
-    title?: React.ReactNode;
-    description?: React.ReactNode;
-    duration?: number | null;
-    closable?: boolean;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  duration?: number | null;
+  closable?: boolean;
 
-    size?: AlertSize;
-    variant?: AlertVariant;
-    intent?: AlertIntent;
-    icon?: boolean | React.ReactNode;
-    accent?: AlertAccent;
+  size?: AlertSize;
+  variant?: AlertVariant;
+  intent?: AlertIntent;
+  icon?: boolean | React.ReactNode;
+  accent?: AlertAccent;
 
-    shadow?: BoxProps['shadow'];
+  shadow?: BoxProps['shadow'];
 
-    renderContent?: (handle: ToastHandle) => React.ReactNode;
-    renderActions?: (handle: ToastHandle) => React.ReactNode;
+  renderContent?: (handle: ToastHandle) => React.ReactNode;
+  renderActions?: (handle: ToastHandle) => React.ReactNode;
+
+  onOpening?: (handle: ToastHandle) => void;
+  onOpen?: (handle: ToastHandle) => void;
+  onClosing?: (handle: ToastHandle) => void;
+  onClose?: (handle: ToastHandle) => void;
+  // onClosing?: (handle: ToastHandle, reason: ToastCloseReason) => void;
+  // onClose?: (handle: ToastHandle, reason: ToastCloseReason) => void;
 };
 
 export type ToastProviderProps = {
-    children?: React.ReactNode;
-    position?: ToastPosition;
-    offset?: number | string;
-    max?: number;
-    minCloseInterval?: number;
+  children?: React.ReactNode;
+  position?: ToastPosition;
+  offset?: number | string;
+  max?: number;
+  minCloseInterval?: number;
 };
 
 export type PendingClose = {
-    id: string;
-    leftTillClose: number;
+  id: string;
+  leftTillClose: number;
 };
 
 export type ToastHandle = {
-    id: string;
-    runAttention: (attention?: TransitionAttention) => void;
-    close: () => void;
-    restart: () => void;
-    update: (options: Partial<ToastOptions>) => void;
+  id: string;
+  runAttention: (attention?: TransitionAttention) => void;
+  close: () => void;
+  restart: () => void;
+  update: (options: Partial<ToastOptions>) => void;
 };
 
 export type ToastControlRef = {
-    restart: () => void;
-    runAttention: (attention?: TransitionAttention) => void;
+  restart: () => void;
+  runAttention: (attention?: TransitionAttention) => void;
 };
 
 const QUEUE_PROCESSOR_INTERVAL = 50;
 
 export const ToastProvider = ({
-    children,
-    position = 'top-right',
-    offset = '1rem',
-    max = 5,
-    minCloseInterval = 1000,
+  children,
+  position = 'top-right',
+  offset = '1rem',
+  max = 5,
+  minCloseInterval = 1000,
 }: ToastProviderProps) => {
-    const [toasts, setToasts] = useState<ToastRecord[]>([]);
-    const [isPaused, setIsPaused] = useState(false);
+  const [toasts, setToasts] = useState<ToastRecord[]>([]);
+  const [isPaused, setIsPaused] = useState(false);
 
-    const toastControlRefs = useRef(new Map<string, ToastControlRef>());
-    const isPausedRef = React.useRef(isPaused);
-    const intervalRef = React.useRef<number | null>(null);
-    const overflowTimeoutRef = useRef<number | null>(null);
+  const toastControlRefs = useRef(new Map<string, ToastControlRef>());
+  const isPausedRef = React.useRef(isPaused);
+  const intervalRef = React.useRef<number | null>(null);
+  const overflowTimeoutRef = useRef<number | null>(null);
 
-    useEffect(() => {
-        isPausedRef.current = isPaused;
-    }, [isPaused]);
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
-    const pauseAll = useCallback(() => {
-        setIsPaused(true);
-    }, []);
+  const pauseAll = useCallback(() => {
+    setIsPaused(true);
+  }, []);
 
-    const resumeAll = useCallback(() => {
-        setIsPaused(false);
-    }, []);
+  const resumeAll = useCallback(() => {
+    setIsPaused(false);
+  }, []);
 
-    const closeQueueRef = React.useRef<PendingClose[]>([]);
+  const closeQueueRef = React.useRef<PendingClose[]>([]);
 
-    const getTimeLeftTillClose = (delay = 0) => {
-        if (closeQueueRef.current.length <= 0) return delay;
+  const getTimeLeftTillClose = (delay = 0) => {
+    if (closeQueueRef.current.length <= 0) return delay;
 
-        const maxItem = closeQueueRef.current.reduce((max, item) =>
-            item.leftTillClose > max.leftTillClose ? item : max,
-        );
+    const maxItem = closeQueueRef.current.reduce((max, item) =>
+      item.leftTillClose > max.leftTillClose ? item : max,
+    );
 
-        return maxItem.leftTillClose + delay;
-    };
+    return maxItem.leftTillClose + delay;
+  };
 
-    const stopQueueProcessor = () => {
-        if (intervalRef.current !== null) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
+  const stopQueueProcessor = () => {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  const startQueueProcessor = () => {
+    if (intervalRef.current !== null) {
+      return;
+    }
+
+    intervalRef.current = window.setInterval(() => {
+      if (closeQueueRef.current.length === 0) {
+        stopQueueProcessor();
+        return;
+      }
+
+      if (isPausedRef.current) {
+        return;
+      }
+
+      const idsToClose: string[] = [];
+
+      closeQueueRef.current = closeQueueRef.current.map((item) => {
+        const updatedLeftTillClose = item.leftTillClose - QUEUE_PROCESSOR_INTERVAL;
+
+        if (updatedLeftTillClose <= 0) {
+          idsToClose.push(item.id);
         }
-    };
 
-    const startQueueProcessor = () => {
-        if (intervalRef.current !== null) {
-            return;
-        }
-
-        intervalRef.current = window.setInterval(() => {
-            if (closeQueueRef.current.length === 0) {
-                stopQueueProcessor();
-                return;
-            }
-
-            if (isPausedRef.current) {
-                return;
-            }
-
-            const idsToClose: string[] = [];
-
-            closeQueueRef.current = closeQueueRef.current.map((item) => {
-                const updatedLeftTillClose = item.leftTillClose - QUEUE_PROCESSOR_INTERVAL;
-
-                if (updatedLeftTillClose <= 0) {
-                    idsToClose.push(item.id);
-                }
-
-                return {
-                    ...item,
-                    leftTillClose: item.leftTillClose - QUEUE_PROCESSOR_INTERVAL,
-                };
-            });
-
-            if (idsToClose.length <= 0) {
-                return;
-            }
-
-            idsToClose.forEach((id) => {
-                close(id);
-                closeQueueRef.current = closeQueueRef.current.filter((item) => item.id != id);
-            });
-
-            // process queue
-        }, QUEUE_PROCESSOR_INTERVAL);
-    };
-
-    useEffect(() => {
-        return () => {
-            stopQueueProcessor();
+        return {
+          ...item,
+          leftTillClose: item.leftTillClose - QUEUE_PROCESSOR_INTERVAL,
         };
-    }, []);
+      });
 
-    const close = useCallback((id: string) => {
-        setToasts((prev) =>
-            prev.map((toast) =>
-                toast.id === id && !toast.closing ? { ...toast, closing: true } : toast,
-            ),
-        );
-    }, []);
+      if (idsToClose.length <= 0) {
+        return;
+      }
 
-    const remove = useCallback((id: string) => {
-        setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, []);
+      idsToClose.forEach((id) => {
+        close(id);
+        closeQueueRef.current = closeQueueRef.current.filter((item) => item.id != id);
+      });
 
-    const requestClose = useCallback(
-        (id: string) => {
-            startQueueProcessor();
+      // process queue
+    }, QUEUE_PROCESSOR_INTERVAL);
+  };
 
-            if (closeQueueRef.current.some((item) => item.id === id)) {
-                return;
+  useEffect(() => {
+    return () => {
+      stopQueueProcessor();
+    };
+  }, []);
+
+  const close = useCallback((id: string) => {
+    setToasts((prev) =>
+      prev.map((toast) =>
+        toast.id === id && !toast.closing ? { ...toast, closing: true } : toast,
+      ),
+    );
+  }, []);
+
+  const remove = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  const requestClose = useCallback(
+    (id: string) => {
+      startQueueProcessor();
+
+      if (closeQueueRef.current.some((item) => item.id === id)) {
+        return;
+      }
+
+      closeQueueRef.current.push({
+        id,
+        leftTillClose: getTimeLeftTillClose(minCloseInterval),
+      });
+    },
+    [minCloseInterval],
+  );
+
+  const clear = useCallback(() => {
+    setToasts([]);
+  }, []);
+
+  const update = useCallback((id: string, options: Partial<ToastOptions>) => {
+    setToasts((prev) =>
+      prev.map((toast) =>
+        toast.id === id
+          ? {
+              ...toast,
+              ...options,
             }
+          : toast,
+      ),
+    );
+  }, []);
 
-            closeQueueRef.current.push({
-                id,
-                leftTillClose: getTimeLeftTillClose(minCloseInterval),
-            });
+  useEffect(() => {
+    return () => {
+      if (overflowTimeoutRef.current) {
+        clearTimeout(overflowTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const activeToasts = toasts.filter((toast) => !toast.closing);
+
+    if (activeToasts.length <= max) {
+      return;
+    }
+
+    const oldest = activeToasts[0];
+
+    if (oldest) {
+      if (overflowTimeoutRef.current) {
+        clearTimeout(overflowTimeoutRef.current);
+      }
+
+      overflowTimeoutRef.current = window.setTimeout(() => {
+        close(oldest.id);
+      }, 200);
+    }
+
+    return () => {
+      if (overflowTimeoutRef.current) {
+        clearTimeout(overflowTimeoutRef.current);
+      }
+    };
+  }, [toasts, max, close]);
+
+  const show = useCallback(
+    (options: ToastOptions): ToastHandle => {
+      const id = crypto.randomUUID();
+
+      setToasts((prev) => {
+        return [
+          ...prev,
+          {
+            id,
+            duration: 5000,
+            closable: true,
+            intent: 'info',
+            ...options,
+          },
+        ];
+      });
+
+      return {
+        id,
+        close: () => close(id),
+        runAttention: (attention) => {
+          const ref = toastControlRefs.current.get(id);
+          ref?.runAttention(attention);
         },
-        [minCloseInterval],
-    );
-
-    const clear = useCallback(() => {
-        setToasts([]);
-    }, []);
-
-    const update = useCallback((id: string, options: Partial<ToastOptions>) => {
-        setToasts((prev) =>
-            prev.map((toast) =>
-                toast.id === id
-                    ? {
-                          ...toast,
-                          ...options,
-                      }
-                    : toast,
-            ),
-        );
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            if (overflowTimeoutRef.current) {
-                clearTimeout(overflowTimeoutRef.current);
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        const activeToasts = toasts.filter((toast) => !toast.closing);
-
-        if (activeToasts.length <= max) {
-            return;
-        }
-
-        const oldest = activeToasts[0];
-
-        if (oldest) {
-            if (overflowTimeoutRef.current) {
-                clearTimeout(overflowTimeoutRef.current);
-            }
-
-            overflowTimeoutRef.current = window.setTimeout(() => {
-                close(oldest.id);
-            }, 200);
-        }
-
-        return () => {
-            if (overflowTimeoutRef.current) {
-                clearTimeout(overflowTimeoutRef.current);
-            }
-        };
-    }, [toasts, max, close]);
-
-    const show = useCallback(
-        (options: ToastOptions): ToastHandle => {
-            const id = crypto.randomUUID();
-
-            setToasts((prev) => {
-                return [
-                    ...prev,
-                    {
-                        id,
-                        duration: 5000,
-                        closable: true,
-                        intent: 'info',
-                        ...options,
-                    },
-                ];
-            });
-
-            return {
-                id,
-                close: () => close(id),
-                runAttention: (attention) => {
-                    const ref = toastControlRefs.current.get(id);
-                    ref?.runAttention(attention);
-                },
-                restart: () => {
-                    const ref = toastControlRefs.current.get(id);
-                    ref?.restart();
-                },
-                update: (options) => {
-                    update(id, options);
-                },
-            };
+        restart: () => {
+          const ref = toastControlRefs.current.get(id);
+          ref?.restart();
         },
-        [close, update],
-    );
+        update: (options) => {
+          update(id, options);
+        },
+      };
+    },
+    [close, update],
+  );
 
-    const value = useMemo(
-        () => ({
-            remove,
-            position,
-            update,
-            toasts,
-            show,
-            close,
-            requestClose,
-            clear,
-            isPaused,
-            pauseAll,
-            resumeAll,
-            minCloseInterval,
-            toastControlRefs,
-            closeQueueRef,
-        }),
-        [
-            remove,
-            position,
-            update,
-            toasts,
-            show,
-            close,
-            requestClose,
-            clear,
-            isPaused,
-            pauseAll,
-            resumeAll,
-        ],
-    );
+  const value = useMemo(
+    () => ({
+      remove,
+      position,
+      update,
+      toasts,
+      show,
+      close,
+      requestClose,
+      clear,
+      isPaused,
+      pauseAll,
+      resumeAll,
+      minCloseInterval,
+      toastControlRefs,
+      closeQueueRef,
+    }),
+    [
+      remove,
+      position,
+      update,
+      toasts,
+      show,
+      close,
+      requestClose,
+      clear,
+      isPaused,
+      pauseAll,
+      resumeAll,
+    ],
+  );
 
-    return (
-        <ToastContext.Provider value={value}>
-            {children}
+  return (
+    <ToastContext.Provider value={value}>
+      {children}
 
-            <ToastViewport
-                position={position}
-                offset={offset}
-                onMouseEnter={pauseAll}
-                onMouseLeave={resumeAll}
-            />
-        </ToastContext.Provider>
-    );
+      <ToastViewport
+        position={position}
+        offset={offset}
+        onMouseEnter={pauseAll}
+        onMouseLeave={resumeAll}
+      />
+    </ToastContext.Provider>
+  );
 };
