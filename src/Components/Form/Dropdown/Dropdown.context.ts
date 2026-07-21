@@ -8,60 +8,62 @@ import { GroupContextValue } from './Group.context';
 // import { PopoverRole } from './Popover';
 
 type DropdownContextValue = {
-    modal: boolean;
-    opened: boolean;
-    setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  modal: boolean;
+  opened: boolean;
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 
-    triggerRef: React.RefObject<HTMLElement | null>;
-    panelRef: React.RefObject<HTMLDivElement | null>;
+  triggerRef: React.RefObject<HTMLElement | null>;
+  panelRef: React.RefObject<HTMLDivElement | null>;
 
-    isPanelHovered: boolean;
-    setIsPanelHovered: React.Dispatch<React.SetStateAction<boolean>>;
+  isPanelHovered: boolean;
+  setIsPanelHovered: React.Dispatch<React.SetStateAction<boolean>>;
 
-    handleSelect: (nextValue: string) => void;
+  handleSelect: (nextValue: string) => void;
 
-    focusByTypeahead: (key: string) => void;
+  focusByTypeahead: (key: string) => void;
 
-    isOptionShown: (option: DropdownOptionData) => boolean;
-    isGroupShown: (group: GroupContextValue) => boolean;
+  isOptionShown: (option: DropdownOptionData) => boolean;
+  isGroupShown: (group: GroupContextValue) => boolean;
 
-    disabled: boolean;
-    invalid: boolean;
+  disabled: boolean;
+  invalid: boolean;
 
-    isSearchable: boolean;
-    setIsSearchable: React.Dispatch<React.SetStateAction<boolean>>;
-    search: string;
-    setSearch: React.Dispatch<React.SetStateAction<string>>;
-    searchInputRef: React.RefObject<HTMLInputElement | null>;
+  isSearchable: boolean;
+  setIsSearchable: React.Dispatch<React.SetStateAction<boolean>>;
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  searchInputRef: React.RefObject<HTMLInputElement | null>;
 
-    focusableList: FocusableListResult;
+  focusableList: FocusableListResult;
 
-    selectedOption?: DropdownOptionData;
-    selectedValue?: string;
+  selectedOption?: DropdownOptionData;
+  selectedValue?: string;
 
-    options: DropdownOptionData[];
-    filteredOptions: DropdownOptionData[];
+  options: DropdownOptionData[];
+  filteredOptions: DropdownOptionData[];
 
-    registerOption: (option: DropdownOptionData) => void;
-    unregisterOption: (id: string) => void;
+  registerOption: (option: DropdownOptionData) => void;
+  unregisterOption: (id: string) => void;
 
-    runAfterReady: (callback: () => void) => void;
-    runOnEntered: (callback: () => void) => void;
+  runAfterReady: (callback: () => void) => void;
+  runOnEntered: (callback: () => void) => void;
 
-    stickyGroupLabels: boolean;
-    openOnArrowKeys: boolean;
+  stickyGroupLabels: boolean;
+  openOnArrowKeys: boolean;
+
+  invokeOnly: boolean;
 };
 
 const DropdownContext = createContext<DropdownContextValue | null>(null);
 
 const useDropdownContext = () => {
-    const ctx = useContext(DropdownContext);
+  const ctx = useContext(DropdownContext);
 
-    if (!ctx) {
-        throw new Error('Dropdown components must be used inside <Dropdown />');
-    }
+  if (!ctx) {
+    throw new Error('Dropdown components must be used inside <Dropdown />');
+  }
 
-    return ctx;
+  return ctx;
 };
 
 export { DropdownContext, useDropdownContext };

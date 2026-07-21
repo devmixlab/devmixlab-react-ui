@@ -32,7 +32,7 @@ export type OnReadyCallbackProps = {
 
 export type DropdownOptionData = {
   id: string;
-  value: string;
+  value: string | null;
   label?: string;
   disabled?: boolean;
   children?: React.ReactNode;
@@ -67,6 +67,8 @@ export type DropdownProps = {
   stickyGroupLabels?: boolean;
 
   openOnArrowKeys?: boolean;
+
+  invokeOnly?: boolean;
 } & PopoverProps;
 
 type DropdownComponent = React.ForwardRefExoticComponent<
@@ -116,6 +118,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
       stickyGroupLabels = false,
 
       openOnArrowKeys = true,
+      invokeOnly = false,
       modal = false,
 
       onUnmount,
@@ -169,7 +172,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
       const normalized = search.toLowerCase().trim();
       return options.filter((option) =>
-        (option.label ?? option.value).toLowerCase().trim().includes(normalized),
+        (option.label ?? option.value ?? '').toLowerCase().trim().includes(normalized),
       );
     }, [options, search]);
 
@@ -301,6 +304,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         runOnEntered,
         stickyGroupLabels,
         openOnArrowKeys,
+        invokeOnly,
       }),
       [
         modal,
@@ -328,6 +332,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         runOnEntered,
         stickyGroupLabels,
         openOnArrowKeys,
+        invokeOnly,
       ],
     );
 
@@ -405,6 +410,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
       triggerRef,
       panelRef,
       runOnEntered,
+      invokeOnly,
     } = useDropdownContext();
 
     const mergedRef = mergeRefs(ref, triggerRef);
@@ -480,6 +486,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
     const triggerProps = {
       // ref: mergedRef,
       ...rest,
+      // invokeOnly,
       onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
         if (!disabled) {
           handleKeyDown(e);
@@ -488,6 +495,8 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
         onKeyDown?.(e);
       },
     };
+
+    const triggerContent = invokeOnly ? children : (selectedOption?.children ?? children);
 
     return render ? (
       <Popover.Trigger
@@ -499,7 +508,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
       />
     ) : (
       <Popover.Trigger ref={mergedRef} className={triggerClassName} {...triggerProps}>
-        {children ?? selectedOption?.children ?? (
+        {triggerContent ?? (
           <Box as="span" opacity={0.8}>
             {placeholder}
           </Box>
@@ -861,7 +870,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
     ref,
   ) => {
     // const finalId = id ?? useStableId('dropdown-option');
-    const optionId = id ?? value;
+    const optionId = id ?? value ?? useStableId('dropdown-option');
 
     const {
       registerOption,
