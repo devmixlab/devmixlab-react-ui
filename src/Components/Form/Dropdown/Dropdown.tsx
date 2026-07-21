@@ -388,7 +388,7 @@ type DropdownTriggerProps = {
 } & PopoverTriggerProps<DropdownRenderContent>;
 
 const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
-  ({ placeholder = 'Select option', render, onKeyDown, ...rest }, ref) => {
+  ({ children, placeholder = 'Select option', render, onKeyDown, ...rest }, ref) => {
     const {
       selectedOption,
       selectedValue,
@@ -499,7 +499,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
       />
     ) : (
       <Popover.Trigger ref={mergedRef} className={triggerClassName} {...triggerProps}>
-        {selectedOption?.children ?? (
+        {children ?? selectedOption?.children ?? (
           <Box as="span" opacity={0.8}>
             {placeholder}
           </Box>
@@ -848,7 +848,7 @@ export type OptionRenderProps = {
 };
 
 export type DropdownOptionProps = {
-  value: string;
+  value: string | null;
   label?: string;
   disabled?: boolean;
   render?: (props: OptionRenderProps) => React.ReactNode;

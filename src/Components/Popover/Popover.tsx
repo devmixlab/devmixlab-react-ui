@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useRef,
   useEffect,
+  ComponentProps,
 } from 'react';
 import {
   FloatingTree,
@@ -32,6 +33,7 @@ import { clsx } from 'clsx';
 import { Transition, SharedTransitionProps, sharedTransitionProps } from '../Transition';
 import { splitProps } from '../../utils/splitProps';
 import { usePopoverTransitionContext } from './PopoverTransition.context';
+import { createPolymorphic } from '../../types';
 
 export const BUTTON_ICON_SLOT_WIDTHS = {
   xs: 6,
@@ -524,137 +526,146 @@ Popover.displayName = 'Popover';
 // PopoverTrigger
 // ---------------------------------------------------------------------------
 
-const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(
-  (
-    {
-      children,
-      className,
-      chevron = 'none',
-      render,
-      btnProps,
-      onClick,
-      onKeyDown,
-      onMouseEnter,
-      onMouseLeave,
-      renderContent,
-      ...rest
+type OwnPopoverTriggerProps<T = {}> = {
+  chevron?: PopoverChevron;
+  render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
+  btnProps?: ButtonProps;
+  renderContent?: T;
+};
+
+type ImplPopoverTriggerProps = OwnPopoverTriggerProps & ComponentProps<'button'>;
+
+const PopoverTriggerImpl = (
+  {
+    children,
+    className,
+    chevron = 'none',
+    render,
+    btnProps,
+    onClick,
+    onKeyDown,
+    onMouseEnter,
+    onMouseLeave,
+    renderContent,
+    ...rest
+  }: ImplPopoverTriggerProps,
+  ref: React.Ref<HTMLButtonElement>,
+) => {
+  const { opened, setOpened } = usePopoverStateContext();
+
+  const { disabled, trigger, handleHoverEnter, handleHoverLeave } = usePopoverInteractionContext();
+
+  const { refs, getReferenceProps, placement } = usePopoverFloatingContext();
+
+  const { triggerId, panelId, role } = usePopoverAccessibilityContext();
+
+  const combinedRef = mergeRefs(refs.setReference, ref);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setOpened(!opened);
+      }
     },
-    ref,
-  ) => {
-    const { opened, setOpened } = usePopoverStateContext();
+    [opened, setOpened],
+  );
 
-    const { disabled, trigger, handleHoverEnter, handleHoverLeave } =
-      usePopoverInteractionContext();
+  const triggerProps = {
+    ...getReferenceProps({
+      onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+        onClick?.(e);
 
-    const { refs, getReferenceProps, placement } = usePopoverFloatingContext();
-
-    const { triggerId, panelId, role } = usePopoverAccessibilityContext();
-
-    const combinedRef = mergeRefs(refs.setReference, ref);
-
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
+        if (!disabled && trigger === 'click') {
           setOpened(!opened);
         }
       },
-      [opened, setOpened],
-    );
 
-    const triggerProps = {
-      ...getReferenceProps({
-        onClick: (e: React.MouseEvent<HTMLElement>) => {
-          onClick?.(e);
+      onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
+        if (!disabled) {
+          handleKeyDown(e);
+        }
 
-          if (!disabled && trigger === 'click') {
-            setOpened(!opened);
-          }
-        },
+        onKeyDown?.(e);
+      },
+      onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => {
+        onMouseEnter?.(e);
 
-        onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
-          if (!disabled) {
-            handleKeyDown(e);
-          }
+        if (trigger !== 'hover' || disabled) {
+          return;
+        }
 
-          onKeyDown?.(e);
-        },
-        onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
-          onMouseEnter?.(e);
+        handleHoverEnter();
+      },
+      onMouseLeave: (e: React.MouseEvent<HTMLButtonElement>) => {
+        onMouseLeave?.(e);
 
-          if (trigger !== 'hover' || disabled) {
-            return;
-          }
+        if (trigger !== 'hover' || disabled) {
+          return;
+        }
 
-          handleHoverEnter();
-        },
-        onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
-          onMouseLeave?.(e);
+        handleHoverLeave();
+      },
+    }),
 
-          if (trigger !== 'hover' || disabled) {
-            return;
-          }
+    id: triggerId,
 
-          handleHoverLeave();
-        },
-      }),
+    'aria-expanded': opened,
+    'aria-controls': opened ? panelId : undefined,
+    'aria-haspopup': role,
+  };
 
-      id: triggerId,
+  const triggerClassName = clsx(prefix('__trigger'), className);
 
-      'aria-expanded': opened,
-      'aria-controls': opened ? panelId : undefined,
-      'aria-haspopup': role,
-    };
+  if (render) {
+    return render({
+      ref: combinedRef,
+      disabled: !!disabled,
+      opened,
+      triggerClassName,
+      triggerProps,
+      content: renderContent,
+    });
+  }
 
-    const triggerClassName = clsx(prefix('__trigger'), className);
+  const isLeftPlacement = placement?.startsWith('left');
 
-    if (render) {
-      return render({
-        ref: combinedRef,
-        disabled: !!disabled,
-        opened,
-        triggerClassName,
-        triggerProps,
-        content: renderContent,
-      });
-    }
+  const chevronIcon = (chevron == 'rotate' || chevron == 'fixed') && (
+    <ChevronDownIcon
+      className={prefix('__chevron')}
+      data-opened={opened || undefined}
+      data-rotate={chevron == 'rotate' || undefined}
+      data-placement={placement}
+      aria-hidden
+    />
+  );
 
-    const isLeftPlacement = placement?.startsWith('left');
+  const buttonSize = btnProps?.size ?? 'md';
 
-    const chevronIcon = (chevron == 'rotate' || chevron == 'fixed') && (
-      <ChevronDownIcon
-        className={prefix('__chevron')}
-        data-opened={opened || undefined}
-        data-rotate={chevron == 'rotate' || undefined}
-        data-placement={placement}
-        aria-hidden
-      />
-    );
+  return (
+    <Button
+      {...rest}
+      {...triggerProps}
+      ref={combinedRef}
+      iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[buttonSize]}
+      className={triggerClassName}
+      type="button"
+      disabled={disabled}
+      active={trigger === 'click' && opened}
+      {...btnProps}
+      // endIcon={chevronIcon}
+      startIcon={isLeftPlacement ? chevronIcon : btnProps?.startIcon}
+      endIcon={!isLeftPlacement ? chevronIcon : btnProps?.endIcon}
+    >
+      {children}
+    </Button>
+  );
+};
 
-    const buttonSize = btnProps?.size ?? 'md';
-
-    return (
-      <Button
-        {...rest}
-        {...triggerProps}
-        ref={combinedRef}
-        iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[buttonSize]}
-        className={triggerClassName}
-        type="button"
-        disabled={disabled}
-        active={trigger === 'click' && opened}
-        {...btnProps}
-        // endIcon={chevronIcon}
-        startIcon={isLeftPlacement ? chevronIcon : btnProps?.startIcon}
-        endIcon={!isLeftPlacement ? chevronIcon : btnProps?.endIcon}
-      >
-        {children}
-      </Button>
-    );
-  },
+const PopoverTrigger = createPolymorphic<OwnPopoverTriggerProps, 'button'>(
+  forwardRef(PopoverTriggerImpl),
+  'Popover.Trigger',
 );
-
-PopoverTrigger.displayName = 'Popover.Trigger';
 
 // ---------------------------------------------------------------------------
 // Panel
