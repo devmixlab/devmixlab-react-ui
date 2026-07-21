@@ -91,10 +91,18 @@ Stepper.displayName = 'Stepper';
 type StepperStepProps = {
   id: string;
   onClick?: (e: MouseEvent) => void;
+  forceClickable?: boolean;
 } & BoxDerivedProps &
   ComponentProps<'div'>;
 
-const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepProps) => {
+const StepperStep = ({
+  className,
+  children,
+  id,
+  onClick,
+  forceClickable = false,
+  ...rest
+}: StepperStepProps) => {
   const {
     passedSteps,
     activeStep,
@@ -127,7 +135,10 @@ const StepperStep = ({ className, children, id, onClick, ...rest }: StepperStepP
 
   const isClickable =
     (!isActive &&
-      (isComplete || currentStep?.hasBeenVisited || (!isComplete && allowFutureNavigation))) ||
+      (isComplete ||
+        forceClickable ||
+        currentStep?.hasBeenVisited ||
+        (!isComplete && allowFutureNavigation))) ||
     false;
 
   // console.log(steps);

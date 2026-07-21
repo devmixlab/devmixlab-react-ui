@@ -38,7 +38,6 @@ $sizes: (
 );
 
 .#{$heading-prefix} {
-    margin: 0;
     font-weight: 600;
 
     @each $key, $conf in $sizes {

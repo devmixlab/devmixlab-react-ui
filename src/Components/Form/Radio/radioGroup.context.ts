@@ -1,16 +1,16 @@
 import { createContext, useContext } from 'react';
 import { Size } from './Radio';
 
-export type radioGroupContextValue = {
-    value?: string | null;
-    name?: string;
-    onValueChange?: (value: string) => void;
-    disabled?: boolean;
-    size?: Size;
-    readOnly?: boolean;
+export type radioGroupContextValue<T> = {
+  value?: T | null;
+  name?: T;
+  onValueChange?: (value: T) => void;
+  disabled?: boolean;
+  size?: Size;
+  readOnly?: boolean;
 };
 
-const RadioGroupContext = createContext<radioGroupContextValue | undefined>(undefined);
+const RadioGroupContext = createContext<radioGroupContextValue<unknown> | undefined>(undefined);
 
 export const useRadioGroup = () => useContext(RadioGroupContext);
 

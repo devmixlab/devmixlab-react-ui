@@ -10,123 +10,124 @@ export type Size = 'sm' | 'md' | 'lg';
 
 type Intent = 'danger' | 'warning' | 'success' | 'info' | 'secondary' | (string & {});
 // type Variant = 'solid' | 'outlined' | 'soft' | 'filled' | 'ghost' | (string & {});
-type Variant = 'solid' | (string & {});
+// type Variant = 'solid' | (string & {});
+type Variant = 'solid' | 'outlined' | 'filled' | 'ghost' | (string & {});
 
 type RadioProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
-    value: string;
-    intent?: Intent;
-    variant?: Variant;
-    size?: Size;
-    children?: React.ReactNode;
-    description?: React.ReactNode;
-    labelPosition?: 'left' | 'right';
+  value: string;
+  intent?: Intent;
+  variant?: Variant;
+  size?: Size;
+  children?: React.ReactNode;
+  description?: React.ReactNode;
+  labelPosition?: 'left' | 'right';
 };
 
 export const prefix = (name: string = '') => {
-    return `${CLASS_PREFIX}--radio${name}`;
+  return `${CLASS_PREFIX}--radio${name}`;
 };
 
 const Radio = forwardRef<HTMLInputElement, RadioProps>(
-    (
-        {
-            className,
-            size,
-            disabled,
-            readOnly,
-            children,
-            description,
-            labelPosition = 'right',
-            value,
-            intent = 'primary',
-            variant = 'solid',
-            onChange,
-            ...rest
-        },
-        ref,
-    ) => {
-        const inputRef = useRef<HTMLInputElement>(null);
-        const combinedRef = mergeRefs(inputRef, ref);
-
-        const group = useRadioGroup();
-
-        const isReadOnly = readOnly || group?.readOnly;
-
-        // if (!group) {
-        //     console.warn('Radio should be used inside RadioGroup for proper behavior');
-        // }
-
-        const finalSize = size ?? group?.size ?? 'md';
-        const name = rest.name ?? group?.name ?? undefined;
-
-        const isDisabled = disabled || group?.disabled;
-        const isChecked = group ? group.value === value : rest.checked === true;
-
-        const id = rest.id ?? useId();
-        const descriptionId = description ? `${id}-desc` : undefined;
-        const labelId = children ? `${id}-label` : undefined;
-
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (isReadOnly) return;
-
-            if (group) group.onValueChange?.(value);
-            onChange?.(e);
-        };
-
-        const labelNode =
-            children || description ? (
-                <span className={prefix('__text')}>
-                    {children && (
-                        <span id={labelId} className={prefix('__label')}>
-                            {children}
-                        </span>
-                    )}
-                    {description && (
-                        <span id={descriptionId} className={prefix('__description')}>
-                            {description}
-                        </span>
-                    )}
-                </span>
-            ) : null;
-
-        return (
-            <label
-                className={clsx(prefix(), className)}
-                data-state={isChecked ? 'checked' : 'unchecked'}
-                data-disabled={isDisabled || undefined}
-                data-readonly={isReadOnly || undefined}
-                data-size={finalSize}
-                data-intent={intent}
-                data-variant={variant}
-            >
-                {labelPosition === 'left' && labelNode}
-
-                <Box
-                    as="input"
-                    type="radio"
-                    id={id}
-                    name={name}
-                    value={value}
-                    {...rest}
-                    {...(group ? { checked: isChecked } : {})}
-                    readOnly={isReadOnly}
-                    aria-readonly={isReadOnly || undefined}
-                    onChange={handleChange}
-                    ref={combinedRef}
-                    disabled={isDisabled}
-                    aria-labelledby={labelId || undefined}
-                    aria-describedby={descriptionId}
-                    aria-label={labelId ? undefined : rest['aria-label']}
-                    className={prefix('__input')}
-                />
-
-                <span className={prefix('__control')}>
-                    <span className={prefix('__indicator')} />
-                </span>
-
-                {labelPosition === 'right' && labelNode}
-            </label>
-        );
+  (
+    {
+      className,
+      size,
+      disabled,
+      readOnly,
+      children,
+      description,
+      labelPosition = 'right',
+      value,
+      intent = 'primary',
+      variant = 'outlined',
+      onChange,
+      ...rest
     },
+    ref,
+  ) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const combinedRef = mergeRefs(inputRef, ref);
+
+    const group = useRadioGroup();
+
+    const isReadOnly = readOnly || group?.readOnly;
+
+    // if (!group) {
+    //     console.warn('Radio should be used inside RadioGroup for proper behavior');
+    // }
+
+    const finalSize = size ?? group?.size ?? 'md';
+    const name = rest.name ?? group?.name ?? undefined;
+
+    const isDisabled = disabled || group?.disabled;
+    const isChecked = group ? group.value === value : rest.checked === true;
+
+    const id = rest.id ?? useId();
+    const descriptionId = description ? `${id}-desc` : undefined;
+    const labelId = children ? `${id}-label` : undefined;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (isReadOnly) return;
+
+      if (group) group.onValueChange?.(value);
+      onChange?.(e);
+    };
+
+    const labelNode =
+      children || description ? (
+        <span className={prefix('__text')}>
+          {children && (
+            <span id={labelId} className={prefix('__label')}>
+              {children}
+            </span>
+          )}
+          {description && (
+            <span id={descriptionId} className={prefix('__description')}>
+              {description}
+            </span>
+          )}
+        </span>
+      ) : null;
+
+    return (
+      <label
+        className={clsx(prefix(), className)}
+        data-state={isChecked ? 'checked' : 'unchecked'}
+        data-disabled={isDisabled || undefined}
+        data-readonly={isReadOnly || undefined}
+        data-size={finalSize}
+        data-intent={intent}
+        data-variant={variant}
+      >
+        {labelPosition === 'left' && labelNode}
+
+        <Box
+          as="input"
+          type="radio"
+          id={id}
+          name={name}
+          value={value}
+          {...rest}
+          {...(group ? { checked: isChecked } : {})}
+          readOnly={isReadOnly}
+          aria-readonly={isReadOnly || undefined}
+          onChange={handleChange}
+          ref={combinedRef}
+          disabled={isDisabled}
+          aria-labelledby={labelId || undefined}
+          aria-describedby={descriptionId}
+          aria-label={labelId ? undefined : rest['aria-label']}
+          className={prefix('__input')}
+        />
+
+        <span className={prefix('__control')}>
+          <span className={prefix('__indicator')} />
+        </span>
+
+        {labelPosition === 'right' && labelNode}
+      </label>
+    );
+  },
 );
 
 Radio.displayName = 'Radio';
