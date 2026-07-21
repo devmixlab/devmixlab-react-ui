@@ -547,10 +547,10 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
       <DropdownTrigger
         ref={ref}
         {...rest}
-        render={({ content, triggerProps, opened, disabled, ...rest }) => {
+        render={({ ref: triggerRef, content, triggerProps, opened, disabled, ...rest }) => {
           const { selectedOption, selectedValue } = content;
 
-          const { ref: triggerRef, ...restTriggerProps } = triggerProps;
+          // const { ref: triggerRef, ...restTriggerProps } = triggerProps;
 
           const isActive = !disabled ? opened || (ctx.modal && triggerActive) : undefined;
           return (
@@ -573,12 +573,12 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
               data-selected={selectedValue}
             >
               <Box
-                ref={triggerRef as React.Ref<HTMLButtonElement>}
+                ref={triggerRef as any}
                 as="button"
                 type="button"
                 className={classPrefix('--field')}
                 {...controlProps}
-                {...restTriggerProps}
+                {...triggerProps}
               >
                 {selectedOption ? selectedOption?.children : (children ?? 'Select ...')}
               </Box>
