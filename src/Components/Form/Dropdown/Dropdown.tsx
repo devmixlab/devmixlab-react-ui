@@ -20,10 +20,13 @@ import { mergeRefs } from '../../../utils/mergeRefs';
 import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } from '../FieldRoot';
 import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { splitProps } from '../../../utils/splitProps';
+import { ButtonProps } from '../../Button';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+export type OptionValue = string | null;
 
 export type OnReadyCallbackProps = {
   isSearchable: boolean;
@@ -32,7 +35,7 @@ export type OnReadyCallbackProps = {
 
 export type DropdownOptionData = {
   id: string;
-  value: string | null;
+  value: OptionValue;
   label?: string;
   disabled?: boolean;
   children?: React.ReactNode;
@@ -55,9 +58,9 @@ export type DropdownProps = {
   // sets how many visible options available till scroll will be applied
   visibleOptions?: number;
 
-  value?: string;
-  defaultValue?: string;
-  onChange?: (value: string) => void;
+  value?: OptionValue;
+  defaultValue?: OptionValue;
+  onChange?: (value: OptionValue) => void;
   placeholder?: React.ReactNode;
 
   invalid?: boolean;
@@ -160,7 +163,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
     // ------------------------------------------------------------------
 
     const isControlled = value !== undefined;
-    const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue);
+    const [internalValue, setInternalValue] = useState<OptionValue>(defaultValue ?? null);
     const selectedValue = isControlled ? value : internalValue;
 
     // ------------------------------------------------------------------
@@ -258,8 +261,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
       });
     }, []);
 
-    const handleSelect = (nextValue: string) => {
-      if (!isControlled) setInternalValue(nextValue);
+    const handleSelect = (nextValue: OptionValue) => {
+      if (!isControlled && !invokeOnly) setInternalValue(nextValue);
       onChange?.(nextValue);
       setOpened(false);
       setFocuses(null);
@@ -385,12 +388,13 @@ Dropdown.displayName = 'Dropdown';
 
 type DropdownRenderContent = {
   selectedOption?: DropdownOptionData;
-  selectedValue?: string;
+  selectedValue?: OptionValue;
 };
 
 type DropdownTriggerProps = {
   placeholder?: React.ReactNode;
-} & PopoverTriggerProps<DropdownRenderContent>;
+} & ButtonProps &
+  PopoverTriggerProps<DropdownRenderContent>;
 
 const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
   ({ children, placeholder = 'Select option', render, onKeyDown, ...rest }, ref) => {
@@ -529,7 +533,7 @@ Dropdown.Trigger = DropdownTrigger;
 type DropdownFieldTriggerProps = DropdownTriggerProps & FieldLayoutProps & SharedFieldRootProps;
 
 const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
-  ({ controls, children, ...rest }, ref) => {
+  ({ controls, placeholder = 'Select option', children, ...rest }, ref) => {
     const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
 
     const ctx = useDropdownContext();
@@ -562,6 +566,9 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
           // const { ref: triggerRef, ...restTriggerProps } = triggerProps;
 
           const isActive = !disabled ? opened || (ctx.modal && triggerActive) : undefined;
+
+          const triggerContent = ctx.invokeOnly ? children : (selectedOption?.children ?? children);
+
           return (
             <FieldRoot
               invalid={isInvalid}
@@ -589,7 +596,12 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                 {...controlProps}
                 {...triggerProps}
               >
-                {selectedOption ? selectedOption?.children : (children ?? 'Select ...')}
+                {/*{selectedOption ? selectedOption?.children : (children ?? 'Select ...')}*/}
+                {triggerContent ?? (
+                  <Box as="span" opacity={0.8}>
+                    {placeholder}
+                  </Box>
+                )}
               </Box>
             </FieldRoot>
           );
@@ -857,7 +869,7 @@ export type OptionRenderProps = {
 };
 
 export type DropdownOptionProps = {
-  value: string | null;
+  value: OptionValue;
   label?: string;
   disabled?: boolean;
   render?: (props: OptionRenderProps) => React.ReactNode;
@@ -886,6 +898,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
       isOptionShown,
       triggerRef,
       modal,
+      invokeOnly,
     } = useDropdownContext();
 
     const group = useGroupContext();

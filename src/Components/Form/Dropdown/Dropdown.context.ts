@@ -1,5 +1,10 @@
 import React, { createContext, useContext, MutableRefObject } from 'react';
-import { DropdownOptionProps, DropdownOptionData, OnReadyCallbackProps } from './Dropdown';
+import {
+  DropdownOptionProps,
+  DropdownOptionData,
+  OnReadyCallbackProps,
+  OptionValue,
+} from './Dropdown';
 import { FocusableListResult } from '../../../hooks/useFocusableList';
 import { GroupContextValue } from './Group.context';
 
@@ -18,7 +23,7 @@ type DropdownContextValue = {
   isPanelHovered: boolean;
   setIsPanelHovered: React.Dispatch<React.SetStateAction<boolean>>;
 
-  handleSelect: (nextValue: string) => void;
+  handleSelect: (nextValue: OptionValue) => void;
 
   focusByTypeahead: (key: string) => void;
 
@@ -37,7 +42,7 @@ type DropdownContextValue = {
   focusableList: FocusableListResult;
 
   selectedOption?: DropdownOptionData;
-  selectedValue?: string;
+  selectedValue?: OptionValue;
 
   options: DropdownOptionData[];
   filteredOptions: DropdownOptionData[];
