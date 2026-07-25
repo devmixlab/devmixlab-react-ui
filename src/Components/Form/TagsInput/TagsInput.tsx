@@ -85,6 +85,8 @@ export type TagsInputProps<TTag extends BaseTagItem = BaseTagItem> = Omit<
   maxTags?: number;
   maxLength?: number;
   onInvalidTag?: (tag: string, reason: 'maxLength' | 'empty') => void;
+
+  onInputValueChange?: (value: string) => void;
 };
 
 const DEFAULT_SEPARATOR = /[,\n]/;
@@ -141,6 +143,9 @@ const TagsInputInner = <TTag extends BaseTagItem>(
     maxTags,
     maxLength,
     onInvalidTag,
+
+    onInputValueChange,
+
     ...props
   }: TagsInputProps<TTag>,
   ref: React.Ref<HTMLInputElement>,
@@ -261,6 +266,10 @@ const TagsInputInner = <TTag extends BaseTagItem>(
   //   // // inputRef.current.style.width = `${width + 2}px`; // small buffer
   //   // inputRef.current.style.width = `${Math.min(width + 2, 300)}px`;
   // }, [tags]);
+
+  useEffect(() => {
+    onInputValueChange?.(inputValue);
+  }, [inputValue]);
 
   const getId = (i: number) => tags[i]?.id ?? tags[i]?.value;
   const getIndexById = (id: string | number | null) => {
