@@ -152,11 +152,13 @@ const TagsInputInner = <TTag extends BaseTagItem>(
   const isCancellingRef = useRef(false);
   const originalValueRef = useRef<string>('');
 
-  const tagRefs = useRef<Record<string | number, HTMLDivElement | null>>({});
+  const tagRefs = useRef<Record<string | number, HTMLElement | null>>({});
   const [activeId, setActiveId] = useState<string | number | null>(null);
 
   const focusTag = (id: string | number | null) => {
     if (id == null) return;
+
+    console.log(id);
 
     requestAnimationFrame(() => {
       tagRefs.current[id]?.focus();
@@ -244,6 +246,21 @@ const TagsInputInner = <TTag extends BaseTagItem>(
   const [inputValue, setInputValue] = useState('');
 
   const tags = isControlled ? value! : innerTags;
+
+  // useEffect(() => {
+  //   if (tags.length === 0) {
+  //     inputRef.current?.focus();
+  //   }
+  //   // if (!inputRef.current || !mirrorRef.current) return;
+  //   //
+  //   // const text = inputValue || ' '; // 👈 avoid 0 width
+  //   // mirrorRef.current.textContent = text;
+  //   //
+  //   // const width = mirrorRef.current.offsetWidth;
+  //   //
+  //   // // inputRef.current.style.width = `${width + 2}px`; // small buffer
+  //   // inputRef.current.style.width = `${Math.min(width + 2, 300)}px`;
+  // }, [tags]);
 
   const getId = (i: number) => tags[i]?.id ?? tags[i]?.value;
   const getIndexById = (id: string | number | null) => {
@@ -451,8 +468,18 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
     const next = tags.filter((_, i) => i !== index);
 
+    console.log(next);
+
     setTags(next);
     onTagRemove?.(removed, index);
+
+    if (next.length === 0) {
+      inputRef.current?.focus();
+    }
+
+    if (next.length <= index) {
+      inputRef.current?.focus();
+    }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!inputEnabled) {
@@ -518,23 +545,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
 
       setTags(next);
 
-      if (next.length === 0) {
-        requestAnimationFrame(() => inputRef.current?.focus());
-        return;
-      }
-
-      // 2. find focus target (LEFT of deleted)
-      const focusIndex = findNextEnabled(next, targetIndex - 1, -1);
-
-      if (focusIndex === null) {
-        requestAnimationFrame(() => inputRef.current?.focus());
-        return;
-      }
-
-      const nextId = next[focusIndex].id ?? next[focusIndex].value;
-
-      setActiveId(nextId);
-      focusTag(nextId);
+      requestAnimationFrame(() => inputRef.current?.focus());
     }
 
     props.onKeyDown?.(e);
@@ -855,8 +866,6 @@ const TagsInputInner = <TTag extends BaseTagItem>(
     setInputValue('');
   };
 
-  const tagProps = {};
-
   const tagNodeWrapper = (
     tag: TTag,
     i: number,
@@ -1029,12 +1038,106 @@ const TagsInputInner = <TTag extends BaseTagItem>(
                     e.preventDefault();
                     cancelEdit();
                   }
+
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelEdit();
+                  }
                 }}
                 className={classPrefix('--tag-edit')}
               />
             </Box>
           );
         }
+
+        const tagProps = {
+          tabIndex: !readOnly && !tag.disabled && activeId === id ? 0 : -1,
+          onFocus: () => {
+            if (readOnly || tag.disabled) return;
+            setActiveId(id);
+          },
+          onBlur: (e: React.FocusEvent<HTMLElement>) => {
+            const next = e.relatedTarget as Node | null;
+
+            // still inside current tag wrapper
+            if (e.currentTarget.contains(next)) return;
+
+            setActiveId(null);
+
+            // optional:
+            if (
+              !next ||
+              !(next instanceof HTMLElement) ||
+              !next.closest(`.${classPrefix('--tags-input')}`)
+            ) {
+              setSelectedIds(new Set());
+              setSelectionAnchor(null);
+            }
+          },
+          onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+            handleTagKeyDown(e);
+
+            if (
+              e.key === 'Enter'
+              // React.isValidElement<any>(tagNode) &&
+              // typeof tagNode.props.onKeyDown === 'function'
+            ) {
+              // tagNode.props.onKeyDown(e);
+            }
+          },
+          onDoubleClick: isEditable(tag, i) ? () => startEdit(i) : undefined,
+          onClick: (e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation();
+
+            if (readOnly || tag.disabled) return;
+
+            // CTRL / CMD toggle
+            if (e.ctrlKey || e.metaKey) {
+              setSelectedIds((prev) => {
+                const next = new Set(prev);
+
+                if (next.has(id)) {
+                  next.delete(id);
+                } else {
+                  next.add(id);
+                }
+
+                return next;
+              });
+
+              // setSelectionAnchor(id);
+              if (selectionAnchor == null) {
+                setSelectionAnchor(id);
+              }
+            }
+
+            // SHIFT range
+            else if (e.shiftKey && selectionAnchor != null) {
+              selectRange(selectionAnchor, id);
+            }
+
+            // NORMAL
+            else {
+              setSelectedIds(new Set([id]));
+              setSelectionAnchor(id);
+              // console.log(42423);
+            }
+
+            setActiveId(id);
+            focusTag(id);
+          },
+        };
+
+        const tagRef = (el: HTMLElement | null) => {
+          if (tag.id != null) {
+            // tagRefs.current[tag.id] = el;
+            if (el) {
+              tagRefs.current[tag.id] = el;
+            } else {
+              delete tagRefs.current[tag.id];
+            }
+          }
+        };
 
         // 🔥 CUSTOM RENDER
         if (renderTag) {
@@ -1052,18 +1155,16 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         // DEFAULT CHIP
         return (
           <Chip
+            ref={tagRef}
+            {...tagProps}
             as="button"
-            onClick={() => {
-              console.log(433434);
-            }}
+            key={i}
             w={layout === 'grid' ? 'full' : undefined}
             size={size}
-            // removable={!tag.disabled}
             disabled={tag.disabled || disabled}
             onRemove={remove}
             intent="primary"
             selected={isSelected(id)}
-            // focused={!tag.disabled && !disabled && activeId === id}
           >
             {tag.label}
           </Chip>

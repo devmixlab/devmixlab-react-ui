@@ -116,10 +116,6 @@ const ImplChip = (
     console.warn('Chip: both href and onClick provided. href takes priority.');
   }
 
-  if (removable && onClick) {
-    console.warn('Chip: removable chips do not support onClick. Use the remove button instead.');
-  }
-
   const isButton = resolvedAs === 'button';
   const isLink = resolvedAs === 'a' || (!!href && !isButton && !removable);
   const isInteractive = (isButton || isLink || !!onClick) && !disabled && !noInteraction;
@@ -209,6 +205,9 @@ const ImplChip = (
           className={prefix('__remove')}
           aria-label={typeof children === 'string' ? `Remove ${children}` : 'Remove'}
           onClick={handleRemove}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+          }}
           disabled={disabled}
         >
           <span className={prefix('__remove-icon')}>
