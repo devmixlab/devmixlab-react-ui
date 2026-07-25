@@ -44,6 +44,8 @@ type OwnModalProps = {
   closeOnOverlayClick?: boolean;
   zIndex?: number;
 
+  intent?: string;
+
   closeOnEscape?: boolean;
   initialFocus?: React.RefObject<HTMLElement>;
   portalContainer?: HTMLElement;
@@ -149,6 +151,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
       onClose,
       closeOnOverlayClick = true,
       zIndex,
+      intent,
       closeOnEscape = true,
       initialFocus,
       portalContainer,
@@ -276,6 +279,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
           data-separated={separated || undefined}
           data-side-space={finalSideSpace}
           data-density={resolvedDensity}
+          data-intent={intent ?? undefined}
         >
           <Transition
             visible={opened}
@@ -315,6 +319,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
               rounded={isFullscreenMode ? undefined : rounded}
               tabIndex={-1}
               className={clsx(prefix('__content'))}
+              data-intent={intent ?? undefined}
               role="dialog"
               aria-modal="true"
               aria-labelledby={hasHeader ? headerId : undefined}
