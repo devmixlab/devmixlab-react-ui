@@ -13,6 +13,7 @@ import { Variant } from '../FieldRoot/FieldRoot';
 import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
+import { createPolymorphic } from '../../../types';
 
 export type TagItem = {
   id?: string | number;
