@@ -14,14 +14,14 @@ import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 
-export type BaseTagItem = {
+export type TagItem = {
   id?: string | number;
   label: string;
   value: string;
   disabled?: boolean;
 };
 
-type RenderTagParams<TTag extends BaseTagItem> = {
+type RenderTagParams<TTag extends TagItem> = {
   tag: TTag;
   index: number;
   remove: () => void;
@@ -42,13 +42,15 @@ export const slugify = (str: string) =>
     .replace(/\s+/g, '-') // spaces → dash
     .replace(/-+/g, '-');
 
-export type TagsInputProps<TTag extends BaseTagItem = BaseTagItem> = Omit<
+export type TagsInputProps<TTag extends TagItem = TagItem> = Omit<
   TextInputProps,
   'value' | 'defaultValue' | 'onChange'
 > & {
   value?: TTag[];
   defaultValue?: TTag[];
   onValueChange?: (tags: TTag[]) => void;
+
+  fieldRootRef?: React.Ref<HTMLDivElement>;
 
   inputEnabled?: boolean;
   placeholder?: string;
@@ -93,13 +95,13 @@ const DEFAULT_SEPARATOR = /[,\n]/;
 
 const defaultNormalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' '); // collapse spaces only
 
-const normalizeTags = <TTag extends BaseTagItem>(tags: TTag[]): TTag[] =>
+const normalizeTags = <TTag extends TagItem>(tags: TTag[]): TTag[] =>
   tags.map((tag) => ({
     ...tag,
     id: tag.id ?? crypto.randomUUID(),
   }));
 
-const TagsInputInner = <TTag extends BaseTagItem>(
+const TagsInputInner = <TTag extends TagItem>(
   {
     className,
 
@@ -107,6 +109,8 @@ const TagsInputInner = <TTag extends BaseTagItem>(
     placeholder,
     inputPlaceholder = '...',
     fullWidth = false,
+
+    fieldRootRef,
 
     value,
     defaultValue = [],
@@ -984,6 +988,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
   return (
     <FieldRoot
       {...props}
+      ref={fieldRootRef}
       className={clsx(className, classPrefix('--tags-input'))}
       invalid={invalid}
       disabled={disabled}
@@ -1221,7 +1226,7 @@ const TagsInputInner = <TTag extends BaseTagItem>(
   );
 };
 
-const TagsInput = forwardRef(TagsInputInner) as <TTag extends BaseTagItem = BaseTagItem>(
+const TagsInput = forwardRef(TagsInputInner) as <TTag extends TagItem = TagItem>(
   props: TagsInputProps<TTag> & {
     ref?: React.Ref<HTMLInputElement>;
   },
