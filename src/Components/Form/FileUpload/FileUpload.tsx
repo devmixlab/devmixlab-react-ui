@@ -1,9 +1,9 @@
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
 import {
   TagsInput,
-  type TagItem,
+  type TagsInputItem,
   type TagsInputProps,
-  type Layout as TagsInputLayout,
+  type TagsInputLayout as TagsInputLayout,
 } from '../TagsInput/TagsInput';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { Size } from '../form.tokens';
@@ -33,11 +33,11 @@ type FileKind =
   | 'video'
   | 'generic';
 
-type UploadPseudoTag = TagItem & {
+type UploadPseudoTag = TagsInputItem & {
   __upload__: true;
 };
 
-type FileUploadTag = TagItem & {
+type FileUploadTag = TagsInputItem & {
   previewUrl?: string;
 
   file: File;

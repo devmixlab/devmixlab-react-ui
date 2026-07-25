@@ -15,14 +15,18 @@ import { IconWrapper } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 import { createPolymorphic } from '../../../types';
 
-export type TagItem = {
+//--------------------------------------------------------
+// Types
+//--------------------------------------------------------
+
+type TagsInputItem = {
   id?: string | number;
   label: string;
   value: string;
   disabled?: boolean;
 };
 
-type RenderTagParams<TTag extends TagItem> = {
+type TagsInputTagRenderParams<TTag extends TagsInputItem> = {
   tag: TTag;
   index: number;
   remove: () => void;
@@ -31,21 +35,21 @@ type RenderTagParams<TTag extends TagItem> = {
   focused?: boolean;
 };
 
-export type Layout = 'inline' | 'stacked' | 'grid';
+type TagsInputLayout = 'inline' | 'stacked' | 'grid';
 
-export const slugify = (str: string) =>
-  str
-    .toLowerCase()
-    .trim()
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '') // remove accents
-    .replace(/[^\w\s-]/g, '') // remove symbols
-    .replace(/\s+/g, '-') // spaces → dash
-    .replace(/-+/g, '-');
+// export const slugify = (str: string) =>
+//   str
+//     .toLowerCase()
+//     .trim()
+//     .normalize('NFKD')
+//     .replace(/[\u0300-\u036f]/g, '') // remove accents
+//     .replace(/[^\w\s-]/g, '') // remove symbols
+//     .replace(/\s+/g, '-') // spaces → dash
+//     .replace(/-+/g, '-');
 
-export type TagsInputProps<TTag extends TagItem = TagItem> = Omit<
+type TagsInputProps<TTag extends TagsInputItem = TagsInputItem> = Omit<
   TextInputProps,
-  'value' | 'defaultValue' | 'onChange'
+  'value' | 'defaultValue' | 'onChange' | 'onValueChange'
 > & {
   value?: TTag[];
   defaultValue?: TTag[];
@@ -62,9 +66,9 @@ export type TagsInputProps<TTag extends TagItem = TagItem> = Omit<
   removable?: boolean | ((tag: TTag, index: number) => boolean);
 
   normalizeTag?: (label: string) => string;
-  renderTag?: (params: RenderTagParams<TTag>) => React.ReactNode;
+  renderTag?: (params: TagsInputTagRenderParams<TTag>) => React.ReactNode;
 
-  layout?: Layout;
+  layout?: TagsInputLayout;
   gridCol?: BoxProps['col'];
 
   invalid?: boolean;
@@ -94,15 +98,23 @@ export type TagsInputProps<TTag extends TagItem = TagItem> = Omit<
 
 const DEFAULT_SEPARATOR = /[,\n]/;
 
+//--------------------------------------------------------
+// Helpers
+//--------------------------------------------------------
+
 const defaultNormalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' '); // collapse spaces only
 
-const normalizeTags = <TTag extends TagItem>(tags: TTag[]): TTag[] =>
+const normalizeTags = <TTag extends TagsInputItem>(tags: TTag[]): TTag[] =>
   tags.map((tag) => ({
     ...tag,
     id: tag.id ?? crypto.randomUUID(),
   }));
 
-const TagsInputInner = <TTag extends TagItem>(
+//--------------------------------------------------------
+// TagsInputImpl
+//--------------------------------------------------------
+
+const TagsInputImpl = <TTag extends TagsInputItem>(
   {
     className,
 
@@ -1227,7 +1239,7 @@ const TagsInputInner = <TTag extends TagItem>(
   );
 };
 
-const TagsInput = forwardRef(TagsInputInner) as <TTag extends TagItem = TagItem>(
+const TagsInput = forwardRef(TagsInputImpl) as <TTag extends TagsInputItem = TagsInputItem>(
   props: TagsInputProps<TTag> & {
     ref?: React.Ref<HTMLInputElement>;
   },
@@ -1236,3 +1248,5 @@ const TagsInput = forwardRef(TagsInputInner) as <TTag extends TagItem = TagItem>
 (TagsInput as React.FC).displayName = 'TagsInput';
 
 export { TagsInput };
+
+export type { TagsInputItem, TagsInputTagRenderParams, TagsInputLayout, TagsInputProps };
