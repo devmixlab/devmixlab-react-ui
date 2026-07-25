@@ -7,7 +7,7 @@ type Value = string;
 
 type RadioGroupProps<T extends Value> = {
   value?: T | null;
-  name?: T;
+  name?: string;
   size?: Size;
   onValueChange?: (value: T) => void;
   disabled?: boolean;
