@@ -7,186 +7,189 @@
 
 .#{$chip-prefix} {
 
-    --chip-scale-active: 0.97;
+  --chip-scale-active: 0.97;
 
-    @each $size, $values in $sizes {
-        &[data-size='#{$size}'] {
-            --chip-padding-y: #{map.get($values, padding-y)};
-            --chip-padding-x: #{map.get($values, padding-x)};
-            --chip-font-size: #{map.get($values, font-size)};
-            --chip-gap: #{map.get($values, gap)};
+  @each $size, $values in $sizes {
+    &[data-size='#{$size}'] {
+      --chip-padding-y: #{map.get($values, padding-y)};
+      --chip-padding-x: #{map.get($values, padding-x)};
+      --chip-font-size: #{map.get($values, font-size)};
+      --chip-gap: #{map.get($values, gap)};
+    }
+  }
+
+  border: 1px solid var(--chip-border-color, transparent);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--chip-gap);
+
+  align-self: center;
+
+  line-height: 1;
+  white-space: nowrap;
+
+  font-size: var(--chip-font-size);
+  font-weight: var(--chip-font-weight, 500);
+
+  overflow: hidden;
+
+  background-color: var(--chip-bg, transparent);
+  color: var(--chip-text-color);
+
+  padding-left: var(--chip-padding-x);
+  padding-right: var(--chip-padding-x);
+  padding-top: var(--chip-padding-y);
+  padding-bottom: var(--chip-padding-y);
+
+  transition: transform 0.08s ease,
+  filter 0.12s ease,
+  box-shadow 0.12s ease,
+  background-color 0.12s ease,
+  border-color 0.12s ease,
+  color 0.12s ease;
+
+  .#{$chip-prefix} {
+    &__content {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    &__icon {
+      @include icon;
+    }
+
+    &__remove {
+      position: relative;
+
+      cursor: pointer;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 1em;
+      height: 1em;
+
+      flex-shrink: 0;
+
+      &::before {
+        content: '';
+        position: absolute;
+
+        inset: -0.4em; // 👈 expand clickable area
+        //border-radius: 50%;
+      }
+
+      .#{$chip-prefix}__remove-icon {
+        @include icon;
+      }
+
+      &:active {
+        transform: scale(0.9);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--chip-remove-ring-color, var(--chip-ring-color));
+      }
+    }
+  }
+
+  &[data-icon-only] {
+    padding-left: var(--chip-padding-y);
+    padding-right: var(--chip-padding-y);
+  }
+
+  &[data-disabled] {
+    cursor: not-allowed;
+
+    font-weight: var(--chip-font-weight-disabled, var(--chip-font-weight));
+    background-color: var(--chip-bg-disabled);
+    border-color: var(--chip-border-color-disabled);
+    color: var(--chip-text-color-disabled, var(--#{$p}-text-disabled));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--chip-ring-color);
+    outline-offset: 2px;
+  }
+
+  &[data-removable] {
+    cursor: default;
+  }
+
+  &[data-interactive]:not([data-disabled]) {
+    &:is(button, a) {
+      cursor: pointer;
+    }
+
+    &:hover {
+      background-color: var(--chip-bg-hover, transparent);
+      border-color: var(--chip-border-color-hover, transparent);
+    }
+
+    &:active {
+      background-color: var(--chip-bg-active, transparent);
+      border-color: var(--chip-border-color-active, transparent);
+    }
+  }
+
+  &[data-selected] {
+    font-weight: var(--chip-font-weight-selected, 600);
+    background-color: var(--chip-bg-selected); // stronger than 200
+    border-color: var(--chip-border-color-selected);
+    color: var(--chip-text-color-selected);
+  }
+
+  @each $intent in $intents {
+    &[data-intent='#{$intent}'] {
+
+      --chip-ring-color: #{intent($intent, 600)};
+
+      // SOLID
+      &[data-variant='solid'] {
+        @include solid($intent);
+      }
+
+      // BASE
+      &[data-variant='base'] {
+        @include base($intent);
+      }
+
+      // OUTLINED
+      &[data-variant='outlined'] {
+        @include outlined($intent);
+      }
+
+      // GHOST
+      &[data-variant='ghost'] {
+        @include ghost($intent);
+      }
+
+      @include dark {
+        --chip-ring-color: #{intent($intent, 400)};
+
+        // SOLID
+        &[data-variant='solid'] {
+          @include solid($intent, 'dark');
         }
-    }
 
-    border: 1px solid var(--chip-border-color, transparent);
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--chip-gap);
-
-    align-self: center;
-
-    line-height: 1;
-    white-space: nowrap;
-
-    font-size: var(--chip-font-size);
-    font-weight: var(--chip-font-weight, 500);
-
-    overflow: hidden;
-
-    background-color: var(--chip-bg, transparent);
-    color: var(--chip-text-color);
-
-    padding-left: var(--chip-padding-x);
-    padding-right: var(--chip-padding-x);
-    padding-top: var(--chip-padding-y);
-    padding-bottom: var(--chip-padding-y);
-
-    transition:
-        transform 0.08s ease,
-        filter 0.12s ease,
-        box-shadow 0.12s ease,
-        background-color 0.12s ease,
-        border-color 0.12s ease,
-        color 0.12s ease;
-
-    .#{$chip-prefix} {
-        &__content {
-            display: inline-flex;
-            align-items: center;
+        // BASE
+        &[data-variant='base'] {
+          @include base($intent, 'dark');
         }
 
-        &__icon {
-            @include icon;
+        // OUTLINED
+        &[data-variant='outlined'] {
+          @include outlined($intent, 'dark');
         }
 
-        &__remove {
-            position: relative;
-
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-
-            width: 1em;
-            height: 1em;
-
-            flex-shrink: 0;
-
-            &::before {
-                content: '';
-                position: absolute;
-
-                inset: -0.4em; // 👈 expand clickable area
-                //border-radius: 50%;
-            }
-
-            .#{$chip-prefix}__remove-icon {
-                @include icon;
-            }
-
-            &:active {
-                transform: scale(0.9);
-            }
-
-            &:focus-visible{
-                outline: 2px solid var(--chip-remove-ring-color, var(--chip-ring-color));
-            }
+        // GHOST
+        &[data-variant='ghost'] {
+          @include ghost($intent, 'dark');
         }
+      }
     }
-
-    &[data-icon-only] {
-        padding-left: var(--chip-padding-y);
-        padding-right: var(--chip-padding-y);
-    }
-
-    &[data-disabled] {
-        cursor: not-allowed;
-
-        font-weight: var(--chip-font-weight-disabled, var(--chip-font-weight));
-        background-color: var(--chip-bg-disabled);
-        border-color: var(--chip-border-color-disabled);
-        color: var(--chip-text-color-disabled, var(--#{$p}-text-disabled));
-    }
-
-    &:focus-visible {
-        outline: 2px solid var(--chip-ring-color);
-        outline-offset: 2px;
-    }
-
-    &[data-removable]{
-        cursor: default;
-    }
-
-    &[data-interactive]:not([data-disabled]) {
-        cursor: pointer;
-
-        &:hover {
-            background-color: var(--chip-bg-hover, transparent);
-            border-color: var(--chip-border-color-hover, transparent);
-        }
-
-        &:active {
-            background-color: var(--chip-bg-active, transparent);
-            border-color: var(--chip-border-color-active, transparent);
-        }
-    }
-
-    &[data-selected] {
-        font-weight: var(--chip-font-weight-selected, 600);
-        background-color: var(--chip-bg-selected); // stronger than 200
-        border-color: var(--chip-border-color-selected);
-        color: var(--chip-text-color-selected);
-    }
-
-    @each $intent in $intents {
-        &[data-intent='#{$intent}'] {
-
-            --chip-ring-color: #{intent($intent, 600)};
-
-            // SOLID
-            &[data-variant='solid'] {
-                @include solid($intent);
-            }
-
-            // BASE
-            &[data-variant='base'] {
-                @include base($intent);
-            }
-
-            // OUTLINED
-            &[data-variant='outlined'] {
-                @include outlined($intent);
-            }
-
-            // GHOST
-            &[data-variant='ghost'] {
-                @include ghost($intent);
-            }
-
-            @include dark {
-                --chip-ring-color: #{intent($intent, 400)};
-
-                // SOLID
-                &[data-variant='solid'] {
-                    @include solid($intent, 'dark');
-                }
-
-                // BASE
-                &[data-variant='base'] {
-                    @include base($intent, 'dark');
-                }
-
-                // OUTLINED
-                &[data-variant='outlined'] {
-                    @include outlined($intent, 'dark');
-                }
-
-                // GHOST
-                &[data-variant='ghost'] {
-                    @include ghost($intent, 'dark');
-                }
-            }
-        }
-    }
+  }
 }

@@ -44,10 +44,11 @@ export type OwnChipProps = {
   onRemove?: () => void;
 };
 
-type ImplChipProps<C extends React.ElementType = 'button'> = PolymorphicProps<
-  C,
-  OwnChipProps & Omit<BoxProps, 'size'>
->;
+type ImplChipProps = OwnChipProps &
+  Omit<BoxProps, 'size'> &
+  ComponentProps<'button'> & {
+    as: React.ElementType;
+  };
 
 type ChipProps = OwnChipProps & Omit<BoxProps, 'size'>;
 
@@ -58,7 +59,11 @@ export const prefix = (name: string = '') => {
   return classPrefix(`--chip${name}`);
 };
 
-const ImplChip = <C extends React.ElementType = 'button'>(
+//-----------------------------------------------------------
+// Chip implementation
+//-----------------------------------------------------------
+
+const ImplChip = (
   {
     as,
     className,
@@ -86,7 +91,7 @@ const ImplChip = <C extends React.ElementType = 'button'>(
     onKeyDown,
 
     ...rest
-  }: ImplChipProps<C>,
+  }: ImplChipProps,
   ref: React.Ref<any>,
 ) => {
   const { href, target, rel } = rest as any;
@@ -117,8 +122,9 @@ const ImplChip = <C extends React.ElementType = 'button'>(
 
   const isButton = resolvedAs === 'button';
   const isLink = resolvedAs === 'a' || (!!href && !isButton && !removable);
-  const isInteractive =
-    (isButton || isLink || !!onClick) && !disabled && !removable && !noInteraction;
+  const isInteractive = (isButton || isLink || !!onClick) && !disabled && !noInteraction;
+  // const isInteractive =
+  //     (isButton || isLink || !!onClick) && !disabled && !removable && !noInteraction;
 
   const handleClick = (e: React.MouseEvent<any>) => {
     if (disabled) {

@@ -855,6 +855,8 @@ const TagsInputInner = <TTag extends BaseTagItem>(
     setInputValue('');
   };
 
+  const tagProps = {};
+
   const tagNodeWrapper = (
     tag: TTag,
     i: number,
@@ -1048,11 +1050,12 @@ const TagsInputInner = <TTag extends BaseTagItem>(
         }
 
         // DEFAULT CHIP
-        return tagNodeWrapper(
-          tag,
-          i,
-          id,
+        return (
           <Chip
+            as="button"
+            onClick={() => {
+              console.log(433434);
+            }}
             w={layout === 'grid' ? 'full' : undefined}
             size={size}
             // removable={!tag.disabled}
@@ -1063,8 +1066,25 @@ const TagsInputInner = <TTag extends BaseTagItem>(
             // focused={!tag.disabled && !disabled && activeId === id}
           >
             {tag.label}
-          </Chip>,
+          </Chip>
         );
+        // return tagNodeWrapper(
+        //   tag,
+        //   i,
+        //   id,
+        //   <Chip
+        //     w={layout === 'grid' ? 'full' : undefined}
+        //     size={size}
+        //     // removable={!tag.disabled}
+        //     disabled={tag.disabled || disabled}
+        //     onRemove={remove}
+        //     intent="primary"
+        //     selected={isSelected(id)}
+        //     // focused={!tag.disabled && !disabled && activeId === id}
+        //   >
+        //     {tag.label}
+        //   </Chip>,
+        // );
       })}
       {!tags.length && placeholder && (
         <span className={classPrefix('--placeholder')} data-disabled={disabled || undefined}>
