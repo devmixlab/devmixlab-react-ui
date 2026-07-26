@@ -1,7 +1,15 @@
 /**
  * @see tagsInputDocumentation.md
  */
-import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react';
+import React, {
+  forwardRef,
+  useRef,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useImperativeHandle,
+} from 'react';
 import { type TextInputProps } from '../TextInput/TextInput';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
 import clsx from 'clsx';
@@ -96,6 +104,11 @@ type TagsInputProps<TTag extends TagsInputItem = TagsInputItem> = Omit<
   onInputValueChange?: (value: string) => void;
 };
 
+type TagsInputRef = {
+  clearInput: () => void;
+  focusInput: () => void;
+};
+
 const DEFAULT_SEPARATOR = /[,\n]/;
 
 //--------------------------------------------------------
@@ -165,11 +178,11 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
 
     ...props
   }: TagsInputProps<TTag>,
-  ref: React.Ref<HTMLInputElement>,
+  // ref: React.Ref<HTMLInputElement>,
+  ref: React.Ref<TagsInputRef>,
 ) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const mirrorRef = useRef<HTMLSpanElement>(null);
-  const combinedRef = mergeRefs(inputRef, ref);
 
   const isCancellingRef = useRef(false);
   const originalValueRef = useRef<string>('');
@@ -287,6 +300,15 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
   useEffect(() => {
     onInputValueChange?.(inputValue);
   }, [inputValue]);
+
+  useImperativeHandle(ref, () => ({
+    clearInput() {
+      setInputValue('');
+    },
+    focusInput() {
+      inputRef.current?.focus();
+    },
+  }));
 
   const getId = (i: number) => tags[i]?.id ?? tags[i]?.value;
   const getIndexById = (id: string | number | null) => {
@@ -1223,7 +1245,7 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
         <>
           <span ref={mirrorRef} className={classPrefix(`--mirror`)} aria-hidden />
           <input
-            ref={combinedRef}
+            ref={inputRef}
             placeholder={inputPlaceholder}
             disabled={disabled || readOnly}
             value={inputValue}
@@ -1241,7 +1263,7 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
 
 const TagsInput = forwardRef(TagsInputImpl) as <TTag extends TagsInputItem = TagsInputItem>(
   props: TagsInputProps<TTag> & {
-    ref?: React.Ref<HTMLInputElement>;
+    ref?: React.Ref<TagsInputRef>;
   },
 ) => React.ReactElement;
 
@@ -1249,4 +1271,10 @@ const TagsInput = forwardRef(TagsInputImpl) as <TTag extends TagsInputItem = Tag
 
 export { TagsInput };
 
-export type { TagsInputItem, TagsInputTagRenderParams, TagsInputLayout, TagsInputProps };
+export type {
+  TagsInputItem,
+  TagsInputTagRenderParams,
+  TagsInputLayout,
+  TagsInputProps,
+  TagsInputRef,
+};
