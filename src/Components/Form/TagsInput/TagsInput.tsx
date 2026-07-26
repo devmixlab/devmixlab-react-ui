@@ -28,7 +28,7 @@ import { createPolymorphic } from '../../../types';
 //--------------------------------------------------------
 
 type TagsInputItem = {
-  id?: string | number;
+  id: string | number;
   label: string;
   value: string;
   disabled?: boolean;
@@ -1056,21 +1056,15 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
     >
       {tags.map((tag, i) => {
         const remove = () => removeTag(i);
-        const id = tag.id ?? tag.value;
+        const id = tag.id;
 
         // 🔥 EDIT MODE
         if (editingIndex === i && isEditable(tag, i)) {
           return (
-            <Box
-              key={tag.id ?? tag.value}
-              col={layout === 'grid' ? gridCol : undefined}
-              // w={layout === 'grid' ? 'full' : undefined}
-              d="flex"
-            >
+            <Box key={id} col={layout === 'grid' ? gridCol : undefined} d="flex">
               <span ref={editMirrorRef} className={classPrefix('--mirror')} aria-hidden />
               <Box
                 as="input"
-                // w={layout === 'grid' ? 'full' : undefined}
                 ref={editInputRef}
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
