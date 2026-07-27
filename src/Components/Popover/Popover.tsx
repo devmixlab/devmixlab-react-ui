@@ -176,14 +176,14 @@ type PopoverTriggerRenderProps = {
   // pressed: boolean;
 };
 
-type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
-  className?: string;
-  children?: React.ReactNode;
-  chevron?: PopoverChevron;
-  render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
-  btnProps?: ButtonProps;
-  renderContent?: T;
-};
+// type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
+//   className?: string;
+//   children?: React.ReactNode;
+//   chevron?: PopoverChevron;
+//   render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
+//   btnProps?: ButtonProps;
+//   renderContent?: T;
+// };
 
 type PopoverPanelProps<C extends React.ElementType = 'div'> = BoxComponentProps<
   C,
@@ -526,14 +526,26 @@ Popover.displayName = 'Popover';
 // PopoverTrigger
 // ---------------------------------------------------------------------------
 
+// type PopoverTriggerProps<T = {}> = React.HTMLAttributes<HTMLElement> & {
+//   // className?: string;
+//   // children?: React.ReactNode;
+//   chevron?: PopoverChevron;
+//   render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
+//   btnProps?: ButtonProps;
+//   renderContent?: T;
+// };
+
 type OwnPopoverTriggerProps<T = {}> = {
   chevron?: PopoverChevron;
   render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
-  btnProps?: ButtonProps;
+  // btnProps?: ButtonProps;
   renderContent?: T;
 };
 
-type ImplPopoverTriggerProps = OwnPopoverTriggerProps & ComponentProps<'button'>;
+type PopoverTriggerProps<T = {}> = OwnPopoverTriggerProps<T> &
+  Omit<ButtonProps, keyof OwnPopoverTriggerProps<T>>;
+
+type ImplPopoverTriggerProps<T = {}> = PopoverTriggerProps<T> & ComponentProps<'button'>;
 
 const PopoverTriggerImpl = (
   {
@@ -541,7 +553,10 @@ const PopoverTriggerImpl = (
     className,
     chevron = 'none',
     render,
-    btnProps,
+    // btnProps,
+    size = 'md',
+    startIcon,
+    endIcon,
     onClick,
     onKeyDown,
     onMouseEnter,
@@ -640,22 +655,19 @@ const PopoverTriggerImpl = (
     />
   );
 
-  const buttonSize = btnProps?.size ?? 'md';
-
   return (
     <Button
       {...rest}
       {...triggerProps}
       ref={combinedRef}
-      iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[buttonSize]}
+      // iconSlotWidth={BUTTON_ICON_SLOT_WIDTHS[size]}
+      size={size}
       className={triggerClassName}
       type="button"
       disabled={disabled}
       active={trigger === 'click' && opened}
-      {...btnProps}
-      // endIcon={chevronIcon}
-      startIcon={isLeftPlacement ? chevronIcon : btnProps?.startIcon}
-      endIcon={!isLeftPlacement ? chevronIcon : btnProps?.endIcon}
+      startIcon={startIcon ?? (isLeftPlacement && chevron ? chevronIcon : undefined)}
+      endIcon={endIcon ?? (!isLeftPlacement && chevron ? chevronIcon : undefined)}
     >
       {children}
     </Button>

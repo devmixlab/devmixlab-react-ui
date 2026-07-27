@@ -1,4 +1,12 @@
-import React, { forwardRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React, {
+  forwardRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+  ComponentProps,
+} from 'react';
 import { Box, BoxProps, BoxDerived, BoxDerivedProps } from '../../Box';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
@@ -393,7 +401,7 @@ type DropdownRenderContent = {
 
 type DropdownTriggerProps = {
   placeholder?: React.ReactNode;
-} & ButtonProps &
+} & ComponentProps<'button'> &
   PopoverTriggerProps<DropdownRenderContent>;
 
 const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
@@ -491,7 +499,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
       // ref: mergedRef,
       ...rest,
       // invokeOnly,
-      onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+      onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => {
         if (!disabled) {
           handleKeyDown(e);
         }
