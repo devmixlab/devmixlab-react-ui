@@ -11,7 +11,7 @@ import { CompositeProps } from '@floating-ui/react';
 //---------------------------------------------------------------
 
 export const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
-export type Size = (typeof sizes)[number];
+export type ChipSize = (typeof sizes)[number];
 
 export type ContentProps = BoxDerivedProps & ComponentProps<'span'>;
 
@@ -28,7 +28,7 @@ export type Intent =
 export type OwnChipProps = {
   intent?: Intent;
   variant?: Variant;
-  size?: Size;
+  size?: ChipSize;
 
   contentProps?: ContentProps;
 

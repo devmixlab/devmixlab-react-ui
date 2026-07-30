@@ -13,7 +13,7 @@ import React, {
 import { type TextInputProps } from '../TextInput/TextInput';
 import { FieldRoot } from '../FieldRoot/FieldRoot';
 import clsx from 'clsx';
-import { Chip } from '../../Chip/Chip';
+import { Chip, ChipSize } from '../../Chip/Chip';
 import { mergeRefs } from '../../../utils/mergeRefs';
 import { Box, BoxProps } from '../../Box/Box';
 import { Size } from '../form.tokens';
@@ -122,6 +122,16 @@ const normalizeTags = <TTag extends TagsInputItem>(tags: TTag[]): TTag[] =>
     ...tag,
     id: tag.id ?? crypto.randomUUID(),
   }));
+
+//--------------------------------------------------------
+// Maps
+//--------------------------------------------------------
+
+const chipSizeMap: Record<Size, ChipSize> = {
+  sm: 'md',
+  md: 'lg',
+  lg: 'xl',
+};
 
 //--------------------------------------------------------
 // TagsInputImpl
@@ -1203,7 +1213,7 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
             as="button"
             key={i}
             w={layout === 'grid' ? 'full' : undefined}
-            size={size}
+            size={chipSizeMap[size]}
             disabled={tag.disabled || disabled}
             onRemove={remove}
             intent="primary"

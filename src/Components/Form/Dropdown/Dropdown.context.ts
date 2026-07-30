@@ -12,7 +12,7 @@ import { GroupContextValue } from './Group.context';
 // import { PresenceState } from '../hooks/usePresence';
 // import { PopoverRole } from './Popover';
 
-type DropdownContextValue = {
+type DropdownContextValue<T extends string = string> = {
   modal: boolean;
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,11 +23,11 @@ type DropdownContextValue = {
   isPanelHovered: boolean;
   setIsPanelHovered: React.Dispatch<React.SetStateAction<boolean>>;
 
-  handleSelect: (nextValue: OptionValue) => void;
+  handleSelect: (nextValue: OptionValue<T>) => void;
 
   focusByTypeahead: (key: string) => void;
 
-  isOptionShown: (option: DropdownOptionData) => boolean;
+  isOptionShown: (option: DropdownOptionData<T>) => boolean;
   isGroupShown: (group: GroupContextValue) => boolean;
 
   disabled: boolean;
@@ -41,13 +41,13 @@ type DropdownContextValue = {
 
   focusableList: FocusableListResult;
 
-  selectedOption?: DropdownOptionData;
-  selectedValue?: OptionValue;
+  selectedOption?: DropdownOptionData<T>;
+  selectedValue?: OptionValue<T>;
 
-  options: DropdownOptionData[];
-  filteredOptions: DropdownOptionData[];
+  options: DropdownOptionData<T>[];
+  filteredOptions: DropdownOptionData<T>[];
 
-  registerOption: (option: DropdownOptionData) => void;
+  registerOption: (option: DropdownOptionData<T>) => void;
   unregisterOption: (id: string) => void;
 
   runAfterReady: (callback: () => void) => void;
@@ -59,16 +59,16 @@ type DropdownContextValue = {
   invokeOnly: boolean;
 };
 
-const DropdownContext = createContext<DropdownContextValue | null>(null);
+const DropdownContext = createContext<DropdownContextValue<any> | null>(null);
 
-const useDropdownContext = () => {
+const useDropdownContext = <T extends string = string>() => {
   const ctx = useContext(DropdownContext);
 
   if (!ctx) {
     throw new Error('Dropdown components must be used inside <Dropdown />');
   }
 
-  return ctx;
+  return ctx as DropdownContextValue<T>;
 };
 
 export { DropdownContext, useDropdownContext };

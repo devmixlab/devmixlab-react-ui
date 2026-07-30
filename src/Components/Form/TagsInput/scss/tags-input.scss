@@ -9,8 +9,8 @@ $tags-input-prefix: #{$p}--tags-input;
 
 $sizes: (
     sm: (height: 32px, spacingY: 4px, spacingTop: 8px),
-    md: (height: 40px, spacingY: 8px, spacingTop: 12px),
-    lg: (height: 48px, spacingY: 12px, spacingTop: 15px),
+    md: (height: 40px, spacingY: 4px, spacingTop: 12px),
+    lg: (height: 48px, spacingY: 4px, spacingTop: 12px),
 );
 
 .#{$tags-input-prefix} {
