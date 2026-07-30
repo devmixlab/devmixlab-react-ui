@@ -1,0 +1,25 @@
+
+@use '../../../scss/config' as cfg;
+@use '../../../scss/functions/common' as *;
+@use '../../../scss/mixins/mode' as *;
+
+$p: cfg.$prefix;
+$loading-overlay-prefix: #{$p}--loading-overlay;
+
+.#{$loading-overlay-prefix} {
+  position: fixed;
+  inset: 0;
+  //z-index: 100;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: auto;
+  user-select: none;
+
+  background-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
+
+}
