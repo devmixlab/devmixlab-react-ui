@@ -91,6 +91,8 @@ type TagsInputProps<TTag extends TagsInputItem = TagsInputItem> = Omit<
 
   onTagAdd?: (tag: TTag) => void;
   onTagRemove?: (tag: TTag, index: number) => void;
+  onTagRemoving?: (tag: TTag, index: number) => boolean | void | Promise<boolean | void>;
+  onTagsRemoving?: (tags: TTag[]) => boolean | void | Promise<boolean | void>;
 
   clearable?: boolean;
   clearIcon?: React.ReactNode;
@@ -174,6 +176,8 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
     removable = true,
     onTagAdd,
     onTagRemove,
+    onTagRemoving,
+    onTagsRemoving,
 
     clearable,
     clearIcon,
@@ -518,24 +522,45 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
     onTagAdd?.(newTag);
     setInputValue('');
   };
-  const removeTag = (index: number) => {
+  // const removeTag = (index: number) => {
+  //   if (disabled || readOnly) return;
+  //
+  //   const removed = tags[index];
+  //   if (!isRemovable(removed, index)) return;
+  //
+  //   const next = tags.filter((_, i) => i !== index);
+  //
+  //   console.log(next);
+  //
+  //   setTags(next);
+  //   onTagRemove?.(removed, index);
+  //
+  //   if (next.length === 0) {
+  //     inputRef.current?.focus();
+  //   }
+  //
+  //   if (next.length <= index) {
+  //     inputRef.current?.focus();
+  //   }
+  // };
+  const removeTag = async (index: number) => {
     if (disabled || readOnly) return;
 
     const removed = tags[index];
     if (!isRemovable(removed, index)) return;
 
-    const next = tags.filter((_, i) => i !== index);
+    const shouldRemove = await onTagRemoving?.(removed, index);
 
-    console.log(next);
+    if (shouldRemove === false) {
+      return;
+    }
+
+    const next = tags.filter((_, i) => i !== index);
 
     setTags(next);
     onTagRemove?.(removed, index);
 
-    if (next.length === 0) {
-      inputRef.current?.focus();
-    }
-
-    if (next.length <= index) {
+    if (next.length === 0 || next.length <= index) {
       inputRef.current?.focus();
     }
   };
@@ -778,8 +803,129 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
       }
     }
   };
-  const removeSelected = () => {
+  // const removeSelected = async () => {
+  //   // if (!selectedIds.size) return;
+  //   //
+  //   // const next = tags.filter((tag, i) => {
+  //   //   const id = getId(i);
+  //   //
+  //   //   if (selectedIds.has(id) && !tag.disabled) {
+  //   //     onTagRemove?.(tag, i);
+  //   //     return false;
+  //   //   }
+  //   //
+  //   //   return true;
+  //   // });
+  //   //
+  //   // setTags(next);
+  //   //
+  //   // setSelectedIds(new Set());
+  //   // setSelectionAnchor(null);
+  //   //
+  //   // if (next.length === 0) {
+  //   //   setActiveId(null);
+  //   //   focusInput();
+  //   //   return;
+  //   // }
+  //
+  //   if (!selectedIds.size) return;
+  //
+  //   const removable = tags.filter((tag, i) => {
+  //     const id = getId(i);
+  //     return selectedIds.has(id) && !tag.disabled;
+  //   });
+  //
+  //   const shouldRemove = await onTagsRemoving?.(removable);
+  //
+  //   if (shouldRemove === false) {
+  //     return;
+  //   }
+  //
+  //   const next = tags.filter((tag, i) => {
+  //     const id = getId(i);
+  //
+  //     if (selectedIds.has(id) && !tag.disabled) {
+  //       onTagRemove?.(tag, i);
+  //       return false;
+  //     }
+  //
+  //     return true;
+  //   });
+  //
+  //   setTags(next);
+  //
+  //   setSelectedIds(new Set());
+  //   setSelectionAnchor(null);
+  //
+  //   if (next.length === 0) {
+  //     setActiveId(null);
+  //     focusInput();
+  //     return;
+  //   }
+  //
+  //   // active tag survived
+  //   const survivingActive = next.find((t) => (t.id ?? t.value) === activeId);
+  //
+  //   if (survivingActive && !survivingActive.disabled) {
+  //     const id = survivingActive.id ?? survivingActive.value;
+  //
+  //     setActiveId(id);
+  //     setSelectionAnchor(id);
+  //     focusTag(id);
+  //
+  //     return;
+  //   }
+  //
+  //   // fallback: nearest enabled tag
+  //   const previousIndex = findNextEnabled(
+  //     next,
+  //     Math.min(getIndexById(activeId), next.length - 1),
+  //     -1,
+  //   );
+  //
+  //   const nextIndex =
+  //     previousIndex ?? findNextEnabled(next, Math.min(getIndexById(activeId), next.length - 1), 1);
+  //
+  //   if (nextIndex == null) {
+  //     setActiveId(null);
+  //     focusInput();
+  //     return;
+  //   }
+  //
+  //   const nextTag = next[nextIndex];
+  //   const nextId = nextTag.id ?? nextTag.value;
+  //
+  //   setActiveId(nextId);
+  //   setSelectionAnchor(nextId);
+  //   focusTag(nextId);
+  // };
+
+  const removeSelected = async () => {
     if (!selectedIds.size) return;
+
+    const removable = tags.filter((tag, i) => {
+      const id = getId(i);
+      return selectedIds.has(id) && !tag.disabled;
+    });
+
+    if (!removable.length) return;
+
+    if (removable.length === 1) {
+      const tag = removable[0];
+      const index = tags.findIndex((t) => (t.id ?? t.value) === (tag.id ?? tag.value));
+
+      const shouldRemove = await onTagRemoving?.(tag, index);
+
+      if (shouldRemove === false) {
+        return;
+      }
+    } else {
+      const shouldRemove = await onTagsRemoving?.(removable);
+
+      if (shouldRemove === false) {
+        return;
+      }
+    }
 
     const next = tags.filter((tag, i) => {
       const id = getId(i);
