@@ -634,7 +634,7 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
     props.onKeyDown?.(e);
   };
 
-  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+  const handleTagKeyDown = async (e: React.KeyboardEvent) => {
     const index = getIndexById(activeId);
     const anchor = selectionAnchor ?? activeId ?? getId(index);
 
@@ -752,49 +752,55 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
 
       if (targetIndex === null) return; // nothing to delete
 
-      const next = tags.filter((_, i) => i !== targetIndex);
+      e.preventDefault();
 
-      const removed = tags[targetIndex];
-      onTagRemove?.(removed, targetIndex);
-      setTags(next);
+      await removeTag(targetIndex);
 
-      if (next.length === 0) {
-        setActiveId(null);
-        requestAnimationFrame(() => inputRef.current?.focus());
-        return;
-      }
+      return;
 
-      let nextIndexTemp: number | null;
-      if (e.key === 'Backspace') {
-        nextIndexTemp = findNextEnabled(next, index - 1, 1);
-      } else {
-        nextIndexTemp = findNextEnabled(next, index, 1);
-      }
-
-      if (nextIndexTemp == null) {
-        // token-only mode (e.g. FileUpload)
-        if (!inputEnabled) {
-          const fallbackIndex = findNextEnabled(next, next.length - 1, -1);
-
-          if (fallbackIndex != null) {
-            nextIndexTemp = fallbackIndex;
-          } else {
-            setActiveId(null);
-            return;
-          }
-        } else {
-          focusInput();
-          return;
-        }
-      }
-
-      const nextIndex = nextIndexTemp;
-
-      const nextTag = next[nextIndex];
-      const nextId = nextTag.id ?? nextTag.value;
-
-      setActiveId(nextId);
-      focusTag(nextId);
+      // const next = tags.filter((_, i) => i !== targetIndex);
+      //
+      // const removed = tags[targetIndex];
+      // onTagRemove?.(removed, targetIndex);
+      // setTags(next);
+      //
+      // if (next.length === 0) {
+      //   setActiveId(null);
+      //   requestAnimationFrame(() => inputRef.current?.focus());
+      //   return;
+      // }
+      //
+      // let nextIndexTemp: number | null;
+      // if (e.key === 'Backspace') {
+      //   nextIndexTemp = findNextEnabled(next, index - 1, 1);
+      // } else {
+      //   nextIndexTemp = findNextEnabled(next, index, 1);
+      // }
+      //
+      // if (nextIndexTemp == null) {
+      //   // token-only mode (e.g. FileUpload)
+      //   if (!inputEnabled) {
+      //     const fallbackIndex = findNextEnabled(next, next.length - 1, -1);
+      //
+      //     if (fallbackIndex != null) {
+      //       nextIndexTemp = fallbackIndex;
+      //     } else {
+      //       setActiveId(null);
+      //       return;
+      //     }
+      //   } else {
+      //     focusInput();
+      //     return;
+      //   }
+      // }
+      //
+      // const nextIndex = nextIndexTemp;
+      //
+      // const nextTag = next[nextIndex];
+      // const nextId = nextTag.id ?? nextTag.value;
+      //
+      // setActiveId(nextId);
+      // focusTag(nextId);
     }
 
     if (e.key === 'Enter') {
