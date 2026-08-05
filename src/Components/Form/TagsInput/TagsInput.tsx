@@ -564,7 +564,7 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
       inputRef.current?.focus();
     }
   };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!inputEnabled) {
       props.onKeyDown?.(e);
       return;
@@ -617,18 +617,31 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
       return;
     }
 
+    // if (e.key === 'Backspace' && !inputValue && tags.length) {
+    //   e.preventDefault();
+    //
+    //   // 1. find deletable
+    //   const targetIndex = findNextEnabled(tags, tags.length - 1, -1);
+    //   if (targetIndex === null) return;
+    //
+    //   const next = tags.filter((_, i) => i !== targetIndex);
+    //
+    //   setTags(next);
+    //
+    //   requestAnimationFrame(() => inputRef.current?.focus());
+    // }
+
     if (e.key === 'Backspace' && !inputValue && tags.length) {
       e.preventDefault();
 
-      // 1. find deletable
       const targetIndex = findNextEnabled(tags, tags.length - 1, -1);
       if (targetIndex === null) return;
 
-      const next = tags.filter((_, i) => i !== targetIndex);
-
-      setTags(next);
+      await removeTag(targetIndex);
 
       requestAnimationFrame(() => inputRef.current?.focus());
+
+      return;
     }
 
     props.onKeyDown?.(e);
