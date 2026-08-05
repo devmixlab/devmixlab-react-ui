@@ -47,7 +47,7 @@ type OwnModalProps = {
   intent?: string;
 
   closeOnEscape?: boolean;
-  initialFocus?: React.RefObject<HTMLElement>;
+  initialFocus?: React.RefObject<HTMLElement | null>;
   portalContainer?: HTMLElement;
   overlayStyle?: ModalOverlayStyle;
 
