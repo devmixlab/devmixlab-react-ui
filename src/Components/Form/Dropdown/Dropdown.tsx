@@ -81,6 +81,8 @@ export type DropdownProps<T extends string = string> = {
   openOnArrowKeys?: boolean;
 
   invokeOnly?: boolean;
+
+  returnFocusOnOptionPick?: boolean;
 } & PopoverProps;
 
 // type DropdownComponent = React.ForwardRefExoticComponent<
@@ -167,6 +169,8 @@ function DropdownImpl<T extends string = string>(
     onUnmount,
     onEntered,
     onReady,
+
+    returnFocusOnOptionPick = false,
 
     ...rest
   }: DropdownProps<T>,
@@ -320,6 +324,7 @@ function DropdownImpl<T extends string = string>(
       modal,
       opened,
       setOpened,
+      returnFocusOnOptionPick,
       triggerRef,
       panelRef,
       isPanelHovered,
@@ -352,6 +357,7 @@ function DropdownImpl<T extends string = string>(
     [
       modal,
       opened,
+      returnFocusOnOptionPick,
       triggerRef,
       panelRef,
       isPanelHovered,
@@ -1226,6 +1232,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
       setOpened,
       opened,
       isOptionShown,
+      returnFocusOnOptionPick,
       triggerRef,
       modal,
       invokeOnly,
@@ -1302,9 +1309,10 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
         e.preventDefault();
         e.stopPropagation();
         handleSelect(value);
-        requestAnimationFrame(() => {
-          triggerRef.current?.focus();
-        });
+        if (returnFocusOnOptionPick)
+          requestAnimationFrame(() => {
+            triggerRef.current?.focus();
+          });
       } else if (key === 'Escape') {
         e.preventDefault();
         e.stopPropagation();
@@ -1332,9 +1340,10 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
 
         if (!finalDisabled) {
           handleSelect(value);
-          requestAnimationFrame(() => {
-            triggerRef.current?.focus();
-          });
+          if (returnFocusOnOptionPick)
+            requestAnimationFrame(() => {
+              triggerRef.current?.focus();
+            });
         }
       },
 

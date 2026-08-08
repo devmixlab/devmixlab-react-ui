@@ -17,6 +17,7 @@ type DropdownContextValue<T extends string = string> = {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 
+  returnFocusOnOptionPick: boolean;
   triggerRef: React.RefObject<HTMLElement | null>;
   panelRef: React.RefObject<HTMLDivElement | null>;
 
