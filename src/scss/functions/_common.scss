@@ -1,7 +1,16 @@
 @use '../config' as cfg;
+@use '../palette.oklch' as *;
+@use '../vars/common' as *;
+@use 'sass:map';
 
 $prefix: cfg.$prefix;
 
 @function intent($name, $step) {
     @return var(--#{$prefix}-intent-#{$name}-#{$step});
+}
+
+@function intentHex($name, $step) {
+  $palette: map.get($oklch-palette-map, $name);
+  $intent: map.get($palette, $step);
+  @return $intent;
 }
