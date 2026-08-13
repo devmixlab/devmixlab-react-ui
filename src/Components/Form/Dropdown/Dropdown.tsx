@@ -869,7 +869,7 @@ Dropdown.Trigger = DropdownTrigger;
 type DropdownFieldTriggerProps = DropdownTriggerProps & FieldLayoutProps & SharedFieldRootProps;
 
 const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
-  ({ controls, placeholder = 'Select option', children, ...rest }, ref) => {
+  ({ controls, placeholder = 'Select option', children, chevron = 'none', ...rest }, ref) => {
     const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
 
     const ctx = useDropdownContext();
@@ -914,11 +914,13 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
               controls={
                 <>
                   {controls}
-                  <ChevronDownIcon
-                    className={prefix('__chevron')}
-                    data-opened={opened || undefined}
-                    aria-hidden
-                  />
+                  {chevron && (chevron === 'fixed' || chevron === 'rotate') && (
+                    <ChevronDownIcon
+                      className={prefix('__chevron')}
+                      data-opened={chevron === 'rotate' ? opened || undefined : undefined}
+                      aria-hidden
+                    />
+                  )}
                 </>
               }
               {...fieldRootProps}
