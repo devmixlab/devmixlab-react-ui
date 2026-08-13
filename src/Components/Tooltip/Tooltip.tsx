@@ -43,6 +43,7 @@ type TooltipProps = {
   rounded?: BoxProps['rounded'];
   maxWidth?: BoxProps['maxWidth'];
   maxW?: BoxProps['maxW'];
+  zIndex?: BoxProps['zIndex'];
 
   density?: TooltipDensity;
 };
@@ -90,6 +91,7 @@ const Tooltip = forwardRef<HTMLElement, TooltipProps>(
       rounded = 'sm',
       maxWidth,
       maxW,
+      zIndex,
     },
     ref,
   ) => {
@@ -147,6 +149,7 @@ const Tooltip = forwardRef<HTMLElement, TooltipProps>(
           rounded={rounded}
           data-variant={`tooltip-${variant}`}
           data-intent={intent}
+          zIndex={zIndex}
         >
           <Box
             rounded={rounded}
