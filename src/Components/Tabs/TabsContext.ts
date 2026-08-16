@@ -7,6 +7,9 @@ export type TabsContextValue = {
   iconPlacement?: TabsIconPlacement;
   size?: TabsSize;
 
+  intent?: string;
+  variant?: string;
+
   value: string;
   onChange: (value: string) => void;
 

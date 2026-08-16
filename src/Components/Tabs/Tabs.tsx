@@ -24,6 +24,9 @@ type TabsProps = {
   iconPlacement?: TabsIconPlacement;
   size?: TabsSize;
 
+  intent?: string;
+  variant?: string;
+
   value?: string;
   defaultValue?: string;
 
@@ -41,6 +44,8 @@ export const prefix = (name: string = '') => classPrefix(`--tags${name}`);
 //----------------------------------------------------------------------
 
 const Tabs: TabsComponent = ({
+  intent,
+  variant,
   fullWidth = false,
   equalWidthTabs = false,
   size = 'md',
@@ -77,6 +82,8 @@ const Tabs: TabsComponent = ({
   return (
     <TabsContext.Provider
       value={{
+        intent,
+        variant,
         size,
         fullWidth,
         equalWidthTabs,
@@ -86,7 +93,14 @@ const Tabs: TabsComponent = ({
         tabs: tabs.current,
       }}
     >
-      <div className={clsx(prefix(), className)}>{children}</div>
+      <div
+        className={clsx(prefix(), className)}
+        data-intent={intent}
+        data-variant={variant}
+        data-size={size}
+      >
+        {children}
+      </div>
     </TabsContext.Provider>
   );
 };

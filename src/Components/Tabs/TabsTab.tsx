@@ -80,6 +80,8 @@ function TabsTab({
     registerTab,
     onChange,
     equalWidthTabs,
+    intent,
+    variant,
   } = useTabsContext();
 
   const active = ctxValue === value;
@@ -110,10 +112,13 @@ function TabsTab({
       px={px}
       py={py}
       fs={fs}
+      cursor="pointer"
       grow={grow ?? (equalWidthTabs || undefined)}
       className={clsx(prefix('__tab'), className)}
       data-active={active || undefined}
       data-size={size}
+      data-intent={intent}
+      data-variant={variant}
     >
       {children}
     </Box>
