@@ -14,8 +14,15 @@ type TabsComponent = React.FC<TabsProps> & {
   Tab: typeof TabsTab;
 };
 
+type TabsIconPlacement = 'top' | 'bottom' | 'start' | 'end';
+type TabsSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
 type TabsProps = {
   // children: ReactNode;
+  fullWidth?: boolean;
+  equalWidthTabs?: boolean;
+  iconPlacement?: TabsIconPlacement;
+  size?: TabsSize;
 
   value?: string;
   defaultValue?: string;
@@ -33,7 +40,16 @@ export const prefix = (name: string = '') => classPrefix(`--tags${name}`);
 // Tabs
 //----------------------------------------------------------------------
 
-const Tabs: TabsComponent = ({ className, children, value, defaultValue, onChange }: TabsProps) => {
+const Tabs: TabsComponent = ({
+  fullWidth = false,
+  equalWidthTabs = false,
+  size = 'md',
+  className,
+  children,
+  value,
+  defaultValue,
+  onChange,
+}: TabsProps) => {
   const controlled = value !== undefined;
 
   const [internalValue, setInternalValue] = useState(defaultValue ?? '');
@@ -61,6 +77,9 @@ const Tabs: TabsComponent = ({ className, children, value, defaultValue, onChang
   return (
     <TabsContext.Provider
       value={{
+        size,
+        fullWidth,
+        equalWidthTabs,
         value: activeValue,
         onChange: handleChange,
         registerTab,
@@ -80,3 +99,5 @@ Tabs.Tab = TabsTab;
 //------------------------------------------------------
 
 export { Tabs };
+
+export type { TabsIconPlacement, TabsSize };

@@ -25,14 +25,16 @@ function TabsList({
   borderBottomStyle = 'solid',
   borderBottomColor = '#ccc',
   position = 'relative',
-  display = 'inline-flex',
+  display: displayProp,
   gap = 1,
 
   indicatorProps,
 
   ...rest
 }: TabsListProps) {
-  const { tabs, value: activeValue } = useTabsContext();
+  const { tabs, value: activeValue, fullWidth } = useTabsContext();
+
+  const display = displayProp ?? (fullWidth ? 'flex' : 'inline-flex');
 
   const [indicator, setIndicator] = useState({
     left: 0,

@@ -1,6 +1,12 @@
 import { createContext, useContext } from 'react';
+import { TabsIconPlacement, TabsSize } from './Tabs';
 
 export type TabsContextValue = {
+  fullWidth: boolean;
+  equalWidthTabs?: boolean;
+  iconPlacement?: TabsIconPlacement;
+  size?: TabsSize;
+
   value: string;
   onChange: (value: string) => void;
 
