@@ -35,6 +35,10 @@ const Overlay = ({
   children,
   zIndex = 100,
   gap = '12px',
+
+  position = 'fixed',
+  inset = 0,
+
   ...rest
 }: OverlayProps) => {
   return (
@@ -46,6 +50,8 @@ const Overlay = ({
       exitDuration={250}
       zIndex={zIndex}
       gap={gap}
+      position={position}
+      inset={inset}
     >
       {spinner ?? <DefaultSpinner />}
       {children}
