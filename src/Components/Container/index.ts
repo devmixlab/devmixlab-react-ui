@@ -1,2 +1,3 @@
-export { Container } from './Container';
-export { ContainerProvider } from './ContainerProvider';
+export * from './Container';
+export * from './ContainerProvider';
+export * from './Container.context';

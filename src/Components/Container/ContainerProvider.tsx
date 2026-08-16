@@ -1,13 +1,32 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 import { ContainerContext, ContainerContextValue } from './Container.context';
+import type { ContainerSize } from './Container';
 
 type ContainerProviderProps = ContainerContextValue & {
-    children: ReactNode;
+  children: ReactNode;
 };
 
-function ContainerProvider({ children, ...value }: ContainerProviderProps) {
-    return <ContainerContext.Provider value={value}>{children}</ContainerContext.Provider>;
+import { Responsive } from '../../utils/responsive';
+
+function ContainerProvider({
+  children,
+  size: initialSize,
+  centered = true,
+}: ContainerProviderProps) {
+  const [size, setSize] = useState<Responsive<ContainerSize | undefined>>(initialSize);
+
+  return (
+    <ContainerContext.Provider
+      value={{
+        size,
+        centered,
+        setSize,
+      }}
+    >
+      {children}
+    </ContainerContext.Provider>
+  );
 }
 
 export { ContainerProvider };
