@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect, ComponentProps, useRef } from 'react';
 import { useTabsContext } from './TabsContext';
 import { prefix } from './Tabs';
 import clsx from 'clsx';
-import { Box, BoxProps, BoxDerived, BoxDerivedProps } from '../Box';
+import { BoxDerived, BoxDerivedProps } from '../Box';
 
 //-----------------------------------
 // Types
@@ -18,50 +18,110 @@ type TabsListProps = {
 // TabsList
 //-----------------------------------
 
-function TabsList({
-  children,
-  className,
-
-  indicatorProps,
-
-  ...rest
-}: TabsListProps) {
-  const { tabs, value: activeValue, fullWidth } = useTabsContext();
+function TabsList({ children, className, indicatorProps, ...rest }: TabsListProps) {
+  const { tabs, value: activeValue } = useTabsContext();
 
   const listRef = useRef<HTMLDivElement>(null);
+
+  const [resizing, setResizing] = useState(false);
 
   const [indicator, setIndicator] = useState({
     left: 0,
     width: 0,
   });
 
-  useEffect(() => {
-    const element = tabs.get(activeValue);
+  //-----------------------------------
+  // Window resize state
+  //-----------------------------------
 
-    if (!element) {
+  useEffect(() => {
+    let timeout: number;
+
+    const handleResize = () => {
+      setResizing(true);
+
+      clearTimeout(timeout);
+
+      timeout = window.setTimeout(() => {
+        setResizing(false);
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  //-----------------------------------
+  // Indicator position
+  //-----------------------------------
+
+  useEffect(() => {
+    const updateIndicator = () => {
+      const element = tabs.get(activeValue);
+
+      if (!element) {
+        return;
+      }
+
+      setIndicator({
+        left: element.offsetLeft,
+        width: element.offsetWidth,
+      });
+    };
+
+    updateIndicator();
+
+    const listElement = listRef.current;
+
+    if (!listElement) {
       return;
     }
 
-    setIndicator({
-      left: element.offsetLeft,
-      width: element.offsetWidth,
+    const observer = new ResizeObserver(() => {
+      updateIndicator();
     });
+
+    observer.observe(listElement);
+
+    return () => {
+      observer.disconnect();
+    };
   }, [tabs, activeValue]);
+
+  //-----------------------------------
+  // Indicator props
+  //-----------------------------------
 
   const indicatorOptions = indicatorProps ?? {};
 
   const finalIndicatorProps = {
     ...indicatorOptions,
-    className: clsx(prefix('__indicator'), indicatorOptions.className ?? ''),
+    className: clsx(prefix('__indicator'), indicatorOptions.className),
     style: {
       ...indicatorOptions.style,
       left: indicator.left,
       width: indicator.width,
+      ...(resizing && {
+        transition: 'none',
+      }),
     },
   };
 
+  //-----------------------------------
+  // Render
+  //-----------------------------------
+
   return (
-    <BoxDerived ref={listRef} {...rest} className={clsx(prefix('__list'), className)}>
+    <BoxDerived
+      ref={listRef}
+      {...rest}
+      className={clsx(prefix('__list'), className)}
+      data-resizing={resizing || undefined}
+    >
       {children}
 
       <BoxDerived {...finalIndicatorProps} />
