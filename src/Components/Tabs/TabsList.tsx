@@ -1,8 +1,8 @@
-import { ReactNode, useState, useEffect, ComponentProps } from 'react';
+import { ReactNode, useState, useEffect, ComponentProps, useRef } from 'react';
 import { useTabsContext } from './TabsContext';
 import { prefix } from './Tabs';
 import clsx from 'clsx';
-import { Box, BoxProps } from '../Box';
+import { Box, BoxProps, BoxDerived, BoxDerivedProps } from '../Box';
 
 //-----------------------------------
 // Types
@@ -10,8 +10,8 @@ import { Box, BoxProps } from '../Box';
 
 type TabsListProps = {
   children: ReactNode;
-  indicatorProps?: BoxProps & ComponentProps<'div'>;
-} & BoxProps &
+  indicatorProps?: BoxDerivedProps & ComponentProps<'div'>;
+} & BoxDerivedProps &
   ComponentProps<'div'>;
 
 //-----------------------------------
@@ -21,12 +21,6 @@ type TabsListProps = {
 function TabsList({
   children,
   className,
-  borderBottomWidth = '1px',
-  borderBottomStyle = 'solid',
-  borderBottomColor = '#ccc',
-  position = 'relative',
-  display: displayProp,
-  gap = 1,
 
   indicatorProps,
 
@@ -34,7 +28,7 @@ function TabsList({
 }: TabsListProps) {
   const { tabs, value: activeValue, fullWidth } = useTabsContext();
 
-  const display = displayProp ?? (fullWidth ? 'flex' : 'inline-flex');
+  const listRef = useRef<HTMLDivElement>(null);
 
   const [indicator, setIndicator] = useState({
     left: 0,
@@ -58,12 +52,6 @@ function TabsList({
 
   const finalIndicatorProps = {
     ...indicatorOptions,
-    position: indicatorOptions.position ?? 'absolute',
-    bottom: indicatorOptions.bottom ?? 0,
-    h: indicatorOptions.h ?? 2,
-    rounded: indicatorOptions.rounded ?? 'full',
-    bg: indicatorOptions.bg ?? '#ccc',
-    transition: indicatorOptions.transition ?? 'all .3s ease',
     className: clsx(prefix('__indicator'), indicatorOptions.className ?? ''),
     style: {
       ...indicatorOptions.style,
@@ -73,20 +61,11 @@ function TabsList({
   };
 
   return (
-    <Box
-      {...rest}
-      borderBottomWidth={borderBottomWidth}
-      borderBottomStyle={borderBottomStyle}
-      borderBottomColor={borderBottomColor}
-      position={position}
-      display={display}
-      gap={gap}
-      className={clsx(prefix('__list'), className)}
-    >
+    <BoxDerived ref={listRef} {...rest} className={clsx(prefix('__list'), className)}>
       {children}
 
-      <Box {...finalIndicatorProps} />
-    </Box>
+      <BoxDerived {...finalIndicatorProps} />
+    </BoxDerived>
   );
 }
 

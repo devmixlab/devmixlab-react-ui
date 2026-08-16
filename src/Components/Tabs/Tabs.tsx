@@ -4,6 +4,9 @@ import { TabsList } from './TabsList';
 import { TabsTab } from './TabsTab';
 import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
+// import { useFocusTrap } from '../../hooks';
+import { FocusableItem, useFocusableList } from '../../hooks/useFocusableList';
+import { FocusScope } from '../Navbar/Navbar.types';
 
 //----------------------------------------------------------------------
 // Types
@@ -16,6 +19,7 @@ type TabsComponent = React.FC<TabsProps> & {
 
 type TabsIconPlacement = 'top' | 'bottom' | 'start' | 'end';
 type TabsSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type TabsOrientation = 'horizontal' | 'vertical';
 
 type TabsProps = {
   // children: ReactNode;
@@ -23,6 +27,7 @@ type TabsProps = {
   equalWidthTabs?: boolean;
   iconPlacement?: TabsIconPlacement;
   size?: TabsSize;
+  orientation?: TabsOrientation;
 
   intent?: string;
   variant?: string;
@@ -37,7 +42,7 @@ type TabsProps = {
 // Helpers
 //----------------------------------------------------------------------
 
-export const prefix = (name: string = '') => classPrefix(`--tags${name}`);
+export const prefix = (name: string = '') => classPrefix(`--tabs${name}`);
 
 //----------------------------------------------------------------------
 // Tabs
@@ -49,12 +54,21 @@ const Tabs: TabsComponent = ({
   fullWidth = false,
   equalWidthTabs = false,
   size = 'md',
+  orientation = 'horizontal',
   className,
   children,
   value,
   defaultValue,
   onChange,
+
+  iconPlacement,
 }: TabsProps) => {
+  const [focusableItems, setfocusableItems] = useState<Map<string, FocusableItem>>(new Map([]));
+
+  const focusableList = useFocusableList([...focusableItems.values()]);
+
+  // console.log('focusableItems', focusableItems);
+
   const controlled = value !== undefined;
 
   const [internalValue, setInternalValue] = useState(defaultValue ?? '');
@@ -71,17 +85,34 @@ const Tabs: TabsComponent = ({
 
   const tabs = useRef(new Map<string, HTMLButtonElement>());
 
-  const registerTab = useCallback((value: string, element: HTMLButtonElement | null) => {
-    if (element) {
-      tabs.current.set(value, element);
-    } else {
-      tabs.current.delete(value);
-    }
-  }, []);
+  const registerTab = useCallback(
+    (value: string, element: HTMLButtonElement | null, disabled = false) => {
+      if (element) {
+        tabs.current.set(value, element);
+        setfocusableItems((prev) => {
+          const next = new Map(prev);
+          next.set(value, { id: value, disabled });
+          return next;
+        });
+      } else {
+        tabs.current.delete(value);
+        setfocusableItems((prev) => {
+          const next = new Map(prev);
+          next.delete(value);
+          return next;
+        });
+      }
+    },
+    [],
+  );
+
+  // useFocusTrap({ active: true,  });
 
   return (
     <TabsContext.Provider
       value={{
+        orientation,
+        focusableList,
         intent,
         variant,
         size,
@@ -91,6 +122,7 @@ const Tabs: TabsComponent = ({
         onChange: handleChange,
         registerTab,
         tabs: tabs.current,
+        iconPlacement,
       }}
     >
       <div
@@ -98,6 +130,7 @@ const Tabs: TabsComponent = ({
         data-intent={intent}
         data-variant={variant}
         data-size={size}
+        data-orientation={orientation}
       >
         {children}
       </div>
@@ -114,4 +147,4 @@ Tabs.Tab = TabsTab;
 
 export { Tabs };
 
-export type { TabsIconPlacement, TabsSize };
+export type { TabsIconPlacement, TabsSize, TabsOrientation };

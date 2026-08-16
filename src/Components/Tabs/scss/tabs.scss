@@ -1,17 +1,154 @@
 @use '../../../scss/functions/common' as *;
 @use '../../../scss/mixins/mode' as *;
+@use '../../../scss/functions' as fn;
+@use '../../../scss/config' as cfg;
 //@use './text-vars' as *;
 @use './tabs-conf' as *;
 @use 'sass:map';
 
+$tabs-sizes: (
+    xs: (
+        px: 4px,
+        py: 4px,
+        fs: 12px,
+        icon-size: 14px,
+        gap: 4px,
+    ),
+    sm: (
+        px: 8px,
+        py: 4px,
+        fs: 13px,
+        icon-size: 16px,
+        gap: 4px,
+    ),
+    md: (
+        px: 12px,
+        py: 8px,
+        fs: 14px,
+        icon-size: 18px,
+        gap: 6px,
+    ),
+    lg: (
+        px: 16px,
+        py: 12px,
+        fs: 16px,
+        icon-size: 20px,
+        gap: 8px,
+    ),
+    xl: (
+        px: 20px,
+        py: 16px,
+        fs: 18px,
+        icon-size: 24px,
+        gap: 10px,
+    ),
+);
+
 .#{$tabs-prefix} {
 
-  #{$tabs-prefix} {
-    &__tab {
+  @each $size, $values in $tabs-sizes {
+    &[data-size='#{$size}'] {
+      --tabs-tab-padding-inline: #{map-get($values, px)};
+      --tabs-tab-padding-block: #{map-get($values, py)};
+      --tabs-tab-content-size: #{map-get($values, fs)};
+      --tabs-tab-icon-size: #{map-get($values, icon-size)};
+      --tabs-tab-gap: #{map-get($values, gap)};
+    }
+  }
 
+  --tabs-ring-color: #{fn.intent-color(primary, 600)};
+  --tabs-indicator-color: #{fn.intent-color(primary, 600)};
+  --tabs-list-border: #{fn.intent-color(neutral, 200)};
+  --tabs-tab-disabled: #{fn.intent-color(gray, 600)};
+
+  @include cfg.dark {
+    --tabs-ring-color: #{fn.intent-color(primary, 400)};
+    --tabs-indicator-color: #{fn.intent-color(primary, 400)};
+    --tabs-list-border: #{fn.intent-color(neutral, 800)};
+    --tabs-tab-disabled: #{fn.intent-color(gray, 400)};
+  }
+
+  --tabs-indicator-transition: var(--#{$p}-duration-slow) var(--#{$p}-ease-standard);
+
+  @mixin icon {
+    width: 1.2em;
+    height: 1.2em;
+    font-size: 1.2em;
+    display: block;
+  }
+
+  .#{$tabs-prefix} {
+    &__tab {
+      //@each $size, $values in $tabs-sizes {
+      //  &[data-size='#{$size}'] {
+      //    padding-inline: map-get($values, px);
+      //    padding-block: map-get($values, py);
+      //    font-size: map-get($values, fs);
+      //  }
+      //}
+
+      display: flex;
+      cursor: pointer;
+      gap: var(--tabs-tab-gap);
+      align-items: center;
+      padding-inline: var(--tabs-tab-padding-inline);
+      padding-block: var(--tabs-tab-padding-block);
+
+      &[data-icon-placement='start'],
+      &[data-icon-placement='end']{
+        flex-direction: row;
+      }
+
+      &[data-icon-placement='top'],
+      &[data-icon-placement='bottom']{
+        flex-direction: column;
+      }
+
+      &[data-disabled] {
+        color: var(--tabs-tab-disabled);
+        cursor: not-allowed;
+      }
+
+      &:focus,
+      &:focus-visible {
+        //outline: none;
+        box-shadow: none;
+        border: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--tabs-ring-color);
+        outline-offset: 2px;
+      }
+    }
+    &__content {
+      font-size: var(--tabs-tab-content-size);
+    }
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      width: var(--tabs-tab-icon-size);
+
+      > svg,
+      > .MuiSvgIcon-root{
+        @include icon;
+      }
+    }
+    &__indicator {
+      position: absolute;
+      bottom: 0;
+      height: 2px;
+      border-radius: 9999px;
+      background-color: var(--tabs-indicator-color);
+      transition: all var(--tabs-indicator-transition);
     }
     &__list {
-
+      position: relative;
+      display: inline-flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--tabs-list-border);
     }
   }
 

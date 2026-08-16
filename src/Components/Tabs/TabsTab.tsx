@@ -1,9 +1,10 @@
 import clsx from 'clsx';
-import { ReactNode, useRef, useEffect, ComponentProps } from 'react';
+import React, { ReactNode, useRef, useEffect, ComponentProps, forwardRef } from 'react';
 import { useTabsContext } from './TabsContext';
 import { prefix, TabsSize } from './Tabs';
 import { Box, BoxProps } from '../Box';
 import { TabsIconPlacement } from './Tabs';
+import { mergeRefs, useStableId } from '../../utils';
 
 //----------------------------------------------------------------------
 // Types
@@ -13,116 +14,155 @@ type TabsTabProps = {
   value: string;
   icon?: ReactNode;
   iconPlacement?: TabsIconPlacement;
-  size?: TabsSize;
+  // size?: TabsSize;
+  disabled?: boolean;
   // children: ReactNode;
 } & Omit<BoxProps, 'size'> &
   ComponentProps<'button'>;
-
-type SizeMap = {
-  py: number;
-  px: number;
-  fs: string;
-};
-
-//----------------------------------------------------------------------
-// sizesMap
-//----------------------------------------------------------------------
-
-const sizesMap: Record<TabsSize, SizeMap> = {
-  xs: {
-    px: 1,
-    py: 1,
-    fs: '12px',
-  },
-  sm: {
-    px: 2,
-    py: 1,
-    fs: '13px',
-  },
-  md: {
-    px: 3,
-    py: 2,
-    fs: '14px',
-  },
-  lg: {
-    px: 4,
-    py: 3,
-    fs: '16px',
-  },
-  xl: {
-    px: 5,
-    py: 4,
-    fs: '18px',
-  },
-} as const;
 
 //----------------------------------------------------------------------
 // Tabs
 //----------------------------------------------------------------------
 
-function TabsTab({
-  value,
-  children,
-  className,
-  type = 'button',
-  onClick,
-  px: pxProp,
-  py: pyProp,
-  fs: fsProp,
-  grow,
-  size: sizeProp,
+const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
+  (
+    {
+      value,
+      children,
+      className,
+      type = 'button',
+      onClick,
+      grow,
+      disabled,
+      onKeyDown,
 
-  ...rest
-}: TabsTabProps) {
-  const {
-    size: ctxSize,
-    value: ctxValue,
-    registerTab,
-    onChange,
-    equalWidthTabs,
-    intent,
-    variant,
-  } = useTabsContext();
+      icon,
+      iconPlacement: propIconPlacement,
 
-  const active = ctxValue === value;
-  const size = sizeProp ?? ctxSize ?? 'md';
+      ...rest
+    },
+    ref,
+  ) => {
+    const {
+      orientation,
+      size,
+      value: ctxValue,
+      registerTab,
+      onChange,
+      equalWidthTabs,
+      intent,
+      variant,
+      focusableList,
+      iconPlacement: ctxIconPlacement,
+    } = useTabsContext();
 
-  const sizes = sizesMap[size];
+    const iconPlacement = propIconPlacement ?? ctxIconPlacement ?? 'start';
 
-  const px = pxProp ?? sizes.px;
-  const py = pyProp ?? sizes.py;
-  const fs = fsProp ?? sizes.fs;
+    const isVertical = orientation === 'vertical';
 
-  const ref = useRef<HTMLButtonElement>(null);
+    console.log('isVertical', isVertical);
 
-  useEffect(() => {
-    registerTab(value, ref.current);
-  }, [registerTab, value]);
+    const { focusNext, focusFirst, focusLast, setFocusedId, setRef, isFocusableElement } =
+      focusableList;
 
-  return (
-    <Box
-      {...rest}
-      as="button"
-      ref={ref}
-      type={type}
-      onClick={(e) => {
-        onClick?.(e);
-        onChange(value);
-      }}
-      px={px}
-      py={py}
-      fs={fs}
-      cursor="pointer"
-      grow={grow ?? (equalWidthTabs || undefined)}
-      className={clsx(prefix('__tab'), className)}
-      data-active={active || undefined}
-      data-size={size}
-      data-intent={intent}
-      data-variant={variant}
-    >
-      {children}
-    </Box>
-  );
-}
+    const innerRef = useRef<HTMLButtonElement>(null);
+
+    const combinedRef = mergeRefs(innerRef, ref, setRef(value));
+
+    const nextKeys = isVertical ? ['ArrowDown'] : ['ArrowRight'];
+
+    const prevKeys = isVertical ? ['ArrowUp'] : ['ArrowLeft'];
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (nextKeys.includes(e.key)) {
+        console.log('nextKeys', nextKeys);
+        e.preventDefault();
+        focusNext(1);
+        return;
+      }
+
+      if (prevKeys.includes(e.key)) {
+        e.preventDefault();
+        focusNext(-1);
+        return;
+      }
+
+      switch (e.key) {
+        case 'Home':
+          e.preventDefault();
+          focusFirst();
+          break;
+
+        case 'End':
+          e.preventDefault();
+          focusLast();
+          break;
+      }
+    };
+
+    const active = ctxValue === value;
+
+    useEffect(() => {
+      registerTab(value, innerRef.current, disabled ?? false);
+    }, [registerTab, value]);
+
+    return (
+      <Box
+        {...rest}
+        as="button"
+        ref={combinedRef}
+        type={type}
+        onClick={(e) => {
+          if (disabled) return;
+          onClick?.(e);
+          onChange(value);
+        }}
+        onFocus={() => {
+          setFocusedId(value);
+        }}
+        onKeyDown={(e: React.KeyboardEvent<Element>) => {
+          if (disabled) {
+            return;
+          }
+
+          const target = e.target;
+
+          if (!(target instanceof Node)) {
+            return;
+          }
+
+          if (!isFocusableElement(target)) {
+            return;
+          }
+
+          handleKeyDown(e);
+
+          onKeyDown?.(e as React.KeyboardEvent<HTMLButtonElement>);
+        }}
+        grow={grow ?? (equalWidthTabs || undefined)}
+        className={clsx(prefix('__tab'), className)}
+        data-active={active || undefined}
+        data-size={size}
+        data-intent={intent}
+        data-variant={variant}
+        data-disabled={disabled}
+        data-value={value}
+        data-icon-placement={iconPlacement}
+      >
+        {/* START TOP ICON */}
+        {icon && (iconPlacement === 'top' || iconPlacement === 'start') && (
+          <span className={prefix(`__icon`)}>{icon}</span>
+        )}
+
+        <span className={prefix(`__content`)}>{children}</span>
+
+        {/* END BOTTOM ICON */}
+        {icon && (iconPlacement === 'bottom' || iconPlacement === 'end') && (
+          <span className={prefix(`__icon`)}>{icon}</span>
+        )}
+      </Box>
+    );
+  },
+);
 
 export { TabsTab };
