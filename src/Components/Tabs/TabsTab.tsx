@@ -48,7 +48,7 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
       size,
       value: ctxValue,
       registerTab,
-      onChange,
+      onValueChange,
       equalWidthTabs,
       intent,
       variant,
@@ -115,7 +115,7 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
         onClick={(e) => {
           if (disabled) return;
           onClick?.(e);
-          onChange(value);
+          onValueChange(value);
         }}
         onFocus={() => {
           setFocusedId(value);

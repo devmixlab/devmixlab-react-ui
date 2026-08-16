@@ -17,7 +17,7 @@ export type TabsContextValue = {
   variant?: string;
 
   value: string;
-  onChange: (value: string) => void;
+  onValueChange: (value: string) => void;
 
   registerTab: (value: string, element: HTMLButtonElement | null, disabled: boolean) => void;
 

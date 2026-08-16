@@ -35,7 +35,7 @@ type TabsProps = {
   value?: string;
   defaultValue?: string;
 
-  onChange?: (value: string) => void;
+  onValueChange?: (value: string) => void;
 } & ComponentProps<'div'>;
 
 //----------------------------------------------------------------------
@@ -59,7 +59,7 @@ const Tabs: TabsComponent = ({
   children,
   value,
   defaultValue,
-  onChange,
+  onValueChange,
 
   iconPlacement,
 }: TabsProps) => {
@@ -80,7 +80,7 @@ const Tabs: TabsComponent = ({
       setInternalValue(nextValue);
     }
 
-    onChange?.(nextValue);
+    onValueChange?.(nextValue);
   };
 
   const tabs = useRef(new Map<string, HTMLButtonElement>());
@@ -119,7 +119,7 @@ const Tabs: TabsComponent = ({
         fullWidth,
         equalWidthTabs,
         value: activeValue,
-        onChange: handleChange,
+        onValueChange: handleChange,
         registerTab,
         tabs: tabs.current,
         iconPlacement,
