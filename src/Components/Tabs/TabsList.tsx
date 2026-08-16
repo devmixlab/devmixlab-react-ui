@@ -25,6 +25,8 @@ function TabsList({ children, className, indicatorProps, ...rest }: TabsListProp
 
   const [resizing, setResizing] = useState(false);
 
+  const [initialized, setInitialized] = useState(false);
+
   const [indicator, setIndicator] = useState({
     left: 0,
     width: 0,
@@ -71,6 +73,10 @@ function TabsList({ children, className, indicatorProps, ...rest }: TabsListProp
         left: element.offsetLeft,
         width: element.offsetWidth,
       });
+
+      requestAnimationFrame(() => {
+        if (!initialized) setInitialized(true);
+      });
     };
 
     updateIndicator();
@@ -101,13 +107,15 @@ function TabsList({ children, className, indicatorProps, ...rest }: TabsListProp
   const finalIndicatorProps = {
     ...indicatorOptions,
     className: clsx(prefix('__indicator'), indicatorOptions.className),
+    ...(resizing ? { 'data-resizing': true } : {}),
+    ...(initialized ? { 'data-initialized': true } : {}),
     style: {
       ...indicatorOptions.style,
       left: indicator.left,
       width: indicator.width,
-      ...(resizing && {
-        transition: 'none',
-      }),
+      // ...((!initialized || resizing) && {
+      //   transition: 'none',
+      // }),
     },
   };
 
@@ -121,6 +129,7 @@ function TabsList({ children, className, indicatorProps, ...rest }: TabsListProp
       {...rest}
       className={clsx(prefix('__list'), className)}
       data-resizing={resizing || undefined}
+      data-initialized={initialized || undefined}
     >
       {children}
 

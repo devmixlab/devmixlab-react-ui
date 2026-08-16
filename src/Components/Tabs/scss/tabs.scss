@@ -143,6 +143,10 @@ $tabs-sizes: (
       border-radius: 9999px;
       background-color: var(--tabs-indicator-color);
       transition: all var(--tabs-indicator-transition);
+      &:not([data-initialized]),
+      &[data-resizing] {
+        transition: none;
+      }
     }
     &__list {
       position: relative;
