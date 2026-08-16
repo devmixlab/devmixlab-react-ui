@@ -1,0 +1,18 @@
+@use '../../../scss/functions/common' as *;
+@use '../../../scss/mixins/mode' as *;
+//@use './text-vars' as *;
+@use './tabs-conf' as *;
+@use 'sass:map';
+
+.#{$tabs-prefix} {
+
+  #{$tabs-prefix} {
+    &__tab {
+
+    }
+    &__list {
+
+    }
+  }
+
+}

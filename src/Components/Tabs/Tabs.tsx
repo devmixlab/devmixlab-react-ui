@@ -1,0 +1,82 @@
+import { ComponentProps, ReactNode, useCallback, useRef, useState } from 'react';
+import { TabsContext } from './TabsContext';
+import { TabsList } from './TabsList';
+import { TabsTab } from './TabsTab';
+import { classPrefix } from '../../utils/classPrefix';
+import clsx from 'clsx';
+
+//----------------------------------------------------------------------
+// Types
+//----------------------------------------------------------------------
+
+type TabsComponent = React.FC<TabsProps> & {
+  List: typeof TabsList;
+  Tab: typeof TabsTab;
+};
+
+type TabsProps = {
+  // children: ReactNode;
+
+  value?: string;
+  defaultValue?: string;
+
+  onChange?: (value: string) => void;
+} & ComponentProps<'div'>;
+
+//----------------------------------------------------------------------
+// Helpers
+//----------------------------------------------------------------------
+
+export const prefix = (name: string = '') => classPrefix(`--tags${name}`);
+
+//----------------------------------------------------------------------
+// Tabs
+//----------------------------------------------------------------------
+
+const Tabs: TabsComponent = ({ className, children, value, defaultValue, onChange }: TabsProps) => {
+  const controlled = value !== undefined;
+
+  const [internalValue, setInternalValue] = useState(defaultValue ?? '');
+
+  const activeValue = controlled ? value : internalValue;
+
+  const handleChange = (nextValue: string) => {
+    if (!controlled) {
+      setInternalValue(nextValue);
+    }
+
+    onChange?.(nextValue);
+  };
+
+  const tabs = useRef(new Map<string, HTMLButtonElement>());
+
+  const registerTab = useCallback((value: string, element: HTMLButtonElement | null) => {
+    if (element) {
+      tabs.current.set(value, element);
+    } else {
+      tabs.current.delete(value);
+    }
+  }, []);
+
+  return (
+    <TabsContext.Provider
+      value={{
+        value: activeValue,
+        onChange: handleChange,
+        registerTab,
+        tabs: tabs.current,
+      }}
+    >
+      <div className={clsx(prefix(), className)}>{children}</div>
+    </TabsContext.Provider>
+  );
+};
+
+Tabs.List = TabsList;
+Tabs.Tab = TabsTab;
+
+//------------------------------------------------------
+// Export
+//------------------------------------------------------
+
+export { Tabs };
