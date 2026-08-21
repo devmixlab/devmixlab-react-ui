@@ -924,6 +924,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
     const {
       registerOption,
       disabled: ctxDisabled,
+      nullable,
       selectedValue,
       focusableList,
       handleSelect,
@@ -940,6 +941,15 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
     } = useDropdownContext();
 
     const group = useGroupContext();
+
+    useEffect(() => {
+      if (value === null && !nullable) {
+        console.error(
+          '[Dropdown] A null option value was provided, but the Dropdown is not nullable. ' +
+            'Set nullable={true} to allow null option values.',
+        );
+      }
+    }, [value, nullable]);
 
     const {
       setRef,
@@ -1039,8 +1049,22 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
       onClick: (e: React.MouseEvent<HTMLElement>) => {
         onClick?.(e);
 
+        // if (!finalDisabled) {
+        //   handleSelect(value);
+        //   if (returnFocusOnOptionPick)
+        //     requestAnimationFrame(() => {
+        //       triggerRef.current?.focus();
+        //     });
+        // }
+
         if (!finalDisabled) {
+          if (value === null && !nullable) {
+            console.error('[Dropdown] Cannot select a null option when nullable is false.');
+            return;
+          }
+
           handleSelect(value);
+
           if (returnFocusOnOptionPick)
             requestAnimationFrame(() => {
               triggerRef.current?.focus();
