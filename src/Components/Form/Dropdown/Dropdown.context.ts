@@ -1,18 +1,9 @@
 import React, { createContext, useContext, MutableRefObject } from 'react';
-import {
-  DropdownOptionProps,
-  DropdownOptionData,
-  OnReadyCallbackProps,
-  OptionValue,
-} from './Dropdown';
+import { DropdownOptionData, OptionValueImpl } from './Dropdown';
 import { FocusableListResult } from '../../../hooks/useFocusableList';
 import { GroupContextValue } from './Group.context';
 
-// import { useFloatingLayer } from '../hooks';
-// import { PresenceState } from '../hooks/usePresence';
-// import { PopoverRole } from './Popover';
-
-type DropdownContextValue<T extends string | number = string> = {
+type DropdownContextValue = {
   modal: boolean;
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,11 +15,11 @@ type DropdownContextValue<T extends string | number = string> = {
   isPanelHovered: boolean;
   setIsPanelHovered: React.Dispatch<React.SetStateAction<boolean>>;
 
-  handleSelect: (nextValue: OptionValue<T>) => void;
+  handleSelect: (nextValue: OptionValueImpl) => void;
 
   focusByTypeahead: (key: string) => void;
 
-  isOptionShown: (option: DropdownOptionData<T>) => boolean;
+  isOptionShown: (option: DropdownOptionData) => boolean;
   isGroupShown: (group: GroupContextValue) => boolean;
 
   disabled: boolean;
@@ -42,13 +33,13 @@ type DropdownContextValue<T extends string | number = string> = {
 
   focusableList: FocusableListResult;
 
-  selectedOption?: DropdownOptionData<T>;
-  selectedValue?: OptionValue<T>;
+  selectedOption?: DropdownOptionData;
+  selectedValue?: OptionValueImpl;
 
-  options: DropdownOptionData<T>[];
-  filteredOptions: DropdownOptionData<T>[];
+  options: DropdownOptionData[];
+  filteredOptions: DropdownOptionData[];
 
-  registerOption: (option: DropdownOptionData<T>) => void;
+  registerOption: (option: DropdownOptionData) => void;
   unregisterOption: (id: string) => void;
 
   runAfterReady: (callback: () => void) => void;
@@ -60,7 +51,7 @@ type DropdownContextValue<T extends string | number = string> = {
   invokeOnly: boolean;
 };
 
-const DropdownContext = createContext<DropdownContextValue<any> | null>(null);
+const DropdownContext = createContext<DropdownContextValue | null>(null);
 
 const useDropdownContext = <T extends string | number = string>() => {
   const ctx = useContext(DropdownContext);
@@ -69,7 +60,7 @@ const useDropdownContext = <T extends string | number = string>() => {
     throw new Error('Dropdown components must be used inside <Dropdown />');
   }
 
-  return ctx as DropdownContextValue<T>;
+  return ctx as DropdownContextValue;
 };
 
 export { DropdownContext, useDropdownContext };

@@ -1,15 +1,15 @@
 import { createContext, useContext } from 'react';
-import type { Responsiveify } from '../../utils/responsive';
+import type { Responsiveify, Responsive } from '../../utils/responsive';
 import type { ContainerSize } from './Container';
 
-type ContainerContextValue = Responsiveify<{
-  size?: ContainerSize;
-  centered?: boolean;
+type ContainerContextValue = {
+  size: Responsive<ContainerSize>;
+  centered: boolean;
 
-  setSize: (size?: ContainerSize) => void;
-}>;
+  setSize: (size: Responsive<ContainerSize>) => void;
+};
 
-const ContainerContext = createContext<ContainerContextValue>({});
+const ContainerContext = createContext<ContainerContextValue | null>(null);
 
 function useContainerContext() {
   // return useContext(ContainerContext);

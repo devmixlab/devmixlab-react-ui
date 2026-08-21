@@ -11,10 +11,10 @@ import { Responsive } from '../../utils/responsive';
 
 function ContainerProvider({
   children,
-  size: initialSize,
+  size: initialSize = 'full',
   centered = true,
 }: ContainerProviderProps) {
-  const [size, setSize] = useState<Responsive<ContainerSize | undefined>>(initialSize);
+  const [size, setSize] = useState<Responsive<ContainerSize>>(initialSize);
 
   return (
     <ContainerContext.Provider

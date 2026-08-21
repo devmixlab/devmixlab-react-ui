@@ -36,14 +36,16 @@ import { ButtonProps } from '../../Button';
 
 export type OptionValue<T extends string | number = string> = T | null;
 
+export type OptionValueImpl = string | number | null;
+
 export type OnReadyCallbackProps = {
   isSearchable: boolean;
   searchInputRef: React.RefObject<HTMLInputElement>;
 };
 
-export type DropdownOptionData<T extends string | number = string> = {
+export type DropdownOptionData = {
   id: string;
-  value: OptionValue<T>;
+  value: OptionValueImpl;
   label?: string;
   disabled?: boolean;
   children?: React.ReactNode;
@@ -51,14 +53,9 @@ export type DropdownOptionData<T extends string | number = string> = {
   group?: GroupContextValue;
 };
 
-// export type DropdownGroupData = {
-//     id: string;
-//     label?: string;
-// };
-
-export type DropdownProps<T extends string | number = string> = {
-  children?: React.ReactNode;
-  id?: string;
+export type DropdownPropsCommon = {
+  // children?: React.ReactNode;
+  // id?: string;
 
   // enables chevron on trigger
   chevron?: boolean;
@@ -66,54 +63,27 @@ export type DropdownProps<T extends string | number = string> = {
   // sets how many visible options available till scroll will be applied
   visibleOptions?: number;
 
+  placeholder?: React.ReactNode;
+  invalid?: boolean;
+  triggerRender?: (props: PopoverTriggerRenderProps) => React.ReactNode;
+  stickyGroupLabels?: boolean;
+  openOnArrowKeys?: boolean;
+  invokeOnly?: boolean;
+  returnFocusOnOptionPick?: boolean;
+} & PopoverProps &
+  ComponentProps<'div'>;
+
+export type DropdownPropsImpl = {
+  value?: OptionValueImpl;
+  defaultValue?: OptionValueImpl;
+  onChange?: (value: OptionValueImpl) => void;
+} & DropdownPropsCommon;
+
+export type DropdownProps<T extends string | number = string> = {
   value?: OptionValue<T>;
   defaultValue?: OptionValue<T>;
-  onChange?: (value: OptionValue<T>) => void;
-
-  placeholder?: React.ReactNode;
-
-  invalid?: boolean;
-
-  triggerRender?: (props: PopoverTriggerRenderProps) => React.ReactNode;
-
-  stickyGroupLabels?: boolean;
-
-  openOnArrowKeys?: boolean;
-
-  invokeOnly?: boolean;
-
-  returnFocusOnOptionPick?: boolean;
-} & PopoverProps;
-
-// type DropdownComponent = React.ForwardRefExoticComponent<
-//   DropdownProps & React.RefAttributes<HTMLDivElement>
-// > & {
-//   Trigger: typeof DropdownTrigger;
-//   FieldTrigger: typeof DropdownFieldTrigger;
-//   Content: typeof DropdownContent;
-//   Search: typeof DropdownSearch;
-//   List: typeof DropdownList;
-//   Group: typeof DropdownGroup;
-//   Label: typeof DropdownLabel;
-//   Option: typeof DropdownOption;
-// };
-
-// type DropdownComponent = <T extends string | number = string>(
-//   props: DropdownProps<T> & React.RefAttributes<HTMLDivElement>,
-// ) => React.ReactElement | null;
-//
-// type DropdownForwardRefComponent = React.ForwardRefExoticComponent<
-//   DropdownProps & React.RefAttributes<HTMLDivElement>
-// > & {
-//   Trigger: typeof DropdownTrigger;
-//   FieldTrigger: typeof DropdownFieldTrigger;
-//   Content: typeof DropdownContent;
-//   Search: typeof DropdownSearch;
-//   List: typeof DropdownList;
-//   Group: typeof DropdownGroup;
-//   Label: typeof DropdownLabel;
-//   Option: typeof DropdownOption;
-// };
+  onValueChange?: (value: OptionValue<T>) => void;
+} & DropdownPropsCommon;
 
 type DropdownComponent = (<T extends string | number = string>(
   props: DropdownProps<T> & React.RefAttributes<HTMLDivElement>,
@@ -140,7 +110,7 @@ const prefix = (name: string = '') => classPrefix(`--dropdown${name}`);
 // Dropdown Implementation
 // ---------------------------------------------------------------------------
 
-function DropdownImpl<T extends string | number = string>(
+function DropdownImpl(
   {
     children,
     id,
@@ -173,20 +143,20 @@ function DropdownImpl<T extends string | number = string>(
     returnFocusOnOptionPick = false,
 
     ...rest
-  }: DropdownProps<T>,
+  }: DropdownPropsImpl,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   // ------------------------------------------------------------------
   // Open / search state
   // ------------------------------------------------------------------
 
-  const [options, setOptions] = useState<DropdownOptionData<T>[]>([]);
+  const [options, setOptions] = useState<DropdownOptionData[]>([]);
   const [opened, setOpened] = useState(false);
   const [isSearchable, setIsSearchable] = useState(false);
   const [search, setSearch] = useState('');
   const [isPanelHovered, setIsPanelHovered] = useState(false);
 
-  const registerOption = useCallback((option: DropdownOptionData<T>) => {
+  const registerOption = useCallback((option: DropdownOptionData) => {
     setOptions((prev) => {
       const exists = prev.some((item) => item.id === option.id);
 
@@ -207,7 +177,7 @@ function DropdownImpl<T extends string | number = string>(
   // ------------------------------------------------------------------
 
   const isControlled = value !== undefined;
-  const [internalValue, setInternalValue] = useState<OptionValue<T>>(defaultValue ?? null);
+  const [internalValue, setInternalValue] = useState<OptionValueImpl>(defaultValue ?? null);
   const selectedValue = isControlled ? value : internalValue;
 
   // ------------------------------------------------------------------
@@ -229,7 +199,7 @@ function DropdownImpl<T extends string | number = string>(
   );
 
   const isOptionShown = useCallback(
-    (option: DropdownOptionData<T>) => {
+    (option: DropdownOptionData) => {
       return filteredOptions.some((o) => o.id === option.id);
     },
     [filteredOptions],
@@ -305,7 +275,7 @@ function DropdownImpl<T extends string | number = string>(
     });
   }, []);
 
-  const handleSelect = (nextValue: OptionValue<T>) => {
+  const handleSelect = (nextValue: OptionValueImpl) => {
     if (!isControlled && !invokeOnly) setInternalValue(nextValue);
     onChange?.(nextValue);
     setOpened(false);
@@ -319,7 +289,7 @@ function DropdownImpl<T extends string | number = string>(
   const ctx = useFormFieldContext();
   const isInvalid = ctx ? ctx.hasError || invalid : invalid;
 
-  const ctxValue = useMemo<DropdownContextValue<T>>(
+  const ctxValue = useMemo<DropdownContextValue>(
     () => ({
       modal,
       opened,
@@ -430,301 +400,12 @@ const Dropdown = forwardRef(DropdownImpl) as unknown as DropdownComponent;
 Dropdown.displayName = 'Dropdown';
 
 // ---------------------------------------------------------------------------
-// Dropdown
-// ---------------------------------------------------------------------------
-
-// const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
-//   (
-//     {
-//       children,
-//       id,
-//
-//       chevron = true,
-//       onOpenChange,
-//
-//       visibleOptions = 6,
-//
-//       value,
-//       defaultValue,
-//       onChange,
-//       placeholder = 'Select option',
-//
-//       invalid = false,
-//       disabled = false,
-//
-//       triggerRender,
-//
-//       stickyGroupLabels = false,
-//
-//       openOnArrowKeys = true,
-//       invokeOnly = false,
-//       modal = false,
-//
-//       onUnmount,
-//       onEntered,
-//       onReady,
-//
-//       ...rest
-//     },
-//     ref,
-//   ) => {
-//     // ------------------------------------------------------------------
-//     // Open / search state
-//     // ------------------------------------------------------------------
-//
-//     const [options, setOptions] = useState<DropdownOptionData[]>([]);
-//     const [opened, setOpened] = useState(false);
-//     const [isSearchable, setIsSearchable] = useState(false);
-//     const [search, setSearch] = useState('');
-//     const [isPanelHovered, setIsPanelHovered] = useState(false);
-//
-//     const registerOption = useCallback((option: DropdownOptionData) => {
-//       setOptions((prev) => {
-//         const exists = prev.some((item) => item.id === option.id);
-//
-//         if (exists) {
-//           return prev.map((item) => (item.id === option.id ? option : item));
-//         }
-//
-//         return [...prev, option];
-//       });
-//     }, []);
-//
-//     const unregisterOption = useCallback((id: string) => {
-//       setOptions((prev) => prev.filter((option) => option.id !== id));
-//     }, []);
-//
-//     // ------------------------------------------------------------------
-//     // Value / selection
-//     // ------------------------------------------------------------------
-//
-//     const isControlled = value !== undefined;
-//     const [internalValue, setInternalValue] = useState<OptionValue>(defaultValue ?? null);
-//     const selectedValue = isControlled ? value : internalValue;
-//
-//     // ------------------------------------------------------------------
-//     // Filter options -> filteredOptions
-//     // ------------------------------------------------------------------
-//
-//     const filteredOptions = useMemo(() => {
-//       if (!search.trim()) return options;
-//
-//       const normalized = search.toLowerCase().trim();
-//       return options.filter((option) =>
-//         (option.label ?? option.value ?? '').toLowerCase().trim().includes(normalized),
-//       );
-//     }, [options, search]);
-//
-//     const selectedOption = useMemo(
-//       () => options.find((option) => option.value === selectedValue),
-//       [options, selectedValue],
-//     );
-//
-//     const isOptionShown = useCallback(
-//       (option: DropdownOptionData) => {
-//         return filteredOptions.some((o) => o.id === option.id);
-//       },
-//       [filteredOptions],
-//     );
-//
-//     const isGroupShown = useCallback(
-//       (group: GroupContextValue) => {
-//         return filteredOptions.some((option) => option.group?.id === group.id);
-//       },
-//       [filteredOptions],
-//     );
-//
-//     // ------------------------------------------------------------------
-//     // Focusable list (keyboard nav + focus tracking)
-//     // ------------------------------------------------------------------
-//
-//     const focusableList = useFocusableList(filteredOptions);
-//     const { focusedId: optionFocused, setFocuses, itemRefs: optionRefs } = focusableList;
-//
-//     useEffect(() => {
-//       if (optionFocused == null) return;
-//       optionRefs.current.get(optionFocused)?.scrollIntoView({ block: 'nearest' });
-//     }, [optionFocused]);
-//
-//     // ------------------------------------------------------------------
-//     // Typeahead
-//     // ------------------------------------------------------------------
-//
-//     const focusByTypeahead = useTypeahead(
-//       (id) => optionRefs.current.get(id)?.focus(),
-//       () => filteredOptions,
-//     );
-//
-//     // ------------------------------------------------------------------
-//     // Refs
-//     // ------------------------------------------------------------------
-//
-//     const readyCallbacksRef = useRef<Array<() => void>>([]);
-//     const enteredCallbacksRef = useRef<Array<() => void>>([]);
-//     const searchInputRef = useRef<HTMLInputElement>(null);
-//     const triggerRef = useRef<HTMLElement>(null);
-//     const panelRef = useRef<HTMLDivElement>(null);
-//
-//     // ------------------------------------------------------------------
-//     // Handlers
-//     // ------------------------------------------------------------------
-//
-//     const runAfterReady = useCallback((callback: () => void) => {
-//       readyCallbacksRef.current.push(callback);
-//     }, []);
-//
-//     const flushReadyCallbacks = useCallback(() => {
-//       const callbacks = readyCallbacksRef.current;
-//
-//       readyCallbacksRef.current = [];
-//
-//       callbacks.forEach((callback) => {
-//         callback();
-//       });
-//     }, []);
-//
-//     const runOnEntered = useCallback((callback: () => void) => {
-//       enteredCallbacksRef.current.push(callback);
-//     }, []);
-//
-//     const flushOnEnteredCallbacks = useCallback(() => {
-//       const callbacks = enteredCallbacksRef.current;
-//
-//       enteredCallbacksRef.current = [];
-//
-//       callbacks.forEach((callback) => {
-//         callback();
-//       });
-//     }, []);
-//
-//     const handleSelect = (nextValue: OptionValue) => {
-//       if (!isControlled && !invokeOnly) setInternalValue(nextValue);
-//       onChange?.(nextValue);
-//       setOpened(false);
-//       setFocuses(null);
-//     };
-//
-//     // ------------------------------------------------------------------
-//     // Context
-//     // ------------------------------------------------------------------
-//
-//     const ctx = useFormFieldContext();
-//     const isInvalid = ctx ? ctx.hasError || invalid : invalid;
-//
-//     const ctxValue = useMemo<DropdownContextValue>(
-//       () => ({
-//         modal,
-//         opened,
-//         setOpened,
-//         triggerRef,
-//         panelRef,
-//         isPanelHovered,
-//         setIsPanelHovered,
-//         handleSelect,
-//         focusByTypeahead,
-//         isOptionShown,
-//         isGroupShown,
-//         disabled,
-//         invalid: isInvalid,
-//         isSearchable,
-//         setIsSearchable,
-//         search,
-//         setSearch,
-//         searchInputRef,
-//         focusableList,
-//         // else
-//         selectedOption,
-//         selectedValue,
-//         options,
-//         filteredOptions,
-//         registerOption,
-//         unregisterOption,
-//         runAfterReady,
-//         runOnEntered,
-//         stickyGroupLabels,
-//         openOnArrowKeys,
-//         invokeOnly,
-//       }),
-//       [
-//         modal,
-//         opened,
-//         triggerRef,
-//         panelRef,
-//         isPanelHovered,
-//         handleSelect,
-//         focusByTypeahead,
-//         isOptionShown,
-//         isGroupShown,
-//         disabled,
-//         isInvalid,
-//         isSearchable,
-//         search,
-//         searchInputRef,
-//         focusableList,
-//         selectedOption,
-//         selectedValue,
-//         options,
-//         filteredOptions,
-//         registerOption,
-//         unregisterOption,
-//         runAfterReady,
-//         runOnEntered,
-//         stickyGroupLabels,
-//         openOnArrowKeys,
-//         invokeOnly,
-//       ],
-//     );
-//
-//     // ------------------------------------------------------------------
-//     // Render
-//     // ------------------------------------------------------------------
-//
-//     return (
-//       <DropdownContext.Provider value={ctxValue}>
-//         <Popover
-//           {...rest}
-//           modal={modal}
-//           open={opened}
-//           hiddenStrategy="visibility"
-//           onOpenChange={(state) => {
-//             onOpenChange?.(state);
-//             setOpened(state);
-//           }}
-//           disabled={disabled}
-//           onUnmount={() => {
-//             if (search.length > 0) setSearch('');
-//
-//             onUnmount?.();
-//           }}
-//           onEntered={() => {
-//             flushOnEnteredCallbacks();
-//
-//             onEntered?.();
-//           }}
-//           onReady={() => {
-//             flushReadyCallbacks();
-//
-//             onReady?.();
-//           }}
-//           keepMounted
-//           role="listbox"
-//         >
-//           {children}
-//         </Popover>
-//       </DropdownContext.Provider>
-//     );
-//   },
-// ) as DropdownComponent;
-//
-// Dropdown.displayName = 'Dropdown';
-
-// ---------------------------------------------------------------------------
 // DropdownTrigger
 // ---------------------------------------------------------------------------
 
 type DropdownRenderContent = {
   selectedOption?: DropdownOptionData;
-  selectedValue?: OptionValue;
+  selectedValue?: OptionValueImpl;
 };
 
 type DropdownTriggerProps = {
@@ -1206,36 +887,21 @@ export type OptionRenderProps = {
   optionProps: DropdownOptionElementProps;
 };
 
-// export type DropdownOptionProps = {
-//   value: OptionValue;
-//   label?: string;
-//   disabled?: boolean;
-//   render?: (props: OptionRenderProps) => React.ReactNode;
-// } & BoxDerivedProps &
-//   React.HTMLAttributes<HTMLElement>;
-
-// add near DropdownComponent's type definition
-type DropdownOptionComponent = (<T extends string | number = string>(
-  props: DropdownOptionProps<T> & React.RefAttributes<HTMLElement>,
-) => React.ReactElement | null) & {
-  displayName?: string;
-};
-
-export type DropdownOptionProps<T extends string | number = string> = {
-  value: OptionValue<T>;
+export type DropdownOptionProps = {
+  value: OptionValueImpl;
   label?: string;
   disabled?: boolean;
   render?: (props: OptionRenderProps) => React.ReactNode;
 } & BoxDerivedProps &
   React.HTMLAttributes<HTMLElement>;
 
-const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps<any>>(
+const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
   (
     { id, value, label, disabled, children, className, onClick, onKeyDown, render, ...rest },
     ref,
   ) => {
     // const finalId = id ?? useStableId('dropdown-option');
-    const optionId = id ?? value ?? useStableId('dropdown-option');
+    const optionId = String(id ?? value ?? useStableId('dropdown-option'));
 
     const {
       registerOption,
@@ -1411,7 +1077,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps<any>>(
       </BoxDerived>
     );
   },
-) as unknown as DropdownOptionComponent;
+);
 
 DropdownOption.displayName = 'DropdownOption';
 
