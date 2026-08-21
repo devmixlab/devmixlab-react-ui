@@ -60,8 +60,6 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
 
     const isVertical = orientation === 'vertical';
 
-    console.log('isVertical', isVertical);
-
     const { focusNext, focusFirst, focusLast, setFocusedId, setRef, isFocusableElement } =
       focusableList;
 
