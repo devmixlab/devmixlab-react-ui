@@ -12,7 +12,7 @@ import { GroupContextValue } from './Group.context';
 // import { PresenceState } from '../hooks/usePresence';
 // import { PopoverRole } from './Popover';
 
-type DropdownContextValue<T extends string = string> = {
+type DropdownContextValue<T extends string | number = string> = {
   modal: boolean;
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -62,7 +62,7 @@ type DropdownContextValue<T extends string = string> = {
 
 const DropdownContext = createContext<DropdownContextValue<any> | null>(null);
 
-const useDropdownContext = <T extends string = string>() => {
+const useDropdownContext = <T extends string | number = string>() => {
   const ctx = useContext(DropdownContext);
 
   if (!ctx) {

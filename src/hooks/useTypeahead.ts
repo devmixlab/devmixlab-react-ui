@@ -1,13 +1,13 @@
 import { useRef, useCallback } from 'react';
 
-type TypeaheadItem<T extends string = string> = {
+type TypeaheadItem<T extends string | number = string> = {
   id: string;
   label?: string;
   value: T | null;
   disabled?: boolean;
 };
 
-export function useTypeahead<T extends string = string>(
+export function useTypeahead<T extends string | number = string>(
   onMatch: (id: string) => void,
   getItems: () => TypeaheadItem<T>[],
 ) {
@@ -33,7 +33,10 @@ export function useTypeahead<T extends string = string>(
           return false;
         }
 
-        return (opt.label ?? opt.value ?? '').toLowerCase().trimStart().startsWith(query);
+        return String(opt.label ?? opt.value ?? '')
+          .toLowerCase()
+          .trimStart()
+          .startsWith(query);
       });
 
       if (match) {

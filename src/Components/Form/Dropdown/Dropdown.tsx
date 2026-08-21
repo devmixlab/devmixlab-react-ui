@@ -10,7 +10,7 @@ import React, {
 import { Box, BoxProps, BoxDerived, BoxDerivedProps } from '../../Box';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { classPrefix } from '../../../utils/classPrefix';
-import { useStableId } from '../../../utils/useStableId';
+import { useStableId } from '../../../utils';
 import { SearchInput, SearchInputProps } from '../SearchInput';
 import { Text } from '../../Text';
 import { useFocusableList, useTypeahead } from '../../../hooks';
@@ -24,7 +24,7 @@ import {
 import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
 import { GroupContext, useGroupContext, GroupContextValue } from './Group.context';
-import { mergeRefs } from '../../../utils/mergeRefs';
+import { mergeRefs } from '../../../utils';
 import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } from '../FieldRoot';
 import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { splitProps } from '../../../utils/splitProps';
@@ -34,14 +34,14 @@ import { ButtonProps } from '../../Button';
 // Types
 // ---------------------------------------------------------------------------
 
-export type OptionValue<T extends string = string> = T | null;
+export type OptionValue<T extends string | number = string> = T | null;
 
 export type OnReadyCallbackProps = {
   isSearchable: boolean;
   searchInputRef: React.RefObject<HTMLInputElement>;
 };
 
-export type DropdownOptionData<T extends string = string> = {
+export type DropdownOptionData<T extends string | number = string> = {
   id: string;
   value: OptionValue<T>;
   label?: string;
@@ -56,7 +56,7 @@ export type DropdownOptionData<T extends string = string> = {
 //     label?: string;
 // };
 
-export type DropdownProps<T extends string = string> = {
+export type DropdownProps<T extends string | number = string> = {
   children?: React.ReactNode;
   id?: string;
 
@@ -98,7 +98,7 @@ export type DropdownProps<T extends string = string> = {
 //   Option: typeof DropdownOption;
 // };
 
-// type DropdownComponent = <T extends string = string>(
+// type DropdownComponent = <T extends string | number = string>(
 //   props: DropdownProps<T> & React.RefAttributes<HTMLDivElement>,
 // ) => React.ReactElement | null;
 //
@@ -115,7 +115,7 @@ export type DropdownProps<T extends string = string> = {
 //   Option: typeof DropdownOption;
 // };
 
-type DropdownComponent = (<T extends string = string>(
+type DropdownComponent = (<T extends string | number = string>(
   props: DropdownProps<T> & React.RefAttributes<HTMLDivElement>,
 ) => React.ReactElement | null) & {
   displayName?: string;
@@ -140,7 +140,7 @@ const prefix = (name: string = '') => classPrefix(`--dropdown${name}`);
 // Dropdown Implementation
 // ---------------------------------------------------------------------------
 
-function DropdownImpl<T extends string = string>(
+function DropdownImpl<T extends string | number = string>(
   {
     children,
     id,
@@ -258,7 +258,7 @@ function DropdownImpl<T extends string = string>(
   // Typeahead
   // ------------------------------------------------------------------
 
-  const focusByTypeahead = useTypeahead<T>(
+  const focusByTypeahead = useTypeahead(
     (id) => optionRefs.current.get(id)?.focus(),
     () => filteredOptions,
   );
@@ -1206,8 +1206,16 @@ export type OptionRenderProps = {
   optionProps: DropdownOptionElementProps;
 };
 
-export type DropdownOptionProps = {
-  value: OptionValue;
+// export type DropdownOptionProps = {
+//   value: OptionValue;
+//   label?: string;
+//   disabled?: boolean;
+//   render?: (props: OptionRenderProps) => React.ReactNode;
+// } & BoxDerivedProps &
+//   React.HTMLAttributes<HTMLElement>;
+
+export type DropdownOptionProps<T extends string | number = string> = {
+  value: OptionValue<T>;
   label?: string;
   disabled?: boolean;
   render?: (props: OptionRenderProps) => React.ReactNode;
