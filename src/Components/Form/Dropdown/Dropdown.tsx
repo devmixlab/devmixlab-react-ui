@@ -34,7 +34,9 @@ import { ButtonProps } from '../../Button';
 // Types
 // ---------------------------------------------------------------------------
 
-export type OptionValue<T extends string | number = string> = T | null;
+export type OptionValue<T extends string | number, Nullable extends boolean> = Nullable extends true
+  ? T | null
+  : T;
 
 export type OptionValueImpl = string | number | null;
 
@@ -74,16 +76,29 @@ export type DropdownPropsCommon = {
   ComponentProps<'div'>;
 
 export type DropdownPropsImpl = {
+  nullable?: boolean;
   value?: OptionValueImpl;
   defaultValue?: OptionValueImpl;
   onValueChange?: (value: OptionValueImpl) => void;
 } & DropdownPropsCommon;
 
-export type DropdownProps<T extends string | number = string> = {
-  value?: OptionValue<T>;
-  defaultValue?: OptionValue<T>;
-  onValueChange?: (value: OptionValue<T>) => void;
+export type DropdownPropsNullable<T extends string | number = string> = {
+  nullable: true;
+  value?: T | null;
+  defaultValue?: T | null;
+  onValueChange?: (value: T | null) => void;
 } & DropdownPropsCommon;
+
+export type DropdownPropsNonNullable<T extends string | number = string> = {
+  nullable?: false;
+  value?: T;
+  defaultValue?: T;
+  onValueChange?: (value: T) => void;
+} & DropdownPropsCommon;
+
+export type DropdownProps<T extends string | number = string> =
+  | DropdownPropsNullable<T>
+  | DropdownPropsNonNullable<T>;
 
 type DropdownComponent = (<T extends string | number = string>(
   props: DropdownProps<T> & React.RefAttributes<HTMLDivElement>,
@@ -124,6 +139,7 @@ function DropdownImpl(
     defaultValue,
     onValueChange,
     placeholder = 'Select option',
+    nullable = false,
 
     invalid = false,
     disabled = false,
@@ -294,6 +310,7 @@ function DropdownImpl(
       modal,
       opened,
       setOpened,
+      nullable,
       returnFocusOnOptionPick,
       triggerRef,
       panelRef,
@@ -327,6 +344,7 @@ function DropdownImpl(
     [
       modal,
       opened,
+      nullable,
       returnFocusOnOptionPick,
       triggerRef,
       panelRef,

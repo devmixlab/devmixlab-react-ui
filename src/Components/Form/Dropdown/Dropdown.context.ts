@@ -49,6 +49,8 @@ type DropdownContextValue = {
   openOnArrowKeys: boolean;
 
   invokeOnly: boolean;
+
+  nullable: boolean;
 };
 
 const DropdownContext = createContext<DropdownContextValue | null>(null);
