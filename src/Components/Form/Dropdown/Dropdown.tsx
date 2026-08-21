@@ -1214,6 +1214,13 @@ export type OptionRenderProps = {
 // } & BoxDerivedProps &
 //   React.HTMLAttributes<HTMLElement>;
 
+// add near DropdownComponent's type definition
+type DropdownOptionComponent = (<T extends string | number = string>(
+  props: DropdownOptionProps<T> & React.RefAttributes<HTMLElement>,
+) => React.ReactElement | null) & {
+  displayName?: string;
+};
+
 export type DropdownOptionProps<T extends string | number = string> = {
   value: OptionValue<T>;
   label?: string;
@@ -1222,7 +1229,7 @@ export type DropdownOptionProps<T extends string | number = string> = {
 } & BoxDerivedProps &
   React.HTMLAttributes<HTMLElement>;
 
-const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
+const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps<any>>(
   (
     { id, value, label, disabled, children, className, onClick, onKeyDown, render, ...rest },
     ref,
@@ -1404,7 +1411,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
       </BoxDerived>
     );
   },
-);
+) as unknown as DropdownOptionComponent;
 
 DropdownOption.displayName = 'DropdownOption';
 
