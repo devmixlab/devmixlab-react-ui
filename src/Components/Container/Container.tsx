@@ -9,6 +9,7 @@ import {
   resolveResponsive,
   useBreakpoint,
   Responsiveify,
+  Responsive,
 } from '../../utils/responsive';
 import { useContainerContext } from './Container.context';
 
@@ -18,18 +19,19 @@ import { useContainerContext } from './Container.context';
 
 type ContainerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
-type ContainerOwnProps = Responsiveify<{
+type ContainerOwnProps = {
   /**
    * Controls the maximum width
    * of the container.
    */
   size?: ContainerSize;
+  responsiveSize?: Responsive<ContainerSize>;
 
   /**
    * Centers the container horizontally.
    */
   centered?: boolean;
-}>;
+};
 
 type ContainerProps = Omit<BoxComponentProps<'div'>, 'size'> & ContainerOwnProps;
 
@@ -45,6 +47,8 @@ const containerSizeMap: Record<Exclude<ContainerSize, 'full'>, Breakpoint> = {
   xl: 'xl',
   '2xl': '2xl',
 };
+
+const DEFAULT_CONTAINER_SIZE = 'lg';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -62,6 +66,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
       className,
 
       size: containerSize,
+      responsiveSize: containerResponsiveSize,
 
       centered: containerCentered,
 
@@ -75,7 +80,18 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
 
     const context = useContainerContext();
 
-    const resolvedSize = resolveResponsive(containerSize ?? context.size ?? 'lg', breakpoint);
+    const resolvedContainerSize = containerSize ?? context.size;
+    const resolvedContainerResponsiveSize = containerResponsiveSize ?? context.responsiveSize;
+
+    // console.log('resolvedContainerSize', resolvedContainerSize);
+    // console.log('containerSize', containerSize);
+    // console.log('context.size', context.size);
+
+    const resolvedSize = resolvedContainerResponsiveSize
+      ? resolveResponsive(resolvedContainerResponsiveSize ?? DEFAULT_CONTAINER_SIZE, breakpoint)
+      : (resolvedContainerSize ?? DEFAULT_CONTAINER_SIZE);
+
+    // const resolvedSize = resolveResponsive(containerSize ?? context.size ?? 'lg', breakpoint);
 
     const resolvedCentered = resolveResponsive(
       containerCentered ?? context.centered ?? true,

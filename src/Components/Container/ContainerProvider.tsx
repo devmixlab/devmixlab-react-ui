@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 
 import { ContainerContext, ContainerContextValue } from './Container.context';
 import type { ContainerSize } from './Container';
@@ -12,16 +12,26 @@ import { Responsive } from '../../utils/responsive';
 function ContainerProvider({
   children,
   size: initialSize = 'full',
+  responsiveSize: initialResponsiveSize,
   centered = true,
 }: ContainerProviderProps) {
-  const [size, setSize] = useState<Responsive<ContainerSize>>(initialSize);
+  const [size, setSize] = useState<ContainerSize>(initialSize);
+  const [responsiveSize, setResponsiveSize] = useState<Responsive<ContainerSize> | undefined>(
+    initialResponsiveSize,
+  );
+
+  useEffect(() => {
+    console.log('size: ', size);
+  }, [size]);
 
   return (
     <ContainerContext.Provider
       value={{
         size,
-        centered,
         setSize,
+        centered,
+        responsiveSize,
+        setResponsiveSize,
       }}
     >
       {children}

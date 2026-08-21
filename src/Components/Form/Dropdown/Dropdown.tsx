@@ -76,7 +76,7 @@ export type DropdownPropsCommon = {
 export type DropdownPropsImpl = {
   value?: OptionValueImpl;
   defaultValue?: OptionValueImpl;
-  onChange?: (value: OptionValueImpl) => void;
+  onValueChange?: (value: OptionValueImpl) => void;
 } & DropdownPropsCommon;
 
 export type DropdownProps<T extends string | number = string> = {
@@ -122,7 +122,7 @@ function DropdownImpl(
 
     value,
     defaultValue,
-    onChange,
+    onValueChange,
     placeholder = 'Select option',
 
     invalid = false,
@@ -277,7 +277,7 @@ function DropdownImpl(
 
   const handleSelect = (nextValue: OptionValueImpl) => {
     if (!isControlled && !invokeOnly) setInternalValue(nextValue);
-    onChange?.(nextValue);
+    onValueChange?.(nextValue);
     setOpened(false);
     setFocuses(null);
   };

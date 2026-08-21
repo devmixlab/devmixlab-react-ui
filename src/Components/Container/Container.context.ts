@@ -3,10 +3,13 @@ import type { Responsiveify, Responsive } from '../../utils/responsive';
 import type { ContainerSize } from './Container';
 
 type ContainerContextValue = {
-  size: Responsive<ContainerSize>;
+  size: ContainerSize;
+  setSize: (size: ContainerSize) => void;
+
   centered: boolean;
 
-  setSize: (size: Responsive<ContainerSize>) => void;
+  responsiveSize?: Responsive<ContainerSize>;
+  setResponsiveSize: (size: Responsive<ContainerSize>) => void;
 };
 
 const ContainerContext = createContext<ContainerContextValue | null>(null);
