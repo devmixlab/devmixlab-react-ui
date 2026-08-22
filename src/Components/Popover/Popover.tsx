@@ -540,6 +540,7 @@ type OwnPopoverTriggerProps<T = {}> = {
   render?: (props: PopoverTriggerRenderProps) => React.ReactNode;
   // btnProps?: ButtonProps;
   renderContent?: T;
+  number?: boolean;
 };
 
 type PopoverTriggerProps<T = {}> = OwnPopoverTriggerProps<T> &
@@ -562,6 +563,8 @@ const PopoverTriggerImpl = (
     onMouseEnter,
     onMouseLeave,
     renderContent,
+    number,
+
     ...rest
   }: ImplPopoverTriggerProps,
   ref: React.Ref<HTMLButtonElement>,
@@ -668,8 +671,9 @@ const PopoverTriggerImpl = (
       active={trigger === 'click' && opened}
       startIcon={startIcon ?? (isLeftPlacement && chevron ? chevronIcon : undefined)}
       endIcon={endIcon ?? (!isLeftPlacement && chevron ? chevronIcon : undefined)}
+      number={number ? children : undefined}
     >
-      {children}
+      {number ? undefined : children}
     </Button>
   );
 };
