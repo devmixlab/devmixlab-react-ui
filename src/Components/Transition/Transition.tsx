@@ -107,6 +107,8 @@ type SharedTransitionProps = {
 
   reduceMotion?: boolean;
 
+  enterDelay?: number;
+
   /**
    * Enables only presence lifecycle management.
    *
@@ -152,6 +154,7 @@ const sharedTransitionProps = defineExactKeys<SharedTransitionProps>()([
   'attentionExit',
   'respectAttentionDuration',
   'reduceMotion',
+  'enterDelay',
   'onlyPresence',
   'enterDuration',
   'exitDuration',
@@ -204,6 +207,7 @@ const ImplTransition = (
     attention,
     attentionExit,
 
+    enterDelay = 0,
     enterDuration: enterDurationProp,
     exitDuration = 120,
 
@@ -274,6 +278,7 @@ const ImplTransition = (
   const { isMounted, state } = usePresence({
     present: visible,
     reduceMotion,
+    enterDelay,
     enterDuration,
     exitDuration,
     onEntered: () => {
