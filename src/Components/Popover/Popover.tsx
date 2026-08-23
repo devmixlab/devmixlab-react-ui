@@ -713,7 +713,15 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
 
     const { triggerId, panelId, role } = usePopoverAccessibilityContext();
 
-    const zIndexRef = useRef(zIndex ?? getNextZIndex('popover'));
+    // const zIndexRef = useRef(zIndex ?? getNextZIndex('popover'));
+
+    const [resolvedZIndex, setResolvedZIndex] = useState<PopoverPanelProps['zIndex']>();
+
+    useEffect(() => {
+      if (opened && resolvedZIndex == null) {
+        setResolvedZIndex(zIndex ?? getNextZIndex('popover'));
+      }
+    }, [opened, resolvedZIndex, zIndex]);
 
     const {
       variant,
@@ -822,7 +830,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             data-variant={variant}
             data-placement={placement}
             {...rest}
-            zIndex={zIndexRef.current}
+            zIndex={resolvedZIndex}
             onMouseEnter={(e) => {
               onMouseEnter?.(e);
 

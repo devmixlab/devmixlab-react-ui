@@ -15,6 +15,8 @@ const zIndexOffsets = new Map<ZLayer, number>();
 export const getNextZIndex = (layer: ZLayer): number => {
   const nextOffset = (zIndexOffsets.get(layer) ?? 0) + 1;
 
+  console.log(layer + ' z-index requested', nextOffset);
+
   zIndexOffsets.set(layer, nextOffset);
 
   return zLayers[layer] + nextOffset;

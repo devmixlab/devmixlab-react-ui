@@ -20,6 +20,7 @@ import {
   PopoverPanelProps,
   PopoverProps,
   PopoverTriggerProps,
+  usePopoverStateContext,
 } from '../../Popover';
 import { clsx } from 'clsx';
 import { DropdownContext, useDropdownContext, DropdownContextValue } from './Dropdown.context';
@@ -665,21 +666,21 @@ const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
   ({ children, className, size = 'md', onMouseEnter, onMouseLeave, zIndex, ...rest }, ref) => {
     const { panelRef, setIsPanelHovered } = useDropdownContext();
 
-    const zIndexRef = useRef(zIndex ?? getNextZIndex('dropdown'));
+    const { opened } = usePopoverStateContext();
 
-    // const zIndexRef = useRef<number | null>(null);
-    //
-    // useEffect(() => {
-    //   if (opened && zIndexRef.current === null) {
-    //     zIndexRef.current = zIndex ?? getNextZIndex('popover');
-    //   }
-    // }, [opened, zIndex]);
+    const [resolvedZIndex, setResolvedZIndex] = useState<PopoverPanelProps['zIndex']>();
+
+    useEffect(() => {
+      if (opened && resolvedZIndex == null) {
+        setResolvedZIndex(zIndex ?? getNextZIndex('dropdown'));
+      }
+    }, [opened, resolvedZIndex, zIndex]);
 
     const mergedRef = mergeRefs(ref, panelRef);
 
     return (
       <Popover.Panel
-        zIndex={zIndexRef.current}
+        zIndex={resolvedZIndex}
         ref={mergedRef}
         className={prefix('__content')}
         {...rest}

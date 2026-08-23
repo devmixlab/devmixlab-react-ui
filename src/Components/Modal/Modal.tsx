@@ -13,6 +13,7 @@ import { mergeRefs } from '../../utils/mergeRefs';
 import { sharedTransitionProps, SharedTransitionProps, Transition } from '../Transition';
 import { splitProps } from '../../utils/splitProps';
 import { resolveResponsive, useBreakpoint, Responsive } from '../../utils/responsive';
+import { PopoverPanelProps } from '../Popover';
 
 //----------------------------------------------------------------------
 // Types
@@ -184,6 +185,14 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
   ) => {
     const { breakpoint } = useBreakpoint();
 
+    const [resolvedZIndex, setResolvedZIndex] = useState<ModalProps['zIndex']>();
+
+    useEffect(() => {
+      if (opened && resolvedZIndex == null) {
+        setResolvedZIndex(zIndex ?? getNextZIndex('modal'));
+      }
+    }, [opened, resolvedZIndex, zIndex]);
+
     const [fullyVisible, setFullyVisible] = useState(false);
     const [hasHeader, setHasHeader] = useState(false);
     const [hasBody, setHasBody] = useState(false);
@@ -204,7 +213,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
     const finalSideSpace = isFullscreenMode ? 'none' : resolvedSideSpace;
 
     const contentRef = useRef<HTMLDivElement | null>(null);
-    const zIndexRef = useRef(zIndex ?? getNextZIndex('modal'));
     const modalIdRef = useRef(Math.random());
 
     // ── Modal stack ──────────────────────────────────────────────────────
@@ -274,7 +282,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
           className={clsx(prefix(), className)}
           position="fixed"
           inset={0}
-          zIndex={zIndexRef.current}
+          zIndex={resolvedZIndex}
           data-placement={placement}
           data-separated={separated || undefined}
           data-side-space={finalSideSpace}
