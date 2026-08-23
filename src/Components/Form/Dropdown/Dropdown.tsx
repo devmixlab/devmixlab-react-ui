@@ -29,7 +29,7 @@ import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } 
 import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { splitProps } from '../../../utils/splitProps';
 import { ButtonProps } from '../../Button';
-import { getNextZIndex } from '../../utils/zIndex';
+import { getNextZIndex } from '../../../utils/zIndex';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -662,13 +662,24 @@ type DropdownContentProps = {
 } & PopoverPanelProps;
 
 const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
-  ({ children, className, size = 'md', onMouseEnter, onMouseLeave, ...rest }, ref) => {
+  ({ children, className, size = 'md', onMouseEnter, onMouseLeave, zIndex, ...rest }, ref) => {
     const { panelRef, setIsPanelHovered } = useDropdownContext();
+
+    const zIndexRef = useRef(zIndex ?? getNextZIndex('dropdown'));
+
+    // const zIndexRef = useRef<number | null>(null);
+    //
+    // useEffect(() => {
+    //   if (opened && zIndexRef.current === null) {
+    //     zIndexRef.current = zIndex ?? getNextZIndex('popover');
+    //   }
+    // }, [opened, zIndex]);
 
     const mergedRef = mergeRefs(ref, panelRef);
 
     return (
       <Popover.Panel
+        zIndex={zIndexRef.current}
         ref={mergedRef}
         className={prefix('__content')}
         {...rest}

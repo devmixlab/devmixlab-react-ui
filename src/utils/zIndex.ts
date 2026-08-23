@@ -1,5 +1,5 @@
 export const zLayers = {
-  dropdown: 1000,
+  dropdown: 5000,
   sticky: 2000,
   overlay: 3000,
   modal: 4000,
