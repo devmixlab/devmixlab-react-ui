@@ -34,6 +34,7 @@ import { Transition, SharedTransitionProps, sharedTransitionProps } from '../Tra
 import { splitProps } from '../../utils/splitProps';
 import { usePopoverTransitionContext } from './PopoverTransition.context';
 import { createPolymorphic } from '../../types';
+import { getNextZIndex } from '../../utils/zIndex';
 
 export const BUTTON_ICON_SLOT_WIDTHS = {
   xs: 6,
@@ -697,6 +698,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
       rounded = 'sm',
       onMouseEnter,
       onMouseLeave,
+      zIndex,
       ...rest
     },
     ref,
@@ -710,6 +712,8 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
       usePopoverFloatingContext();
 
     const { triggerId, panelId, role } = usePopoverAccessibilityContext();
+
+    const zIndexRef = useRef(zIndex ?? getNextZIndex('popover'));
 
     const {
       variant,
@@ -818,6 +822,7 @@ const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             data-variant={variant}
             data-placement={placement}
             {...rest}
+            zIndex={zIndexRef.current}
             onMouseEnter={(e) => {
               onMouseEnter?.(e);
 

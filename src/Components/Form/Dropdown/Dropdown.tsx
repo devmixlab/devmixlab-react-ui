@@ -29,6 +29,7 @@ import { FieldLayoutProps, FieldRoot, fieldRootPropKeys, SharedFieldRootProps } 
 import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { splitProps } from '../../../utils/splitProps';
 import { ButtonProps } from '../../Button';
+import { getNextZIndex } from '../../utils/zIndex';
 
 // ---------------------------------------------------------------------------
 // Types

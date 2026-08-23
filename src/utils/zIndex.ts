@@ -1,33 +1,34 @@
 export const zLayers = {
-    dropdown: 1000,
-    sticky: 1100,
-    overlay: 1200,
-    modal: 1300,
-    popover: 1400,
-    tooltip: 1500,
-    toast: 1600,
+  dropdown: 1000,
+  sticky: 2000,
+  overlay: 3000,
+  modal: 4000,
+  popover: 5000,
+  tooltip: 6000,
+  toast: 7000,
 } as const;
 
-type ZLayer = keyof typeof zLayers;
+export type ZLayer = keyof typeof zLayers;
 
-const zIndexCounters = new Map<ZLayer, number>();
+const zIndexOffsets = new Map<ZLayer, number>();
 
-export const getNextZIndex = (layer: ZLayer) => {
-    const current = zIndexCounters.get(layer) ?? zLayers[layer];
+export const getNextZIndex = (layer: ZLayer): number => {
+  const nextOffset = (zIndexOffsets.get(layer) ?? 0) + 1;
 
-    const next = current + 1;
+  zIndexOffsets.set(layer, nextOffset);
 
-    zIndexCounters.set(layer, next);
-
-    return next;
+  return zLayers[layer] + nextOffset;
 };
 
-export const resetZIndex = (layer?: ZLayer) => {
-    if (layer) {
-        zIndexCounters.delete(layer);
+export const getBaseZIndex = (layer: ZLayer): number => {
+  return zLayers[layer];
+};
 
-        return;
-    }
+export const resetZIndex = (layer?: ZLayer): void => {
+  if (layer) {
+    zIndexOffsets.delete(layer);
+    return;
+  }
 
-    zIndexCounters.clear();
+  zIndexOffsets.clear();
 };
