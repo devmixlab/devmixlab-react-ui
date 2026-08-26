@@ -164,8 +164,9 @@ $tabs-sizes: (
 
     &__track {
       display: flex;
-      flex: 1 1 auto;
+      min-width: 100%;
       border-bottom: 1px solid var(--tabs-list-border);
+
     }
 
 
@@ -178,26 +179,23 @@ $tabs-sizes: (
       .#{$tabs-prefix}__list {
         flex: 1 1 auto;
         align-self: stretch;
-        height: 100%;
-        width: 100%;
       }
     }
 
-    &__scrollable__next, &__scrollable__prev {
-      &[data-visible='true'] {
-        visibility: visible;
-      }
-      &[data-visible='false'] {
-        visibility: hidden;
-      }
-    }
-
-    &__scrollable__next {
-      right: 0;
-    }
-
+    &__scrollable__next,
     &__scrollable__prev {
-      left: 0;
+      transition: opacity 150ms;
+    }
+
+    &__scrollable__next[data-visible='false'],
+    &__scrollable__prev[data-visible='false'] {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &__scrollable__next[data-visible='true'],
+    &__scrollable__prev[data-visible='true'] {
+      opacity: 1;
     }
 
     &__scrollable__viewport {
@@ -207,8 +205,6 @@ $tabs-sizes: (
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
       min-width: 0;
-
-      //border-bottom: 1px solid var(--tabs-list-border);
 
       &::-webkit-scrollbar {
         display: none;
