@@ -75,23 +75,23 @@ function TabsList({ children, className, indicatorProps, ...rest }: TabsListProp
       });
 
       requestAnimationFrame(() => {
-        if (!initialized) setInitialized(true);
+        setInitialized(true);
       });
     };
 
     updateIndicator();
 
-    const listElement = listRef.current;
+    const activeTab = tabs.get(activeValue);
 
-    if (!listElement) {
-      return;
+    const observer = new ResizeObserver(updateIndicator);
+
+    if (listRef.current) {
+      observer.observe(listRef.current);
     }
 
-    const observer = new ResizeObserver(() => {
-      updateIndicator();
-    });
-
-    observer.observe(listElement);
+    if (activeTab) {
+      observer.observe(activeTab);
+    }
 
     return () => {
       observer.disconnect();
