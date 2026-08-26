@@ -16,6 +16,7 @@ type TabsTabProps = {
   iconPlacement?: TabsIconPlacement;
   // size?: TabsSize;
   disabled?: boolean;
+  noInteraction?: boolean; // removes hover/active interaction styles
   // children: ReactNode;
 } & Omit<BoxProps, 'size'> &
   ComponentProps<'button'>;
@@ -36,6 +37,8 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
       disabled,
       onKeyDown,
 
+      noInteraction = false,
+
       icon,
       iconPlacement: propIconPlacement,
 
@@ -55,6 +58,8 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
       focusableList,
       iconPlacement: ctxIconPlacement,
     } = useTabsContext();
+
+    const isDisabled = disabled || noInteraction;
 
     const iconPlacement = propIconPlacement ?? ctxIconPlacement ?? 'start';
 
@@ -111,7 +116,12 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
         ref={combinedRef}
         type={type}
         onClick={(e) => {
-          if (disabled) return;
+          if (isDisabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+
           onClick?.(e);
           onValueChange(value);
         }}
@@ -119,7 +129,8 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
           setFocusedId(value);
         }}
         onKeyDown={(e: React.KeyboardEvent<Element>) => {
-          if (disabled) {
+          if (isDisabled) {
+            e.preventDefault();
             return;
           }
 
@@ -143,9 +154,11 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
         data-size={size}
         data-intent={intent}
         data-variant={variant}
-        data-disabled={disabled}
+        data-disabled={disabled || undefined}
+        data-no-interaction={noInteraction || undefined}
         data-value={value}
         data-icon-placement={iconPlacement}
+        aria-disabled={isDisabled}
       >
         {/* START TOP ICON */}
         {icon && (iconPlacement === 'top' || iconPlacement === 'start') && (

@@ -109,6 +109,10 @@ $tabs-sizes: (
         cursor: not-allowed;
       }
 
+      &[data-no-interaction] {
+        cursor: default;
+      }
+
       &:focus,
       &:focus-visible {
         //outline: none;
