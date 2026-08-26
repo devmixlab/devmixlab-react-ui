@@ -67,6 +67,8 @@ const Tabs: TabsComponent = ({
 }: TabsProps) => {
   const [focusableItems, setfocusableItems] = useState<Map<string, FocusableItem>>(new Map([]));
 
+  const [scrollable, setScrollable] = useState(false);
+
   const focusableList = useFocusableList([...focusableItems.values()]);
 
   // console.log('focusableItems', focusableItems);
@@ -113,6 +115,8 @@ const Tabs: TabsComponent = ({
   return (
     <TabsContext.Provider
       value={{
+        scrollable,
+        setScrollable,
         orientation,
         focusableList,
         intent,

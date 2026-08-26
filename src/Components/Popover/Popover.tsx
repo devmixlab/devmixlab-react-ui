@@ -583,6 +583,10 @@ const PopoverTriggerImpl = (
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
+        if (trigger !== 'click') {
+          return;
+        }
+
         e.preventDefault();
         setOpened(!opened);
       }

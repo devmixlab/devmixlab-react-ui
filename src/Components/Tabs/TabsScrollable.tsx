@@ -8,7 +8,8 @@ import { Box, BoxProps } from '../Box';
 type TabsScrollableProps = {
   children: ReactNode;
   viewPortProps?: BoxProps;
-} & ComponentProps<'div'>;
+} & BoxProps &
+  ComponentProps<'div'>;
 
 const prefix = (p: string = '') => {
   return tabsPrefix(`__scrollable${p}`);
@@ -89,7 +90,7 @@ export function TabsScrollable({
   const viewPortProps = { pb: 1, pt: 1, ...viewPortPropsProp };
 
   return (
-    <div {...rest} className={prefix()} data-scrolls={canScrollRight || canScrollLeft || undefined}>
+    <Box {...rest} className={prefix()} data-scrolls={canScrollRight || canScrollLeft || undefined}>
       {/*{canScrollLeft && <div className={`${prefix('__shadow')} ${prefix('__shadow--left')}`} />}*/}
 
       {/*{canScrollRight && <div className={`${prefix('__shadow')} ${prefix('__shadow--right')}`} />}*/}
@@ -134,6 +135,6 @@ export function TabsScrollable({
       >
         <ChevronRight />
       </Button>
-    </div>
+    </Box>
   );
 }

@@ -1,8 +1,11 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, Dispatch, SetStateAction } from 'react';
 import { TabsIconPlacement, TabsSize, TabsOrientation } from './Tabs';
 import { FocusableItem, FocusableListResult } from '../../hooks/useFocusableList';
 
 export type TabsContextValue = {
+  scrollable: boolean;
+  setScrollable: Dispatch<SetStateAction<boolean>>;
+
   fullWidth: boolean;
   equalWidthTabs?: boolean;
   iconPlacement?: TabsIconPlacement;

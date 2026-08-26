@@ -130,12 +130,16 @@ const Tooltip = forwardRef<HTMLElement, TooltipProps>(
             //   ref: mergeRefs(triggerRef, ref, (children as any).ref),
             //   ...triggerProps,
             // })
+
+            const { onClick, ...rest } = triggerProps;
+            console.log(triggerProps);
+
             const childRef = (children.props as { ref?: React.Ref<HTMLElement> }).ref;
 
             return React.cloneElement(
               children,
               mergeProps(children.props, {
-                ...triggerProps,
+                ...rest,
                 ref: mergeRefs(triggerRef, ref, childRef),
               }),
             );
