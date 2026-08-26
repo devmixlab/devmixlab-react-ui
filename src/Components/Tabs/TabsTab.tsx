@@ -17,6 +17,7 @@ type TabsTabProps = {
   // size?: TabsSize;
   disabled?: boolean;
   noInteraction?: boolean; // removes hover/active interaction styles
+  noInteractionOnActive?: boolean; // removes hover/active interaction styles if tab active
   // children: ReactNode;
 } & Omit<BoxProps, 'size'> &
   ComponentProps<'button'>;
@@ -37,7 +38,8 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
       disabled,
       onKeyDown,
 
-      noInteraction = false,
+      noInteraction: noInteractionProp,
+      noInteractionOnActive = false,
 
       icon,
       iconPlacement: propIconPlacement,
@@ -58,6 +60,10 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
       focusableList,
       iconPlacement: ctxIconPlacement,
     } = useTabsContext();
+
+    const active = ctxValue === value;
+
+    const noInteraction = noInteractionProp ?? (active ? noInteractionOnActive : false);
 
     const isDisabled = disabled || noInteraction;
 
@@ -102,8 +108,6 @@ const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
           break;
       }
     };
-
-    const active = ctxValue === value;
 
     useEffect(() => {
       registerTab(value, innerRef.current, disabled ?? false);
