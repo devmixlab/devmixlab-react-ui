@@ -176,6 +176,7 @@ $tabs-sizes: (
 
     &__track {
       display: flex;
+      flex: 1 1 auto;
       border-bottom: 1px solid var(--tabs-list-border);
     }
 
@@ -183,8 +184,6 @@ $tabs-sizes: (
     // Scrollable
     &__scrollable {
       position: relative;
-      display: flex;
-      gap: 8px;
       align-items: center;
       .#{$tabs-prefix}__list {
         flex: 1 1 auto;

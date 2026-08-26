@@ -19,7 +19,7 @@ type TabsListProps = {
 //-----------------------------------
 
 function TabsList({ children, className, indicatorProps, ...rest }: TabsListProps) {
-  const { tabs, value: activeValue } = useTabsContext();
+  const { tabs, value: activeValue, fullWidth } = useTabsContext();
 
   const listRef = useRef<HTMLDivElement>(null);
 

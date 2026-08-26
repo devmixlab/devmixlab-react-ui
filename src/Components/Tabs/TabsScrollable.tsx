@@ -1,4 +1,4 @@
-import { ReactNode, ComponentProps, useRef, useState, useEffect } from 'react';
+import { ReactNode, ComponentProps, useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { prefix as tabsPrefix } from './Tabs';
 import { Button } from '../Button';
 import { ChevronLeft, ChevronRight } from '../Icon';
@@ -18,9 +18,15 @@ const prefix = (p: string = '') => {
 export function TabsScrollable({
   children,
   viewPortProps: viewPortPropsProp,
+  width: widthProp,
+  display: displayProp,
+  gap = 2,
   ...rest
 }: TabsScrollableProps) {
-  const { value, tabs } = useTabsContext();
+  const { value, tabs, fullWidth } = useTabsContext();
+
+  const width = widthProp ?? (fullWidth ? 'full' : 'auto');
+  const display = displayProp ?? (fullWidth ? 'flex' : 'inline-flex');
 
   const activeTab = tabs.get(value);
 
@@ -42,15 +48,19 @@ export function TabsScrollable({
   };
 
   useEffect(() => {
-    const container = viewportRef.current;
-    const activeTab = tabs.get(value);
+    const id = requestAnimationFrame(() => {
+      const container = viewportRef.current;
+      const activeTab = tabs.get(value);
 
-    if (!container || !activeTab) {
-      return;
-    }
+      if (!container || !activeTab) {
+        return;
+      }
 
-    container.scrollLeft =
-      activeTab.offsetLeft - container.clientWidth / 2 + activeTab.clientWidth / 2;
+      container.scrollLeft =
+        activeTab.offsetLeft - container.clientWidth / 2 + activeTab.clientWidth / 2;
+    });
+
+    return () => cancelAnimationFrame(id);
   }, [value, tabs]);
 
   useEffect(() => {
@@ -90,7 +100,14 @@ export function TabsScrollable({
   const viewPortProps = { pb: 1, pt: 1, ...viewPortPropsProp };
 
   return (
-    <Box {...rest} className={prefix()} data-scrolls={canScrollRight || canScrollLeft || undefined}>
+    <Box
+      {...rest}
+      width={width}
+      display={display}
+      gap={gap}
+      className={prefix()}
+      data-scrolls={canScrollRight || canScrollLeft || undefined}
+    >
       {/*{canScrollLeft && <div className={`${prefix('__shadow')} ${prefix('__shadow--left')}`} />}*/}
 
       {/*{canScrollRight && <div className={`${prefix('__shadow')} ${prefix('__shadow--right')}`} />}*/}
@@ -101,17 +118,19 @@ export function TabsScrollable({
       {/*  </Button>*/}
       {/*)}*/}
 
-      <Button
-        disabled={!canScrollLeft}
-        type="button"
-        onClick={() => scroll('left')}
-        className={`${prefix('__prev')}`}
-        style={{ paddingLeft: 0, paddingRight: 0 }}
-        intent="secondary"
-        data-visible={canScrollRight || canScrollLeft}
-      >
-        <ChevronLeft />
-      </Button>
+      {(canScrollLeft || canScrollRight) && (
+        <Button
+          disabled={!canScrollLeft}
+          type="button"
+          onClick={() => scroll('left')}
+          className={`${prefix('__prev')}`}
+          style={{ paddingLeft: 0, paddingRight: 0 }}
+          intent="secondary"
+          data-visible={canScrollRight || canScrollLeft}
+        >
+          <ChevronLeft />
+        </Button>
+      )}
 
       <Box {...viewPortProps} ref={viewportRef} className={prefix('__viewport')}>
         {children}
@@ -123,18 +142,20 @@ export function TabsScrollable({
       {/*  </Button>*/}
       {/*)}*/}
 
-      <Button
-        disabled={!canScrollRight}
-        type="button"
-        onClick={() => scroll('right')}
-        className={`${prefix('__next')}`}
-        style={{ paddingLeft: 0, paddingRight: 0 }}
-        rounded="sm"
-        intent="secondary"
-        data-visible={canScrollRight || canScrollLeft}
-      >
-        <ChevronRight />
-      </Button>
+      {(canScrollLeft || canScrollRight) && (
+        <Button
+          disabled={!canScrollRight}
+          type="button"
+          onClick={() => scroll('right')}
+          className={`${prefix('__next')}`}
+          style={{ paddingLeft: 0, paddingRight: 0 }}
+          rounded="sm"
+          intent="secondary"
+          data-visible={canScrollRight || canScrollLeft}
+        >
+          <ChevronRight />
+        </Button>
+      )}
     </Box>
   );
 }
