@@ -3,16 +3,22 @@ import { prefix as tabsPrefix } from './Tabs';
 import { Button } from '../Button';
 import { ChevronLeft, ChevronRight } from '../Icon';
 import { useTabsContext } from './TabsContext';
+import { Box, BoxProps } from '../Box';
 
 type TabsScrollableProps = {
   children: ReactNode;
+  viewPortProps?: BoxProps;
 } & ComponentProps<'div'>;
 
-const prefix = (p?: string = '') => {
+const prefix = (p: string = '') => {
   return tabsPrefix(`__scrollable${p}`);
 };
 
-export function TabsScrollable({ children, ...rest }: TabsScrollableProps) {
+export function TabsScrollable({
+  children,
+  viewPortProps: viewPortPropsProp,
+  ...rest
+}: TabsScrollableProps) {
   const { value, tabs } = useTabsContext();
 
   const activeTab = tabs.get(value);
@@ -80,6 +86,8 @@ export function TabsScrollable({ children, ...rest }: TabsScrollableProps) {
     });
   };
 
+  const viewPortProps = { pb: 1, pt: 1, ...viewPortPropsProp };
+
   return (
     <div {...rest} className={prefix()} data-scrolls={canScrollRight || canScrollLeft || undefined}>
       {/*{canScrollLeft && <div className={`${prefix('__shadow')} ${prefix('__shadow--left')}`} />}*/}
@@ -104,9 +112,9 @@ export function TabsScrollable({ children, ...rest }: TabsScrollableProps) {
         <ChevronLeft />
       </Button>
 
-      <div ref={viewportRef} className={prefix('__viewport')}>
+      <Box {...viewPortProps} ref={viewportRef} className={prefix('__viewport')}>
         {children}
-      </div>
+      </Box>
 
       {/*{canScrollRight && (*/}
       {/*  <Button type="button" onClick={() => scroll('right')} className={`${prefix('__next')}`}>*/}

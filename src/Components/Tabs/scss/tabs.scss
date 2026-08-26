@@ -153,6 +153,18 @@ $tabs-sizes: (
       &[data-resizing] {
         transition: none;
       }
+
+      //box-shadow:
+      //    0 0 0 2px color-mix(
+      //        in srgb,
+      //        var(--tabs-ring-color) 30%,
+      //        transparent
+      //    ),
+      //    0 0 12px color-mix(
+      //        in srgb,
+      //        var(--tabs-ring-color) 25%,
+      //        transparent
+      //    );
     }
 
     &__list {
@@ -164,9 +176,7 @@ $tabs-sizes: (
 
     &__track {
       display: flex;
-      min-width: 100%;
       border-bottom: 1px solid var(--tabs-list-border);
-
     }
 
 
@@ -179,6 +189,9 @@ $tabs-sizes: (
       .#{$tabs-prefix}__list {
         flex: 1 1 auto;
         align-self: stretch;
+      }
+      .#{$tabs-prefix}__track {
+        padding-inline: 4px;
       }
     }
 
@@ -205,6 +218,8 @@ $tabs-sizes: (
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
       min-width: 0;
+      //padding-bottom: 4px;
+      //padding-top: 10px;
 
       &::-webkit-scrollbar {
         display: none;
