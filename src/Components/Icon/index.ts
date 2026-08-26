@@ -11,6 +11,7 @@ export { Warning, Warning as WarningIcon } from './Warning';
 export { TriangleDown, TriangleDown as TriangleDownIcon } from './TriangleDown';
 export { ChevronUp, ChevronUp as ChevronUpIcon } from './ChevronUp';
 export { ChevronLeft, ChevronLeft as ChevronLeftIcon } from './ChevronLeft';
+export { ChevronRight, ChevronRight as ChevronRightIcon } from './ChevronRight';
 export { ChevronDown, ChevronDown as ChevronDownIcon } from './ChevronDown';
 export { Indeterminate, Indeterminate as IndeterminateIcon } from './Indeterminate';
 export { Image, Image as ImageIcon } from './Image';

@@ -2,6 +2,7 @@ import { ComponentProps, ReactNode, useCallback, useRef, useState } from 'react'
 import { TabsContext } from './TabsContext';
 import { TabsList } from './TabsList';
 import { TabsTab } from './TabsTab';
+import { TabsScrollable } from './TabsScrollable';
 import { classPrefix } from '../../utils/classPrefix';
 import clsx from 'clsx';
 // import { useFocusTrap } from '../../hooks';
@@ -15,6 +16,7 @@ import { FocusScope } from '../Navbar/Navbar.types';
 type TabsComponent = React.FC<TabsProps> & {
   List: typeof TabsList;
   Tab: typeof TabsTab;
+  Scrollable: typeof TabsScrollable;
 };
 
 type TabsIconPlacement = 'top' | 'bottom' | 'start' | 'end';
@@ -140,6 +142,7 @@ const Tabs: TabsComponent = ({
 
 Tabs.List = TabsList;
 Tabs.Tab = TabsTab;
+Tabs.Scrollable = TabsScrollable;
 
 //------------------------------------------------------
 // Export
