@@ -132,7 +132,7 @@ const Tooltip = forwardRef<HTMLElement, TooltipProps>(
             // })
 
             const { onClick, ...rest } = triggerProps;
-            console.log(triggerProps);
+            // console.log(triggerProps);
 
             const childRef = (children.props as { ref?: React.Ref<HTMLElement> }).ref;
 
