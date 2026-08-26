@@ -154,21 +154,17 @@ $tabs-sizes: (
         transition: none;
       }
     }
+
     &__list {
       position: relative;
       display: flex;
       flex: 1 1 auto;
       gap: 4px;
-      //border-bottom: 1px solid var(--tabs-list-border);
     }
 
     &__track {
-      //position: relative;
       display: flex;
       flex: 1 1 auto;
-      //justify-content: space-evenly;
-      //gap: 4px;
-      //background-color: red;
       border-bottom: 1px solid var(--tabs-list-border);
     }
 
@@ -178,33 +174,16 @@ $tabs-sizes: (
       position: relative;
       display: flex;
       gap: 8px;
-      //&[data-scrolls] {
-      //  padding-inline: 35px;
-      //}
+      align-items: center;
       .#{$tabs-prefix}__list {
         flex: 1 1 auto;
         align-self: stretch;
         height: 100%;
         width: 100%;
-        //border-bottom: none;
       }
     }
 
-    //&__scrollable__shadow {
-    //  position: absolute;
-    //  top: 0;
-    //  bottom: 0;
-    //  width: 48px;
-    //  pointer-events: none;
-    //  z-index: 1;
-    //}
-
     &__scrollable__next, &__scrollable__prev {
-      //position: absolute;
-      //top: 50%;
-      //transform: translateY(-50%);
-      //z-index: 10;
-
       &[data-visible='true'] {
         visibility: visible;
       }
@@ -221,48 +200,13 @@ $tabs-sizes: (
       left: 0;
     }
 
-    //&__scrollable__shadow--left {
-    //  left: 0;
-    //
-    //  background: linear-gradient(
-    //      to right,
-    //      var(--surface, white),
-    //      transparent
-    //  );
-    //}
-
-    //&__scrollable__shadow--right {
-    //  right: 0;
-    //
-    //  background: linear-gradient(
-    //      to left,
-    //      var(--surface, white),
-    //      transparent
-    //  );
-    //}
-
-    //&__scrollable__prev,
-    //&__scrollable__next {
-    //  position: absolute;
-    //  top: 50%;
-    //  transform: translateY(-50%);
-    //  z-index: 2;
-    //}
-
-    //&__scrollable__prev {
-    //  left: 8px;
-    //}
-    //
-    //&__scrollable__next {
-    //  right: 8px;
-    //}
-
     &__scrollable__viewport {
       flex: 1;
       overflow-x: auto;
       overflow-y: hidden;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
+      min-width: 0;
 
       //border-bottom: 1px solid var(--tabs-list-border);
 

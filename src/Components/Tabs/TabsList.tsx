@@ -130,13 +130,7 @@ function TabsList({ children, className, indicatorProps, ...rest }: TabsListProp
       data-resizing={resizing || undefined}
       data-initialized={initialized || undefined}
     >
-      <BoxDerived
-        // ref={listRef}
-        {...rest}
-        className={clsx(prefix('__track'), className)}
-        // data-resizing={resizing || undefined}
-        // data-initialized={initialized || undefined}
-      >
+      <BoxDerived {...rest} className={clsx(prefix('__track'), className)}>
         {children}
       </BoxDerived>
       <BoxDerived {...finalIndicatorProps} />
