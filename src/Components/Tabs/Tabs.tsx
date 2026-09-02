@@ -13,7 +13,9 @@ import { FocusScope } from '../Navbar/Navbar.types';
 // Types
 //----------------------------------------------------------------------
 
-type TabsComponent = React.FC<TabsProps> & {
+type TabsComponent = {
+  <TValue extends string = string>(props: TabsProps<TValue>): React.ReactElement | null;
+
   List: typeof TabsList;
   Tab: typeof TabsTab;
   Scrollable: typeof TabsScrollable;
@@ -23,21 +25,18 @@ type TabsIconPlacement = 'top' | 'bottom' | 'start' | 'end';
 type TabsSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type TabsOrientation = 'horizontal' | 'vertical';
 
-type TabsProps = {
-  // children: ReactNode;
+type TabsProps<TValue extends string = string> = {
+  value?: TValue;
+  defaultValue?: TValue;
+  onValueChange?: (value: TValue) => void;
+
   fullWidth?: boolean;
   equalWidthTabs?: boolean;
   iconPlacement?: TabsIconPlacement;
   size?: TabsSize;
   orientation?: TabsOrientation;
-
   intent?: string;
   variant?: string;
-
-  value?: string;
-  defaultValue?: string;
-
-  onValueChange?: (value: string) => void;
 } & ComponentProps<'div'>;
 
 //----------------------------------------------------------------------
@@ -50,7 +49,7 @@ export const prefix = (name: string = '') => classPrefix(`--tabs${name}`);
 // Tabs
 //----------------------------------------------------------------------
 
-const Tabs: TabsComponent = ({
+const Tabs = (<TValue extends string = string>({
   intent,
   variant,
   fullWidth = false,
@@ -62,9 +61,8 @@ const Tabs: TabsComponent = ({
   value,
   defaultValue,
   onValueChange,
-
   iconPlacement,
-}: TabsProps) => {
+}: TabsProps<TValue>) => {
   const [focusableItems, setfocusableItems] = useState<Map<string, FocusableItem>>(new Map([]));
 
   const [scrollable, setScrollable] = useState(false);
@@ -75,16 +73,18 @@ const Tabs: TabsComponent = ({
 
   const controlled = value !== undefined;
 
-  const [internalValue, setInternalValue] = useState(defaultValue ?? '');
+  // const [internalValue, setInternalValue] = useState(defaultValue ?? '');
+  const [internalValue, setInternalValue] = useState<string>((defaultValue ?? '') as string);
 
-  const activeValue = controlled ? value : internalValue;
+  // const activeValue = controlled ? value : internalValue;
+  const activeValue = controlled ? (value as string) : internalValue;
 
   const handleChange = (nextValue: string) => {
     if (!controlled) {
       setInternalValue(nextValue);
     }
 
-    onValueChange?.(nextValue);
+    onValueChange?.(nextValue as TValue);
   };
 
   const tabs = useRef(new Map<string, HTMLButtonElement>());
@@ -142,7 +142,7 @@ const Tabs: TabsComponent = ({
       </div>
     </TabsContext.Provider>
   );
-};
+}) as TabsComponent;
 
 Tabs.List = TabsList;
 Tabs.Tab = TabsTab;
