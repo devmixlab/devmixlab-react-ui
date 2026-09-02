@@ -34,6 +34,11 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
   const remainingRef = React.useRef(toast.duration ?? 0);
   const startedAtRef = React.useRef<number | null>(null);
 
+  // Check alertRef if it exist
+  // useLayoutEffect(() => {
+  //   console.log('alertRef', alertRef.current);
+  // }, []);
+
   const handleClose = () => {
     close(toast.id);
   };
@@ -154,7 +159,7 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
   }, [toast.id, restart]);
 
   useLayoutEffect(() => {
-    if (!alertRef.current) {
+    if (!wrapperIn || !alertRef.current) {
       return;
     }
 
@@ -169,7 +174,7 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
     setHeight(element.offsetHeight);
 
     return () => observer.disconnect();
-  }, []);
+  }, [wrapperIn]);
 
   const renderContent = {
     id: toast.id,
@@ -191,6 +196,12 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         remove(toast.id);
         toast.onClose?.(renderContent);
       }}
+      // onMount={() => {
+      //   // console.log('entered', alertRef.current);
+      //   if (alertRef.current) {
+      //     setHeight(alertRef.current.offsetHeight);
+      //   }
+      // }}
       className={prefix('__item-wrapper')}
       data-position={position}
       data-wrapper-in={wrapperIn || undefined}
