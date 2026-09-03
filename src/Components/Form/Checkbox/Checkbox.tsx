@@ -56,7 +56,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const group = useCheckboxGroupContext<any>();
     const valueProp = rest.value as unknown;
 
-    const isDisabled = group?.disabled ?? disabled;
+    const isDisabled = disabled || group?.disabled;
 
     const [uncontrolledChecked, setUncontrolledChecked] = useState(() => Boolean(defaultChecked));
 
