@@ -9,6 +9,7 @@ type DropdownContextValue = {
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 
   returnFocusOnOptionPick: boolean;
+  autoFocusOption: boolean;
   triggerRef: React.RefObject<HTMLElement | null>;
   panelRef: React.RefObject<HTMLDivElement | null>;
 

@@ -31,6 +31,7 @@ import { ChevronDown as ChevronDownIcon } from '../../Icon';
 import { splitProps } from '../../../utils/splitProps';
 import { ButtonProps } from '../../Button';
 import { getNextZIndex } from '../../../utils/zIndex';
+import { FocusableListResult } from '../../../hooks/useFocusableList';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -60,6 +61,8 @@ export type DropdownOptionData = {
 export type DropdownPropsCommon = {
   // children?: React.ReactNode;
   // id?: string;
+  open?: boolean;
+  defaultOpen?: boolean;
 
   // enables chevron on trigger
   chevron?: boolean;
@@ -74,6 +77,7 @@ export type DropdownPropsCommon = {
   openOnArrowKeys?: boolean;
   invokeOnly?: boolean;
   returnFocusOnOptionPick?: boolean;
+  autoFocusOption?: boolean;
 } & PopoverProps &
   ComponentProps<'div'>;
 
@@ -133,6 +137,9 @@ function DropdownImpl(
     id,
 
     chevron = true,
+
+    open,
+    defaultOpen,
     onOpenChange,
 
     visibleOptions = 6,
@@ -159,6 +166,7 @@ function DropdownImpl(
     onReady,
 
     returnFocusOnOptionPick = false,
+    autoFocusOption = true,
 
     ...rest
   }: DropdownPropsImpl,
@@ -169,7 +177,23 @@ function DropdownImpl(
   // ------------------------------------------------------------------
 
   const [options, setOptions] = useState<DropdownOptionData[]>([]);
-  const [opened, setOpened] = useState(false);
+
+  const isOpenControlled = open !== undefined;
+
+  const [internalOpened, setInternalOpened] = useState(defaultOpen ?? false);
+
+  const opened = isOpenControlled ? open : internalOpened;
+
+  const setOpened: React.Dispatch<React.SetStateAction<boolean>> = (value) => {
+    const nextValue = typeof value === 'function' ? value(opened) : value;
+
+    if (!isOpenControlled) {
+      setInternalOpened(nextValue);
+    }
+
+    onOpenChange?.(nextValue);
+  };
+
   const [isSearchable, setIsSearchable] = useState(false);
   const [search, setSearch] = useState('');
   const [isPanelHovered, setIsPanelHovered] = useState(false);
@@ -314,6 +338,7 @@ function DropdownImpl(
       setOpened,
       nullable,
       returnFocusOnOptionPick,
+      autoFocusOption,
       triggerRef,
       panelRef,
       isPanelHovered,
@@ -348,6 +373,7 @@ function DropdownImpl(
       opened,
       nullable,
       returnFocusOnOptionPick,
+      autoFocusOption,
       triggerRef,
       panelRef,
       isPanelHovered,
@@ -385,11 +411,13 @@ function DropdownImpl(
         {...rest}
         modal={modal}
         open={opened}
+        onOpenChange={setOpened}
+        // open={opened}
         hiddenStrategy="visibility"
-        onOpenChange={(state) => {
-          onOpenChange?.(state);
-          setOpened(state);
-        }}
+        // onOpenChange={(state) => {
+        //   onOpenChange?.(state);
+        //   setOpened(state);
+        // }}
         disabled={disabled}
         onUnmount={() => {
           if (search.length > 0) setSearch('');
@@ -426,6 +454,7 @@ Dropdown.displayName = 'Dropdown';
 type DropdownRenderContent = {
   selectedOption?: DropdownOptionData;
   selectedValue?: OptionValueImpl;
+  focusableList: FocusableListResult;
 };
 
 type DropdownTriggerProps = {
@@ -452,16 +481,17 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
       panelRef,
       runOnEntered,
       invokeOnly,
+      autoFocusOption,
     } = useDropdownContext();
 
     const mergedRef = mergeRefs(ref, triggerRef);
 
     const { focusFirst, focusLast, focusById, itemRefs, firstFocusableId } = focusableList;
 
-    const renderContent: DropdownRenderContent = { selectedOption, selectedValue };
+    const renderContent: DropdownRenderContent = { selectedOption, selectedValue, focusableList };
 
     useEffect(() => {
-      if (!opened) {
+      if (!opened || !autoFocusOption) {
         return;
       }
 
@@ -477,7 +507,16 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
           focusFirst();
         }
       });
-    }, [opened, selectedOption, focusById, focusFirst, isSearchable, searchInputRef, runOnEntered]);
+    }, [
+      opened,
+      selectedOption,
+      focusById,
+      focusFirst,
+      isSearchable,
+      searchInputRef,
+      runOnEntered,
+      autoFocusOption,
+    ]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
       const key = e.key;

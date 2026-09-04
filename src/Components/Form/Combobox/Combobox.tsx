@@ -62,8 +62,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     },
     ref,
   ) => {
-    const [open, setOpen] = useState(false);
-
+    const [opened, setOpened] = useState(true);
     const ctx = useFormFieldContext();
 
     const searchRef = useRef<HTMLInputElement>(null);
@@ -97,6 +96,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
     useEffect(() => {
       latestValueRef.current = value;
+      if (!opened) setOpened(true);
     }, [value]);
 
     useEffect(() => {
@@ -146,10 +146,17 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       props.onKeyDown?.(e);
     };
 
+    const isOpened = opened && filteredOptions.length > 0 && value.length > 0;
+
+    // console.log('value', value);
+    // console.log(23423423);
+
     return (
-      <Dropdown open={true} onOpenChange={setOpen}>
+      <Dropdown autoFocusOption={false} open={isOpened}>
         <Dropdown.Trigger
-          render={({ ref }) => {
+          render={({ ref, content }) => {
+            const { focusFirst } = content.focusableList;
+
             return (
               <TextInput
                 {...props}
@@ -161,7 +168,30 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                 start={finalSearchIcon}
                 end={(loading && finalLoadingSpinner) || undefined}
                 onValueChange={handleValueChange}
-                onKeyDown={handleKeyDown}
+                // onKeyDown={handleKeyDown}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setOpened(false);
+                  }
+
+                  if (e.key === 'Enter' && !loading) {
+                    if (debounce && timeoutRef.current) {
+                      clearTimeout(timeoutRef.current);
+                      timeoutRef.current = null;
+                    }
+                    onSearch?.(latestValueRef.current);
+                  }
+
+                  if (e.key === 'ArrowDown') {
+                    focusFirst(true);
+                    // requestAnimationFrame(() => {
+                    //   focusFirst();
+                    // });
+                  }
+
+                  props.onKeyDown?.(e);
+                }}
               />
             );
           }}
