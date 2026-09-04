@@ -83,6 +83,16 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     const value = isControlled ? (props.value as string) : innerValue;
     const latestValueRef = useRef(value);
 
+    const setValue = (v: string) => {
+      latestValueRef.current = v;
+
+      if (!isControlled) {
+        setInnerValue(v);
+      }
+
+      props.onValueChange?.(v);
+    };
+
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const filteredOptions = (options ?? []).filter((option) => {
@@ -94,10 +104,10 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       );
     });
 
-    useEffect(() => {
-      latestValueRef.current = value;
-      if (!opened) setOpened(true);
-    }, [value]);
+    // useEffect(() => {
+    //   latestValueRef.current = value;
+    //   if (!opened) setOpened(true);
+    // }, [value]);
 
     useEffect(() => {
       return () => {
@@ -108,13 +118,8 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     }, []);
 
     const handleValueChange = (v: string) => {
-      latestValueRef.current = v;
-
-      if (!isControlled) {
-        setInnerValue(v);
-      }
-
-      props.onValueChange?.(v);
+      setOpened(true);
+      setValue(v);
 
       if (!onSearch) return;
 
@@ -134,17 +139,17 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       }, debounce);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter' && !loading) {
-        if (debounce && timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
-        onSearch?.(latestValueRef.current);
-      }
-
-      props.onKeyDown?.(e);
-    };
+    // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    //   if (e.key === 'Enter' && !loading) {
+    //     if (debounce && timeoutRef.current) {
+    //       clearTimeout(timeoutRef.current);
+    //       timeoutRef.current = null;
+    //     }
+    //     onSearch?.(latestValueRef.current);
+    //   }
+    //
+    //   props.onKeyDown?.(e);
+    // };
 
     const isOpened = opened && filteredOptions.length > 0 && value.length > 0;
 
@@ -155,7 +160,12 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
         autoFocusOption={false}
         open={isOpened}
         onOpenChange={setOpened}
-        onValueChange={}
+        onValueChange={(v) => {
+          setOpened(false);
+          setValue(v);
+        }}
+        invokeOnly
+        returnFocusOnOptionPick
       >
         <Dropdown.Trigger
           render={({ ref, content }) => {
@@ -171,6 +181,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                 type={'search'}
                 start={finalSearchIcon}
                 end={(loading && finalLoadingSpinner) || undefined}
+                value={value}
                 onValueChange={handleValueChange}
                 // onKeyDown={handleKeyDown}
                 onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -201,7 +212,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
         <Dropdown.Content>
           <Dropdown.List>
             {filteredOptions.map((option) => (
-              <Dropdown.Option value={option.value} key={String(option.value)}>
+              <Dropdown.Option value={option.label} key={String(option.value)}>
                 {option.label}
               </Dropdown.Option>
               // <button
