@@ -4,24 +4,12 @@ import { useFormFieldContext } from '../FormField/FormField.context';
 import { Search as SearchIcon } from '../../Icon/Search';
 import { mergeRefs } from '../../../utils';
 import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
-import { Popover } from '../../Popover';
 import { Dropdown } from '../Dropdown';
 
 type ComboboxOption<T = string> = {
   value: T;
   label: string;
 };
-
-// type ComboboxProps = Omit<TextInputProps, 'type'> & {
-//   searchIcon?: React.ReactNode;
-//   clearIcon?: React.ReactNode;
-//
-//   onSearch?: (value: string) => void;
-//   debounce?: number; // ms
-//
-//   loading?: boolean;
-//   loadingIcon?: React.ReactNode;
-// };
 
 type ComboboxProps<T = string> = Omit<TextInputProps, 'type'> & {
   options?: ComboboxOption<T>[];
@@ -104,11 +92,6 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       );
     });
 
-    // useEffect(() => {
-    //   latestValueRef.current = value;
-    //   if (!opened) setOpened(true);
-    // }, [value]);
-
     useEffect(() => {
       return () => {
         if (timeoutRef.current) {
@@ -139,18 +122,6 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       }, debounce);
     };
 
-    // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    //   if (e.key === 'Enter' && !loading) {
-    //     if (debounce && timeoutRef.current) {
-    //       clearTimeout(timeoutRef.current);
-    //       timeoutRef.current = null;
-    //     }
-    //     onSearch?.(latestValueRef.current);
-    //   }
-    //
-    //   props.onKeyDown?.(e);
-    // };
-
     const isOpened = opened && filteredOptions.length > 0 && value.length > 0;
 
     return (
@@ -163,6 +134,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
         onValueChange={(v) => {
           setOpened(false);
           setValue(v);
+          onSearch?.(v);
         }}
         invokeOnly
         returnFocusOnOptionPick
@@ -200,7 +172,11 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
                   if (e.key === 'ArrowDown') {
                     e.preventDefault();
-                    focusFirst(true);
+                    if (!opened) {
+                      setOpened(true);
+                    } else {
+                      focusFirst(true);
+                    }
                   }
 
                   props.onKeyDown?.(e);
