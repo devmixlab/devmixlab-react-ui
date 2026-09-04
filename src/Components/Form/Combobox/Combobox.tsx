@@ -122,7 +122,12 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       }, debounce);
     };
 
-    const isOpened = opened && filteredOptions.length > 0 && value.length > 0;
+    const hasSingleExactMatch =
+      filteredOptions.length === 1 &&
+      filteredOptions[0].label.toLowerCase() === value.toLowerCase();
+
+    const isOpened =
+      opened && filteredOptions.length > 0 && value.length > 0 && !hasSingleExactMatch;
 
     return (
       <Dropdown
@@ -188,7 +193,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
         <Dropdown.Content>
           <Dropdown.List>
             {filteredOptions.map((option) => (
-              <Dropdown.Option value={option.label} key={String(option.value)}>
+              <Dropdown.Option value={String(option.label)} key={String(option.value)}>
                 {option.label}
               </Dropdown.Option>
               // <button
