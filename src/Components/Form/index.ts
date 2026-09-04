@@ -1,5 +1,6 @@
 export * from './TextInput';
 export * from './SearchInput';
+export * from './Combobox';
 export * from './PasswordInput';
 export * from './NumberInput';
 export * from './FormField';
