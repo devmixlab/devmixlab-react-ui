@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, useEffect } from 'react';
+import React, { forwardRef, useRef, useState, useEffect, useMemo } from 'react';
 import { TextInput, type TextInputProps } from '../TextInput';
 import { useFormFieldContext } from '../FormField/FormField.context';
 import { Search as SearchIcon } from '../../Icon/Search';
@@ -27,6 +27,8 @@ type ComboboxProps<T = string> = Omit<TextInputProps, 'type'> & {
   renderOption?: (option: ComboboxOption<T>) => React.ReactNode;
 
   emptyState?: React.ReactNode;
+
+  sortOptions?: (options: ComboboxOption<T>[], query: string) => ComboboxOption<T>[];
 };
 
 const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
@@ -36,6 +38,8 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       onOptionSelect,
       renderOption,
       emptyState,
+
+      sortOptions,
 
       searchIcon,
       clearIcon,
@@ -83,14 +87,27 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const filteredOptions = (options ?? []).filter((option) => {
-      const query = value.toLowerCase();
+    // const filteredOptions = (options ?? []).filter((option) => {
+    //   const query = value.toLowerCase();
+    //
+    //   return (
+    //     option.label.toLowerCase().includes(query) ||
+    //     String(option.value).toLowerCase().includes(query)
+    //   );
+    // });
 
-      return (
-        option.label.toLowerCase().includes(query) ||
-        String(option.value).toLowerCase().includes(query)
-      );
-    });
+    const filteredOptions = useMemo(() => {
+      const filtered = (options ?? []).filter((option) => {
+        const query = value.toLowerCase();
+
+        return (
+          option.label.toLowerCase().includes(query) ||
+          String(option.value).toLowerCase().includes(query)
+        );
+      });
+
+      return sortOptions ? sortOptions(filtered, value) : filtered;
+    }, [options, value, sortOptions]);
 
     useEffect(() => {
       return () => {
@@ -191,7 +208,10 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
           }}
         />
         <Dropdown.Content>
-          <Dropdown.List maxHeight={200}>
+          <Dropdown.List
+            // key={filteredOptions.map((o) => o.value).join('|')}
+            maxHeight={200}
+          >
             {filteredOptions.map((option) => (
               <Dropdown.Option value={String(option.label)} key={String(option.value)}>
                 {option.label}
