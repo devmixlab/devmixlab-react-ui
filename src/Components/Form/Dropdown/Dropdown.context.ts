@@ -19,6 +19,7 @@ type DropdownContextValue = {
   handleSelect: (nextValue: OptionValueImpl) => void;
 
   focusByTypeahead: (key: string) => void;
+  typeahead: boolean;
 
   isOptionShown: (option: DropdownOptionData) => boolean;
   isGroupShown: (group: GroupContextValue) => boolean;

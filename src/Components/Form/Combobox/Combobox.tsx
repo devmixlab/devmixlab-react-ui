@@ -5,6 +5,7 @@ import { Search as SearchIcon } from '../../Icon/Search';
 import { mergeRefs } from '../../../utils';
 import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
 import { Dropdown } from '../Dropdown';
+import { Text } from '../../Text';
 
 type ComboboxOption<T = string> = {
   value: T;
@@ -31,6 +32,7 @@ type ComboboxProps<T = string> = Omit<TextInputProps, 'type'> & {
   sortOptions?: (options: ComboboxOption<T>[], query: string) => ComboboxOption<T>[];
 
   minChars?: number;
+  showInfo?: boolean;
 };
 
 const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
@@ -43,6 +45,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
       sortOptions,
       minChars = 2,
+      showInfo = true,
 
       searchIcon,
       clearIcon,
@@ -196,6 +199,8 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
         }}
         invokeOnly
         returnFocusOnOptionPick
+        // visibleOptions={4}
+        typeahead={false}
       >
         <Dropdown.Trigger
           render={({ ref, content }) => {
@@ -244,13 +249,18 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
           }}
         />
         <Dropdown.Content>
+          {showInfo && (
+            <Text px={3} variant="body-sm" emphasis="muted">
+              {filteredOptions.length} of {options?.length ?? 0}
+            </Text>
+          )}
           <Dropdown.List
             key={
               value.trim().length >= minChars
                 ? filteredOptions.map((o) => o.value).join('|')
                 : undefined
             }
-            maxHeight={200}
+            // maxHeight={200}
           >
             {filteredOptions.map((option) => (
               <Dropdown.Option value={String(option.label)} key={String(option.value)}>

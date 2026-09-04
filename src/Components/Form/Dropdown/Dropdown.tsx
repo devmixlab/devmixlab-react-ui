@@ -70,6 +70,8 @@ export type DropdownPropsCommon = {
   // sets how many visible options available till scroll will be applied
   visibleOptions?: number;
 
+  typeahead?: boolean;
+
   placeholder?: React.ReactNode;
   invalid?: boolean;
   triggerRender?: (props: PopoverTriggerRenderProps) => React.ReactNode;
@@ -117,6 +119,7 @@ type DropdownComponent = (<T extends string | number = string>(
   FieldTrigger: typeof DropdownFieldTrigger;
   Content: typeof DropdownContent;
   Search: typeof DropdownSearch;
+  Status: typeof DropdownStatus;
   List: typeof DropdownList;
   Group: typeof DropdownGroup;
   Label: typeof DropdownLabel;
@@ -145,6 +148,7 @@ function DropdownImpl(
     onOpenChange,
 
     visibleOptions = 6,
+    typeahead = true,
 
     value,
     defaultValue,
@@ -349,6 +353,7 @@ function DropdownImpl(
       setIsPanelHovered,
       handleSelect,
       focusByTypeahead,
+      typeahead,
       isOptionShown,
       isGroupShown,
       disabled,
@@ -384,6 +389,7 @@ function DropdownImpl(
       isPanelHovered,
       handleSelect,
       focusByTypeahead,
+      typeahead,
       isOptionShown,
       isGroupShown,
       disabled,
@@ -480,6 +486,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
       opened,
       runAfterReady,
       focusByTypeahead,
+      typeahead,
       openOnArrowKeys,
       disabled,
       options,
@@ -527,7 +534,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
     const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
       const key = e.key;
 
-      if (key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (typeahead && key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         focusByTypeahead(key);
         return;
       }
@@ -841,6 +848,22 @@ DropdownSearch.displayName = 'DropdownSearch';
 Dropdown.Search = DropdownSearch;
 
 // ---------------------------------------------------------------------------
+// DropdownStatus
+// ---------------------------------------------------------------------------
+
+const DropdownStatus = () => {
+  const { filteredOptions, options } = useDropdownContext();
+
+  return (
+    <Text variant="body-sm" emphasis="muted" px="md" py="sm">
+      Showing {filteredOptions.length} of {options.length}
+    </Text>
+  );
+};
+
+Dropdown.Status = DropdownStatus;
+
+// ---------------------------------------------------------------------------
 // DropdownList
 // ---------------------------------------------------------------------------
 
@@ -988,6 +1011,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
       focusableList,
       handleSelect,
       focusByTypeahead,
+      typeahead,
       isSearchable,
       searchInputRef,
       setOpened,
@@ -1047,7 +1071,12 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
     const handleKeyDown = (e: React.KeyboardEvent) => {
       const key = e.key;
 
-      if (key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      // if (key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      //   focusByTypeahead(key);
+      //   return;
+      // }
+
+      if (typeahead && key.length === 1 && key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         focusByTypeahead(key);
         return;
       }
