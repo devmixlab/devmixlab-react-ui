@@ -263,7 +263,20 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             // maxHeight={200}
           >
             {filteredOptions.map((option) => (
-              <Dropdown.Option value={String(option.label)} key={String(option.value)}>
+              <Dropdown.Option
+                onKeyDown={(e) => {
+                  const isPrintable = e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+
+                  if (isPrintable) {
+                    e.preventDefault();
+                    searchRef.current?.focus();
+                    handleValueChange(e.key);
+                    return;
+                  }
+                }}
+                value={String(option.label)}
+                key={String(option.value)}
+              >
                 {option.label}
               </Dropdown.Option>
               // <button
