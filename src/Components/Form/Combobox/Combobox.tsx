@@ -29,6 +29,8 @@ type ComboboxProps<T = string> = Omit<TextInputProps, 'type'> & {
   emptyState?: React.ReactNode;
 
   sortOptions?: (options: ComboboxOption<T>[], query: string) => ComboboxOption<T>[];
+
+  minChars?: number;
 };
 
 const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
@@ -40,6 +42,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       emptyState,
 
       sortOptions,
+      minChars = 2,
 
       searchIcon,
       clearIcon,
@@ -96,17 +99,36 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     //   );
     // });
 
-    const filteredOptions = useMemo(() => {
-      const filtered = (options ?? []).filter((option) => {
-        const query = value.toLowerCase();
+    // const filteredOptions = useMemo(() => {
+    //   const filtered = (options ?? []).filter((option) => {
+    //     const query = value.toLowerCase();
+    //
+    //     return (
+    //       option.label.toLowerCase().includes(query) ||
+    //       String(option.value).toLowerCase().includes(query)
+    //     );
+    //   });
+    //
+    //   return sortOptions ? sortOptions(filtered, value) : filtered;
+    // }, [options, value, sortOptions]);
 
+    // const minChars = 2;
+
+    const filteredOptions = useMemo(() => {
+      const query = value.trim().toLowerCase();
+
+      if (query.length < minChars) {
+        return [];
+      }
+
+      const filtered = (options ?? []).filter((option) => {
         return (
           option.label.toLowerCase().includes(query) ||
           String(option.value).toLowerCase().includes(query)
         );
       });
 
-      return sortOptions ? sortOptions(filtered, value) : filtered;
+      return sortOptions ? sortOptions(filtered, query) : filtered;
     }, [options, value, sortOptions]);
 
     useEffect(() => {
@@ -143,8 +165,22 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       filteredOptions.length === 1 &&
       filteredOptions[0].label.toLowerCase() === value.toLowerCase();
 
+    // const minChars = 2;
+    //
+    // const isOpened =
+    //   opened &&
+    //   value.trim().length >= minChars &&
+    //   filteredOptions.length > 0 &&
+    //   !hasSingleExactMatch;
+
+    // const isOpened =
+    //   opened && filteredOptions.length > 0 && value.length > 0 && !hasSingleExactMatch;
+
     const isOpened =
-      opened && filteredOptions.length > 0 && value.length > 0 && !hasSingleExactMatch;
+      opened &&
+      value.trim().length >= minChars &&
+      filteredOptions.length > 0 &&
+      !hasSingleExactMatch;
 
     return (
       <Dropdown
@@ -209,7 +245,11 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
         />
         <Dropdown.Content>
           <Dropdown.List
-            // key={filteredOptions.map((o) => o.value).join('|')}
+            key={
+              value.trim().length >= minChars
+                ? filteredOptions.map((o) => o.value).join('|')
+                : undefined
+            }
             maxHeight={200}
           >
             {filteredOptions.map((option) => (
