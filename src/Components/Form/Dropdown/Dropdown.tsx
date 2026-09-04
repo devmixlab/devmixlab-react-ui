@@ -78,6 +78,8 @@ export type DropdownPropsCommon = {
   invokeOnly?: boolean;
   returnFocusOnOptionPick?: boolean;
   autoFocusOption?: boolean;
+
+  shouldUnregister?: boolean;
 } & PopoverProps &
   ComponentProps<'div'>;
 
@@ -167,6 +169,8 @@ function DropdownImpl(
 
     returnFocusOnOptionPick = false,
     autoFocusOption = true,
+
+    shouldUnregister = false,
 
     ...rest
   }: DropdownPropsImpl,
@@ -362,6 +366,7 @@ function DropdownImpl(
       filteredOptions,
       registerOption,
       unregisterOption,
+      shouldUnregister,
       runAfterReady,
       runOnEntered,
       stickyGroupLabels,
@@ -393,6 +398,7 @@ function DropdownImpl(
       filteredOptions,
       registerOption,
       unregisterOption,
+      shouldUnregister,
       runAfterReady,
       runOnEntered,
       stickyGroupLabels,
@@ -975,6 +981,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
 
     const {
       registerOption,
+      unregisterOption,
       disabled: ctxDisabled,
       nullable,
       selectedValue,
@@ -990,6 +997,7 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
       triggerRef,
       modal,
       invokeOnly,
+      shouldUnregister,
     } = useDropdownContext();
 
     const group = useGroupContext();
@@ -1029,7 +1037,12 @@ const DropdownOption = forwardRef<HTMLElement, DropdownOptionProps>(
       registerOption(option);
 
       // return () => unregisterOption(optionId);
-    }, [optionId, value, label, finalDisabled, children, group]);
+      return () => {
+        if (shouldUnregister) {
+          unregisterOption(optionId);
+        }
+      };
+    }, [optionId, value, label, finalDisabled, children, group, shouldUnregister]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
       const key = e.key;

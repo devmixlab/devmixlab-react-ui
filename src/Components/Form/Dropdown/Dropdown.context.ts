@@ -42,6 +42,7 @@ type DropdownContextValue = {
 
   registerOption: (option: DropdownOptionData) => void;
   unregisterOption: (id: string) => void;
+  shouldUnregister: boolean;
 
   runAfterReady: (callback: () => void) => void;
   runOnEntered: (callback: () => void) => void;

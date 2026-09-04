@@ -62,7 +62,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     },
     ref,
   ) => {
-    const [opened, setOpened] = useState(true);
+    const [opened, setOpened] = useState(false);
     const ctx = useFormFieldContext();
 
     const searchRef = useRef<HTMLInputElement>(null);
@@ -148,11 +148,15 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
     const isOpened = opened && filteredOptions.length > 0 && value.length > 0;
 
-    // console.log('value', value);
-    // console.log(23423423);
-
     return (
-      <Dropdown autoFocusOption={false} open={isOpened}>
+      <Dropdown
+        shouldUnregister
+        closeOnEscape
+        autoFocusOption={false}
+        open={isOpened}
+        onOpenChange={setOpened}
+        onValueChange={}
+      >
         <Dropdown.Trigger
           render={({ ref, content }) => {
             const { focusFirst } = content.focusableList;
@@ -184,10 +188,8 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                   }
 
                   if (e.key === 'ArrowDown') {
+                    e.preventDefault();
                     focusFirst(true);
-                    // requestAnimationFrame(() => {
-                    //   focusFirst();
-                    // });
                   }
 
                   props.onKeyDown?.(e);
