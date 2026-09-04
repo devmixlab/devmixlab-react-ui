@@ -191,7 +191,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
           }}
         />
         <Dropdown.Content>
-          <Dropdown.List>
+          <Dropdown.List maxHeight={200}>
             {filteredOptions.map((option) => (
               <Dropdown.Option value={String(option.label)} key={String(option.value)}>
                 {option.label}
@@ -218,4 +218,4 @@ Combobox.displayName = 'Combobox';
 
 export { Combobox };
 
-export type { ComboboxProps };
+export type { ComboboxProps, ComboboxOption };
