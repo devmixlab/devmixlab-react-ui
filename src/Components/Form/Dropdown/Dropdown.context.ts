@@ -8,6 +8,8 @@ type DropdownContextValue = {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 
+  visibleOptions: number;
+
   returnFocusOnOptionPick: boolean;
   autoFocusOption: boolean;
   triggerRef: React.RefObject<HTMLElement | null>;

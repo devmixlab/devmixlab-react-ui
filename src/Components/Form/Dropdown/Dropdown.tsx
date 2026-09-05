@@ -344,6 +344,7 @@ function DropdownImpl(
       modal,
       opened,
       setOpened,
+      visibleOptions,
       nullable,
       returnFocusOnOptionPick,
       autoFocusOption,
@@ -381,6 +382,7 @@ function DropdownImpl(
     [
       modal,
       opened,
+      visibleOptions,
       nullable,
       returnFocusOnOptionPick,
       autoFocusOption,
@@ -870,12 +872,24 @@ Dropdown.Status = DropdownStatus;
 type DropdownListProps = {
   children: React.ReactNode;
   className?: string;
-} & BoxProps;
+} & BoxProps &
+  ComponentProps<'div'>;
 
 const DropdownList = forwardRef<HTMLDivElement, DropdownListProps>(
   ({ children, className, ...rest }, ref) => {
+    const { visibleOptions } = useDropdownContext();
+
     return (
-      <Box tabIndex={-1} ref={ref} className={clsx(prefix('__list'), className)} {...rest}>
+      <Box
+        tabIndex={-1}
+        ref={ref}
+        className={clsx(prefix('__list'), className)}
+        style={{
+          ...rest.style,
+          ['--visible-options' as string]: visibleOptions,
+        }}
+        {...rest}
+      >
         {children}
       </Box>
     );
