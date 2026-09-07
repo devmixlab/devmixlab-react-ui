@@ -624,7 +624,10 @@ Dropdown.Trigger = DropdownTrigger;
 type DropdownFieldTriggerProps = DropdownTriggerProps & FieldLayoutProps & SharedFieldRootProps;
 
 const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
-  ({ controls, placeholder = 'Select option', children, chevron = 'none', ...rest }, ref) => {
+  (
+    { className, controls, placeholder = 'Select option', children, chevron = 'none', ...rest },
+    ref,
+  ) => {
     const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
 
     const ctx = useDropdownContext();
@@ -663,7 +666,7 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
           return (
             <FieldRoot
               invalid={isInvalid}
-              className={prefix('__trigger')}
+              className={clsx(prefix('__trigger'), className)}
               active={isActive}
               pseudoHovered={ctx.isPanelHovered}
               controls={
