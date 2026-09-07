@@ -378,6 +378,7 @@ function DropdownImpl(
       stickyGroupLabels,
       openOnArrowKeys,
       invokeOnly,
+      placeholder,
     }),
     [
       modal,
@@ -412,6 +413,7 @@ function DropdownImpl(
       stickyGroupLabels,
       openOnArrowKeys,
       invokeOnly,
+      placeholder,
     ],
   );
 
@@ -477,7 +479,7 @@ type DropdownTriggerProps = {
   PopoverTriggerProps<DropdownRenderContent>;
 
 const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
-  ({ children, placeholder = 'Select option', render, onKeyDown, ...rest }, ref) => {
+  ({ children, render, onKeyDown, ...rest }, ref) => {
     const {
       selectedOption,
       selectedValue,
@@ -497,6 +499,7 @@ const DropdownTrigger = forwardRef<HTMLElement, DropdownTriggerProps>(
       runOnEntered,
       invokeOnly,
       autoFocusOption,
+      placeholder,
     } = useDropdownContext();
 
     const mergedRef = mergeRefs(ref, triggerRef);
@@ -624,10 +627,7 @@ Dropdown.Trigger = DropdownTrigger;
 type DropdownFieldTriggerProps = DropdownTriggerProps & FieldLayoutProps & SharedFieldRootProps;
 
 const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
-  (
-    { className, controls, placeholder = 'Select option', children, chevron = 'none', ...rest },
-    ref,
-  ) => {
+  ({ className, controls, children, chevron = 'none', ...rest }, ref) => {
     const [fieldRootProps, controlProps] = splitProps(rest, fieldRootPropKeys);
 
     const ctx = useDropdownContext();
@@ -661,7 +661,11 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
 
           const isActive = !disabled ? opened || (ctx.modal && triggerActive) : undefined;
 
-          const triggerContent = ctx.invokeOnly ? children : (selectedOption?.children ?? children);
+          // const triggerContent = ctx.invokeOnly ? children : (selectedOption?.children ?? children);
+
+          const hasSelection = selectedValue != null;
+
+          const triggerContent = hasSelection ? (selectedOption?.children ?? children) : null;
 
           return (
             <FieldRoot
@@ -692,10 +696,9 @@ const DropdownFieldTrigger = forwardRef<HTMLElement, DropdownFieldTriggerProps>(
                 {...controlProps}
                 {...triggerProps}
               >
-                {/*{selectedOption ? selectedOption?.children : (children ?? 'Select ...')}*/}
                 {triggerContent ?? (
                   <Box as="span" opacity={0.8}>
-                    {placeholder}
+                    {ctx.placeholder}
                   </Box>
                 )}
               </Box>

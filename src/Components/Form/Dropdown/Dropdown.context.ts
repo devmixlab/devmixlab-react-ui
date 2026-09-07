@@ -56,6 +56,8 @@ type DropdownContextValue = {
   invokeOnly: boolean;
 
   nullable: boolean;
+
+  placeholder?: React.ReactNode;
 };
 
 const DropdownContext = createContext<DropdownContextValue | null>(null);
