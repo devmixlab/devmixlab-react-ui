@@ -6,19 +6,19 @@
 
 .#{$text-prefix} {
 
-    @each $variant, $value in $variants {
-        &[data-variant='#{$variant}'] {
-            --text-fs: #{map.get($value, fontSize)};
-            --text-fw: #{map.get($value, fontWeight)};
-            --text-lh: #{map.get($value, lineHeight)};
-            --text-ls: #{map.get($value, letterSpacing)};
-        }
-    }
-
-    font-size: var(--text-fs, inherit);
-    font-weight: var(--text-fw, inherit);
-    line-height: var(--text-lh, inherit);
-    letter-spacing: var(--text-ls, normal);
+    //@each $variant, $value in $variants {
+    //    &[data-variant='#{$variant}'] {
+    //        --text-fs: #{map.get($value, fontSize)};
+    //        --text-fw: #{map.get($value, fontWeight)};
+    //        --text-lh: #{map.get($value, lineHeight)};
+    //        --text-ls: #{map.get($value, letterSpacing)};
+    //    }
+    //}
+    //
+    //font-size: var(--text-fs, inherit);
+    //font-weight: var(--text-fw, inherit);
+    //line-height: var(--text-lh, inherit);
+    //letter-spacing: var(--text-ls, normal);
 
     color: var(--text-color-base, inherit);
     margin: 0;
