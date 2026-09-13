@@ -16,6 +16,7 @@ type ComboboxProps<T = string> = Omit<TextInputProps, 'type'> & {
   options?: ComboboxOption<T>[];
 
   searchable?: boolean;
+  showSearchIcon?: boolean;
 
   searchIcon?: React.ReactNode;
   clearIcon?: React.ReactNode;
@@ -42,6 +43,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     {
       options,
       searchable = true,
+      showSearchIcon = false,
 
       onOptionSelect,
       renderOption,
@@ -210,7 +212,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                 id={inputId}
                 ref={mergeRefs(ref, combinedRef)}
                 type={'search'}
-                start={finalSearchIcon}
+                start={showSearchIcon ? finalSearchIcon : undefined}
                 end={(loading && finalLoadingSpinner) || undefined}
                 value={value}
                 onValueChange={handleValueChange}
