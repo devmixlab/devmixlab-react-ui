@@ -6,6 +6,9 @@ import { mergeRefs } from '../../../utils';
 import { DefaultSpinner } from '../../Spinner/DefaultSpinner';
 
 type SearchInputProps = Omit<TextInputProps, 'type'> & {
+  showSearchIcon?: boolean;
+  maxSymbols?: number;
+
   searchIcon?: React.ReactNode;
   clearIcon?: React.ReactNode;
 
@@ -19,6 +22,8 @@ type SearchInputProps = Omit<TextInputProps, 'type'> & {
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   (
     {
+      showSearchIcon = false,
+      maxSymbols,
       searchIcon,
       clearIcon,
       onSearch,
@@ -107,12 +112,13 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     return (
       <TextInput
         {...props}
+        maxLength={maxSymbols}
         clearable={!loading && clearable}
         clearIcon={clearIcon}
         id={inputId}
         ref={combinedRef}
         type={'search'}
-        start={finalSearchIcon}
+        start={showSearchIcon ? finalSearchIcon : undefined}
         end={(loading && finalLoadingSpinner) || undefined}
         onValueChange={handleValueChange}
         onKeyDown={handleKeyDown}
