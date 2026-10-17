@@ -29,6 +29,7 @@ export * from './src/Components/Stepper';
 export * from './src/Components/Divider';
 export * from './src/Components/LoadingOverlay';
 export * from './src/Components/Tabs';
+export * from './src/Components/Table';
 
 export * from './src/Components/Transition';
 
