@@ -9,6 +9,7 @@ type SuggestionTagsInputProps<TTag extends TagsInputItem> = Omit<
   'onInputValueChange'
 > & {
   suggestions: TTag[];
+  onlySuggestionsValues?: boolean;
 
   minChars?: number;
   maxSuggestions?: number;
@@ -21,6 +22,7 @@ type SuggestionTagsInputProps<TTag extends TagsInputItem> = Omit<
 
 const SuggestionTagsInput = <TTag extends TagsInputItem>({
   suggestions,
+  onlySuggestionsValues = true,
 
   minChars = 1,
   maxSuggestions = 8,
@@ -31,17 +33,17 @@ const SuggestionTagsInput = <TTag extends TagsInputItem>({
   onInputValueChange,
 
   value,
- defaultValue = [],
- onValueChange,
- onTagAdd,
+  defaultValue = [],
+  onValueChange,
+  onTagAdd,
 
- fieldRootRef,
- disabled,
- readOnly,
- maxTags,
- unique,
+  fieldRootRef,
+  disabled,
+  readOnly,
+  maxTags,
+  unique,
 
- ...props
+  ...props
 }: SuggestionTagsInputProps<TTag>) => {
   const tagsInputRef = useRef<TagsInputRef>(null);
 
@@ -81,17 +83,7 @@ const SuggestionTagsInput = <TTag extends TagsInputItem>({
         );
       })
       .slice(0, maxSuggestions);
-  }, [
-    suggestions,
-    tags,
-    query,
-    minChars,
-    maxSuggestions,
-    disabled,
-    readOnly,
-    maxTags,
-    unique,
-  ]);
+  }, [suggestions, tags, query, minChars, maxSuggestions, disabled, readOnly, maxTags, unique]);
 
   const updateTags = (next: TTag[]) => {
     if (!isControlled) {
@@ -144,6 +136,7 @@ const SuggestionTagsInput = <TTag extends TagsInputItem>({
           return (
             <TagsInput<TTag>
               {...props}
+              // inputEnabled={!onlySuggestionsValues}
               ref={tagsInputRef}
               fieldRootRef={mergeRefs(ref, fieldRootRef)}
               value={tags}
@@ -172,17 +165,10 @@ const SuggestionTagsInput = <TTag extends TagsInputItem>({
           </Text>
         )}
 
-        <Dropdown.List
-          key={filteredSuggestions.map((tag) => String(tag.id)).join('|')}
-        >
+        <Dropdown.List key={filteredSuggestions.map((tag) => String(tag.id)).join('|')}>
           {filteredSuggestions.map((suggestion, index) => (
-            <Dropdown.Option
-              key={suggestion.id}
-              value={String(index)}
-            >
-              {renderSuggestion
-                ? renderSuggestion(suggestion)
-                : suggestion.label}
+            <Dropdown.Option key={suggestion.id} value={String(index)}>
+              {renderSuggestion ? renderSuggestion(suggestion) : suggestion.label}
             </Dropdown.Option>
           ))}
         </Dropdown.List>
