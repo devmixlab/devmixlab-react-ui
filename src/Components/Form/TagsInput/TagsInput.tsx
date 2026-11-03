@@ -22,6 +22,7 @@ import { Close } from '../../Icon/Close';
 import { IconWrapper } from '../../Icon';
 import { classPrefix } from '../../../utils/classPrefix';
 import { createPolymorphic } from '../../../types';
+import { normalizeTagValue as defaultNormalize } from './utils/normalizeTagValue';
 
 //--------------------------------------------------------
 // Types
@@ -117,7 +118,7 @@ const DEFAULT_SEPARATOR = /[,\n]/;
 // Helpers
 //--------------------------------------------------------
 
-const defaultNormalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' '); // collapse spaces only
+// const defaultNormalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' '); // collapse spaces only
 
 const normalizeTags = <TTag extends TagsInputItem>(tags: TTag[]): TTag[] =>
   tags.map((tag) => ({
