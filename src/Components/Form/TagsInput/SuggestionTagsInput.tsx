@@ -8,6 +8,7 @@ import {
 import { Dropdown } from '../Dropdown';
 import { Text } from '../../Text';
 import { mergeRefs } from '../../../utils';
+import { normalizeTagValue } from './utils'
 
 type SuggestionTagsInputProps<TTag extends TagsInputItem> = Omit<
   TagsInputProps<TTag>,
@@ -161,16 +162,18 @@ const SuggestionTagsInput = <TTag extends TagsInputItem>({
                 }
               }}
               onBeforeTagAdd={(tag) => {
-                if (!onlySuggestionsValues) return true;
+                if (!onlySuggestionsValues) return;
 
-                const exists = suggestions.some((suggestion) => suggestion.value === tag.value);
+                const suggestion = suggestions.find(
+                  (item) => normalizeTagValue(item.value) === normalizeTagValue(tag.value),
+                );
 
-                if (!exists) {
-                  onInvalidSuggestion?.(tag.value);
+                if (!suggestion) {
+                  onInvalidSuggestion?.(tag.label);
                   return false;
                 }
 
-                return true;
+                return suggestion;
               }}
             />
           );
