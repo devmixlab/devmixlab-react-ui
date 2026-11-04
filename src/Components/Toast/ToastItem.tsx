@@ -232,7 +232,7 @@ export const ToastItem = ({ toast }: ToastItemProps) => {
         className={prefix('__item')}
         intent={toast.intent ?? 'secondary'}
         variant={toast.variant ?? 'subtle'}
-        accent={toast.accent ?? 'left'}
+        accent={toast.accent}
         size={toast.size ?? 'md'}
         icon={toast.icon}
         role={toast.intent === 'danger' ? 'alert' : 'status'}
