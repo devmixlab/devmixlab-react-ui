@@ -1,5 +1,10 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { TagsInput, type TagsInputItem, type TagsInputProps, type TagsInputRef } from '../TagsInput';
+import {
+  TagsInput,
+  type TagsInputItem,
+  type TagsInputProps,
+  type TagsInputRef,
+} from '../TagsInput';
 import { Dropdown } from '../Dropdown';
 import { Text } from '../../Text';
 import { mergeRefs } from '../../../utils';
@@ -10,6 +15,7 @@ type SuggestionTagsInputProps<TTag extends TagsInputItem> = Omit<
 > & {
   suggestions: TTag[];
   onlySuggestionsValues?: boolean;
+  onInvalidSuggestion?: (value: string) => void;
 
   minChars?: number;
   maxSuggestions?: number;
@@ -22,7 +28,8 @@ type SuggestionTagsInputProps<TTag extends TagsInputItem> = Omit<
 
 const SuggestionTagsInput = <TTag extends TagsInputItem>({
   suggestions,
-  onlySuggestionsValues = true,
+  onlySuggestionsValues = false,
+  onInvalidSuggestion,
 
   minChars = 1,
   maxSuggestions = 8,
@@ -152,6 +159,18 @@ const SuggestionTagsInput = <TTag extends TagsInputItem>({
                   e.preventDefault();
                   focusFirst(true);
                 }
+              }}
+              onBeforeTagAdd={(tag) => {
+                if (!onlySuggestionsValues) return true;
+
+                const exists = suggestions.some((suggestion) => suggestion.value === tag.value);
+
+                if (!exists) {
+                  onInvalidSuggestion?.(tag.value);
+                  return false;
+                }
+
+                return true;
               }}
             />
           );

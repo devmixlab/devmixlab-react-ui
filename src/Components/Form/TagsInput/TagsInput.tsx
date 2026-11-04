@@ -90,6 +90,7 @@ type TagsInputProps<TTag extends TagsInputItem = TagsInputItem> = Omit<
   unique?: boolean;
   onDuplicate?: (tag: TTag, existing: TTag) => void;
 
+  onBeforeTagAdd?: (tag: TTag) => boolean | void;
   onTagAdd?: (tag: TTag) => void;
   onTagRemove?: (tag: TTag, index: number) => void;
   onTagRemoving?: (tag: TTag, index: number) => boolean | void | Promise<boolean | void>;
@@ -175,6 +176,7 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
     onDuplicate,
 
     removable = true,
+    onBeforeTagAdd,
     onTagAdd,
     onTagRemove,
     onTagRemoving,
@@ -515,6 +517,10 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
         onDuplicate?.(newTag, existing);
         return;
       }
+    }
+
+    if (onBeforeTagAdd?.(newTag) === false) {
+      return;
     }
 
     const next = [...tags, newTag];
@@ -1078,6 +1084,10 @@ const TagsInputImpl = <TTag extends TagsInputItem>(
           onDuplicate?.(newTag, existing);
           continue;
         }
+      }
+
+      if (onBeforeTagAdd?.(newTag) === false) {
+        continue;
       }
 
       next.push(newTag);
