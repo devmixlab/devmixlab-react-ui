@@ -12,6 +12,7 @@ type OwnButtonProps = {
   intent?: Intent;
   variant?: Variant;
   size?: Size;
+  fullWidth?: boolean;
   number?: number; // to format value as tabular-nums
   disabled?: boolean;
   active?: boolean; // selected / current (pagination, tabs)
@@ -59,6 +60,7 @@ const ButtonImpl = (
     intent = 'primary',
     variant = 'base',
     size = 'md',
+    fullWidth = false,
     number,
     disabled = false,
     active = false,
@@ -179,6 +181,7 @@ const ButtonImpl = (
       data-loading-position={showSpinner ? loadingPosition : undefined}
       data-bg-opacity={bgOpacity != null ? true : undefined}
       data-bg-blur={bgBlur != null ? true : undefined}
+      data-full-width={fullWidth || undefined}
     >
       {/* START ICON */}
       {startIcon &&

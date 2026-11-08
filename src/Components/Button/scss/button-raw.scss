@@ -211,6 +211,17 @@ $button-sizes: (
         color var(--button-transition),
         border-color var(--button-transition);
 
+    &[data-full-width] {
+        width: 100%;
+        justify-content: flex-start;
+
+        .#{$button-prefix}__content {
+            flex: 1;
+            min-width: 0;
+            text-align: left;
+        }
+    }
+
     &:not([data-disabled]) {
         &:hover {
             background-color: var(--button-bg-hover);
