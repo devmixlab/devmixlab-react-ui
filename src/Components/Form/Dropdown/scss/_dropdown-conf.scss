@@ -1,6 +1,7 @@
 @use '../../../../scss/config' as cfg;
 
 $p: cfg.$prefix;
+$popover-prefix: #{$p}--popover;
 $dropdown-prefix: #{$p}--dropdown;
 $content-prefix: #{$dropdown-prefix}__content;
 $trigger-prefix: #{$dropdown-prefix}__trigger;

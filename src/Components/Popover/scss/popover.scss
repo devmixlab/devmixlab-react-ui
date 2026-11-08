@@ -107,6 +107,8 @@
 
         &[data-match-trigger-width] {
             width: var(--popover-trigger-width);
+            min-width: var(--popover-trigger-width);
+            box-sizing: border-box;
         }
 
         &[data-variant='solid'] {

@@ -238,3 +238,16 @@
   }
 
 }
+
+// Constrain dropdowns displayed inside a trigger-width Popover.
+@at-root .#{$popover-prefix}__panel[data-match-trigger-width] {
+  &.#{$content-prefix} {
+    .#{$dropdown-prefix}__list {
+      min-width: 0;
+    }
+
+    .#{$dropdown-prefix}__option {
+      min-width: 0;
+    }
+  }
+}
