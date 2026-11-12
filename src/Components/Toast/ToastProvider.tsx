@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
-import { ToastContext, ToastRecord } from './Toast.context';
+import { ToastActionsContext, ToastStateContext, type ToastRecord } from './Toast.context';
 import { ToastViewport } from './ToastViewport';
 import { TransitionAttention } from '../Transition';
 import { AlertAccent, AlertIntent, AlertSize, AlertVariant } from '../Alert';
@@ -281,48 +281,44 @@ export const ToastProvider = ({
     [close, update],
   );
 
-  const value = useMemo(
+  const actionsValue = useMemo(
     () => ({
       remove,
-      position,
       update,
-      toasts,
       show,
-      close,
       requestClose,
+      close,
       clear,
-      isPaused,
       pauseAll,
       resumeAll,
+    }),
+    [remove, update, show, requestClose, close, clear, pauseAll, resumeAll],
+  );
+
+  const stateValue = useMemo(
+    () => ({
+      position,
+      toasts,
+      isPaused,
       minCloseInterval,
       toastControlRefs,
       closeQueueRef,
     }),
-    [
-      remove,
-      position,
-      update,
-      toasts,
-      show,
-      close,
-      requestClose,
-      clear,
-      isPaused,
-      pauseAll,
-      resumeAll,
-    ],
+    [position, toasts, isPaused, minCloseInterval],
   );
 
   return (
-    <ToastContext.Provider value={value}>
-      {children}
+    <ToastActionsContext.Provider value={actionsValue}>
+      <ToastStateContext.Provider value={stateValue}>
+        {children}
 
-      <ToastViewport
-        position={position}
-        offset={offset}
-        onMouseEnter={pauseAll}
-        onMouseLeave={resumeAll}
-      />
-    </ToastContext.Provider>
+        <ToastViewport
+          position={position}
+          offset={offset}
+          onMouseEnter={pauseAll}
+          onMouseLeave={resumeAll}
+        />
+      </ToastStateContext.Provider>
+    </ToastActionsContext.Provider>
   );
 };

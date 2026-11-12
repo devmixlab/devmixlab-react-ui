@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useLayoutEffect } from 'react';
-import { ToastRecord, useToastContext } from './Toast.context';
+import { ToastRecord, useToastActions, useToastState } from './Toast.context';
 import { classPrefix } from '../../utils/classPrefix';
 import { Alert } from '../Alert';
 import { TransitionAttention, TransitionControlRef, Transition } from '../Transition';
@@ -12,16 +12,9 @@ type ToastItemProps = {
 };
 
 export const ToastItem = ({ toast }: ToastItemProps) => {
-  const {
-    remove,
-    position,
-    update,
-    close,
-    requestClose,
-    isPaused,
-    toastControlRefs,
-    closeQueueRef,
-  } = useToastContext();
+  const { remove, update, close, requestClose } = useToastActions();
+
+  const { position, isPaused, toastControlRefs, closeQueueRef } = useToastState();
 
   const [wrapperIn, setWrapperIn] = React.useState(false);
   const [visible, setVisible] = React.useState(true);

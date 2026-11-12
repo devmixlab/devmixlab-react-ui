@@ -1,58 +1,56 @@
 import React from 'react';
-import { useToastContext } from './Toast.context';
+import { useToastActions } from './Toast.context';
 import { Button } from '../Button';
 import { Box } from '../Box';
 
 export const useToast = () => {
-    const context = useToastContext();
+  const context = useToastActions();
 
-    return {
-        ...context,
+  return {
+    ...context,
 
-        success: (title: React.ReactNode, description?: React.ReactNode) =>
-            context.show({
-                title,
-                description,
-                closable: true,
-                duration: null,
-                intent: 'success',
-                renderActions: ({ close }) => {
-                    return (
-                        <Box d="flex" grow={1} justify="end">
-                            <Button onClick={close} intent="success" size="sm" variant="ghost">
-                                Dismiss
-                            </Button>
-                        </Box>
-                    );
-                },
-            }),
+    success: (title: React.ReactNode, description?: React.ReactNode) =>
+      context.show({
+        title,
+        description,
+        closable: true,
+        duration: null,
+        intent: 'success',
+        renderActions: ({ close }) => (
+          <Box d="flex" grow={1} justify="end">
+            <Button onClick={close} intent="success" size="sm" variant="ghost">
+              Dismiss
+            </Button>
+          </Box>
+        ),
+      }),
 
-        primary: (title: React.ReactNode, description?: React.ReactNode) =>
-            context.show({
-                title,
-                description,
-                intent: 'primary',
-            }),
+    primary: (title: React.ReactNode, description?: React.ReactNode) =>
+      context.show({
+        title,
+        description,
+        intent: 'primary',
+      }),
 
-        error: (title: React.ReactNode, description?: React.ReactNode) =>
-            context.show({
-                title,
-                description,
-                intent: 'danger',
-            }),
+    error: (title: React.ReactNode, description?: React.ReactNode) =>
+      context.show({
+        title,
+        description,
+        intent: 'danger',
+      }),
 
-        warning: (title: React.ReactNode, description?: React.ReactNode) =>
-            context.show({
-                title,
-                description,
-                intent: 'warning',
-            }),
+    warning: (title: React.ReactNode, description?: React.ReactNode) =>
+      context.show({
+        title,
+        description,
+        intent: 'warning',
+      }),
 
-        info: (title: React.ReactNode, description?: React.ReactNode) =>
-            context.show({
-                title,
-                description,
-                intent: 'info',
-            }),
-    };
+    info: (title: React.ReactNode, description?: React.ReactNode) =>
+      context.show({
+        title,
+        description,
+        intent: 'info',
+      }),
+  };
 };
