@@ -1,19 +1,38 @@
 import type { TableHTMLAttributes } from 'react';
 import { Box } from '../Box';
+import { TableContext } from './contexts';
 
-type TableProps = TableHTMLAttributes<HTMLTableElement>;
+//--------------------------------
+// Types
+//--------------------------------
 
-export function Table({ className = '', ...props }: TableProps) {
+type TableProps = TableHTMLAttributes<HTMLTableElement> & {
+  spacingHeader?: number;
+  spacingBody?: number;
+};
+
+//--------------------------------
+// Table component
+//--------------------------------
+
+export function Table({
+  className = '',
+  spacingHeader = 0,
+  spacingBody = 0,
+  ...props
+}: TableProps) {
   return (
-    <Box w="full" overflowX="auto">
-      <Box
-        as="table"
-        w="full"
-        textAlign="left"
-        borderCollapse="collapse"
-        className={className}
-        {...props}
-      />
-    </Box>
+    <TableContext.Provider value={{ spacingHeader, spacingBody }}>
+      <Box w="full" overflowX="auto">
+        <Box
+          as="table"
+          w="full"
+          textAlign="left"
+          borderCollapse="collapse"
+          className={className}
+          {...props}
+        />
+      </Box>
+    </TableContext.Provider>
   );
 }
